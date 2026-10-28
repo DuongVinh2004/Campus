@@ -1,7 +1,7 @@
 ---
 name: settings-config
 description: Production-ready configuration management for Python backend projects using pydantic-settings. Use this skill when the user needs to add environment variable management, introduce pydantic-settings, replace scattered os.getenv usage, add a settings module, or set up .env support in a FastAPI service or Python backend.
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Skill: settings-config

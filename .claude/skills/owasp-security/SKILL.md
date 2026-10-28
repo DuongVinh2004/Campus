@@ -1,6 +1,6 @@
 ---
 name: owasp-security
-description: Reviews code for security vulnerabilities and guides secure implementation using OWASP Top 10:2025, ASVS 5.0, the OWASP Top 10 for LLM Applications (2026), and the OWASP Top 10 for Agentic Applications (2026). Use when reviewing code or a diff for security issues, implementing authentication, authorization, sessions, or cryptography, handling untrusted input, files, or URLs, hardening config, dependencies, or CI, or building LLM and AI agent features.
+description: Reviews code for security vulnerabilities and guides secure implementation using OWASP Top 10:2025, ASVS 5.0, the OWASP Top 10 for LLM Applications (2026), and the OWASP Top 10 for Agentic Applications (2026). Use only when the user asks for a security review or audit, or when implementing or changing authentication, authorization, sessions, or cryptography. Not for routine edits.
 when_to_use: Trigger phrases include "security review", "security check", "anything exploitable", "audit this", "is this secure", "is this safe to ship", "check for vulnerabilities", "find security bugs", "threat model", "OWASP", "ASVS", "CWE", "prompt injection", "MCP server security", "secrets in code", "supply chain", and "harden this Dockerfile or workflow".
 ---
 
