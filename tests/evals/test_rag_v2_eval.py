@@ -69,8 +69,11 @@ def test_known_a1_a3_a5_a6_arithmetic():
     assert m["A1"]["value"] == .5
     assert m["A3"]["value"] == 1
     assert m["A5"]["value"] == pytest.approx(2 / 3)
-    assert m["A6"]["value"] == pytest.approx(1 / 3)
-    assert m["A6"]["inconsistent_cases"] == ["c2", "n"]
+    assert m["A6"]["value"] is None  # Two repeats no longer measure the three-repeat criterion.
+    repeated = runner.score_records(rows + [row(repeat=3), row("c2", repeat=3),
+        row("n", repeat=3, outcome_class="refuse")], cases)["metrics"]["A6"]
+    assert repeated["value"] == pytest.approx(1 / 3)
+    assert repeated["inconsistent_cases"] == ["c2", "n"]
     assert m["A1"]["incorrect"][1]["forbidden_facts"] == ["999.000 đồng"]
     assert report["by_variant"]["keyword"]["A1"]["value"] == .5
     assert report["coverage"]["fewer_than_three_repeats"] == ["c1", "c2", "n"]
@@ -78,12 +81,13 @@ def test_known_a1_a3_a5_a6_arithmetic():
 
 def test_proxy_citations_vs_unresolved_chunk_and_no_samples():
     m = runner.score_records([row(citation_chunk_ids=[])], [case()])["metrics"]
-    assert m["A2"]["value"] == 0  # An unresolved citation still exists.
+    assert m["uncited_answer"]["value"] == 0  # An unresolved citation still exists.
+    assert m["A2"]["passed"] is None  # Source text could not be resolved.
     assert m["A5"]["value"] == 0
     assert m["A6"]["passed"] is None
     m = runner.score_records([row(citation_count=0, citation_chunk_ids=[])], [case()])["metrics"]
-    assert m["A2"]["value"] == 1
-    assert m["A2"]["cases"] == [{"case_id": "c1", "repeat": 1}]
+    assert m["uncited_answer"]["value"] == 1
+    assert m["uncited_answer"]["cases"] == [{"case_id": "c1", "repeat": 1}]
     assert runner.score_records([], [case()])["metrics"]["A7"]["passed"] is None
 
 
@@ -127,7 +131,7 @@ def test_split_filter_coverage_duplicates_unknown_cases():
     assert report["metrics"]["A1"]["value"] is None
     for rows in ([row(), row()], [row("unknown")]):
         with pytest.raises(ValueError):
-            runner.score_records(rows, cases)
+            runner.score_records(rows, cases, strict=True)
     with pytest.raises(ValueError):
         runner.score_records([], [case(), case()])
     report = runner.score_records([row(repeat=i) for i in range(1, 4)], [case()])
@@ -430,7 +434,8 @@ def test_score_compare_cli_json_and_tables(memory, monkeypatch, capsys):
     runner.write_json(memory("b.json"), {"records": [row()]})
     runner.main(["score", "--results", "a.json", "--results", "b.json", "--cases", "cases.jsonl"])
     report = json.loads(memory("a.json.score.json").read_text())
-    assert report["metrics"]["A6"]["value"] == 1
+    assert report["metrics"]["A6"]["value"] is None
+    assert "duplicate_repeat" in report["provenance"]["issues"]
     printed = capsys.readouterr().out
     assert "family: hoc_phi" in printed and "variant: form" in printed and "A9 | EXTERNAL" in printed
     runner.main(["compare", "--a", "a.json.score.json", "--b", "a.json.score.json", "--out", "compare.json"])

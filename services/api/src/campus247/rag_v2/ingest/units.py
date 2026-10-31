@@ -7,9 +7,12 @@ from dataclasses import replace
 from hashlib import sha256
 
 from campus247.rag_v2.types import Scope, Unit
+from campus247.rag_v2.ingest.tables import encode_inheritance, table_contexts
 
 CONTEXT_START = "⟦RAG_V2_CONTEXT⟧\n"
 SOURCE_SEPARATOR = "\n⟦RAG_V2_SOURCE⟧\n"
+SPLITTER_VERSION = "structural-spans-v2"
+SPAN = re.compile(r"⟦RAG_V2_SPAN:(\d+):(\d+)⟧")
 _ARTICLE = re.compile(r"^\s*Điều\s+(\d+)\s*[.:]?\s*", re.IGNORECASE)
 _CLAUSE = re.compile(r"^\s*(\d+)[.)]\s+")
 _POINT = re.compile(r"^\s*([a-zđ])[)]\s+", re.IGNORECASE)
@@ -76,6 +79,7 @@ def _segments(chunk: dict):
     current = None
     start = 0
     offset = 0
+    tables = table_contexts(text)
     for line in text.splitlines(keepends=True):
         stripped = line.strip()
         a, c, p = _ARTICLE.match(line), _CLAUSE.match(line), _POINT.match(line)
@@ -93,9 +97,11 @@ def _segments(chunk: dict):
         elif article_name and p:
             new = ("clause", " > ".join(filter(None, (article_name, clause, f"Điểm {p[1]}"))), article)
         elif "|" in line:
-            if re.search(r"STT|mã học phần|chương trình đào tạo", line, re.IGNORECASE) and not re.match(r"\s*\d", line):
-                header = stripped
-            new = ("table_row", f"{section} > Dòng {offset}", "\n".join(filter(None, (header, table_group))))
+            inherited = ""
+            if offset in tables:
+                header, values = tables[offset]
+                inherited = encode_inheritance(values)
+            new = ("table_row", f"{section} > Dòng {offset}", "\n".join(filter(None, (header, table_group, inherited))))
             row_context = stripped if re.search(r"phụ thu", line, re.IGNORECASE) else ""
         elif _SECTION.match(line):
             item_context = stripped
@@ -142,10 +148,15 @@ def build_units(chunks: Iterable[dict]) -> list[Unit]:
             path = f"{path} > tr.{page}" if page is not None else path
             # Bound context too; complete context is still available via doc_title/path.
             context = "\n".join(dict.fromkeys(s for s in (title, context) if s))[:500]
-            prefix = CONTEXT_START + context + SOURCE_SEPARATOR if context else ""
-            for relative, piece in _pieces(body, max(100, 1200 - len(prefix))):
+            # Reserve room for the explicit source span; never count context as
+            # source coverage or infer coverage for repeated occurrences.
+            prefix_size = (len(CONTEXT_START) + len(context) + 1 + len(SOURCE_SEPARATOR)
+                           + len(f"⟦RAG_V2_SPAN:{len(text)}:{len(text)}⟧"))
+            for relative, piece in _pieces(body, max(100, 1200 - prefix_size)):
                 if not piece.strip():
                     continue
+                span = f"⟦RAG_V2_SPAN:{start + relative}:{start + relative + len(piece)}⟧"
+                prefix = CONTEXT_START + context + "\n" + span + SOURCE_SEPARATOR
                 locator = f"{chunk['document_id']}|{page}|{path}|{start + relative}"
                 unit_id = sha256(f"{chunk['version_id']}|{locator}|{sha256(piece.encode()).hexdigest()}".encode()).hexdigest()[:16]
                 unit = Unit(unit_id, (str(chunk["chunk_id"]),), str(chunk["document_id"]),

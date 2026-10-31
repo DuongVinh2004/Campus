@@ -17,6 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "services/api/src"))
+sys.path.insert(0, str(ROOT))
 
 import httpx  # noqa: E402
 from campus247.rag_v2.adapters.http_reranker import HTTPReranker  # noqa: E402
@@ -53,13 +54,30 @@ async def main() -> None:
     parser.add_argument("--out", required=True)
     parser.add_argument("--no-rerank", action="store_true")
     parser.add_argument("--all-cases", action="store_true", help="include abstain/clarify cases (records top rerank score)")
+    parser.add_argument("--authorized", action="store_true")
+    parser.add_argument("--allowed", help="JSON array of simulated allowed unit IDs")
+    parser.add_argument("--corpus", default="evals/corpus/served-chunks.jsonl")
+    parser.add_argument("--embed-cache", help="Immutable JSONL query embedding cache; disables HTTP reranker")
     args = parser.parse_args()
-    index = MemoryIndex(ROOT / args.index, embed)
-    reranker = HTTPReranker(batch_size=10)
+    from evals.runners.rag_v2_context_probe import cached_embed, authorized_index, runtime_context
+    embedding = cached_embed([json.loads(l) for l in Path(args.embed_cache).read_text(encoding="utf-8").splitlines()
+                              if l.strip()]) if args.embed_cache else embed
+    index = MemoryIndex(ROOT / args.index, embedding)
+    if args.authorized:
+        if not args.allowed:
+            parser.error("--authorized requires --allowed")
+        chunks = {r["chunk_id"]: r for r in map(json.loads, Path(args.corpus).read_text(encoding="utf-8").splitlines())}
+        index = authorized_index(index, chunks, allowed=set(json.loads(Path(args.allowed).read_text(encoding="utf-8"))))
+    if args.embed_cache:
+        args.no_rerank = True
+    reranker = None if args.no_rerank else HTTPReranker(batch_size=10)
     cases = [json.loads(line) for line in (ROOT / args.cases).read_text(encoding="utf-8").splitlines()]
     cases = [c for c in cases if c["split"] == args.split and (args.all_cases or c["expected"] == "answer")][::args.stride]
     if args.limit:
         cases = cases[:args.limit]
+    if args.embed_cache:
+        for case in cases:
+            await embedding(analyze(case["question"], ()).search_query)
     unit_chunks = {uid: set(index.get(uid).chunk_ids) for uid in index.all_ids()}
     rows, summary = [], defaultdict(lambda: defaultdict(int))
     for case in cases:
@@ -71,7 +89,8 @@ async def main() -> None:
         summary[key]["n"] += 1
         if u.clarify_prompt or u.out_of_scope:
             summary[key]["early_exit"] += 1
-            rows.append({"case_id": case["case_id"], "early_exit": "clarify" if u.clarify_prompt else "oos"})
+            rows.append({"case_id": case["case_id"], "early_exit": "clarify" if u.clarify_prompt else "oos",
+                         "context_sha256": (await runtime_context(index, case["question"]))["context_sha256"]})
             continue
         fused = await retrieve(u, index, reranker, preselect=40, rerank_deadline_s=0, final_limit=40)
         order = [c.unit_id for c in fused.candidates]
@@ -102,9 +121,13 @@ async def main() -> None:
         rows.append({"case_id": case["case_id"], "expected": case["expected"], "variant": case["variant"],
                      "fused_rank": rank, "final_rank": final, "top_score": top if not args.no_rerank else None,
                      "gold_top_score": max(gold_scores) if not args.no_rerank and gold_scores else None,
-                     "fallback": res.fallback_used if not args.no_rerank else None})
-    out = {"summary": {f"{k[0]}|{k[1]}": dict(v) for k, v in summary.items()}, "rows": rows}
-    Path(args.out).write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+                     "fallback": res.fallback_used if not args.no_rerank else None,
+                     "context_sha256": (await runtime_context(index, case["question"]))["context_sha256"]})
+    out = {"summary": {f"{k[0]}|{k[1]}": dict(v) for k, v in summary.items()}, "rows": rows,
+           "authorized": args.authorized, "embedding_mode": "cache" if args.embed_cache else "http",
+           "rerank_mode": "disabled" if args.no_rerank else "http"}
+    from evals.runners.rag_v2_eval import writable_path, write_json
+    write_json(writable_path(args.out), out)
     totals = defaultdict(int)
     for v in summary.values():
         for k, n in v.items():

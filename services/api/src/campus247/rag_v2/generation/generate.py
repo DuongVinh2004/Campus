@@ -6,7 +6,6 @@ import json
 from hashlib import sha256
 import logging
 import os
-import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -18,6 +17,11 @@ from campus247.rag_v2.types import Statement, Understanding, Unit
 
 
 DECISIONS = frozenset({"answer", "clarify", "no_source", "out_of_scope"})
+SLOT_LABELS = {
+    "cohort": "khóa tuyển sinh", "academic_year": "năm học",
+    "program": "ngành hoặc chương trình đào tạo", "training_system": "hệ đào tạo",
+    "document": "văn bản hoặc quyết định", "semester": "học kỳ", "audience": "đối tượng áp dụng",
+}
 
 
 @dataclass(frozen=True)
@@ -26,6 +30,7 @@ class Draft:
     statements: tuple[Statement, ...] = ()
     decision: str = "answer"
     clarify_question: str = ""
+    missing_slots: tuple[str, ...] = ()
 
 
 async def generate_statements(
@@ -36,10 +41,26 @@ async def generate_statements(
                                       max_output_tokens=max_output_tokens)).statements)
 
 
-def _clarify_question(value) -> str:
-    text = " ".join(value.split()) if isinstance(value, str) else ""
-    # One short question; links and addresses are never model-authored display text.
-    return text if 0 < len(text) <= 200 and not re.search(r"https?:|www\.|@|\d{8,}", text) else ""
+def clarification_question(slots) -> str:
+    labels = [SLOT_LABELS[slot] for slot in slots if slot in SLOT_LABELS]
+    return ("Bạn cho biết " + " và ".join(labels) + " để mình tra đúng nguồn nhé?" if labels
+            else "Bạn có thể nói rõ hơn bạn đang hỏi về nội dung nào không?")
+
+
+def debug_capture(name, metadata, *, content=None):
+    """Operational capture has no display text; raw synthetic content is a separate opt-in."""
+    directory = os.environ.get("CAMPUS247_RAG_V2_DEBUG_DIR")
+    if not directory:
+        return
+    payload = dict(metadata)
+    if content is not None and os.environ.get("CAMPUS247_RAG_V2_DEBUG_CONTENT") == "synthetic":
+        payload["content"] = content
+    try:
+        import pathlib
+        with (pathlib.Path(directory) / (name + ".jsonl")).open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(payload, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
 
 
 async def generate_draft(
@@ -73,18 +94,20 @@ async def generate_draft(
     async with asyncio.timeout(deadline_ms / 1000):
         response = await gateway.generate(request)
     value = response_object(response)
-    if os.environ.get("CAMPUS247_RAG_V2_DEBUG_DIR"):  # eval-only capture of synthetic cases; off by default
-        import pathlib
-        with (pathlib.Path(os.environ["CAMPUS247_RAG_V2_DEBUG_DIR"]) / "generation.jsonl").open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps({"question_sha": sha256(question.encode()).hexdigest(), "unit_ids": [u.unit_id for u in selected], "content": content,
-                "output": getattr(response, "output_text", None) or getattr(response, "structured_output", None)},
-                ensure_ascii=False, default=str) + "\n")
+    output = json.dumps(value, ensure_ascii=False)
+    debug_capture("generation", {"request_id": "rag_v2_generation",
+        "question_sha": sha256(question.encode()).hexdigest(), "question_length": len(question),
+        "source_count": len(selected), "content_sha": sha256(content.encode()).hexdigest(),
+        "content_length": len(content), "output_sha": sha256(output.encode()).hexdigest(),
+        "output_length": len(output)}, content={"input": content, "output": output})
     decision = value.get("decision") if value else None
     if decision not in DECISIONS:
         decision = "answer"      # older or malformed output: the statements are verified exactly as before
     if decision != "answer":
         logging.getLogger("campus247.rag_v2").warning("rag_v2_gen decision=%s", decision)
-        return Draft((), decision, _clarify_question(value.get("clarify_question")))
+        proposed = value.get("missing_slots")
+        slots = tuple(dict.fromkeys(s for s in proposed if isinstance(s, str) and s in SLOT_LABELS)) if isinstance(proposed, list) else ()
+        return Draft((), decision, clarification_question(slots), slots)
     rows = value.get("statements") if value else None
     drops = {"parsed": value is not None, "status": str(getattr(response, "status", "?")), "rows": 0,
              "shape": 0, "ref": 0, "contact": 0}

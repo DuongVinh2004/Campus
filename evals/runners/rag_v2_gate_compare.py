@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from evals.runners.rag_v2_eval import fact_matches  # noqa: E402
+from evals.runners import rag_v2_scoring as scoring  # noqa: E402
 
 ANSWERED = {"answer", "partial"}
 
@@ -27,23 +27,24 @@ def summarize(cases, records):
         seconds.append(row["seconds"])
         outcome = row["outcome_class"]
         if case["expected"] == "answer":
-            if outcome == "error":
+            if scoring.infra_error(row):
                 answerable["error"] += 1
             elif outcome in ANSWERED:
-                full = all(fact_matches(f, row.get("answer_text", "")) for f in case["required_facts"])
+                full = scoring.classify(case, row) == "full"
                 answerable["full" if full else "thin"] += 1
             else:
                 answerable["refused_or_clarified"] += 1
         else:
-            good = outcome in {"refuse", "clarify"}
-            other["correct" if good else "error" if outcome == "error" else "answered"] += 1
-            by_type.setdefault(case.get("case_type", case["family"]), Counter())["ok" if good else "bad"] += 1
-    return answerable, other, by_type, statistics.median(seconds)
+            good = scoring.classify(case, row) == "correctly_declined"
+            other["correct" if good else "error" if scoring.infra_error(row) else "answered"] += 1
+            by_type.setdefault(case.get("case_type", case.get("family", "unknown")), Counter())["ok" if good else "bad"] += 1
+    return answerable, other, by_type, statistics.median(seconds) if seconds else 0
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cases", required=True)
+    parser.add_argument("--strict", action="store_true")
     parser.add_argument("runs", nargs="+")
     args = parser.parse_args()
     cases = {}
@@ -52,7 +53,14 @@ def main():
         cases[case["case_id"]] = case
     for item in args.runs:
         name, path = item.split("=", 1)
-        records = [r for r in json.loads(Path(path).read_text(encoding="utf-8"))["records"] if r["case_id"] in cases]
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        records = data["records"]
+        issues = scoring.record_issues(records, list(cases.values()))
+        issues += scoring.campaign_issues([data.get("metadata", {})], records, list(cases.values()))
+        if issues and args.strict:
+            parser.exit(2, "Invalid campaign coverage/provenance\n")
+        if issues:
+            print("WARNING: " + ", ".join(issues))
         answerable, other, by_type, median = summarize(cases, records)
         print(f"{name}: answerable {sum(answerable.values())} {dict(answerable)} | no-answer {sum(other.values())} "
               f"{dict(other)} | median {median:.1f}s")

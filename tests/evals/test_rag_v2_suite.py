@@ -143,7 +143,7 @@ def test_all_deterministic_assertions_and_route_observability():
     assert a["passed"] and a["route"] is None
     assert "route" in runner.assess(c, record(c, final(route="unsupported")))["failures"]
     c["expect"]["route_any"] = ["grounded_faq"]
-    assert "route" in runner.assess(c, record(c, final()))["failures"]
+    assert runner.assess(c, record(c, final()))["route_unmeasured"]
     assert runner.assess(c, record(c, final(route="grounded_faq")))["passed"]
 
 

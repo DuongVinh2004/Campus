@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from hashlib import sha256
 
 from campus247.rag_v2.ingest.units import context_text, source_text
+from campus247.rag_v2.ingest.tables import cells as table_cells, inherited_cells
 from campus247.rag_v2.types import Fact, Unit
 
 _MONEY = re.compile(r"(?<![\d.])\d{1,3}(?:[.,]\d{3})+(?![\d.])")
@@ -50,24 +51,30 @@ def extract_facts(units: Iterable[Unit]) -> list[Fact]:
             quote = line.strip()
             # Pipe tables have explicit headers. Never interpret arbitrary numbers
             # in fee waivers, percentages or curriculum credits as tuition amounts.
-            if unit.kind == "table_row" and "|" in line and re.search(r"học phí.*(?:tín chỉ|đvht)", context, re.IGNORECASE):
-                cells = [c.strip() for c in quote.split("|")]
-                headers = next((l for l in context.splitlines() if "|" in l and re.search(r"học phí", l, re.IGNORECASE)), "")
-                column_names = [c.strip() for c in headers.split("|")]
-                fee_columns = [i for i, c in enumerate(column_names) if re.search(r"học phí", c, re.IGNORECASE)]
-                if len(cells) == len(column_names) and len(fee_columns) == 1:
-                    i = fee_columns[0]
-                    if _MONEY.fullmatch(cells[i]):
-                        attrs = {"currency": "VND", "basis": "ĐVHT" if "ĐVHT" in quote else "tín chỉ",
+            if unit.kind == "table_row" and "|" in line:
+                cells = table_cells(quote)
+                headers = next((l for l in context.splitlines() if "|" in l and re.search(r"học phí|mức thu|đơn giá", l, re.IGNORECASE)), "")
+                column_names = table_cells(headers)
+                fee_columns = [i for i, c in enumerate(column_names) if re.search(r"học phí|mức thu|đơn giá", c, re.IGNORECASE)]
+                label_columns = [i for i, c in enumerate(column_names) if re.search(r"chương trình|ngành|tên", c, re.IGNORECASE)]
+                for i in fee_columns if len(cells) == len(column_names) and len(label_columns) == 1 else ():
+                    # A header may explicitly name both credit conventions;
+                    # preserve that full declaration rather than read the row.
+                    name = column_names[i].casefold()
+                    basis_value = ("ĐVHT" if "đvht" in name else "tín chỉ" if "tín chỉ" in name
+                                   else "năm" if re.search(r"(?:/|mỗi|theo|hàng)\s*năm\b", name) else "")
+                    inherited = inherited_cells(context)
+                    subject = cells[label_columns[0]] or inherited.get(str(label_columns[0]), "")
+                    if _MONEY.fullmatch(cells[i]) and basis_value and subject:
+                        attrs = {"currency": "VND", "basis": basis_value,
                                  "column_header": column_names[i], "row": quote}
                         for j, name in enumerate(column_names):
                             if j != i:
                                 attrs[name] = cells[j]
                         attrs["cohort_constraint"] = next((c for c in cells if re.search(r"\bK\d{2}\b", c)), "")
-                        subject = cells[1] if len(cells) > 1 else unit.doc_title
                         add("fee", subject, cells[i], quote, attrs)
             # Explicit monetary units only; preserve annual surcharges as annual.
-            if re.search(r"học phí|phụ thu", context + "\n" + quote, re.IGNORECASE):
+            if "|" not in line and re.search(r"học phí|phụ thu", context + "\n" + quote, re.IGNORECASE):
                 for m in _MONEY.finditer(quote):
                     suffix = quote[m.end():]
                     amount_unit = re.match(r"\s*(?:đồng|đ)\s*/\s*(năm|tín chỉ|ĐVHT)", suffix, re.IGNORECASE)

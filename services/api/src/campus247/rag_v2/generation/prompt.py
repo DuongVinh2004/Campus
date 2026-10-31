@@ -15,17 +15,19 @@ Chỉ trả danh sách rỗng khi không đoạn nào liên quan đến điều 
 Không có dữ kiện được hỗ trợ thì trả danh sách rỗng.
 Trường "decision" quyết định trước cách xử lý câu hỏi:
 - "answer": các đoạn nguồn trả lời được toàn bộ hoặc một phần câu hỏi; viết phát biểu như trên.
-- "clarify": câu hỏi thiếu đối tượng, văn bản, đợt, mức hoặc phạm vi nên nhiều câu trả lời khác nhau có thể đúng (chỉ nói "việc đó", "đợt nào", "mức nào", "kịp không" mà không nêu rõ cái gì); đặt "clarify_question" là MỘT câu hỏi ngắn, hỏi đúng thông tin còn thiếu.
+- "clarify": câu hỏi thiếu phạm vi nên nhiều câu trả lời khác nhau có thể đúng; chỉ trả "missing_slots" trong danh mục cohort, academic_year, program, training_system, document, semester, audience. Máy chủ dựng câu hỏi; không viết câu hỏi làm rõ tự do.
 - "no_source": câu hỏi nêu một tên riêng, chứng chỉ, khóa học, chương trình, mã, năm hay số liệu thống kê (tỷ lệ, điểm chuẩn, số lượng của trường) mà không đoạn nguồn nào nhắc tới. Quy định chung cùng chủ đề KHÔNG phải câu trả lời cho điều cụ thể đó.
 - "out_of_scope": câu hỏi không liên quan đến học vụ, dịch vụ sinh viên HUCE.
 Khi "decision" khác "answer" thì "statements" phải rỗng.
-Chỉ trả JSON {"decision":"answer","clarify_question":"","statements":[{"text":"...","unit_ids":["U1"]}]}.
+Chỉ trả JSON {"decision":"answer","missing_slots":[],"statements":[{"text":"...","unit_ids":["U1"]}]}.
 """
 
 STATEMENTS_SCHEMA = {
     "type": "object", "additionalProperties": False, "required": ["decision", "statements"],
     "properties": {"decision": {"type": "string", "enum": ["answer", "clarify", "no_source", "out_of_scope"]},
-                   "clarify_question": {"type": "string", "maxLength": 200},
+                   "missing_slots": {"type": "array", "maxItems": 7, "uniqueItems": True,
+                       "items": {"type": "string", "enum": ["cohort", "academic_year", "program",
+                           "training_system", "document", "semester", "audience"]}},
                    "statements": {"type": "array", "maxItems": 32, "items": {
         "type": "object", "additionalProperties": False, "required": ["text", "unit_ids"],
         "properties": {"text": {"type": "string"}, "unit_ids": {

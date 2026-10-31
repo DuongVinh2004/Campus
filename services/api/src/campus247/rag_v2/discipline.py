@@ -29,6 +29,32 @@ def _meaningful_words(sentence: str) -> list[str]:
             if w not in _CONNECTIVES and (len(w) >= 3 or w.isdigit())]
 
 
+def _named_subject(sentence, titles):
+    """An individual cannot become a generic rule by adding a conditional adjunct."""
+    runs, run = [], []
+    previous_end = 0
+    for match in re.finditer(r"\b[^\W\d_]+\b", sentence):
+        word = match.group()
+        if run and not sentence[previous_end:match.start()].isspace():
+            if len(run) >= 2:
+                runs.append(" ".join(run))
+            run = []
+        if word[0].isupper():
+            run.append(word)
+        else:
+            if len(run) >= 2:
+                runs.append(" ".join(run))
+            run = []
+        previous_end = match.end()
+    if len(run) >= 2:
+        runs.append(" ".join(run))
+    if any(name not in titles for name in runs):
+        return True
+    # Also recognize a one-word personal subject after the generic role.
+    subject = re.search(r"\b(?:sinh viên|bạn)\s+(\w+)\b", sentence, re.I)
+    return bool(subject and (subject[1][0].isupper() or any(c.isdigit() for c in subject[1])))
+
+
 def discipline_failure(outcome: Outcome, rows) -> str | None:
     """Why the exception does not apply, as a content-free code; None when it applies.
 
@@ -48,12 +74,16 @@ def discipline_failure(outcome: Outcome, rows) -> str | None:
         if not statement.unit_ids:
             return "no_unit"
         discipline_sentences = []
+        titles = "\n".join(str(rows.get(chunk, {}).get("title") or "")
+                           for c in outcome.citations if c.unit_id in statement.unit_ids for chunk in c.chunk_ids)
         # Check each sentence: a generic first sentence cannot license a later
         # personal accusation, even when both were quoted from a source.
         for sentence in re.split(r"(?<=[.!?;])\s+|\n+", statement.text):
             if not re.search(r"kỷ luật", sentence, re.I):
                 continue
             discipline_sentences.append(sentence)
+            if _named_subject(sentence, titles):
+                return "named_subject"
             text = " ".join(sentence.casefold().split())
             if re.search(r"\b(?:bạn|em|tôi|mình|anh|chị|ông|bà|mssv|mã sinh viên|tên|"
                          r"sinh viên này|sinh viên đó|sv\d+)\b", text):

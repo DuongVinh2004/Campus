@@ -385,7 +385,8 @@ async def test_model_decision_not_to_answer_becomes_a_typed_outcome_without_veri
     assert result.kind == kind and result.reason == reason and not result.statements and not result.citations
     assert [r.request_id for r in gateway.requests] == ["rag_v2_generation"]
     if kind == "clarify":
-        assert "Bạn hỏi đợt nào?" in result.text
+        # Model free text is never displayed; the server builds the question.
+        assert "Bạn hỏi đợt nào?" not in result.text and "Câu hỏi chưa đủ rõ" in result.text
 
 
 @pytest.mark.asyncio

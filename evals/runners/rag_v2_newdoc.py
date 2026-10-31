@@ -16,12 +16,14 @@ import json
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "services/api/src"))
 sys.path.insert(0, str(ROOT))
+from evals.runners import rag_v2_scoring as scoring
 
 DATASET = ROOT / "evals/datasets/rag-v2/newdoc"
 CORPUS_DIR = ROOT / "data/rag_v2_newdoc_corpus"
@@ -93,6 +95,7 @@ async def run(args) -> int:
     from campus247.rag_v2.adapters.runtime import AuthorizedIndex
     from campus247.rag_v2.service import RagV2Service
     from evals.runners.rag_v2_context_probe import embed
+    from evals.runners.rag_v2_eval import campaign_manifest, writable_path, write_json
 
     snapshot = read_index(Path(args.index))
     index = MemoryIndex.__new__(MemoryIndex)
@@ -110,34 +113,51 @@ async def run(args) -> int:
     gateway = create_llm_gateway(settings=get_settings())
     cases = [json.loads(line) for line in Path(args.cases).read_text(encoding="utf-8").splitlines() if line.strip()]
     records = []
+    manifest = campaign_manifest(cases, "in-process:RagV2Service", "v2")
     for case in cases:
+        started = time.perf_counter()
         outcome = await service.answer(case["question"], (), gateway=gateway, index=authorized, reranker=None,
                                        embed=embed)
         records.append({"case_id": case["case_id"], "kind": str(getattr(outcome.kind, "value", outcome.kind)),
+                        "repeat": 1, "attempt_index": 1, "seconds": time.perf_counter() - started,
                         "text": outcome.text, "cited_quotes": [c.quote for c in outcome.citations],
                         "statements": [s.text for s in outcome.statements]})
         print(case["case_id"], records[-1]["kind"], flush=True)
-    Path(args.out).write_text(json.dumps({"records": records}, ensure_ascii=False, indent=1), encoding="utf-8")
+    write_json(writable_path(args.out), {"metadata": manifest, "records": records, "journal": records})
     return 0
 
 
 def score(args) -> int:
-    from evals.runners.rag_v2_eval import fact_matches
-
-    cases = {c["case_id"]: c for c in map(json.loads, Path(args.cases).read_text(encoding="utf-8").splitlines()) if c}
+    case_list = [json.loads(line) for line in Path(args.cases).read_text(encoding="utf-8").splitlines() if line.strip()]
+    cases = {c["case_id"]: c for c in case_list}
     records = json.loads(Path(args.results).read_text(encoding="utf-8"))["records"]
+    repeats = getattr(args, "repeat", 1)
+    scoring.validate_records(records, case_list, repeats=repeats)
     full = thin = refused = wrong_ans = right_ref = errors = cited_ok = 0
+    normalized_records = []
     for record in records:
         case = cases[record["case_id"]]
-        answered = record["kind"] in {"answer", "partial"}
-        if record["kind"] in {"transient_error", "error"}:
+        normalized = record | {"outcome_class": record["kind"], "answer_text": record.get("text", ""),
+                               "repeat": record.get("repeat", 1),
+                               "final_event": record["kind"] not in {"transient_error", "error"},
+                               "citation_chunk_ids": record.get("citation_chunk_ids", []),
+                               "citation_count": sum(len(q.strip()) >= 20 for q in record.get("cited_quotes", [])),
+                               "cited_texts": [q for q in record.get("cited_quotes", []) if len(q.strip()) >= 20]}
+        if normalized["outcome_class"] == "transient_error":
+            normalized["outcome_class"] = "error"
+        normalized_records.append(normalized)
+        label = scoring.classify(case, normalized)
+        if label == "error":
             errors += 1
+            continue
+        answered = record["kind"] in scoring.ANSWERED
+        if answered:
+            cited_ok += any(scoring.quote_matches(case.get("quote", ""), q) for q in record.get("cited_quotes", []))
         if case["expected"] == "answer":
             if not answered:
                 refused += 1
-            elif all(fact_matches(f, record["text"]) for f in case["required_facts"]):
+            elif label == "full":
                 full += 1
-                cited_ok += any(case["quote"] and (q in case["quote"] or case["quote"] in q) for q in record["cited_quotes"])
             else:
                 thin += 1
         elif answered:
@@ -145,9 +165,12 @@ def score(args) -> int:
         else:
             right_ref += 1
     n_answer = sum(c["expected"] == "answer" for c in cases.values())
+    normalized_cases = {cid: c | {"gold": c.get("gold", [{"chunk_id": "unresolved-newdoc-gold", "quote": c.get("quote", "")}]),
+                                  "variant": c.get("variant", "form")} for cid, c in cases.items()}
     print(json.dumps({"answerable": n_answer, "full": full, "thin": thin, "refused": refused, "cited_quote_overlaps_gold": cited_ok,
                       "no_answer": len(cases) - n_answer, "correctly_declined": right_ref, "wrongly_answered": wrong_ans,
-                      "errors": errors}, ensure_ascii=False))
+                      "errors": errors, "metrics": scoring.metrics(normalized_records, normalized_cases),
+                      "limits": "Direct service path; SQL publication, routing, cross-user isolation and side effects are not measured"}, ensure_ascii=False))
     return 0
 
 
@@ -164,6 +187,7 @@ def main() -> int:
     s = sub.add_parser("score")
     s.add_argument("--results", required=True)
     s.add_argument("--cases", default=str(DATASET / "cases.jsonl"))
+    s.add_argument("--repeat", type=int, default=1)
     args = parser.parse_args()
     if args.command == "build":
         return build(args)

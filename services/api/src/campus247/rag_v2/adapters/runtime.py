@@ -12,6 +12,10 @@ class AuthorizedIndex:
         self.index, self.units = index, dict(units)
         self._rows, self._injection_check = rows or {}, injection_check
         self._chunk_units: dict[str, Unit | None] = {}
+        # A blocked/unreadable parent invalidates every dependent slice, including facts.
+        if rows is not None:
+            self.units = {uid: unit for uid, unit in self.units.items()
+                          if unit.chunk_ids and all(self.chunk_unit(chunk) is not None for chunk in unit.chunk_ids)}
 
     def get(self, unit_id):
         return self.units.get(unit_id)
@@ -29,7 +33,7 @@ class AuthorizedIndex:
             return self._chunk_units[chunk_id]
         row = self._rows.get(chunk_id)
         unit = None
-        if row is not None and row.get("content_text"):
+        if row is not None and isinstance(row.get("content_text"), str) and row["content_text"]:
             title = row.get("title") or ""
             path = row.get("section_path") or title
             if not (self._injection_check and self._injection_check(chunk_id, title + "\n" + str(path) + "\n" + row["content_text"])):

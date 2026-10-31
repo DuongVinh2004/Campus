@@ -21,7 +21,7 @@ from campus247.rag_v2.outcome.compose import RETRY_HINT, TRANSIENT_MESSAGE
 from campus247.rag_v2.retrieval.hybrid import rerank_excerpt
 from campus247.rag_v2.types import Outcome
 from campus247.rag_v2.understanding.normalize import fold
-from campus247.rag_v2.generation.rewrite import rewrite_question
+from campus247.rag_v2.generation.rewrite import ResolvedQuestion, rewrite_question
 from campus247.rag_v2.understanding.analyze import analyze
 
 
@@ -98,27 +98,37 @@ class RagV2Node:
             # A revocation between generation and verification stops the next
             # provider dispatch, rather than merely blocking the final answer.
             owner = self
+            resolved = ResolvedQuestion(state.request.query, state.request.query)
+
+            async def revalidate(chunks):
+                guard()
+                if owner.revalidate is not None:
+                    await owner.revalidate(resolved.resolved, context, chunks)
+                guard()
+
             class GuardedGateway:
                 async def generate(self, request):
                     guard()
+                    if request.request_id == "rag_v2_rewrite":
+                        await revalidate(())
                     return await owner.gateway.generate(request)
             guarded_gateway = GuardedGateway()
             guard()
             history = tuple(t.content for t in state.request.history.turns if t.role == "user") if state.request.history else ()
             async with asyncio.timeout(12):
-                query = state.request.query
                 if history:
                     # A follow-up ("nó bao nhiêu?", "à không, K67") is understood from the earlier user turns;
                     # on failure the original question and history go through the unchanged path.
-                    rewritten = await rewrite_question(guarded_gateway, query, history, deadline_ms=2500)
+                    rewritten = await rewrite_question(guarded_gateway, resolved.original, history, deadline_ms=2500)
                     if rewritten:
-                        query, history = rewritten, ()
-                understanding = analyze(query, history)
+                        resolved = ResolvedQuestion(resolved.original, rewritten)
+                        history = ()
+                understanding = analyze(resolved.resolved, history)
                 if understanding.clarify_prompt or understanding.out_of_scope:
-                    outcome = await self.service.answer(query, history, gateway=guarded_gateway,
-                        index=self.index, reranker=self.reranker, embed=self.embed)
+                    outcome = await self.service.answer(resolved.resolved, history, gateway=guarded_gateway,
+                        index=self.index, reranker=self.reranker, embed=self.embed, revalidate=revalidate)
                     return self.map_outcome(state, outcome, {})
-                rows = await self.authorize_sources(query, context)
+                rows = await self.authorize_sources(resolved.resolved, context)
                 t_auth = int((monotonic() - started) * 1000)
                 detector = PromptInjectionDetector()
                 units, drops = {}, {}
@@ -147,13 +157,12 @@ class RagV2Node:
                         ((f"{kind}:{reason}", count) for (kind, reason), count in drops.items()), key=lambda item: -item[1])[:8])
                 import logging
                 logging.getLogger("campus247.rag_v2").warning("rag_v2_node_stage auth_ms=%d units_ms=%d units=%d", t_auth, t_units, len(units))
-                outcome = await self.service.answer(query, history, gateway=guarded_gateway,
+                outcome = await self.service.answer(resolved.resolved, history, gateway=guarded_gateway,
                     index=AuthorizedIndex(self.index, units, rows=rows, injection_check=self._chunk_injection(detector)), reranker=self.reranker, embed=self.embed,
-                    deadline_s=12 - (monotonic() - started))
+                    deadline_s=12 - (monotonic() - started), revalidate=revalidate)
                 guard()  # Recheck after all model awaits.
                 cited_chunks = tuple(dict.fromkeys(chunk for c in outcome.citations for chunk in c.chunk_ids))
-                if self.revalidate is not None:
-                    await self.revalidate(state.request.query, context, cited_chunks)
+                await revalidate(cited_chunks)
                 mapped = self.map_outcome(state, outcome, rows)
                 if mapped.terminal == Terminal.ANSWERED:
                     discipline = re.search(r"kỷ luật", mapped.draft.text, re.IGNORECASE)
@@ -177,6 +186,7 @@ class RagV2Node:
                             mapped = replace(mapped, errors=mapped.errors + ("RAG_V2_DISCIPLINE_RULE_VERIFIED",))
                     if (discipline and not verified_rule) or guarded.terminal == Terminal.SAFE_FAILURE:
                         mapped = self.map_outcome(state, Outcome("refuse", GUARD_BLOCKED_MESSAGE, reason="unsafe"), {})
+                await revalidate(cited_chunks)
                 return mapped
         except Exception as exc:  # noqa: BLE001 -- never propagate denied source content or exception text
             import logging

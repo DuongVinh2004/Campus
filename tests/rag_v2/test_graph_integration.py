@@ -286,7 +286,8 @@ async def test_snapshot_load_uses_existing_embedding_adapter_without_http(monkey
     source = unit()
     snapshot = SimpleNamespace(units=(source,), facts=(Fact("f", "contact", "phòng đào tạo", "hồ sơ",
         source.unit_id, TEXT),), embeddings=np.array([[1.0, 0.0]], dtype=np.float32),
-        manifest={"embedding_status": "complete"})
+        manifest={"embedding_status": "complete", "embedding_model": "m", "embedding_revision": "r",
+                  "embedding_dimension": 2, "embedding_pooling": "cls", "normalization": "l2"})
     monkeypatch.setattr(rag_v2, "read_index", lambda directory: snapshot)
     calls = []
     async def embed(inputs):
@@ -294,7 +295,8 @@ async def test_snapshot_load_uses_existing_embedding_adapter_without_http(monkey
         return SimpleNamespace(vectors=[SimpleNamespace(values=[1.0, 0.0])])
     async def unused(*args):
         pytest.fail("source port must not be called during index initialization")
-    runtime = SimpleNamespace(embedding=SimpleNamespace(_embed=embed),
+    profile = SimpleNamespace(model_id="m", model_revision="r", dimension=2, pooling="cls", normalization="l2")
+    runtime = SimpleNamespace(embedding=SimpleNamespace(_embed=embed, profile=profile),
         rag_v2_sources=unused, rag_v2_revalidate=unused)
     settings = Settings(_env_file=None, rag_engine="v2", rag_v2_index_dir=Path(__file__).resolve().parent)
     node = rag_v2.load_rag_v2(settings, gateway=FakeGateway(), knowledge_runtime=runtime)

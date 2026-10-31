@@ -12,8 +12,10 @@ import hashlib
 import importlib.util
 import json
 import math
+import os
 import re
 import statistics
+import subprocess
 import threading
 import time
 import unicodedata
@@ -35,6 +37,14 @@ except ImportError:  # Direct script execution and file-based test imports.
     probe = importlib.util.module_from_spec(_spec)
     _spec.loader.exec_module(probe)
 
+try:
+    from . import rag_v2_scoring as scoring
+except ImportError:
+    _score_spec = importlib.util.spec_from_file_location(
+        "rag_v2_scoring", Path(__file__).with_name("rag_v2_scoring.py"))
+    scoring = importlib.util.module_from_spec(_score_spec)
+    _score_spec.loader.exec_module(scoring)
+
 ROOT = Path(__file__).resolve().parents[2]
 CASES = ROOT / "evals/datasets/rag-v2/cases.jsonl"
 CORPUS = ROOT / "evals/corpus/served-chunks.jsonl"
@@ -42,42 +52,9 @@ ANSWERED = {"answer", "partial"}
 VARIANT_LIMITS = {"form+no_diacritics": .92, "keyword": .85, "slang": .75}
 
 
-def normalize(text: str) -> str:
-    text = unicodedata.normalize("NFKD", text.casefold().replace("đ", "d"))
-    text = "".join(c for c in text if not unicodedata.combining(c))
-    # "181TC" and "181 tín chỉ" state the same credit count.
-    text = re.sub(r"(?<=\d)\s*tc\b", " tin chi", text)
-    # Only thousands groups collapse: dates and decimal 2.5 retain boundaries.
-    text = re.sub(r"(?<=\d)(?:[.,]|\s+)(?=\d{3}(?:\D|$))", "", text)
-    return " ".join(re.findall(r"[a-z0-9]+", text))
-
-
-_STOP = frozenset("la va cua cho co the duoc khong nhung thi ma o tai tu den khi neu da se hay hoac cac mot nhu".split())
-
-
-def fact_matches(fact: str, answer: str) -> bool:
-    """A required fact is satisfied when the answer states it, wording aside.
-
-    Exact phrase match first. Otherwise every number of the fact must appear in the answer (dates match
-    by their numbers: "13 tháng 01 năm 2026" = "13/01/2026") and at least 75% of its other content words
-    must appear. The same rule scores v1 and v2, so it never favours one engine.
-    """
-    needle, haystack = normalize(fact), normalize(answer)
-    if not needle:
-        return False
-    if f" {needle} " in f" {haystack} ":
-        return True
-    padded = f" {haystack} "
-    tokens = [t for t in needle.split() if t not in _STOP]
-    numbers = [t for t in tokens if t.isdigit()]
-    words = [t for t in tokens if not t.isdigit()]
-    if any(f" {t} " not in padded for t in numbers):
-        return False
-    if not words:
-        return bool(numbers)
-    # Stems tolerate inflection ("ứng" / "ứng với") at the cost of nothing: whole-word containment.
-    hits = sum(1 for t in words if f" {t} " in padded)
-    return hits / len(words) >= 0.75
+# Backward-compatible imports; all decisions live in the pure shared scorer.
+normalize = scoring.normalize
+fact_matches = scoring.fact_matches
 
 
 def outcome(final: dict | None) -> str:
@@ -220,6 +197,7 @@ def _frame(block: str) -> tuple[str, dict]:
 
 def stream_reply(client, path, question, limiter, started, record):
     for attempt in range(6):
+        record["http_attempts"] = attempt + 1
         limiter.wait()
         with client.stream("POST", path, json={"content": question}) as response:
             record["http_status"] = response.status_code
@@ -262,6 +240,7 @@ def run_case(client, case: dict, repeat: int, corpus: list[dict], limiter: RateL
              api_log: Path | None = None) -> dict:
     started = time.perf_counter()
     record = {"case_id": case["case_id"], "repeat": repeat, "outcome_class": "error",
+              "attempt_index": 1,
               "answer_text": "", "citation_chunk_ids": [], "citation_count": 0,
               "http_status": None, "error": None, "final_event": False,
               "first_byte_seconds": None, "first_content_seconds": None}
@@ -279,6 +258,10 @@ def run_case(client, case: dict, repeat: int, corpus: list[dict], limiter: RateL
                           answer_text=final.get("content", ""),
                           citation_chunk_ids=citation_ids(final, corpus),
                           citation_count=len(final.get("citations") or []))
+            texts = {c["chunk_id"]: c.get("text", c.get("content_text", "")) for c in corpus}
+            if all(uid in texts for uid in record["citation_chunk_ids"]) and (
+                    record["citation_chunk_ids"] or not record["citation_count"]):
+                record["cited_texts"] = [texts[uid] for uid in record["citation_chunk_ids"]]
             if record["outcome_class"] == "error":
                 record["error"] = "TerminalError"
         if api_log:
@@ -316,14 +299,32 @@ def fingerprint(cases):
     return hashlib.sha256(json.dumps(cases, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
-def prepare_run(path: Path, cases: list[dict], base_url: str, force=False) -> dict:
-    metadata = {"cases_sha256": fingerprint(cases), "base_url": base_url.rstrip("/")}
+def campaign_manifest(cases, base_url, engine):
+    def git(*args):
+        try:
+            return subprocess.check_output(["git", *args], cwd=ROOT, stderr=subprocess.DEVNULL,
+                                           text=True, timeout=5).strip()
+        except (OSError, subprocess.SubprocessError):
+            return None
+    # Only non-secret switches, validated against explicit values, enter evidence.
+    flags = {k: os.environ[k] for k in ("CAMPUS247_RAG_V2_ENABLED", "CAMPUS247_RAG_V2_DEBUG")
+             if os.environ.get(k) in {"0", "1", "true", "false"}}
+    if os.environ.get("CAMPUS247_RAG_ENGINE") in {"v1", "v2"}:
+        flags["CAMPUS247_RAG_ENGINE"] = os.environ["CAMPUS247_RAG_ENGINE"]
+    return {"cases_sha256": fingerprint(cases), "base_url": base_url.rstrip("/"), "engine": engine,
+            "git_commit": git("rev-parse", "HEAD"), "git_branch": git("branch", "--show-current"),
+            "started_at": datetime.now(UTC).isoformat(), "campaign_id": uuid.uuid4().hex,
+            "environment_flags": flags}
+
+
+def prepare_run(path: Path, cases: list[dict], base_url: str, force=False, *, engine="v2") -> dict:
+    identity = {"cases_sha256": fingerprint(cases), "base_url": base_url.rstrip("/"), "engine": engine}
     if path.exists():
         previous = json.loads(path.read_text(encoding="utf-8"))
         if previous.get("schema") != "rag-v2-run/1":
             raise ValueError("Existing output is not a runner checkpoint; choose a new path")
         if not force:
-            if previous.get("metadata") != metadata:
+            if any(previous.get("metadata", {}).get(k) != v for k, v in identity.items()):
                 raise ValueError("Resume dataset/base URL differs; choose a new output or --force")
             keys = [(row["case_id"], row["repeat"]) for row in previous["records"]]
             if len(keys) != len(set(keys)):
@@ -333,7 +334,8 @@ def prepare_run(path: Path, cases: list[dict], base_url: str, force=False) -> di
         # Preserve the exact old bytes before --force replaces any result.
         with backup.open("xb") as target:
             target.write(path.read_bytes())
-    result = {"schema": "rag-v2-run/1", "metadata": metadata, "records": []}
+    result = {"schema": "rag-v2-run/1", "metadata": campaign_manifest(cases, base_url, engine),
+              "records": [], "journal": []}
     write_json(path, result, replace=path.exists())
     return result
 
@@ -350,7 +352,7 @@ def run(args):
         raise ValueError("Empty selection or duplicate case IDs")
     corpus = read_jsonl(Path(args.corpus))
     path = writable_path(args.out)
-    result = prepare_run(path, cases, args.base_url, args.force)
+    result = prepare_run(path, cases, args.base_url, args.force, engine=args.engine)
     done = {(row["case_id"], row["repeat"]) for row in result["records"]}
     jobs = [(case, repeat) for repeat in range(1, args.repeat + 1) for case in cases
             if (case["case_id"], repeat) not in done]
@@ -373,6 +375,10 @@ def run(args):
             row = run_case(client, job[0], job[1], corpus, limiter,
                            Path(args.api_log) if args.api_log else None)
             with checkpoint_lock:
+                row.update({k: result["metadata"][k] for k in ("campaign_id", "engine", "cases_sha256")})
+                row["attempt_index"] = 1 + max((r.get("attempt_index", 1) for r in result.get("journal", [])
+                    if (r["case_id"], r["repeat"]) == (row["case_id"], row["repeat"])), default=0)
+                result.setdefault("journal", []).append(dict(row))
                 result["records"].append(row)
                 write_json(path, result, replace=True)
             return row
@@ -400,170 +406,73 @@ def run(args):
     print(f"Saved {len(result['records'])} attempts: {path}")
 
 
-def percentile(values, fraction=.95):
-    ordered = sorted(values)
-    return ordered[max(0, math.ceil(fraction * len(ordered)) - 1)] if ordered else None
-
-
-def ratio(numerator, denominator, threshold, *, maximum=False, strict=False):
-    value = numerator / denominator if denominator else None
-    passed = None if value is None else (
-        value < threshold if strict else value <= threshold if maximum else value >= threshold)
-    return {"numerator": numerator, "denominator": denominator, "value": value,
-            "threshold": threshold, "passed": passed}
-
-
-def infra_error(row):
-    return (row.get("outcome_class") == "error" or bool(row.get("error"))
-            or row.get("final_event") is not True or (row.get("http_status") or 200) >= 400)
-
-
-def error_label(case, row):
-    if infra_error(row):
-        return "INFRA"
-    kind = row["outcome_class"]
-    if case["expected"] == "answer" and kind == "refuse":
-        return "OVER_REFUSE"
-    if case["expected"] in {"abstain", "clarify"} and kind in ANSWERED:
-        return "OVER_ANSWER"
-    trace = row.get("trace") or {}
-    if trace.get("failure_layer") in {"CORPUS_MISSING", "INGEST", "RETRIEVAL", "RERANK", "GENERATION", "VERIFICATION"}:
-        return trace["failure_layer"]
-    if trace.get("in_pool") is False or trace.get("in_chosen") is False:
-        return "RETRIEVAL"
-    return "UNLABELED"
+percentile = scoring.percentile
+ratio = scoring.ratio
+infra_error = scoring.infra_error
+error_label = scoring.error_label
 
 
 _CHUNK_TEXT: dict[str, str] = {}
 
 
-def cites_gold(case, cited_ids) -> bool:
-    """A citation is correct when it is a gold chunk or another chunk that contains a gold quote verbatim.
-
-    The corpus holds the same table or notice in several chunks (per-semester and per-prerequisite views);
-    demanding the one chunk the case writer happened to pick scores a correct citation as wrong.
-    """
-    gold = {item["chunk_id"] for item in case.get("gold", [])}
-    if gold & set(cited_ids):
-        return True
+def corpus_texts():
     if not _CHUNK_TEXT and CORPUS.exists():
-        for line in CORPUS.read_text(encoding="utf-8").splitlines():
-            row = json.loads(line)
+        for row in read_jsonl(CORPUS):
             _CHUNK_TEXT[row["chunk_id"]] = " ".join(row.get("text", row.get("content_text", "")).split())
-    quotes = [" ".join(item["quote"].split()) for item in case.get("gold", []) if item.get("quote")]
-    return any(quote in _CHUNK_TEXT.get(chunk_id, "") for chunk_id in cited_ids for quote in quotes)
+    return _CHUNK_TEXT
+
+
+def cites_gold(case, cited_ids):
+    return scoring.cites_gold(case, cited_ids, corpus_texts())
 
 
 def metrics(rows, cases):
-    answers = [row for row in rows if cases[row["case_id"]]["expected"] == "answer"]
-    negative = [row for row in rows if cases[row["case_id"]]["expected"] in {"abstain", "clarify"}]
-    displayed = [row for row in rows if row["outcome_class"] in ANSWERED]
-    incorrect, unsourced, wrong_gold, failures = [], [], [], []
-    for row in rows:
-        case = cases[row["case_id"]]
-        text = row.get("answer_text", "")
-        answered = row["outcome_class"] in ANSWERED
-        missing = [fact for fact in case.get("required_facts", []) if not fact_matches(fact, text)]
-        forbidden = [fact for fact in case.get("forbidden_facts", []) if fact_matches(fact, text)]
-        reasons = []
-        key = {"case_id": row["case_id"], "repeat": row.get("repeat", 1)}
-        if case["expected"] == "answer" and answered and (missing or forbidden):
-            incorrect.append(key | {"missing_facts": missing, "forbidden_facts": forbidden})
-            reasons.append("A1")
-        if answered and not row.get("citation_count", len(row.get("citation_chunk_ids", []))):
-            unsourced.append(key)
-            reasons.append("A2")
-        if answered and not cites_gold(case, row.get("citation_chunk_ids", [])):
-            wrong_gold.append(key)
-            reasons.append("A5")
-        if case["expected"] != "answer" and row["outcome_class"] not in {"refuse", "clarify"}:
-            reasons.append("A3")
-        if case["expected"] == "answer" and not answered:
-            reasons.append("A4")
-        if infra_error(row):
-            reasons.append("A7")
-        if reasons:
-            failures.append(key | {"criteria": reasons, "label": error_label(case, row)})
-    grouped = defaultdict(list)
-    for row in rows:
-        grouped[row["case_id"]].append(row["outcome_class"])
-    repeated = {key: values for key, values in grouped.items() if len(values) >= 2}
-    inconsistent = [key for key, values in repeated.items() if len(set(values)) != 1]
-    # A6 failures also receive exactly one case label if not already attributed.
-    for case_id in inconsistent:
-        if not any(failure["case_id"] == case_id for failure in failures):
-            failures.append({"case_id": case_id, "repeat": None, "criteria": ["A6"], "label": "UNLABELED"})
-    variants = {}
-    for variant, threshold in VARIANT_LIMITS.items():
-        names = variant.split("+")
-        subset = [row for row in answers if cases[row["case_id"]]["variant"] in names]
-        variants[variant] = ratio(sum(row["outcome_class"] in ANSWERED for row in subset), len(subset), threshold)
-    seconds = [row["seconds"] for row in rows if isinstance(row.get("seconds"), (int, float))]
-    first_bytes = [row["first_byte_seconds"] for row in rows if row.get("first_byte_seconds") is not None]
-    first_content = [row["first_content_seconds"] for row in rows if row.get("first_content_seconds") is not None]
-    timing = {"median_seconds": statistics.median(seconds) if seconds else None,
-              "p95_seconds": percentile(seconds),
-              "first_byte_median_seconds": statistics.median(first_bytes) if first_bytes else None,
-              "first_byte_p95_seconds": percentile(first_bytes),
-              "first_content_median_seconds": statistics.median(first_content) if first_content else None,
-              "first_content_p95_seconds": percentile(first_content),
-              "thresholds_seconds": {"median": 6, "p95": 12, "first_byte_median": 2},
-              "samples": len(seconds), "first_byte_samples": len(first_bytes)}
-    timing["passed"] = (timing["median_seconds"] <= 6 and timing["p95_seconds"] <= 12
-                        and timing["first_byte_median_seconds"] <= 2) if (
-                            rows and len(seconds) == len(rows) and len(first_bytes) == len(rows)) else None
-    variant_passes = [value["passed"] for value in variants.values()]
-    return {
-        "A1": ratio(len(incorrect), len(answers), .02, maximum=True) | {"incorrect": incorrect},
-        "A2": {"value": len(unsourced), "threshold": 0, "passed": not unsourced if displayed else None,
-               "proxy": "Displayed answer/partial with zero citations; not claim-level verification", "cases": unsourced},
-        "A3": ratio(sum(row["outcome_class"] in {"refuse", "clarify"} for row in negative), len(negative), .98),
-        "A4": {"by_variant": variants, "passed": False if False in variant_passes else
-               None if None in variant_passes else True},
-        "A5": ratio(len(displayed) - len(wrong_gold), len(displayed), .95) | {"misses": wrong_gold},
-        "A6": ratio(len(repeated) - len(inconsistent), len(repeated), .95) | {"inconsistent_cases": inconsistent},
-        "A7": ratio(sum(infra_error(row) for row in rows), len(rows), .01, maximum=True, strict=True),
-        "A8": timing,
-        "A9": {"passed": None, "status": "EXTERNAL", "reason": "Separate safety/routing/tool campaign required"},
-        "failures": failures,
-    }
+    return scoring.metrics(rows, cases, corpus_texts())
 
 
-def score_records(records, cases, split="holdout"):
-    selected = {case["case_id"]: case for case in cases if split == "all" or case["split"] == split}
-    if not selected:
-        raise ValueError("No cases in selected split")
-    if len({case["case_id"] for case in cases}) != len(cases):
-        raise ValueError("Duplicate case IDs")
-    unknown = {row["case_id"] for row in records} - {case["case_id"] for case in cases}
-    if unknown:
+def score_records(records, cases, split="holdout", *, strict=False, manifests=(), journal=(), chunk_text=None):
+    selected = {c["case_id"]: c for c in cases if split == "all" or c["split"] == split}
+    if not selected or len({c["case_id"] for c in cases}) != len(cases):
+        raise ValueError("Empty selection or duplicate case IDs")
+    if {r["case_id"] for r in records} - {c["case_id"] for c in cases}:
         raise ValueError("Results contain unknown case IDs")
-    rows = [row for row in records if row["case_id"] in selected]
+    rows = [r for r in records if r["case_id"] in selected]
     seen = set()
-    for row in rows:
-        key = (row.get("source_run"), row["case_id"], row.get("repeat", 1))
-        if key in seen:
-            raise ValueError("Duplicate attempt within a result source")
+    for r in rows:
+        key = (r.get("source_run"), r["case_id"], r.get("repeat", 1))
         seen.add(key)
-        if row.get("outcome_class") not in ANSWERED | {"refuse", "clarify", "error"}:
+        if r.get("outcome_class") not in ANSWERED | {"refuse", "clarify", "error"}:
             raise ValueError("Invalid outcome_class")
-    report = {"schema": "rag-v2-score/1", "split": split, "metrics": metrics(rows, selected),
-              "by_family": {}, "by_variant": {}, "case_outcomes": {}}
+    issues = scoring.record_issues(rows, list(selected.values()))
+    issues += scoring.campaign_issues(manifests, rows, list(selected.values()))
+    if strict and issues:
+        raise ValueError("Invalid campaign coverage/provenance")
+    texts = corpus_texts() if chunk_text is None else chunk_text
+    report = {"schema": "rag-v2-score/1", "split": split,
+              "metrics": scoring.metrics(rows, selected, texts),
+              "by_family": {}, "by_variant": {}, "case_outcomes": {},
+              "provenance": {"issues": sorted(set(issues)), "manifests": list(manifests),
+                             "cases_sha256": fingerprint(list(selected.values()))},
+              "attempt_metrics": scoring.attempt_metrics(rows, [r for r in journal if r["case_id"] in selected])}
     for field in ("family", "variant"):
-        for value in sorted({case[field] for case in selected.values()}):
-            subset = [row for row in rows if selected[row["case_id"]][field] == value]
-            report["by_" + field][value] = metrics(subset, selected)
-    for case_id in sorted(selected):
-        report["case_outcomes"][case_id] = [{"repeat": row.get("repeat", 1), "outcome_class": row["outcome_class"],
-                                            "result_sha256": fingerprint({key: row.get(key) for key in (
-                                                "outcome_class", "answer_text", "citation_chunk_ids", "error")})}
-                                            for row in sorted(rows, key=lambda row: row.get("repeat", 1))
-                                            if row["case_id"] == case_id]
-    counts = {key: len(value) for key, value in report["case_outcomes"].items()}
+        for value in sorted({c[field] for c in selected.values()}):
+            subset = [r for r in rows if selected[r["case_id"]][field] == value]
+            report["by_" + field][value] = scoring.metrics(subset, selected, texts, confidence=False)
+    for cid in sorted(selected):
+        report["case_outcomes"][cid] = [
+            {"repeat": r.get("repeat", 1), "outcome_class": r["outcome_class"],
+             "result_sha256": fingerprint({k: r.get(k) for k in (
+                 "outcome_class", "answer_text", "citation_chunk_ids", "error")})}
+            for r in sorted(rows, key=lambda r: r.get("repeat", 1)) if r["case_id"] == cid]
+    counts = {cid: [r["repeat"] for r in rs] for cid, rs in report["case_outcomes"].items()}
+    incomplete = [cid for cid, indices in counts.items() if len(indices) != len(set(indices))
+                  or not {1, 2, 3} <= set(indices)]
     report["coverage"] = {"selected_cases": len(selected), "attempts": len(rows),
-                          "missing_cases": [key for key, count in counts.items() if count == 0],
-                          "fewer_than_three_repeats": [key for key, count in counts.items() if count < 3],
-                          "holdout_three_repeats_complete": split == "holdout" and all(count >= 3 for count in counts.values())}
+        "missing_cases": [cid for cid, indices in counts.items() if not indices],
+        "fewer_than_three_repeats": incomplete,
+        "holdout_three_repeats_complete": split == "holdout" and not incomplete,
+        "issues": scoring.record_issues(rows, list(selected.values()))}
+    report["distribution"] = {"issues": scoring.distribution_issues(list(selected.values()))}
     return report
 
 
@@ -583,21 +492,39 @@ def show_metrics(title, values):
         print(f"{criterion} | {status(metric)} | {json.dumps(detail, ensure_ascii=False)}")
 
 
-def load_report(path, cases, split):
+def load_report(path, cases, split, *, strict=False):
     data = json.loads(Path(path).read_text(encoding="utf-8"))
-    return data if data.get("schema") == "rag-v2-score/1" else score_records(data["records"], cases, split)
+    if data.get("schema") == "rag-v2-score/1":
+        if strict and (not data.get("provenance") or data["provenance"].get("issues")):
+            raise ValueError("Scored report lacks valid campaign provenance")
+        return data
+    return score_records(data["records"], cases, split, strict=strict,
+                         manifests=[data.get("metadata", {})], journal=data.get("journal", []))
 
 
-def compare_reports(a, b):
+def compare_reports(a, b, *, strict=False):
     if a["split"] != b["split"]:
         raise ValueError("Cannot compare different splits")
+    issues = []
+    if set(a["case_outcomes"]) != set(b["case_outcomes"]):
+        issues.append("different_case_set")
+    pa, pb = a.get("provenance", {}), b.get("provenance", {})
+    if not pa or not pb or pa.get("issues") or pb.get("issues"):
+        issues.append("invalid_campaign")
+    ma, mb = pa.get("manifests", []), pb.get("manifests", [])
+    issues += scoring.campaign_issues(ma + mb)
+    if pa.get("cases_sha256") != pb.get("cases_sha256"):
+        issues.append("different_cases_sha256")
+    # Exploratory cross-engine/campaign comparison remains available without --strict.
+    if strict and issues:
+        raise ValueError("Cannot compare incomplete or incompatible campaigns")
     changed = []
-    for case_id in sorted(set(a["case_outcomes"]) | set(b["case_outcomes"])):
-        left, right = a["case_outcomes"].get(case_id, []), b["case_outcomes"].get(case_id, [])
+    for cid in sorted(set(a["case_outcomes"]) | set(b["case_outcomes"])):
+        left, right = a["case_outcomes"].get(cid, []), b["case_outcomes"].get(cid, [])
         if left != right:
-            changed.append({"case_id": case_id, "a": left, "b": right})
-    return {"criteria": {f"A{i}": {"a": a["metrics"][f"A{i}"], "b": b["metrics"][f"A{i}"]} for i in range(1, 10)},
-            "changed_cases": changed}
+            changed.append({"case_id": cid, "a": left, "b": right})
+    return {"criteria": {f"A{i}": {"a": a["metrics"][f"A{i}"], "b": b["metrics"][f"A{i}"]}
+                         for i in range(1, 10)}, "changed_cases": changed, "warnings": issues}
 
 
 def positive(value):
@@ -612,6 +539,8 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     live = sub.add_parser("run", help="Explicit live local run; spends configured provider budget")
     live.add_argument("--base-url", default="http://127.0.0.1:8015")
+    live.add_argument("--engine", choices=("v1", "v2"), default="v2",
+                      help="Declared engine served by this endpoint; persisted in campaign manifest")
     live.add_argument("--split", choices=("dev", "holdout", "all"), default="dev")
     live.add_argument("--repeat", type=positive, default=3)
     live.add_argument("--out", required=True)
@@ -623,25 +552,31 @@ def main(argv=None):
     live.add_argument("--corpus", default=str(CORPUS))
     live.add_argument("--api-log", help="Optional log; only conversation-correlated lines are attributed")
     live.add_argument("--force", action="store_true", help="Restart, retaining the previous JSON in a unique backup")
-    scoring = sub.add_parser("score")
-    scoring.add_argument("--results", action="append", required=True)
-    scoring.add_argument("--cases", required=True)
-    scoring.add_argument("--split", choices=("dev", "holdout", "all"), default="holdout")
-    scoring.add_argument("--out", help="Default: first results filename + .score.json; must not exist")
+    for command in ("score", "gate"):
+        scoring_parser = sub.add_parser(command)
+        scoring_parser.add_argument("--results", action="append", required=True)
+        scoring_parser.add_argument("--cases", required=True)
+        scoring_parser.add_argument("--split", choices=("dev", "holdout", "all"), default="holdout")
+        scoring_parser.add_argument("--strict", action="store_true")
+        scoring_parser.add_argument("--out", help="Default: first results filename + .score.json; must not exist")
     comparison = sub.add_parser("compare")
     comparison.add_argument("--a", required=True)
     comparison.add_argument("--b", required=True)
     comparison.add_argument("--cases", default=str(CASES), help="Required for raw result inputs, unused for scored reports")
     comparison.add_argument("--split", choices=("dev", "holdout", "all"), default="holdout")
     comparison.add_argument("--out", help="Optional new comparison JSON")
+    comparison.add_argument("--strict", action="store_true")
     args = parser.parse_args(argv)
     try:
         if args.command == "run":
             run(args)
-        elif args.command == "score":
-            records = [row | {"source_run": str(Path(path).resolve())} for path in args.results
-                       for row in json.loads(Path(path).read_text(encoding="utf-8"))["records"]]
-            report = score_records(records, read_jsonl(Path(args.cases)), args.split)
+        elif args.command in {"score", "gate"}:
+            inputs = [json.loads(Path(path).read_text(encoding="utf-8")) for path in args.results]
+            records = [row | {"source_run": str(Path(path).resolve())} for path, data in zip(args.results, inputs)
+                       for row in data["records"]]
+            report = score_records(records, read_jsonl(Path(args.cases)), args.split,
+                strict=args.strict, manifests=[d.get("metadata", {}) for d in inputs],
+                journal=[row for d in inputs for row in d.get("journal", [])])
             output = writable_path(args.out or (args.results[0] + ".score.json"))
             write_json(output, report)
             show_metrics("Overall", report["metrics"])
@@ -649,23 +584,34 @@ def main(argv=None):
                 for key, values in report["by_" + field].items():
                     show_metrics(f"{field}: {key}", values)
             print("Coverage: " + json.dumps(report["coverage"], ensure_ascii=False))
+            print("uncited_answer: " + json.dumps(report["metrics"]["uncited_answer"]))
+            print("A7 attempts: " + json.dumps(report["attempt_metrics"]))
+            if report["provenance"]["issues"]:
+                print("WARNING: " + ", ".join(report["provenance"]["issues"]))
             print(f"JSON: {output}")
+            if args.command == "gate":
+                passed = (not report["provenance"]["issues"] and not report["distribution"]["issues"]
+                          and all(report["metrics"][f"A{i}"].get("passed") is True for i in range(1, 9)))
+                return 0 if passed else 1
         else:
             inputs = [json.loads(Path(path).read_text(encoding="utf-8")) for path in (args.a, args.b)]
             cases = read_jsonl(Path(args.cases)) if any(data.get("schema") != "rag-v2-score/1" for data in inputs) else []
-            a, b = [load_report(path, cases, args.split) for path in (args.a, args.b)]
-            report = compare_reports(a, b)
+            a, b = [load_report(path, cases, args.split, strict=args.strict) for path in (args.a, args.b)]
+            report = compare_reports(a, b, strict=args.strict)
             print("criterion | v1 (a) | v2 (b)")
             for criterion, pair in report["criteria"].items():
                 print(f"{criterion} | {status(pair['a'])} {json.dumps(pair['a'], ensure_ascii=False)} | "
                       f"{status(pair['b'])} {json.dumps(pair['b'], ensure_ascii=False)}")
             print("Changed cases: " + json.dumps(report["changed_cases"], ensure_ascii=False))
+            if report["warnings"]:
+                print("WARNING: " + ", ".join(report["warnings"]))
             if args.out:
                 write_json(writable_path(args.out), report)
     except (ValueError, OSError, KeyError, TypeError, httpx.HTTPError) as error:
         # No exception message here: paths/data/HTTP errors can contain secrets.
         parser.exit(2, f"{type(error).__name__}: invalid input, output conflict, or local runtime failure\n")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -1,11 +1,11 @@
-"""Independent provenance and character-union coverage checks."""
+"""Independent provenance and complete source-span coverage checks."""
 from __future__ import annotations
 
 from collections import Counter, defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from campus247.rag_v2.ingest.units import source_text
+from campus247.rag_v2.ingest.units import SPAN, context_text, source_text
 from campus247.rag_v2.types import Unit
 
 
@@ -39,14 +39,21 @@ def _inspect(chunks, units):
                 issues.append(Issue("SOURCE_IDENTITY_MISMATCH", key, unit.unit_id))
                 continue
             text = row.get("content_text", row.get("text", ""))
-            pos = text.find(body) if body else -1
+            span = SPAN.search(context_text(unit))
+            if span:
+                pos, end = map(int, span.groups())
+                if end > len(text) or text[pos:end] != body:
+                    issues.append(Issue("SOURCE_SPAN_MISMATCH", key, unit.unit_id))
+                    continue
+            else:
+                pos = text.find(body) if body else -1
+                # Legacy units consume one occurrence, never every equal span.
+                while pos >= 0 and all(masks[key][pos:pos + len(body)]):
+                    pos = text.find(body, pos + 1)
             if pos < 0:
                 issues.append(Issue("NON_VERBATIM_UNIT", key, unit.unit_id))
                 continue
-            # All occurrences, including overlapping repeated source fragments.
-            while pos >= 0:
-                masks[key][pos:pos + len(body)] = b"\1" * len(body)
-                pos = text.find(body, pos + 1)
+            masks[key][pos:pos + len(body)] = b"\1" * len(body)
     coverage = {}
     for key, row in rows.items():
         text = row.get("content_text", row.get("text", ""))
@@ -54,7 +61,7 @@ def _inspect(chunks, units):
         covered = sum(masks[key][i] for i in meaningful)
         ratio = covered / len(meaningful) if meaningful else 1.0
         coverage[key] = (covered, len(meaningful), ratio)
-        if ratio < .98:
+        if covered != len(meaningful):
             issues.append(Issue("LOW_COVERAGE", key, detail=f"{ratio:.6f}"))
     return rows, issues, coverage
 

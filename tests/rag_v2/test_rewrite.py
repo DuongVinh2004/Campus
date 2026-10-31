@@ -66,7 +66,7 @@ async def test_the_node_answers_the_rewritten_question_and_keeps_the_original_wh
     for rewritten, expected in ((QUESTION + " cho K64", QUESTION + " cho K64"), ("", QUESTION)):
         gateway = RewriteGateway(rewritten)
         stack = setup(gateway=gateway)
-        history = HistoryContext(ACTOR, stack.turn.session_id, (TurnItem("1", "user", "Câu hỏi trước"),), 50, "test")
+        history = HistoryContext(ACTOR, stack.turn.session_id, (TurnItem("1", "user", "Câu hỏi trước về K64"),), 50, "test")
         state = await stack.workflow.arun(replace(stack.turn, history=history), retrieval_context=context())
         prepare_chat_result(state)
         ids = [r.request_id for r in gateway.requests]

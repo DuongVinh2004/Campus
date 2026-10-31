@@ -10,8 +10,8 @@ from dataclasses import replace
 from time import monotonic
 
 from campus247.ports.llm import LlmResponseStatus
-from campus247.rag_v2.generation.generate import generate_draft
-from campus247.rag_v2.ingest.units import source_text
+from campus247.rag_v2.generation.generate import clarification_question, generate_draft
+from campus247.rag_v2.ingest.units import context_text, source_text
 from campus247.rag_v2.observability.trace import TurnTrace, emit
 from campus247.rag_v2.outcome.compose import build_outcome
 from campus247.rag_v2.retrieval.hybrid import retrieve, scope_allows
@@ -51,26 +51,26 @@ def _fact_kind(u):
 
 
 _CONDITION = re.compile(
-    r"\b(?:chi ap dung|ap dung cho|ap dung doi voi|tru |ngoai tru|rieng|neu |khi |truong hop|khong |chua |"
-    r"toi thieu|toi da|dieu kien)", re.IGNORECASE)
+    r"\b(?:chi|ap dung|danh cho|doi voi|tru|ngoai tru|rieng|neu|khi|truong hop|khong|chua|"
+    r"toi thieu|toi da|dieu kien|tu khoa|nam hoc|k\d{2,3}|20\d{2})\b", re.IGNORECASE)
 
 
 def _self_contained(fact, unit, parent=None):
-    """A fact line is a complete answer only when the rest of its unit adds no condition.
+    """Inspect the complete available structure, never a window after the quoted row.
 
-    "Học phí đại trà: 580.500 đồng/tín chỉ.\nMức trên chỉ áp dụng cho học phần học lại." must not be
-    answered from the first line alone; such units go through generation and semantic verification.
+    Sliced/table units need a readable parent. Context and headings are evidence
+    of scope too, including column headings; uncertainty leaves the fast path.
     """
-    body = fold(source_text(unit))
     quote = fold(fact.quote)
-    rest = body.replace(quote, " ", 1) if quote in body else body
-    if _CONDITION.search(rest) is not None:
+    if not quote or (parent is None and (unit.kind in {"table_row", "curriculum_row"} or unit.parent_unit_id)):
         return False
-    if parent is not None:
-        # A condition may sit in the next row/unit of the same source row ("2. Mức trên chỉ áp dụng ...").
-        whole = fold(source_text(parent))
-        at = whole.find(quote)
-        if at >= 0 and _CONDITION.search(whole[at + len(quote):at + len(quote) + 600]) is not None:
+    for structure in (unit, parent) if parent is not None else (unit,):
+        whole = fold(source_text(structure))
+        if quote not in whole:
+            return False
+        outside = "\n".join((structure.doc_title, structure.path, context_text(structure),
+                              whole.replace(quote, " ", 1)))
+        if _CONDITION.search(fold(outside)) is not None:
             return False
     return True
 
@@ -129,21 +129,28 @@ class RagV2Service:
     def _declined(self, u, draft) -> Outcome:
         """The model decided the sources cannot answer: ask back, or refuse with a typed reason."""
         if draft.decision == "clarify":
-            question = draft.clarify_question or "Bạn có thể nói rõ hơn bạn đang hỏi về nội dung nào không?"
-            return build_outcome(replace(u, clarify_prompt="Câu hỏi chưa đủ rõ để tra đúng nguồn. " + question))
+            question = clarification_question(draft.missing_slots)
+            return build_outcome(replace(u, missing_slots=draft.missing_slots,
+                clarify_prompt="Câu hỏi chưa đủ rõ để tra đúng nguồn. " + question))
         return build_outcome(u, refuse_reason=draft.decision)
 
     async def answer(self, question, history_turns, *, gateway, index, reranker,
-                     embed, deadline_s=12.0) -> Outcome:
+                     embed, deadline_s=12.0, revalidate=None) -> Outcome:
         started = monotonic()
         trace = TurnTrace()
         u = analyze(question, history_turns)
         trace.latency_ms["understanding"] = (monotonic() - started) * 1000
 
-        def finish(outcome, units=None):
+        async def validate(units):
+            if revalidate is not None:
+                await revalidate(tuple(dict.fromkeys(chunk for unit in units.values() for chunk in unit.chunk_ids)))
+
+        async def finish(outcome, units=None, *, original_quotes=True):
+            if outcome.kind != "transient_error":
+                await validate(units or {})
             # Context headers are useful for generation, but only the original
             # source body is quotable. Never expose the synthetic context marker.
-            if units:
+            if units and original_quotes:
                 outcome = replace(outcome, citations=tuple(replace(c,
                     quote=source_text(units[c.unit_id])) for c in outcome.citations))
             trace.outcome_kind = outcome.kind
@@ -152,9 +159,9 @@ class RagV2Service:
             return replace(outcome, trace=trace.payload())
 
         if u.clarify_prompt or u.out_of_scope:
-            return finish(build_outcome(u))
+            return await finish(build_outcome(u))
         if not math.isfinite(deadline_s) or deadline_s <= 0:
-            return finish(build_outcome(u, infra_error=True))
+            return await finish(build_outcome(u, infra_error=True))
         end = started + deadline_s
 
         def budget(cap, reserve=0):
@@ -170,7 +177,8 @@ class RagV2Service:
                 chunk_unit = getattr(index, "chunk_unit", None)
                 matched = [(fact, unit) for fact in self.facts if fact.kind == kind
                            and (unit := index.get(fact.unit_id)) is not None
-                           and _matches(fact, u, unit, chunk_unit(unit.chunk_ids[0]) if chunk_unit else None)]
+                           and (all((parent := chunk_unit(chunk)) is not None and _matches(fact, u, unit, parent)
+                                    for chunk in unit.chunk_ids) if chunk_unit else _matches(fact, u, unit))]
                 # A compound question needs the normal generation/coverage path.
                 compound = bool(re.search(r"[;,\n]|\b(?:va|dong thoi|ngoai ra)\b", fold(question)))
                 if matched and not compound and len({f.unit_id for f, _ in matched}) <= 8:
@@ -192,7 +200,8 @@ class RagV2Service:
                         quotes[uid] = body[min(a for a, _ in spans):max(b for _, b in spans)]
                     result = replace(result, citations=tuple(replace(c, quote=quotes[c.unit_id])
                                                              for c in result.citations))
-                    return finish(result)
+                    # Keep the fact-specific citation quote while checking its actual source grant.
+                    return await finish(result, units, original_quotes=False)
                 trace.latency_ms["facts"] = (monotonic() - phase) * 1000
                 phase = monotonic()
                 # Measured on the dev set (445 answerable cases): fused RRF keeps the gold unit in the
@@ -222,48 +231,58 @@ class RagV2Service:
                     if parents:
                         units = {parent.unit_id: parent for parent in parents.values()}
                 if not units:
-                    return finish(build_outcome(u, candidate_count=0))
+                    return await finish(build_outcome(u, candidate_count=0))
                 phase = monotonic()
                 generation_end = monotonic() + budget(8, reserve=min(3, deadline_s / 4))
                 reasons = ()
                 slow = False
+                verdicts = []
                 for attempt in range(2):
+                    verdicts = []  # An unavailable attempt cannot reuse an earlier rejection.
+                    trace.statement_rejections.clear()
                     milliseconds = int(min(5, generation_end - monotonic()) * 1000)
                     if milliseconds < 1:
                         raise TimeoutError
+                    await validate(units)
                     try:
                         draft = await generate_draft(_GenerationGateway(gateway, reasons),
                             u.search_query, u, list(units.values()), deadline_ms=milliseconds,
                             max_output_tokens=900)
                         statements = list(draft.statements)
                     except TimeoutError:
+                        logging.getLogger("campus247.rag_v2").warning(
+                            "rag_v2_generation_attempt attempt=%d status=timeout", attempt + 1)
                         # A slow provider answers the second request in time more often than not;
                         # one retry is made only while a full attempt still fits in the budget.
-                        if slow or generation_end - monotonic() < 2.5:
+                        if attempt or slow or generation_end - monotonic() < 2.5:
                             raise
                         slow = True
                         logging.getLogger("campus247.rag_v2").warning("rag_v2_generation_retry")
                         continue
                     if draft.decision != "answer":
                         trace.latency_ms["generation"] = (monotonic() - phase) * 1000
-                        return finish(self._declined(u, draft))
+                        return await finish(self._declined(u, draft), units)
                     verdicts = [check_statement(stmt, units) for stmt in statements]
                     for i, verdict in enumerate(verdicts):
                         if not verdict.passed:
                             trace.statement_rejections[i] = verdict.reasons
                     reasons = tuple(sorted({code for verdict in verdicts for code in verdict.reasons}))
+                    logging.getLogger("campus247.rag_v2").info(
+                        "rag_v2_generation_attempt attempt=%d status=%s", attempt + 1,
+                        "rejected" if reasons else "checked")
                     if (attempt or not verdicts or any(v.passed for v in verdicts)
                             or not reasons or not set(reasons) <= REPAIRABLE):
                         break
                 trace.latency_ms["generation"] = (monotonic() - phase) * 1000
                 passed = [v.statement for v in verdicts if v.passed]
                 if not passed:
-                    return finish(build_outcome(u, verdicts, units), units)
+                    return await finish(build_outcome(u, verdicts, units), units)
                 phase = monotonic()
                 semantic = None
                 for attempt in range(2):
                     # One retry: a malformed or late verdict is usually transient and the deterministic
                     # checks above have already passed, so a second look is cheaper than an error.
+                    await validate(units)
                     try:
                         semantic = await verify_semantic(_GenerationGateway(gateway), passed, units, u.search_query,
                             deadline_ms=max(1, int(budget(3.5, reserve=0.5 if attempt == 0 else 0) * 1000)))
@@ -274,15 +293,15 @@ class RagV2Service:
                     logging.getLogger("campus247.rag_v2").warning("rag_v2_semantic_unavailable attempt=%d", attempt + 1)
                 trace.latency_ms["semantic"] = (monotonic() - phase) * 1000
                 if semantic is None:
-                    return finish(build_outcome(u, infra_error=True))
+                    return await finish(build_outcome(u, infra_error=True))
                 iterator = iter(semantic)
                 aligned = [next(iterator) if verdict.passed else False for verdict in verdicts]
                 for i, (verdict, supported) in enumerate(zip(verdicts, aligned)):
                     if verdict.passed and not supported:
                         trace.statement_rejections[i] = ("SEMANTIC_UNSUPPORTED",)
-                return finish(build_outcome(u, verdicts, units, semantic_results=aligned), units)
+                return await finish(build_outcome(u, verdicts, units, semantic_results=aligned), units)
         except Exception as exc:  # noqa: BLE001 -- port failures must become content-free typed outcomes
             logging.getLogger("campus247.rag_v2").warning("rag_v2_failure kind=%s where=%s detail=%s", type(exc).__name__,
                 exc.__traceback__.tb_next.tb_frame.f_code.co_name if exc.__traceback__ and exc.__traceback__.tb_next else "?",
                 str(getattr(getattr(exc, "response", None), "status_code", "")))
-            return finish(build_outcome(u, infra_error=True))
+            return await finish(build_outcome(u, infra_error=True))
