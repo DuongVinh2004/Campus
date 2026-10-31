@@ -30,6 +30,11 @@ GUARD_BLOCKED_MESSAGE = ("Nội dung này liên quan đến quy định cần đ
 
 
 _HAYSTACKS: dict[tuple[str, int], str] = {}
+# Units whose binding to an authoritative row was already proven. A row is trusted again only when its
+# identifiers, title, path and evidence hash are unchanged and its text equals the proven text, so a
+# changed or revoked row falls back to the full checks. Checking 9,000 units per turn blocked the loop for ~2 s.
+_BOUND: dict[tuple[str, str], tuple[tuple, str]] = {}
+_CACHE_LIMIT = 40_000
 
 
 def _scope_is_grounded(unit, row):
@@ -45,22 +50,33 @@ def _scope_is_grounded(unit, row):
     haystack = _HAYSTACKS.get(key)
     if haystack is None:
         raw = " ".join(str(part) for part in (row.get("title"), row.get("section_path"), row.get("content_text")))
+        if len(_HAYSTACKS) >= _CACHE_LIMIT:
+            _HAYSTACKS.clear()
         haystack = _HAYSTACKS[key] = re.sub(r"\s*[\u2013\u2014-]\s*", "-", fold(raw))
     return all(re.sub(r"\s*[\u2013\u2014-]\s*", "-", fold(claim)) in haystack for claim in claims)
 
 
-def _binding_failure(unit, body, rows):
+def _binding_failure(unit, rows):
     """Name of the first check an index unit fails against its authoritative rows, else None.
 
     The checks are those of the authorization gate: both identifiers, the original slice, the
     title, the scope the unit claims and the evidence hash of the row.
     """
+    body = None
     for chunk in unit.chunk_ids:
         row = rows.get(chunk)
         if row is None:
             return "row"
+        fingerprint = (row.get("evidence_sha256"), row.get("source_id"), row.get("document_version_id"),
+                       row.get("title"), row.get("section_path"))
+        memo = _BOUND.get((unit.unit_id, chunk))
+        text = row.get("content_text") or ""
+        if memo is not None and memo[0] == fingerprint and (memo[1] is text or memo[1] == text):
+            continue
         if row["source_id"] != unit.document_id or row["document_version_id"] != unit.version_id:
             return "ids"
+        if body is None:
+            body = source_text(unit)
         if not body or body not in row["content_text"]:
             return "body"
         if unit.doc_title != row.get("title"):
@@ -69,6 +85,9 @@ def _binding_failure(unit, body, rows):
             return "scope"
         if sha256(row["content_text"].encode()).hexdigest() != row["evidence_sha256"]:
             return "hash"
+        if len(_BOUND) >= _CACHE_LIMIT:
+            _BOUND.clear()
+        _BOUND[(unit.unit_id, chunk)] = (fingerprint, row["content_text"])
     return None
 
 
@@ -102,9 +121,11 @@ class RagV2Node:
 
             async def revalidate(chunks):
                 guard()
+                live = None
                 if owner.revalidate is not None:
-                    await owner.revalidate(resolved.resolved, context, chunks)
+                    live = await owner.revalidate(resolved.resolved, context, chunks)
                 guard()
+                return live
 
             class GuardedGateway:
                 async def generate(self, request):
@@ -136,10 +157,9 @@ class RagV2Node:
                     unit = self.index.get(uid)
                     if unit is None or not unit.chunk_ids:
                         continue
-                    body = source_text(unit)
                     # The authoritative row must match both identifiers and the
                     # original slice; an index file never confers a source grant.
-                    failed = _binding_failure(unit, body, rows)
+                    failed = _binding_failure(unit, rows)
                     if failed:
                         drops[(unit.kind, failed)] = drops.get((unit.kind, failed), 0) + 1
                         continue
@@ -162,7 +182,12 @@ class RagV2Node:
                     deadline_s=12 - (monotonic() - started), revalidate=revalidate)
                 guard()  # Recheck after all model awaits.
                 cited_chunks = tuple(dict.fromkeys(chunk for c in outcome.citations for chunk in c.chunk_ids))
-                await revalidate(cited_chunks)
+                live = await revalidate(cited_chunks)
+                # The live read of the cited chunks carries the attestations the bulk read leaves out.
+                for chunk, fresh in (live or {}).items():
+                    if chunk in rows and isinstance(fresh, dict):
+                        rows[chunk] = {**rows[chunk], **{key: fresh[key] for key in (
+                            "_verified_publication", "_verified_curriculum", "applicability_note") if key in fresh}}
                 mapped = self.map_outcome(state, outcome, rows)
                 if mapped.terminal == Terminal.ANSWERED:
                     discipline = re.search(r"kỷ luật", mapped.draft.text, re.IGNORECASE)

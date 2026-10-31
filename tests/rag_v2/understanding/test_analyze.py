@@ -172,3 +172,14 @@ def test_degree_level_or_a_named_decision_is_enough_scope_for_a_fee_question(que
 
 def test_fee_question_without_any_scope_still_asks_back():
     assert analyze("Học phí bao nhiêu một tín chỉ?", ()).clarify_prompt
+
+
+def test_several_named_cohorts_or_programmes_are_not_filtered_by_the_first_one():
+    both = analyze("So sánh quy định mượn thiết bị K70 và K71", ())
+    assert both.cohort is None and not both.clarify_prompt
+    fee = analyze("Học phí K70 và K71 ngành CNTT bao nhiêu?", ())
+    assert fee.cohort is None and fee.program == "7480201" and not fee.missing_slots
+    programs = analyze("So sánh học phí CNTT và ATTT K70?", ())
+    assert programs.cohort == "K70" and programs.program is None and not programs.missing_slots
+    single = analyze("Học phí K70 CNTT bao nhiêu?", ())
+    assert single.cohort == "K70" and single.program == "7480201"

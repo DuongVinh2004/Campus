@@ -48,11 +48,22 @@ def program_key(value: str) -> str:
     return text
 
 
+def _many(text: str):
+    """Whether the question names more than one cohort, year or programme ("so sánh K70 và K71")."""
+    cohorts = set(re.findall(r"\bk\s*(\d{2,3})\b", text))
+    years = set(re.findall(r"\b20\d{2}-20\d{2}\b", text))
+    programs = {code for code, names in _PROGRAMS if any(contains(text, name) for name in names)}
+    programs |= set(re.findall(r"\b7\d{6}\b", text))
+    return len(cohorts) > 1, len(years) > 1, len(programs) > 1
+
+
 def _scope(text: str):
-    cohort = re.search(r"\bk\s*(\d{2,3})\b", text)
-    year = re.search(r"\b20\d{2}-20\d{2}\b", text)
-    program = next((code for code, names in _PROGRAMS if any(contains(text, name) for name in names)), None)
-    if program is None:
+    many_cohort, many_year, many_program = _many(text)
+    # Several named values are not a filter: keeping only the first would silently drop the others' sources.
+    cohort = None if many_cohort else re.search(r"\bk\s*(\d{2,3})\b", text)
+    year = None if many_year else re.search(r"\b20\d{2}-20\d{2}\b", text)
+    program = None if many_program else next((code for code, names in _PROGRAMS if any(contains(text, name) for name in names)), None)
+    if program is None and not many_program:
         code = re.search(r"\b7\d{6}\b", text)
         program = code[0] if code else next((label for key, label in zip(_TRACKS, _TRACK_LABELS)
                                             if contains(text, key)), None)
@@ -64,6 +75,7 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
     text = fold(query)
     topics = tuple(key for key, phrases in _TOPICS.items() if any(contains(text, p) for p in phrases))
     cohort, program, year = _scope(text)
+    many_cohort, many_year, many_program = _many(text)
     semester = bool(re.search(r"\bhoc ky\s*(?:[123]|i{1,3})\b", text))
     # Carry context only for elliptical follow-ups, never for a new named topic.
     elliptical = bool(re.fullmatch(
@@ -128,8 +140,8 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
     if not out and not partial and not named_document:
         if "hoc_phi" in topics and qtype == "number":
             required = ["cohort|academic_year", "program"]
-            missing = (["cohort|academic_year"] if not (cohort or year) else []) + (
-                ["program"] if not (program or degree) else [])
+            missing = (["cohort|academic_year"] if not (cohort or year or many_cohort or many_year) else []) + (
+                ["program"] if not (program or degree or many_program) else [])
         elif qtype == "deadline" and ("hoc_phi" in topics or contains(text, "mien giam") or contains(text, "hoc bong")):
             required = ["semester|academic_year"]
             missing = [] if semester or year else required.copy()
