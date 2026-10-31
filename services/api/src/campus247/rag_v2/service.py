@@ -11,6 +11,7 @@ from time import monotonic
 
 from campus247.ports.llm import LlmResponseStatus
 from campus247.rag_v2.generation.generate import clarification_question, generate_draft
+from campus247.rag_v2.generation.packing import pack_context
 from campus247.rag_v2.ingest.units import context_text, source_text
 from campus247.rag_v2.observability.trace import TurnTrace, emit
 from campus247.rag_v2.outcome.compose import build_outcome
@@ -38,6 +39,18 @@ class _GenerationGateway:
         if response.status != LlmResponseStatus.COMPLETED:
             raise RuntimeError("GENERATION_UNAVAILABLE")
         return response
+
+
+def _uncovered(facets, facet_of, verdicts, supported=None):
+    """The user's own words for the parts of the question no accepted statement covers.
+
+    Unknown coverage (the model assigned no statement to any part) reports nothing rather than guessing.
+    """
+    if not facets or not any(facet_of):
+        return []
+    covered = {facet for i, (facet, verdict) in enumerate(zip(facet_of, verdicts))
+               if facet and verdict.passed and (supported is None or (i < len(supported) and supported[i]))}
+    return [ask for facet_id, ask in facets if facet_id not in covered]
 
 
 def _fact_kind(u):
@@ -214,29 +227,25 @@ class RagV2Service:
                 trace.rerank_scores = [c.rerank_score for c in retrieval.candidates if c.rerank_score is not None]
                 units = {c.unit_id: unit for c in retrieval.candidates if (unit := index.get(c.unit_id)) is not None}
                 chunk_unit = getattr(index, "chunk_unit", None)
-                if chunk_unit is not None and units:
+                truncated = False
+                if units:
                     # Read the whole parent rows of the best units (answers often sit in sibling
-                    # rows or footnotes the fine unit lacks): 83% -> measured in REPORT-v2.
-                    parents, used = {}, 0
-                    for unit in units.values():
-                        for chunk_id in unit.chunk_ids[:1]:
-                            if len(parents) < CONTEXT_CHUNKS and chunk_id not in parents:
-                                parent = chunk_unit(chunk_id)
-                                # The provider gateway rejects a request above 28,000 bytes of JSON, so
-                                # pack whole rows in rank order until the evidence budget is spent.
-                                size = len(json.dumps(parent.text, ensure_ascii=False).encode()) if parent else 0
-                                if parent is not None and used + size <= CONTEXT_BYTES:
-                                    parents[chunk_id] = parent
-                                    used += size
-                    if parents:
-                        units = {parent.unit_id: parent for parent in parents.values()}
+                    # rows or footnotes the fine unit lacks). The provider gateway rejects a request
+                    # above 28,000 bytes of JSON, so rows are packed by real payload bytes.
+                    units, truncated = pack_context(units.values(), chunk_unit, budget=CONTEXT_BYTES,
+                                                    max_parents=CONTEXT_CHUNKS)
+                if not units and retrieval.trace.get("vector_failed"):
+                    # Nothing came back and a retrieval branch failed: an outage, not an absent source.
+                    return await finish(build_outcome(u, infra_error=True))
                 if not units:
                     return await finish(build_outcome(u, candidate_count=0))
                 phase = monotonic()
                 generation_end = monotonic() + budget(8, reserve=min(3, deadline_s / 4))
                 reasons = ()
                 slow = False
-                verdicts = []
+                malformed = False
+                verdicts, facet_of, facets = [], [], ()
+                carry, focus = None, ()
                 for attempt in range(2):
                     verdicts = []  # An unavailable attempt cannot reuse an earlier rejection.
                     trace.statement_rejections.clear()
@@ -247,9 +256,13 @@ class RagV2Service:
                     try:
                         draft = await generate_draft(_GenerationGateway(gateway, reasons),
                             u.search_query, u, list(units.values()), deadline_ms=milliseconds,
-                            max_output_tokens=900)
+                            max_output_tokens=900, focus=focus)
                         statements = list(draft.statements)
                     except TimeoutError:
+                        if carry is not None:
+                            # The follow-up for missing parts is optional: keep what already passed.
+                            verdicts, facet_of, facets = carry
+                            break
                         logging.getLogger("campus247.rag_v2").warning(
                             "rag_v2_generation_attempt attempt=%d status=timeout", attempt + 1)
                         # A slow provider answers the second request in time more often than not;
@@ -260,9 +273,23 @@ class RagV2Service:
                         logging.getLogger("campus247.rag_v2").warning("rag_v2_generation_retry")
                         continue
                     if draft.decision != "answer":
+                        if carry is not None:
+                            verdicts, facet_of, facets = carry
+                            break
                         trace.latency_ms["generation"] = (monotonic() - phase) * 1000
                         return await finish(self._declined(u, draft), units)
+                    malformed = draft.malformed
                     verdicts = [check_statement(stmt, units) for stmt in statements]
+                    facets = draft.facets
+                    facet_of = (list(draft.statement_facets) + [""] * len(verdicts))[:len(verdicts)]
+                    if carry is not None:
+                        # Merge the follow-up (only the missing parts) into the first, already checked draft.
+                        old_verdicts, old_facet_of, old_facets = carry
+                        seen = {v.statement.text for v in old_verdicts}
+                        fresh = [(v, f) for v, f in zip(verdicts, facet_of) if v.statement.text not in seen]
+                        verdicts = old_verdicts + [v for v, _ in fresh]
+                        facet_of = old_facet_of + [f for _, f in fresh]
+                        facets = old_facets
                     for i, verdict in enumerate(verdicts):
                         if not verdict.passed:
                             trace.statement_rejections[i] = verdict.reasons
@@ -270,13 +297,22 @@ class RagV2Service:
                     logging.getLogger("campus247.rag_v2").info(
                         "rag_v2_generation_attempt attempt=%d status=%s", attempt + 1,
                         "rejected" if reasons else "checked")
+                    uncovered = _uncovered(facets, facet_of, verdicts)
+                    if (not attempt and uncovered and any(v.passed for v in verdicts)
+                            and generation_end - monotonic() >= 3.0):
+                        # A multi-part question answered in part: one more request for the missing parts only.
+                        carry, focus, reasons = (verdicts, facet_of, facets), tuple(uncovered), ()
+                        continue
                     if (attempt or not verdicts or any(v.passed for v in verdicts)
                             or not reasons or not set(reasons) <= REPAIRABLE):
                         break
                 trace.latency_ms["generation"] = (monotonic() - phase) * 1000
                 passed = [v.statement for v in verdicts if v.passed]
                 if not passed:
-                    return await finish(build_outcome(u, verdicts, units), units)
+                    if malformed:
+                        # Unparseable model output is a provider fault, not missing evidence.
+                        return await finish(build_outcome(u, infra_error=True))
+                    return await finish(build_outcome(u, verdicts, units, coverage=0.9 if truncated else 1.0), units)
                 phase = monotonic()
                 semantic = None
                 for attempt in range(2):
@@ -299,7 +335,9 @@ class RagV2Service:
                 for i, (verdict, supported) in enumerate(zip(verdicts, aligned)):
                     if verdict.passed and not supported:
                         trace.statement_rejections[i] = ("SEMANTIC_UNSUPPORTED",)
-                return await finish(build_outcome(u, verdicts, units, semantic_results=aligned), units)
+                missing = _uncovered(facets, facet_of, verdicts, aligned)
+                return await finish(build_outcome(u, verdicts, units, semantic_results=aligned,
+                    coverage=0.9 if truncated or missing else 1.0, missing_parts=missing), units)
         except Exception as exc:  # noqa: BLE001 -- port failures must become content-free typed outcomes
             logging.getLogger("campus247.rag_v2").warning("rag_v2_failure kind=%s where=%s detail=%s", type(exc).__name__,
                 exc.__traceback__.tb_next.tb_frame.f_code.co_name if exc.__traceback__ and exc.__traceback__.tb_next else "?",

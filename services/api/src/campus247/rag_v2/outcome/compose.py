@@ -32,6 +32,7 @@ def build_outcome(
     semantic_results: Sequence[bool] | None = None, semantic_required: bool = True,
     coverage: float = 1.0, infra_error: bool = False,
     refuse_reason: RefuseReason | None = None, suggestions: Sequence[str] = (),
+    missing_parts: Sequence[str] = (),
 ) -> Outcome:
     """Semantic results align with *all* verdicts; unavailable means fail closed.
 
@@ -75,9 +76,12 @@ def build_outcome(
     if not accepted:
         reason = "unverified" if candidates or verdicts else "no_source"
         return Outcome("refuse", REFUSAL_MESSAGES[reason], reason=reason)
-    partial = len(accepted) < len(verdicts) or coverage < 1.0 or bool(understanding.missing_slots)
+    partial = len(accepted) < len(verdicts) or coverage < 1.0 or bool(missing_parts) or bool(understanding.missing_slots)
     text = "\n".join(stmt.text for stmt in accepted)
     if partial:
         text += "\n\n" + PARTIAL_NOTE
+        if missing_parts:
+            # The parts are the user's own words from the question, never model-authored text.
+            text += " Chưa tìm thấy căn cứ cho: " + "; ".join(missing_parts) + "."
     return Outcome("partial" if partial else "answer", text, tuple(accepted),
                    tuple(citations.values()), partial_note=PARTIAL_NOTE if partial else None)

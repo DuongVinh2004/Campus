@@ -14,6 +14,7 @@ from campus247.rag_v2.generation.contacts import contact_map, redact, restore
 from campus247.rag_v2.generation.json_output import response_object
 from campus247.rag_v2.generation.prompt import GENERATION_PROMPT, STATEMENTS_SCHEMA
 from campus247.rag_v2.types import Statement, Understanding, Unit
+from campus247.rag_v2.understanding.normalize import fold
 
 
 DECISIONS = frozenset({"answer", "clarify", "no_source", "out_of_scope"})
@@ -31,6 +32,9 @@ class Draft:
     decision: str = "answer"
     clarify_question: str = ""
     missing_slots: tuple[str, ...] = ()
+    malformed: bool = False      # the model output could not be parsed into the statement schema
+    facets: tuple[tuple[str, str], ...] = ()   # (id, ask): the distinct things the question asks, in its own words
+    statement_facets: tuple[str, ...] = ()     # facet id per statement ("" when unassigned)
 
 
 async def generate_statements(
@@ -63,9 +67,26 @@ def debug_capture(name, metadata, *, content=None):
         pass
 
 
+def _facets(raw, question):
+    """Facets are the user's own words: an ``ask`` that is not in the question is dropped, so the
+    server can show it back safely. A single facet is the whole question and adds nothing."""
+    if not isinstance(raw, list):
+        return ()
+    folded, seen, result = fold(question), set(), []
+    for item in raw[:8]:
+        if not isinstance(item, dict):
+            continue
+        facet_id, ask = item.get("id"), item.get("ask")
+        if (isinstance(facet_id, str) and isinstance(ask, str) and facet_id and facet_id not in seen
+                and 2 <= len(ask.strip()) <= 80 and fold(ask.strip()) in folded):
+            seen.add(facet_id)
+            result.append((facet_id, " ".join(ask.split())))
+    return tuple(result) if len(result) >= 2 else ()
+
+
 async def generate_draft(
     gateway: LlmGateway, question: str, understanding: Understanding, units: Sequence[Unit],
-    *, deadline_ms: int, max_output_tokens: int,
+    *, deadline_ms: int, max_output_tokens: int, focus: Sequence[str] = (),
 ) -> Draft:
     selected = list(units[:12])
     if not selected:
@@ -76,8 +97,11 @@ async def generate_draft(
                  "scope": {"cohorts": unit.scope.cohorts, "programs": unit.scope.programs,
                            "academic_years": unit.scope.academic_years}}
                 for label, unit in labels.items()]
-    content = json.dumps({"question": question, "question_type": understanding.question_type,
-                          "sources": evidence}, ensure_ascii=False)
+    body = {"question": question, "question_type": understanding.question_type, "sources": evidence}
+    if focus:
+        # Parts of the question (its own words) that an earlier answer left uncovered; data, not instructions.
+        body["missing_parts"] = list(focus)
+    content = json.dumps(body, ensure_ascii=False)
     # Known source contacts are minimized everywhere in the model view. Other
     # user identifiers remain subject to the unmodified outbound policy.
     content = redact(content, markers)
@@ -113,9 +137,11 @@ async def generate_draft(
              "shape": 0, "ref": 0, "contact": 0}
     if not isinstance(rows, list):
         logging.getLogger("campus247.rag_v2").warning("rag_v2_gen %s", json.dumps(drops))
-        return Draft()
+        return Draft(malformed=True)
     drops["rows"] = len(rows)
-    result = []
+    facets = _facets(value.get("facets"), question)
+    facet_ids = {facet_id for facet_id, _ in facets}
+    result, assigned = [], []
     for row in rows[:32]:
         if not isinstance(row, dict):
             drops["shape"] += 1
@@ -134,5 +160,7 @@ async def generate_draft(
             drops["contact"] += 1
             continue
         result.append(Statement(text, tuple(dict.fromkeys(unit.unit_id for unit in cited))))
+        facet = row.get("facet")
+        assigned.append(facet if isinstance(facet, str) and facet in facet_ids else "")
     logging.getLogger("campus247.rag_v2").warning("rag_v2_gen %s kept=%d", json.dumps(drops), len(result))
-    return Draft(tuple(result))
+    return Draft(tuple(result), facets=facets, statement_facets=tuple(assigned))

@@ -19,7 +19,8 @@ Trường "decision" quyết định trước cách xử lý câu hỏi:
 - "no_source": câu hỏi nêu một tên riêng, chứng chỉ, khóa học, chương trình, mã, năm hay số liệu thống kê (tỷ lệ, điểm chuẩn, số lượng của trường) mà không đoạn nguồn nào nhắc tới. Quy định chung cùng chủ đề KHÔNG phải câu trả lời cho điều cụ thể đó.
 - "out_of_scope": câu hỏi không liên quan đến học vụ, dịch vụ sinh viên HUCE.
 Khi "decision" khác "answer" thì "statements" phải rỗng.
-Chỉ trả JSON {"decision":"answer","missing_slots":[],"statements":[{"text":"...","unit_ids":["U1"]}]}.
+Câu hỏi có từ hai ý trở lên: liệt kê mỗi ý trong "facets" (id ngắn "f1","f2"..., "ask" là cụm từ NGUYÊN VĂN lấy từ câu hỏi, tối đa 80 ký tự) và gán mỗi phát biểu cho một ý bằng "facet". Câu hỏi một ý thì "facets" rỗng. Ý nào nguồn không có thì không viết phát biểu cho ý đó. Nếu dữ liệu có "missing_parts": các ý đã được trả lời ở lượt trước, lần này chỉ viết phát biểu cho các ý trong "missing_parts" (nếu nguồn có), dùng lại đúng id facets.
+Chỉ trả JSON {"decision":"answer","missing_slots":[],"facets":[],"statements":[{"text":"...","unit_ids":["U1"],"facet":"f1"}]}.
 """
 
 STATEMENTS_SCHEMA = {
@@ -28,9 +29,13 @@ STATEMENTS_SCHEMA = {
                    "missing_slots": {"type": "array", "maxItems": 7, "uniqueItems": True,
                        "items": {"type": "string", "enum": ["cohort", "academic_year", "program",
                            "training_system", "document", "semester", "audience"]}},
+                   "facets": {"type": "array", "maxItems": 8, "items": {
+                       "type": "object", "additionalProperties": False, "required": ["id", "ask"],
+                       "properties": {"id": {"type": "string", "maxLength": 8},
+                                      "ask": {"type": "string", "maxLength": 80}}}},
                    "statements": {"type": "array", "maxItems": 32, "items": {
         "type": "object", "additionalProperties": False, "required": ["text", "unit_ids"],
-        "properties": {"text": {"type": "string"}, "unit_ids": {
+        "properties": {"text": {"type": "string"}, "facet": {"type": "string", "maxLength": 8}, "unit_ids": {
             "type": "array", "minItems": 1, "maxItems": 12,
             "items": {"type": "string", "enum": [f"U{i}" for i in range(1, 13)]}}}}}},
 }
