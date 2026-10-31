@@ -39,7 +39,8 @@ class BM25:
             return []
         scores: dict[str, float] = defaultdict(float)
         n = len(self.lengths)
-        for term in set(features(query)):
+        # Sorted terms fix the float summation order, so ranking does not depend on PYTHONHASHSEED.
+        for term in sorted(set(features(query))):
             posting = self.postings.get(term, {})
             idf = math.log(1 + (n - len(posting) + 0.5) / (len(posting) + 0.5))
             for uid, tf in posting.items():
@@ -47,7 +48,9 @@ class BM25:
                     continue
                 denominator = tf + self.k1 * (1 - self.b + self.b * self.lengths[uid] / self.average_length)
                 scores[uid] += idf * tf * (self.k1 + 1) / denominator
-        return sorted(scores.items(), key=lambda item: (-item[1], item[0]))[:limit]
+        # Scores equal up to float noise tie-break by unit id.
+        return sorted(((uid, round(score, 9)) for uid, score in scores.items()),
+                      key=lambda item: (-item[1], item[0]))[:limit]
 
     def anchored(self, query: str, limit: int, *, allowed: set[str] | None = None,
                  max_document_frequency: int = 200) -> list[tuple[str, float]]:
@@ -62,8 +65,11 @@ class BM25:
             mixed = re.search(r"\d", word) and re.search(r"[^\W\d_]", word)
             if mixed or re.fullmatch(r"\d{6}", word):
                 posting = self.postings.get("a:" + word)
-                if posting and len(posting) <= max_document_frequency:
-                    anchors.append(set(posting))
+                # Discriminating power is judged inside the authorized set, so the branch does not
+                # switch off when unrelated (unauthorized or other-scope) units repeat the code.
+                units = set(posting) & allowed if posting and allowed is not None else set(posting or ())
+                if units and len(units) <= max_document_frequency:
+                    anchors.append(units)
         if not anchors:
             return []
         units = set.intersection(*anchors) or set.union(*anchors)

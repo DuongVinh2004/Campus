@@ -55,3 +55,9 @@ class AuthorizedIndex:
 
     async def vector(self, query, limit, *, allowed=None):
         return await self.index.vector(query, limit, allowed=self._allowed(allowed))
+
+    def anchored(self, query, limit, *, allowed=None):
+        # The identifier branch must see the same authorization as lexical/vector; without it the
+        # runtime ranks differently from the offline probes that use the bare index.
+        anchored = getattr(self.index, "anchored", None)
+        return anchored(query, limit, allowed=self._allowed(allowed)) if anchored else []
