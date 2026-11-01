@@ -153,11 +153,11 @@ Cách làm: đưa 17 tệp mã v2 và dòng nối `inventory_reader` trong `app.
 
 **Kết luận: baseline tốt hơn ở hầu hết chỉ số; các thay đổi hardening làm v2 kém đi.** Cả hai đều xa mục tiêu A1 (≤2%), nên baseline cũng chưa đạt.
 
-Khác biệt tập trung: họ `ctdt` (bảng chương trình đào tạo) chiếm 15/22 ca xấu đi (8 đủ→từ chối, 6 →lỗi hết hạn, 1 →thiếu), và nhóm "gần miền vàng" (3 đúng→lỗi, 2 đúng→trả lời nhầm). Ca tốt lên chỉ 3.
+Khác biệt tập trung: họ `ctdt` (bảng chương trình đào tạo) chiếm 16/24 ca xấu đi (8 đủ→từ chối, 7 →lỗi hết hạn, 1 →thiếu), và nhóm "gần miền vàng" (3 đúng→lỗi, 2 đúng→trả lời nhầm). Ca tốt lên chỉ 2.
 
 **Nguyên nhân rất có khả năng (đọc từ kết quả, chưa chạy lại để xác nhận):**
 1. **Hầu như mọi lượt bị đánh dấu "bị cắt ngữ cảnh" → `partial`.** Phân bố kết quả: baseline `answer` 105 / `partial` 4; hiện tại `answer` 9 / `partial` 87 (không có câu nào mang "Chưa tìm thấy căn cứ cho", tức không phải do độ phủ từng ý). `pack_context` đặt `truncated=True` ngay khi còn đơn vị ứng viên sau khi đủ 8 nguồn; retrieval luôn trả 12 ứng viên nên hầu như lượt nào cũng "bị cắt" → `coverage=0.9` → trả lời một phần kèm câu "chưa đủ căn cứ". Đây là lỗi thiết kế của tôi: phần đuôi xếp hạng bị bỏ là bình thường, không phải mất ngữ cảnh. Nó giải thích phần lớn "trả lời một phần/thiếu ý" và các ca trả lời nhầm.
-2. **`UNIT_MISMATCH` (mới, 31 lần bác phát biểu)** và `NEGATION_MISMATCH` tăng (14→26) khiến câu hỏi mã/tín chỉ ở bảng bị "đã tìm thấy nguồn nhưng chưa xác minh được phát biểu" (7/9 ca ctdt đủ→từ chối).
+2. **`UNIT_MISMATCH` (mới, 31 lần bác phát biểu)** và `NEGATION_MISMATCH` tăng (14→26) khiến câu hỏi mã/tín chỉ ở bảng bị "đã tìm thấy nguồn nhưng chưa xác minh được phát biểu" (7/9 ca đủ→từ chối).
 3. **Thêm vòng gọi mô hình và ngữ cảnh lớn hơn** làm phần v2 chậm thêm ~1,2 s ở p50 và ~2 s ở p90, đẩy đuôi vượt 12 s (1→14 lần hết hạn).
 
 **Đề xuất sửa nhỏ, chưa làm (chờ bạn quyết):** chỉ đặt `truncated` khi một đơn vị được xếp hạng cao bị loại vì ngân sách/giới hạn, không phải khi cắt đuôi; xem lại ngưỡng của `UNIT_MISMATCH` với ô bảng; đo lại từng nhóm trên mẫu dev trước khi gộp.
