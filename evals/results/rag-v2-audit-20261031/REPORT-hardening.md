@@ -135,3 +135,29 @@ Các mục đã thu hẹp ở trên vẫn chưa làm (F-D8, F-D10, F-C2/C4/C6/C7
 2. **Trả lời một phần so với từ chối** khi chỉ có quy định chung (Udemy/CCNA/LinkedIn Learning): chấp nhận trả lời một phần có ghi chú, hay ép từ chối (mất giá trị cho câu hỏi thật)?
 3. **Có làm tiếp v2 để đạt A1–A7** hay giữ v1 làm mặc định. Khoảng cách ở holdout3 là lớn (A1 32,5% so với 2%); Codex dự kiến đã được đặt lại quota từ 02:14 ngày 01/11 (chưa kiểm) nên có thể làm các hạng mục nặng (ctdt/bảng, độ phủ, chấm lại), nhưng sẽ tốn thêm công và lời gọi và **bộ holdout3 đã mở, không còn là bộ sạch**.
 4. Các câu chính sách 1–6 ở phần trên vẫn còn mở.
+
+---
+
+# Cập nhật 2026-11-01 (A/B): v2 trước hardening so với hiện tại, cùng holdout3
+
+Cách làm: đưa 17 tệp mã v2 và dòng nối `inventory_reader` trong `app.py` về commit baseline `01c9a7013` (chỉ thư mục làm việc, có sao lưu), chạy runtime v2 với chỉ mục cũ `embedded`, holdout3 ×1, cùng bộ chấm đã sửa; sau đó khôi phục mã (khớp byte với HEAD) và trả runtime về v1. Mỗi bên chỉ 1 lần chạy, chỉ mục khác nhau (cũ/mới) và thời điểm khác nhau nên có nhiễu. Tệp: `e2e/holdout3-base.json`, `holdout3-base.score.json`, `ab-flips.json`.
+
+| holdout3 | Baseline (trước hardening) | Hiện tại |
+|---|---|---|
+| Có đáp án (120): đủ / thiếu / từ chối / lỗi | **63** / 42 / 15 / 0 | 51 / 39 / 23 / 7 |
+| Không đáp án (40): đúng / nhầm / lỗi | **36** / 4 / 0 | 31 / 6 / 3 |
+| A1 · A2 · A3 · A5 · A7 | 35% · 6 · 90% · 89% · 0% | 32,5% · 10 · 77,5% · 86,5% · 6,25% |
+| Độ trễ khách p50 | **8,1 s** | 14,0 s |
+| Phần v2 p50 / p90 (nhật ký) | 3,6 / 5,2 s | 4,8 / 7,3 s |
+| Hết hạn 12 s | 1 | 14 |
+
+**Kết luận: baseline tốt hơn ở hầu hết chỉ số; các thay đổi hardening làm v2 kém đi.** Cả hai đều xa mục tiêu A1 (≤2%), nên baseline cũng chưa đạt.
+
+Khác biệt tập trung: họ `ctdt` (bảng chương trình đào tạo) chiếm 15/22 ca xấu đi (8 đủ→từ chối, 6 →lỗi hết hạn, 1 →thiếu), và nhóm "gần miền vàng" (3 đúng→lỗi, 2 đúng→trả lời nhầm). Ca tốt lên chỉ 3.
+
+**Nguyên nhân rất có khả năng (đọc từ kết quả, chưa chạy lại để xác nhận):**
+1. **Hầu như mọi lượt bị đánh dấu "bị cắt ngữ cảnh" → `partial`.** Phân bố kết quả: baseline `answer` 105 / `partial` 4; hiện tại `answer` 9 / `partial` 87 (không có câu nào mang "Chưa tìm thấy căn cứ cho", tức không phải do độ phủ từng ý). `pack_context` đặt `truncated=True` ngay khi còn đơn vị ứng viên sau khi đủ 8 nguồn; retrieval luôn trả 12 ứng viên nên hầu như lượt nào cũng "bị cắt" → `coverage=0.9` → trả lời một phần kèm câu "chưa đủ căn cứ". Đây là lỗi thiết kế của tôi: phần đuôi xếp hạng bị bỏ là bình thường, không phải mất ngữ cảnh. Nó giải thích phần lớn "trả lời một phần/thiếu ý" và các ca trả lời nhầm.
+2. **`UNIT_MISMATCH` (mới, 31 lần bác phát biểu)** và `NEGATION_MISMATCH` tăng (14→26) khiến câu hỏi mã/tín chỉ ở bảng bị "đã tìm thấy nguồn nhưng chưa xác minh được phát biểu" (7/9 ca ctdt đủ→từ chối).
+3. **Thêm vòng gọi mô hình và ngữ cảnh lớn hơn** làm phần v2 chậm thêm ~1,2 s ở p50 và ~2 s ở p90, đẩy đuôi vượt 12 s (1→14 lần hết hạn).
+
+**Đề xuất sửa nhỏ, chưa làm (chờ bạn quyết):** chỉ đặt `truncated` khi một đơn vị được xếp hạng cao bị loại vì ngân sách/giới hạn, không phải khi cắt đuôi; xem lại ngưỡng của `UNIT_MISMATCH` với ô bảng; đo lại từng nhóm trên mẫu dev trước khi gộp.

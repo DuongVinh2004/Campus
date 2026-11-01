@@ -1,0 +1,48 @@
+{
+ "full->error": [
+  "R2-H3-0001",
+  "R2-H3-0003",
+  "R2-H3-0004"
+ ],
+ "full->refused_or_clarified": [
+  "R2-H3-0002",
+  "R2-H3-0015",
+  "R2-H3-0017",
+  "R2-H3-0018",
+  "R2-H3-0021",
+  "R2-H3-0022",
+  "R2-H3-0023",
+  "R2-H3-0024",
+  "R2-H3-0039"
+ ],
+ "thin->error": [
+  "R2-H3-0005",
+  "R2-H3-0007",
+  "R2-H3-0008"
+ ],
+ "refused_or_clarified->error": [
+  "R2-H3-0006"
+ ],
+ "full->thin": [
+  "R2-H3-0020"
+ ],
+ "refused_or_clarified->full": [
+  "R2-H3-0028"
+ ],
+ "thin->refused_or_clarified": [
+  "R2-H3-0031"
+ ],
+ "correctly_declined->wrongly_answered": [
+  "R2-H3-0138",
+  "R2-H3-0145",
+  "R2-H3-0146"
+ ],
+ "wrongly_answered->correctly_declined": [
+  "R2-H3-0139"
+ ],
+ "correctly_declined->error": [
+  "R2-H3-0142",
+  "R2-H3-0143",
+  "R2-H3-0144"
+ ]
+}
