@@ -264,3 +264,24 @@ def test_strict_comparison_rejects_two_different_campaigns():
     b = runner.score_records(rows, [case()], manifests=[dict(manifest, campaign_id="two")], strict=True)
     with pytest.raises(ValueError):
         runner.compare_reports(a, b, strict=True)
+
+
+def test_a_fact_listed_from_a_negated_gold_statement_may_be_stated_inside_a_negated_clause():
+    from evals.runners import rag_v2_scoring as scoring
+    gold = [{"chunk_id": "c", "quote": "Tổng: 181TC (Không tính HP giáo dục thể chất, Giáo dục quốc phòng và An ninh;)"}]
+    case = {"required_facts": ["181TC", "giáo dục thể chất"], "forbidden_facts": [], "gold": gold}
+    answer = "Tổng số tín chỉ là 181TC. Tổng 181TC không tính học phần giáo dục thể chất."
+    assert scoring.fact_errors(case, answer) == {"missing_facts": [], "forbidden_facts": []}
+
+
+def test_polarity_still_catches_a_contradiction_of_a_positive_gold_statement():
+    from evals.runners import rag_v2_scoring as scoring
+    case = {"required_facts": ["miễn học phí"], "forbidden_facts": [],
+            "gold": [{"chunk_id": "c", "quote": "Sinh viên diện này được miễn học phí."}]}
+    assert scoring.fact_errors(case, "Sinh viên diện này được miễn học phí.")["missing_facts"] == []
+    assert scoring.fact_errors(case, "Sinh viên diện này không được miễn học phí.")["missing_facts"] == ["miễn học phí"]
+
+
+def test_a_full_stop_inside_a_token_does_not_split_a_clause():
+    from evals.runners import rag_v2_scoring as scoring
+    assert scoring.fact_matches("https://office.com", "Truy cập trang https://office.com, ấn Sign in.")

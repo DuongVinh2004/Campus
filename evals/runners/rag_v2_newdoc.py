@@ -74,17 +74,22 @@ def chunks_of(document: Path) -> list[dict]:
 
 def build(args) -> int:
     new_rows = chunks_of(Path(args.document))
-    if CORPUS_DIR.exists() or INDEX_DIR.exists():
-        sys.exit("newdoc corpus/index already exist; choose a clean state (nothing is overwritten)")
-    CORPUS_DIR.mkdir(parents=True)
+    corpus_dir, index_dir = Path(str(CORPUS_DIR) + args.tag), Path(str(INDEX_DIR) + args.tag)
+    if corpus_dir.exists() or index_dir.exists():
+        sys.exit("newdoc corpus/index already exist; choose a clean state or a new --tag (nothing is overwritten)")
+    corpus_dir.mkdir(parents=True)
     source = (ROOT / "evals/corpus/served-chunks.jsonl").read_text(encoding="utf-8")
-    with (CORPUS_DIR / "served-chunks.jsonl").open("w", encoding="utf-8", newline="\n") as handle:
+    with (corpus_dir / "served-chunks.jsonl").open("w", encoding="utf-8", newline="\n") as handle:
         handle.write(source if source.endswith("\n") else source + "\n")
         for row in new_rows:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
     print(f"{len(new_rows)} new chunks")
-    return subprocess.call([sys.executable, "-B", str(ROOT / "scripts/rag_v2_build_index.py"),
-                            "--corpus", str(CORPUS_DIR / "served-chunks.jsonl"), "--output", str(INDEX_DIR), "--embed"])
+    command = [sys.executable, "-B", str(ROOT / "scripts/rag_v2_build_index.py"),
+               "--corpus", str(corpus_dir / "served-chunks.jsonl"), "--output", str(index_dir), "--embed",
+               "--batch-size", str(args.batch_size)]
+    if args.base:
+        command += ["--base", args.base]   # unchanged chunks keep their vectors; only the new document is embedded
+    return subprocess.call(command)
 
 
 async def run(args) -> int:
@@ -179,6 +184,9 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     b = sub.add_parser("build")
     b.add_argument("--document", default=str(DATASET / "document.md"))
+    b.add_argument("--tag", default="", help="suffix for the copy's corpus/index directories")
+    b.add_argument("--base", help="validated index whose vectors are reused for unchanged chunks")
+    b.add_argument("--batch-size", type=int, default=1, choices=range(1, 21))
     r = sub.add_parser("run")
     r.add_argument("--cases", default=str(DATASET / "cases.jsonl"))
     r.add_argument("--out", required=True)

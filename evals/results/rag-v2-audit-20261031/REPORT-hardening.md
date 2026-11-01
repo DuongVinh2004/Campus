@@ -89,3 +89,49 @@ Sau khi dịch vụ mô hình chạy lại, thứ tự tiếp theo (không cần
 4. Nguồn tài liệu mới để nghiệm thu (tài liệu HUCE công khai thật, hay tổng hợp) và cách nạp thử vào DB.
 5. Có sửa các nút dùng chung với v1 đang làm trượt A9 (khẩn cấp, bàn giao, lời chào, yêu cầu ghi, che liên hệ) hay không.
 6. Cho phép commit `infrastructure/knowledge/runtime.py` (đang chưa theo dõi) cùng các tệp ngoài v2 hay để bạn tự quản.
+
+---
+
+# Cập nhật 2026-11-01: chạy lại dịch vụ, dựng chỉ mục mới, đo thật — kết quả **chưa đạt**
+
+Bằng chứng: ca do mô hình viết, đoạn nguồn kiểm bằng mã, mỗi ca chạy 1 lần (nên có dao động); không đo người dùng thật. Runtime 8015 đã **trả về v1** (cờ mặc định không đổi). Test sau các thay đổi: **1.016 đạt** (`tests/rag_v2`, `tests/evals`).
+
+## Đính chính "Bị chặn" ở trên
+Dịch vụ mô hình **không hỏng**: nó chỉ nhận **đúng 1 văn bản mỗi lượt `/embed`** (`len(inputs) != 1` → 503), còn `rag_v2_build_index.py` mặc định gửi lô 20. Phép thử của tôi lúc đó dùng sai định dạng nên kết luận "hỏng" là sai. Sau khi bạn cho phép, tôi dừng 5 tiến trình cũ và chạy lại với namespace `…20261031-accounting-01` (không xóa state nào). Chỉ mục mới dựng với `--batch-size 1`: `data/rag_v2_index/embedded2` (9.173 đơn vị, 1024 chiều, `embedding_status=complete`, ~38 phút, 0 lời gọi DeepSeek). Script dựng vẫn mặc định lô 20, không chạy được với dịch vụ hiện tại nếu quên `--batch-size 1`.
+
+## Lỗi thật tìm ra khi đo (đã sửa)
+| Lỗi | Hậu quả | Sửa |
+|---|---|---|
+| `app.py` không truyền `inventory_reader` | `/health/ready` của v2 **luôn** `unverified` (503), không bao giờ đối chiếu chỉ mục với DB | `KnowledgeReleaseRuntime.rag_v2_inventory()` (đọc chỉ-đọc, dùng chung bộ truy vấn với xuất kho, chia sẻ giữa các probe, nhớ 60 s). Kết quả thật: `ready`, `inventory_checked=true`, 0 chunk thiếu/thừa/đổi |
+| Bộ nhớ đệm ràng buộc nguồn có trần 40.000 < 48.364 cặp (đơn vị, chunk) | Cache bị xóa mỗi lượt, không có tác dụng; mỗi lượt vẫn băm sha256 48 nghìn lần (~0,86 s) | Trần 250.000 + test chống tái phát. Đo ngoại tuyến: lượt thứ hai 0,86 s → 0,024 s (chưa đo lại trên runtime) |
+| Bộ chấm `rag_v2_scoring` (Codex) coi mọi mệnh đề phủ định chứa fact là mâu thuẫn, và tách mệnh đề tại dấu chấm trong `office.com` | Câu trả lời đúng như "181TC … không tính học phần giáo dục thể chất" bị gán *thiếu ý* | Phân cực chấp nhận được lấy thêm từ câu gold chứa fact; chấm không tách tại dấu chấm trong token. Test mới (phủ định đúng, mâu thuẫn vẫn bị bắt, URL) |
+
+## Kết quả đo (bộ chấm đã sửa, cùng bộ chấm cho bản cũ và mới)
+| Bộ | Chỉ số | Bản cũ (trước hardening) | Bản mới |
+|---|---|---|---|
+| B2 (79 ca) | có đáp án (40): đủ / thiếu / từ chối / lỗi | 16 / 10 / 11 / 3 | 14 / 18 / 5 / 3 |
+| B2 | không đáp án (39): đúng / trả lời nhầm / lỗi | 37 / 1 / 1 | 32 / 5 / 2 |
+| Mẫu dev (136 ca) | có đáp án (116): đủ / thiếu / từ chối / lỗi | 63 / 21 / 27 / 5 | 62 / 28 / 23 / 3 |
+| Mẫu dev | không đáp án (20) | 20 đúng | 20 đúng |
+| Tài liệu mới (25 ca, 8 chunk mới trong bản sao kho) | có đáp án (18): đủ / thiếu / từ chối | — | 15 / 3 / 0, trích đúng đoạn gốc 18/18 |
+| Tài liệu mới | không đáp án (7) | — | 7 đúng, 0 lỗi |
+| **holdout3 (160 ca, chưa ai mở)** | có đáp án (120): đủ / thiếu / từ chối / lỗi | — | 51 / 39 / 23 / 7 |
+| holdout3 | không đáp án (40): đúng / nhầm / lỗi | — | 31 / 6 / 3 |
+
+**Kết luận trung thực: thay đổi P4 thu hẹp không làm tăng số câu trả lời đủ ý** (mẫu dev 63 → 62); nó chuyển một phần từ chối thành trả lời một phần (có ghi "chưa đủ căn cứ"), nên "thiếu ý" tăng. Phía không đáp án ở B2 kém hơn: lặp lại 7 ca sai ×3 cho thấy 3 ca là nhiễu/hết hạn, **4 ca ổn định** (CCNA, LinkedIn Learning, thi tiếng Anh trên máy, "CNTT K74 tổng tín chỉ") — đó là trả lời một phần có trích dẫn đúng quy định chung (Điều 12 công nhận tín chỉ), không bịa, nhưng bộ ca kỳ vọng từ chối. Đây là câu hỏi chính sách (xem cuối).
+
+**holdout3, chấm chính thức** (`e2e/holdout3-v2.score.json`): A1 = 32,5% (mục tiêu ≤ 2%), A2 = 10 lỗi (mục tiêu 0), A3 = 77,5% (≥ 98%), A5 = 86,5% (≥ 95%), A7 = 6,25% (≤ 1%), A4/A8 không đạt, A6/A9 không có số liệu. **Không chỉ số nào đạt.** Trong 39 ca "thiếu ý", 25 ca vẫn chứa fact theo phép so khớp chuỗi lỏng (bộ chấm chặt coi là thiếu vì diễn đạt/ngắt mệnh đề) và 14 ca thiếu thật; cận dưới của A1 vẫn ~11,7%, xa mục tiêu. Điểm yếu thật rõ nhất: họ `ctdt` (chương trình đào tạo/bảng) có 13/23 lần từ chối.
+
+## Độ trễ và lỗi
+- Phần v2 (đo trong nhật ký): tổng p50 4,8 s, p90 7,3 s; sinh p50 2,2 s; kiểm ngữ nghĩa p50 1,8 s.
+- Phía khách: byte đầu p50 0,1 s, nội dung đầu p50 8,5 s, hoàn tất p50 14,0 s (p90 23,9 s) với 2 luồng đồng thời. Khoảng 3,7 s trước dịch vụ v2 và ~5,5 s sau nội dung đầu nằm ngoài dịch vụ v2 (ước từ hiệu số các trung vị, chưa phân tích từng nút dùng chung).
+- 14 lần `TimeoutError` ở ngưỡng cứng 12 s của nút (`agent/nodes/rag_v2.py`, `asyncio.timeout(12)`), dồn thành đợt (độ trễ nhà cung cấp tăng). Chúng trở thành thông báo "lỗi kết nối" (đúng thiết kế `transient_error`) nhưng chiếm 6,25% số lượt ở holdout3. Tôi **không đổi ngưỡng 12 s** vì đó là đánh đổi độ trễ/lỗi cần bạn quyết.
+
+## Việc chưa làm và vì sao
+Các mục đã thu hẹp ở trên vẫn chưa làm (F-D8, F-D10, F-C2/C4/C6/C7/C8, F-D5, P3.1, P7 soak, P8). Không chạy bộ safety 610 ca (tốn ~1.800 lời gọi, và A9 phụ thuộc các nút dùng chung). Chưa commit: `infrastructure/knowledge/runtime.py`, `evals/runners/corpus_export.py` (chưa được git theo dõi) và `bootstrap/app.py` (lẫn sửa đổi của bạn).
+
+## Việc cần bạn quyết định tiếp
+1. **Ngưỡng 12 s của nút v2**: giữ (lỗi ~6% khi nhà cung cấp chậm) hay nâng (vd 20 s) và cho phép trả lời chậm hơn?
+2. **Trả lời một phần so với từ chối** khi chỉ có quy định chung (Udemy/CCNA/LinkedIn Learning): chấp nhận trả lời một phần có ghi chú, hay ép từ chối (mất giá trị cho câu hỏi thật)?
+3. **Có làm tiếp v2 để đạt A1–A7** hay giữ v1 làm mặc định. Khoảng cách ở holdout3 là lớn (A1 32,5% so với 2%); Codex dự kiến đã được đặt lại quota từ 02:14 ngày 01/11 (chưa kiểm) nên có thể làm các hạng mục nặng (ctdt/bảng, độ phủ, chấm lại), nhưng sẽ tốn thêm công và lời gọi và **bộ holdout3 đã mở, không còn là bộ sạch**.
+4. Các câu chính sách 1–6 ở phần trên vẫn còn mở.

@@ -38,6 +38,18 @@ def test_a_changed_row_is_checked_again_and_fails_closed():
     assert node._binding_failure(unit(), {}) == "row"
 
 
+def test_a_realistic_working_set_stays_cached_between_turns(monkeypatch):
+    """~48,000 (unit, chunk) pairs per turn: a bound below that clears the cache every turn."""
+    node._BOUND.clear()
+    pairs = 60_000
+    for i in range(pairs):
+        node._BOUND[(f"u{i}", "c1")] = ((), "")
+    node._binding_failure(unit(), {"c1": row()})
+    assert len(node._BOUND) >= pairs
+    assert node._CACHE_LIMIT > pairs
+    node._BOUND.clear()
+
+
 def test_the_cache_is_bounded():
     node._BOUND.clear()
     for i in range(node._CACHE_LIMIT + 5):

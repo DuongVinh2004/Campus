@@ -57,7 +57,8 @@ def _canonical(text):
 
 
 def _clauses(text):
-    return [part.strip() for part in re.split(r"[;\n!?]+|(?<!\d)\.(?!\d)|,\s*(?:còn|nhưng|con|nhung)\b",
+    # A full stop inside a token (office.com, 3.5) does not end a clause.
+    return [part.strip() for part in re.split(r"[;\n!?]+|(?<!\d)\.(?!\w)|,\s*(?:còn|nhưng|con|nhung)\b",
                                              text, flags=re.I) if part.strip()]
 
 
@@ -65,12 +66,27 @@ def _negative(text):
     return bool(re.search(r"\b(?:khong|chua|cam|chang)\b", text))
 
 
-def fact_matches(fact, answer):
+def _polarities(needle, words, numbers, reference):
+    """Polarities a clause stating this fact may have: the fact's own, and that of the gold
+    statement it was taken from ("181TC" listed from "181TC (Không tính HP thể chất)" is
+    legitimately stated inside a negated clause; "miễn học phí" taken from a positive statement is not)."""
+    allowed = {_negative(needle)}
+    for text in reference:
+        for part in _clauses(text):
+            clause = _canonical(part)
+            present = clause.split()
+            if words + numbers and all(t in present for t in words + numbers):
+                allowed.add(_negative(clause))
+    return allowed
+
+
+def fact_matches(fact, answer, reference=()):
     """Match one fact within one clause; do not pool labels/numbers across rows.
 
     Short facts require every content word. Long facts retain the historical
     lexical tolerance, but their numbers/units must co-occur locally. Contradictory
-    occurrences fail even if another occurrence states the correct fact.
+    occurrences fail even if another occurrence states the correct fact. `reference` is the
+    gold text the fact comes from; it only widens the polarity a correct statement may have.
     """
     needle = _canonical(fact)
     if not needle:
@@ -82,6 +98,7 @@ def fact_matches(fact, answer):
     if not words and not numbers:
         return False
     matches = []
+    allowed = _polarities(needle, words, numbers, reference)
     for part in _clauses(answer):
         clause = _canonical(part)
         present = clause.split()
@@ -103,12 +120,14 @@ def fact_matches(fact, answer):
                     clause[positions[i - 1].end() if i else 0:m.start()].split() for label in labels)
                     for i, m in enumerate(positions)):
                 continue
-        matches.append(_negative(needle) == _negative(clause))
+        matches.append(_negative(clause) in allowed)
     return bool(matches) and all(matches)
 
 
 def fact_errors(case, text):
-    return {"missing_facts": [f for f in case.get("required_facts", []) if not fact_matches(f, text)],
+    # Gold quotes only widen the polarity of a required fact; a forbidden fact is judged on its own words.
+    reference = tuple(g["quote"] for g in case.get("gold", []) if isinstance(g.get("quote"), str))
+    return {"missing_facts": [f for f in case.get("required_facts", []) if not fact_matches(f, text, reference)],
             "forbidden_facts": [f for f in case.get("forbidden_facts", []) if fact_matches(f, text)]}
 
 

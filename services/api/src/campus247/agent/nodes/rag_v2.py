@@ -34,7 +34,9 @@ _HAYSTACKS: dict[tuple[str, int], str] = {}
 # identifiers, title, path and evidence hash are unchanged and its text equals the proven text, so a
 # changed or revoked row falls back to the full checks. Checking 9,000 units per turn blocked the loop for ~2 s.
 _BOUND: dict[tuple[str, str], tuple[tuple, str]] = {}
-_CACHE_LIMIT = 40_000
+# One entry per (unit, chunk) pair: the current index has ~48,000, so the bound leaves room for several
+# index generations and still stops growth (a bound below the working set clears the cache every turn).
+_CACHE_LIMIT = 250_000
 
 
 def _scope_is_grounded(unit, row):
