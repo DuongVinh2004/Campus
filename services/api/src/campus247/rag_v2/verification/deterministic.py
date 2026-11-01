@@ -61,7 +61,8 @@ _UNITS = {"dong": "vnd", "vnd": "vnd", "usd": "usd", "eur": "eur", "kg": "kg", "
           "km": "km", "gio": "gio", "phut": "phut", "ngay": "ngay", "tuan": "tuan", "thang": "thang",
           "nam": "nam", "tin chi": "tin chi", "tc": "tin chi", "diem": "diem", "lan": "lan",
           "hoc ky": "hoc ky", "phan tram": "%", "%": "%"}
-_UNIT_PAIR = re.compile(r"(\d+(?:[.,]\d+)*)\s*(" + "|".join(sorted(map(re.escape, _UNITS), key=len, reverse=True))
+# Same line only: a table cell ending in a number must not pair with the next row's "Học kỳ" header.
+_UNIT_PAIR = re.compile(r"(\d+(?:[.,]\d+)*)[ \t]*(" + "|".join(sorted(map(re.escape, _UNITS), key=len, reverse=True))
                         + r")(?!\w)")
 _ROMAN = {"i": 1, "ii": 2, "iii": 3, "iv": 4, "v": 5}
 _SEMESTER = re.compile(r"\bhoc\s+ky\s+(iii|ii|iv|i|v|\d)\b")
@@ -76,8 +77,25 @@ def _iso_dates(text: str) -> set[tuple[int, int, int]]:
     return {(int(d), int(m), int(y)) for y, m, d in ISO_DATE.findall(_fold(text))}
 
 
+def _lines(text: str) -> list[str]:
+    """Lines of a source, with a sentence wrapped onto a lower-case line rejoined (PDF text)."""
+    return re.sub(r"[ \t]*\n\s*(?=[^\W\d_])", lambda m: " " if m.string[m.end()].islower() else "\n", text).split("\n")
+
+
+# "Học kỳ 2 Học kỳ 3": the number after "Học kỳ" labels that semester, it is not a quantity of the next "Học kỳ".
+_LABEL_BEFORE = re.compile(r"hoc ky\s*$")
+
+
 def _unit_pairs(text: str) -> set[tuple[str, str]]:
-    return {(_number(m.group(1)), _UNITS[m.group(2)]) for m in _UNIT_PAIR.finditer(_fold(_without_dates(text)))}
+    # A number pairs with a unit on its own line: the last number of a table cell is not
+    # measured in the next row's "Học kỳ N" header.
+    pairs = set()
+    for line in _lines(text):
+        folded = _fold(_without_dates(line))
+        for m in _UNIT_PAIR.finditer(folded):
+            if not _LABEL_BEFORE.search(folded[:m.start()]):
+                pairs.add((_number(m.group(1)), _UNITS[m.group(2)]))
+    return pairs
 
 
 def _unit_mismatch(text: str, source: str) -> bool:

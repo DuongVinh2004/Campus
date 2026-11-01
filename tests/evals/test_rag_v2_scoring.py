@@ -285,3 +285,27 @@ def test_polarity_still_catches_a_contradiction_of_a_positive_gold_statement():
 def test_a_full_stop_inside_a_token_does_not_split_a_clause():
     from evals.runners import rag_v2_scoring as scoring
     assert scoring.fact_matches("https://office.com", "Truy cập trang https://office.com, ấn Sign in.")
+
+
+def test_a_gold_sentence_wrapped_across_pdf_lines_keeps_its_polarity():
+    from evals.runners import rag_v2_scoring as scoring
+    case = {"required_facts": ["cảnh báo học tập"], "forbidden_facts": [], "gold": [{"chunk_id": "c", "quote":
+            "5. Sinh viên không đăng ký học tập, nếu không có lý do chính đáng sẽ bị\ncảnh báo học tập."}]}
+    answer = "Sinh viên không đăng ký học tập, nếu không có lý do chính đáng sẽ bị cảnh báo học tập."
+    assert scoring.fact_errors(case, answer)["missing_facts"] == []
+    case["gold"] = [{"chunk_id": "c", "quote": "được Hiệu trưởng đồng ý với số tín chỉ tích lũy tại trường khác\n"
+                                                "(nếu có) không vượt quá 25%."}]
+    case["required_facts"] = ["Hiệu trưởng đồng ý"]
+    assert scoring.fact_errors(case, "Nếu được Hiệu trưởng đồng ý với số tín chỉ (nếu có) không vượt quá 25%.")[
+        "missing_facts"] == []
+    # A separate upper-case line is still its own clause: its negation does not widen a positive fact.
+    case["gold"] = [{"chunk_id": "c", "quote": "Sinh viên được miễn học phí.\nKhông áp dụng cho học phần học lại."}]
+    case["required_facts"] = ["miễn học phí"]
+    assert scoring.fact_errors(case, "Sinh viên không được miễn học phí.")["missing_facts"] == ["miễn học phí"]
+
+
+def test_a_unit_token_with_digits_is_bound_whole():
+    from evals.runners import rag_v2_scoring as scoring
+    assert scoring.fact_matches("5.000 m²", "Tòa nhà Thư viện có tổng diện tích khoảng 5.000 m².")
+    assert scoring.fact_matches("#002A5C", "Màu xanh nhận diện có mã HEX #002A5C.")
+    assert not scoring.fact_matches("5.000 m²", "Tòa nhà Thư viện có tổng diện tích khoảng 5.000 ha.")

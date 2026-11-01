@@ -50,9 +50,10 @@ class WithParent(UnitIndex):
 
 
 @pytest.mark.asyncio
-async def test_answer_from_a_fine_unit_is_partial_when_the_parent_could_not_be_sent():
+async def test_answer_from_a_fine_unit_stays_complete_when_the_parent_could_not_be_sent():
+    # Packing only decides what the model reads; a partial answer is reported from the facets it did not cover.
     result = await answer(index=WithParent("w" * 60_000))
-    assert result.kind == "partial" and result.partial_note and result.statements[0].text == TEXT
+    assert result.kind == "answer" and not result.partial_note and result.statements[0].text == TEXT
 
 
 @pytest.mark.asyncio
@@ -91,3 +92,4 @@ class Garbage(FakeGateway):
 async def test_unparseable_generation_is_a_transient_error_not_unverified():
     result = await answer(gateway=Garbage())
     assert result.kind == "transient_error"
+

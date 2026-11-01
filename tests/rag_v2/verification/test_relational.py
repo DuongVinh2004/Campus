@@ -57,3 +57,23 @@ def test_a_cohort_declared_by_none_of_the_cited_units_is_still_rejected():
     k64 = unit("K64 dùng A1.", "u1", Scope(cohorts=("K64",)))
     verdict = check_statement(Statement("K66 dùng A1.", ("u1",)), {"u1": k64})
     assert not verdict.passed and "SCOPE_MISMATCH" in verdict.reasons
+
+
+def test_a_number_ending_a_table_cell_does_not_pair_with_the_next_line_header():
+    source = "521335 Kinh tế xây dựng 2\nHọc kỳ 3\n521336 Quản lý dự án 3 tín chỉ"
+    verdict = check(source, "Môn 521335 có 2 tín chỉ.")
+    assert "UNIT_MISMATCH" not in verdict.reasons
+
+
+def test_a_number_and_unit_on_the_same_line_are_still_paired():
+    verdict = check("Tối đa 14 tín chỉ.\nHọc kỳ 2", "Tối đa 14 học kỳ.")
+    assert "UNIT_MISMATCH" in verdict.reasons
+
+
+def test_a_semester_header_row_does_not_turn_a_credit_count_into_a_unit_mismatch():
+    source = "Học kỳ 1 Học kỳ 2 Học kỳ 3\n320701 – 2\nQuy hoạch theo mô hình TOD"
+    assert "UNIT_MISMATCH" not in check(source, "Môn 320701 có 2 tín chỉ.").reasons
+
+
+def test_a_number_before_its_unit_is_still_paired_after_a_label_word():
+    assert "UNIT_MISMATCH" in check("Tối đa 14 tín chỉ.", "Tối đa 14 học kỳ.").reasons

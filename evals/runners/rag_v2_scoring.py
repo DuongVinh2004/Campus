@@ -72,6 +72,9 @@ def _polarities(needle, words, numbers, reference):
     legitimately stated inside a negated clause; "miễn học phí" taken from a positive statement is not)."""
     allowed = {_negative(needle)}
     for text in reference:
+        # Gold quotes are PDF text: a line that continues in lower case is one sentence wrapped, not two clauses.
+        text = re.sub(r"(?<![.:;!?|])[ \t]*\n\s*(?=[^\W\d_]|\()",
+                      lambda m: " " if m.string[m.end()].islower() or m.string[m.end()] == "(" else m[0], text)
         for part in _clauses(text):
             clause = _canonical(part)
             present = clause.split()
@@ -108,7 +111,8 @@ def fact_matches(fact, answer, reference=()):
         if sum(w in present for w in words) < required:
             continue
         # Units remain bound to their values, including table cells (|).
-        bindings = re.findall(r"\b(\d+(?:[.,]\d+)?)\s+([a-z]+)", needle)
+        # The unit is the whole token ("5000 m2", "002 a5c"), not only its leading letters.
+        bindings = re.findall(r"\b(\d+(?:[.,]\d+)?)\s+([a-z][a-z0-9]*)", needle)
         if any(not re.search(r"\b" + re.escape(n + " " + unit) + r"\b", clause)
                for n, unit in bindings):
             continue

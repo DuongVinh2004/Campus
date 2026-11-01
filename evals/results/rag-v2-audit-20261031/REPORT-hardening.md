@@ -161,3 +161,105 @@ Khác biệt tập trung: họ `ctdt` (bảng chương trình đào tạo) chi�
 3. **Thêm vòng gọi mô hình và ngữ cảnh lớn hơn** làm phần v2 chậm thêm ~1,2 s ở p50 và ~2 s ở p90, đẩy đuôi vượt 12 s (1→14 lần hết hạn).
 
 **Đề xuất sửa nhỏ, chưa làm (chờ bạn quyết):** chỉ đặt `truncated` khi một đơn vị được xếp hạng cao bị loại vì ngân sách/giới hạn, không phải khi cắt đuôi; xem lại ngưỡng của `UNIT_MISMATCH` với ô bảng; đo lại từng nhóm trên mẫu dev trước khi gộp.
+
+# Cập nhật 2026-11-01 (Opus): đọc lại ca lỗi của A/B — xác nhận và đính chính
+
+Bằng chứng gồm ba nguồn: nhật ký runtime của hai lượt chạy (`infra/local/knowledge-platform-20261023/resume-20261031T231811571085/api.log` cho bản hiện tại, `resume-20261101T010058419190/api.log` cho baseline), tái hiện 7 ca trong tiến trình bằng mã hiện tại có ghi từng phán quyết phát biểu (không qua cổng SQL), và chấm lại các tệp kết quả sẵn có (không gọi mô hình).
+
+## 1. Bộ chấm có lỗi, làm phóng đại A1 ở cả hai bản (đã sửa)
+
+Có 2 lỗi trong `evals/runners/rag_v2_scoring.py` khiến câu trả lời đúng bị tính là "thiếu ý":
+- **Trích dẫn gold là văn bản PDF bị ngắt dòng giữa câu.** Ví dụ "…không có lý do chính đáng sẽ bị⏎cảnh báo học tập". Bộ chấm tách mệnh đề tại `\n`, nên chữ "không" và ý cần tìm rơi vào hai mệnh đề khác nhau. Việc nới cực tính theo gold vì thế không có tác dụng, và câu trả lời đúng (một dòng, có "không") bị tính là mâu thuẫn. Cách sửa: một dòng PDF tiếp nối bằng chữ thường hoặc "(" được nối với dòng trước. Dòng mới bắt đầu bằng chữ hoa vẫn là mệnh đề riêng, nên phủ định của nó không nới cực tính cho ý khẳng định (có test).
+- **Đơn vị có chữ số bị cắt mất.** "5.000 m²" và "#002A5C" có đơn vị "m2"/"a5c", nhưng regex chỉ lấy "m"/"a", nên không bao giờ khớp. Cách sửa: lấy cả token.
+
+Tôi đã đọc lại từng ý trong 33 ý bộ chấm mới chấp nhận ở holdout3. Tất cả đều có nguyên văn trong câu trả lời và đúng cực tính; không có câu sai nào được tính thành đúng. Đã thêm 2 test vào `tests/evals/test_rag_v2_scoring.py`: tệp này đạt 83/83, toàn bộ `tests/evals` đạt 464/466. Hai test thất bại là `test_multi_agent_resources` và `test_native_stale_successor`; chúng không dùng bộ chấm (một test về trạng thái tính phí, một test đòi thư mục workspace con).
+
+**Chấm lại cùng các tệp kết quả** (`e2e/holdout3-*.rescore.json`; các tệp `.score.json` cũ giữ nguyên):
+
+| Bộ | Có đáp án: đủ / thiếu / từ chối / lỗi | Không đáp án: đúng / nhầm / lỗi |
+|---|---|---|
+| holdout3 baseline | **92** / 13 / 15 / 0 (trước: 63 / 42) | 36 / 4 / 0 |
+| holdout3 hiện tại | 80 / **10** / 23 / 7 (trước: 51 / 39) | 31 / 6 / 3 |
+| B2 bản cũ / mới | 16 / 10 / 11 / 3 · 17 / 15 / 5 / 3 | 37 / 1 / 1 · 32 / 5 / 2 |
+| Mẫu dev bản cũ / mới | 69 / 15 / 27 / 5 · 68 / 22 / 23 / 3 | 20 / 0 / 0 · 20 / 0 / 0 |
+
+| holdout3 (bộ chấm đã sửa) | A1 (≤2%) | A2 (0) | A3 (≥98%) | A5 (≥95%) | A7 (≤1%) |
+|---|---|---|---|---|---|
+| Baseline | 10,8% | 6* | 90% | 89% | 0% |
+| Hiện tại | 8,3% | 10 | 77,5% | 86,5% | 6,25% |
+
+\* A2 của baseline lấy từ lần chấm trước, vì lỗi bộ chấm không ảnh hưởng A2.
+
+**Đính chính kết luận A/B:** câu "baseline tốt hơn ở hầu hết chỉ số" chỉ đúng một phần.
+- Bản hiện tại có ít câu thiếu ý hơn: A1 8,3% so với 10,8%.
+- Bản hiện tại kém hơn ở bốn điểm: từ chối nhầm (+8), lỗi hết hạn (+10), trả lời nhầm câu không có đáp án (+2), và lỗi ở câu không đáp án (+3).
+- Khoảng cách tới A1 ≤2% nhỏ hơn nhiều so với báo cáo trước (khoảng 10% chứ không phải 35%).
+
+## 2. Nguyên nhân từng nhóm (đã kiểm)
+
+| Nhóm | Kết luận | Bằng chứng |
+|---|---|---|
+| **10 lỗi hết hạn** (7 câu có đáp án, 3 câu không) | **Xác nhận, nhưng khác giả thuyết cũ:** không do nội dung câu hỏi hay độ dài ngữ cảnh. Lỗi dồn theo thời điểm: vị trí 1–7 và 141–143 trong lượt chạy. Các lỗi trùng với lúc runtime đọc lại toàn bộ 2.019 dòng nguồn (22–74 s). Bản hiện tại gọi kiểm lại nguồn khoảng **4,9 lần mỗi lượt**, gồm trước mỗi lần sinh, lúc kết thúc và 2 lần sau sinh, có kèm attestation. Baseline gọi **1 lần**. Các lượt kẹt sau lần đọc lớn đó và chạm mốc 12 s. | `api.log`: baseline 151 lượt / 151 lần đọc nhỏ (16 ms p50); hiện tại 276 lượt / 1.344 lần đọc nhỏ (62 ms p50, 250 ms p90). Các dòng `node_failure` nằm ngay trước các dòng `sources_read ok ms=73718 rows=2019` và `ms=22717`. |
+| **Từ chối nhầm ở `ctdt`** | **Xác nhận: `UNIT_MISMATCH` báo động giả.** Trang PDF chứa bảng có "…521335– 2 ⏎ Học kỳ 3…". Regex `\s*` vượt qua dòng mới nên nối số "2" ở cuối ô với tiêu đề cột "Học kỳ" thành cặp (2, học kỳ). Câu đúng "mã 521335 và 2 tín chỉ" vì thế bị coi là đổi đơn vị. | Tái hiện 0017 và 0021: câu chứa "3/2 tín chỉ" bị bác `UNIT_MISMATCH`, còn câu chỉ nêu mã thì qua. Các cặp tìm thấy trong nguồn: `2 hoc ky`, `3 hoc ky`. |
+| **`truncated` → 87 `partial`** | **Xác nhận cơ chế, nhưng bác vai trò "nguyên nhân chính làm giảm chất lượng".** Cờ này không làm mất ý (bộ chấm tính theo ý). Nó chỉ gắn câu "các phần còn lại chưa đủ căn cứ" vào câu trả lời đã đủ. Đây là lỗi trải nghiệm: báo sai cho người dùng rằng còn thiếu căn cứ. | Tái hiện 0001/0002: cả 2 phát biểu qua kiểm, `pack 12→8, truncated=True`, kết quả vẫn là `partial` kèm câu "chưa đủ căn cứ". |
+| Chậm thêm trong phần v2 | Thêm khoảng +1,25 s ở p50 và +2,1 s ở p90 (tổng của trace dịch vụ). Có 10 lượt bước sinh vượt 5 s (baseline: 0), do lần gọi thêm để hỏi ý còn thiếu. Tổng thời gian HTTP chênh khoảng 5,8 s, phần còn lại chưa phân bổ được vì log không có dấu thời gian. | Trace `latency_ms` trong hai `api.log`. Chạy trong tiến trình, mỗi câu mất 2–3,6 s. |
+| Trả lời nhầm 0145/0146 (chứng chỉ Coursera), 0138 (cần hỏi lại) | Bản hiện tại đưa quy định chung về công nhận tín chỉ, hoặc trả lời một phần, ở chỗ baseline từ chối. Đây là câu hỏi chính sách đã nêu ("trả lời một phần hay từ chối khi chỉ có quy định chung"), không phải lỗi kiểm chứng. | Văn bản trả lời trong `holdout3-v2.json`. |
+| 10–13 ca thiếu ý thật, chung cho cả hai bản | Phần lớn là câu nhiều ý mà một ý không được nêu, ví dụ 0032 thiếu "vừa làm vừa học". Một số ca từ chối kiểu 0039 do mô hình kết luận `no_source` với 6 nguồn đã đóng gói. Chưa kiểm xem đoạn gold có bị loại khi đóng gói hay không. | Tái hiện 0039: `pack 12→6`, mô hình từ chối. |
+
+## 3. Hướng đề xuất (chưa sửa mã v2)
+
+Nên giữ v2 hiện tại và sửa 3 lỗi nhỏ đã xác nhận, thay vì quay về baseline. Bản hiện tại đã ít thiếu ý hơn; phần kém hơn đến từ 3 lỗi cụ thể, mỗi lỗi sửa trong vài dòng:
+1. **`UNIT_MISMATCH`:** cặp số–đơn vị chỉ được ghép trên cùng một dòng (`[ \t]*` thay cho `\s*`) và chỉ khi số đứng ngay trước đơn vị. Thêm test cho ô bảng "521335– 2 ⏎ Học kỳ 3".
+2. **Bỏ `truncated` khỏi độ phủ.** `partial` chỉ đặt khi còn ý chưa được phát biểu nào phủ (`missing`).
+3. **Kiểm lại nguồn ít hơn:** chỉ 1 lần trước khi sinh và 1 lần trên các chunk được trích lúc kết thúc, như baseline. Lần đọc lớn đầu ngày, hoặc khi khóa cache đổi ngày UTC, phải được làm nóng trước, không để lượt người dùng chờ.
+
+Sau khi sửa, đo lại **mẫu dev** (136 câu, bộ chấm đã sửa) trước. Chỉ khi không tệ hơn mới chạy lại holdout3 một lần để so với baseline. Lưu ý: holdout3 đã bị mở, nên nó chỉ còn là tập so sánh A/B, không còn là holdout chưa ai thấy.
+
+Chưa kiểm: phần độ trễ HTTP ngoài dịch vụ v2 (cần một lượt có dấu thời gian); và việc tái hiện chạy không qua cổng SQL theo phạm vi câu hỏi.
+
+# Cập nhật 2026-11-01 (sửa lỗi v2 đã xác nhận và đo lại mẫu dev)
+
+**Đã sửa (mã v2, chưa commit):**
+1. `UNIT_MISMATCH` (`verification/deterministic.py`): cặp số–đơn vị chỉ ghép trong cùng một dòng (câu PDF ngắt dòng chữ thường vẫn được nối lại), và số đứng sau nhãn "Học kỳ" không còn ghép với "Học kỳ" kế tiếp ("Học kỳ 1 Học kỳ 2 …" trước đây sinh cặp (2, học kỳ) giả).
+2. `truncated` (`service.py`): không còn tự đánh dấu câu trả lời là "partial". Chỉ `missing` (ý của câu hỏi mà mô hình không phủ) mới làm câu trả lời thành một phần.
+3. Kiểm lại nguồn: **không giảm số lần kiểm.** `tests/rag_v2/test_i1_dispatch.py` bắt buộc kiểm lại trước mỗi lần gọi mô hình và trước khi trả về. Bản đo này cho thấy hết hạn không phải do số lần kiểm: cả lượt chạy chỉ có 1 lần đọc nguồn lớn (19 s, lúc khởi động), thời gian xử lý v2 p50 4,8 s / p90 7,1 s. 9 lỗi hết hạn 12 s trong 533 ca đến từ độ trễ nhà cung cấp mô hình (có ca `semantic_unavailable`). Làm nóng cache khi khởi động chưa làm: khóa cache phụ thuộc vị từ quyền của từng người dùng nên không có ngữ cảnh để đọc trước.
+
+**Test:** `tests/rag_v2` + `tests/evals/test_rag_v2_scoring.py` 642 đạt; thêm 4 test cho UNIT_MISMATCH. Một test cũ (`…partial_when_the_parent_could_not_be_sent`) khẳng định hành vi `truncated` bị bỏ nên đã đổi thành khẳng định "answer".
+
+**Đo trên cùng 136 ca dev của b3** (116 có đáp án, 20 không; chấm bằng bộ chấm đã sửa; runtime 8015, engine v2, chỉ mục embedded2, DeepSeek thật; bằng chứng: ca do mô hình viết, đáp án chuẩn kiểm bằng mã):
+
+| | b3 (trước) | sau sửa |
+|---|---|---|
+| đủ ý | 68 | **80** |
+| thiếu ý | 22 | 19 |
+| từ chối/hỏi lại nhầm | 23 | **14** |
+| lỗi | 3 | 3 |
+| không đáp án: từ chối đúng | 20/20 | 20/20 |
+
+Số lần `UNIT_MISMATCH` trong log: 0 (trước 26–38 mỗi 276–497 lượt). 4 ca bảng CTĐT (R2-A2-0041/0042/0073/0075) đạt 3/3 khi lặp. Khoảng 136 ca là một lần chạy, có nhiễu của mô hình và nhà cung cấp (đổi 12 ca, 1 ca xấu đi).
+
+**Phần còn lại (không phải lỗi v2 cần sửa ở đây):**
+- 10 trong 86 lần từ chối của lượt dev 533 ca là chốt "kỷ luật" của node: câu trả lời nhắc kỷ luật từ nguồn chưa xác minh chính thống (`cdnm.heyzine.com`, `publication=False`). Đây là kiểm soát an toàn, không nới. Các ca R2-Q2-0045…0048 (điểm rèn luyện) bị từ chối ổn định vì lý do này, dù đáp án nằm trong nguồn.
+- Còn khoảng 53 lần mô hình tự quyết định không trả lời dù có nguồn (không có lý do bị từ chối nào khác); chưa điều tra.
+- Lượt dev đầy đủ 533 ca (`dev-fix.json`) chạy ngoài dự kiến (tôi định chỉ chạy 136 ca): kết quả đó dùng bản sửa lần 1, chưa có bản b3 tương ứng để so; chỉ dùng phần 136 ca trùng.
+- Holdout3 chưa chạy lại.
+
+## Holdout3 chạy lại sau sửa (2026-11-01)
+
+Một lần chạy 160 ca (120 có đáp án, 40 không), bộ chấm đã sửa, runtime 8015 v2/embedded2. Holdout3 đã bị mở từ trước nên đây chỉ là so sánh A/B.
+
+| | Baseline | v2 trước sửa | v2 sau sửa |
+|---|---|---|---|
+| đủ ý | 92 (76,7%) | 80 (66,7%) | **87 (72,5%)** |
+| thiếu ý | 13 (10,8%) | 10 (8,3%) | 10 (8,3%) |
+| từ chối/hỏi lại nhầm | 15 | 23 | **15** |
+| lỗi | 0 | 7 | 8 |
+| không đáp án: đúng / trả lời nhầm / lỗi | 36 / 4 / 0 | 31 / 6 / 3 | 34 / 6 / 0 |
+
+`UNIT_MISMATCH` trong log: 0. Từ chối nhầm giảm 23 → 15, bằng baseline. Đủ ý vẫn thấp hơn baseline 5 ca, và **lỗi vẫn là 8**, chưa đạt A2 (0 lỗi).
+
+**Nguyên nhân 8 lỗi (TerminalError, đều nằm ở ca 0001–0012 của lượt chạy):** log cho thấy runtime đọc lại toàn bộ 2.019 dòng nguồn khoảng mỗi 5 phút, mỗi lần 19–68 s (`rag_v2_sources_read ok ms=…`). Đó là cơ chế stale-while-revalidate 300 s. Lượt đầu tiên sau khoảng nghỉ kích hoạt lần đọc lại này, và trong lúc nó chạy các lượt kế tiếp bị chậm quá 12 s. Điều này không liên quan đến nội dung câu hỏi và không do bản sửa. Chưa kiểm chứng riêng phần "lần đọc lại làm chậm các lượt khác"; chỉ biết các lỗi trùng thời điểm với lần đọc lại.
+
+**Không đổi mà chờ quyết định:** nâng thời hạn cache từ 300 s lên vài chục phút sẽ bỏ các lần đọc lại này, nhưng kéo dài thời gian một nguồn bị thu hồi vẫn nằm trong ngữ cảnh đưa cho mô hình (nguồn được trích dẫn vẫn bị kiểm lại trực tiếp trước khi trả lời). Đó là đánh đổi về kiểm soát nguồn nên tôi không tự đổi.
+
+**Quyết định (2026-11-01):** giữ thời hạn cache nguồn 300 s, không nâng. 8 lỗi hết hạn đầu lượt chạy là giới hạn đã biết của cơ chế này.

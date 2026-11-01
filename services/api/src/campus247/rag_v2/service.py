@@ -227,12 +227,11 @@ class RagV2Service:
                 trace.rerank_scores = [c.rerank_score for c in retrieval.candidates if c.rerank_score is not None]
                 units = {c.unit_id: unit for c in retrieval.candidates if (unit := index.get(c.unit_id)) is not None}
                 chunk_unit = getattr(index, "chunk_unit", None)
-                truncated = False
                 if units:
                     # Read the whole parent rows of the best units (answers often sit in sibling
                     # rows or footnotes the fine unit lacks). The provider gateway rejects a request
                     # above 28,000 bytes of JSON, so rows are packed by real payload bytes.
-                    units, truncated = pack_context(units.values(), chunk_unit, budget=CONTEXT_BYTES,
+                    units, _ = pack_context(units.values(), chunk_unit, budget=CONTEXT_BYTES,
                                                     max_parents=CONTEXT_CHUNKS)
                 if not units and retrieval.trace.get("vector_failed"):
                     # Nothing came back and a retrieval branch failed: an outage, not an absent source.
@@ -312,7 +311,7 @@ class RagV2Service:
                     if malformed:
                         # Unparseable model output is a provider fault, not missing evidence.
                         return await finish(build_outcome(u, infra_error=True))
-                    return await finish(build_outcome(u, verdicts, units, coverage=0.9 if truncated else 1.0), units)
+                    return await finish(build_outcome(u, verdicts, units), units)
                 phase = monotonic()
                 semantic = None
                 for attempt in range(2):
@@ -337,7 +336,7 @@ class RagV2Service:
                         trace.statement_rejections[i] = ("SEMANTIC_UNSUPPORTED",)
                 missing = _uncovered(facets, facet_of, verdicts, aligned)
                 return await finish(build_outcome(u, verdicts, units, semantic_results=aligned,
-                    coverage=0.9 if truncated or missing else 1.0, missing_parts=missing), units)
+                    coverage=0.9 if missing else 1.0, missing_parts=missing), units)
         except Exception as exc:  # noqa: BLE001 -- port failures must become content-free typed outcomes
             logging.getLogger("campus247.rag_v2").warning("rag_v2_failure kind=%s where=%s detail=%s", type(exc).__name__,
                 exc.__traceback__.tb_next.tb_frame.f_code.co_name if exc.__traceback__ and exc.__traceback__.tb_next else "?",
