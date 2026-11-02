@@ -1,0 +1,17 @@
+{
+ "at": "2026-11-02T00:00:00+00:00",
+ "note": "Pinned handbook publication: official huce.edu.vn article -> flipbook link -> CDN PDF, from files already retained in data/huce-public-20261013.",
+ "results": [
+  {
+   "publisher_url": "https://huce.edu.vn/so-tay-sinh-vien-nam-hoc-2026-2027-truong-dai-hoc-xay-dung-ha-noi",
+   "publisher_file": "data/huce-public-20261013/handbook-publication.html",
+   "publisher_sha256": "8100e7d0066ea08f4634b91d87e21056e2a97c03e6456ba37a0556e95b8ffb45",
+   "publisher_link": "https://heyzine.com/flip-book/5d2f740216.html?#page/2",
+   "viewer_file": "data/huce-public-20261013/handbook-viewer.html",
+   "viewer_sha256": "064f5593fd282a8fee5ea1d75016a9e851147238564860235e356252ea4b56cd",
+   "linked_url": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+   "source_file": "data/huce-public-20261013/handbook-2026-2027.pdf",
+   "source_sha256": "007aba0ee8bcb35fdede0360d4ee9d3c24323a21f74f309ab23431dcfd7b3213"
+  }
+ ]
+}

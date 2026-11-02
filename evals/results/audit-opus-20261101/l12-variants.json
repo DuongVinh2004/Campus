@@ -1,0 +1,287 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793634253.504361,
+ "wall_seconds": 27.85512375831604,
+ "paid_calls": 10,
+ "ledger_before": 74324,
+ "ledger_after": 74334,
+ "records": [
+  {
+   "case_id": "L12-V1",
+   "question": "Ai là người ký quyết định kỷ luật sinh viên?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.036237700027413666,
+   "first_content_seconds": 9.316,
+   "started_at": 1793634253.509644,
+   "conversation_id": "01a19cee-bac9-7ef8-8b09-f334350d33d8",
+   "timeline": [
+    [
+     "message.started",
+     0.036
+    ],
+    [
+     "message.delta",
+     9.316
+    ],
+    [
+     "message.delta",
+     9.317
+    ],
+    [
+     "message.delta",
+     9.317
+    ],
+    [
+     "message.delta",
+     9.318
+    ],
+    [
+     "message.delta",
+     9.318
+    ],
+    [
+     "message.delta",
+     9.319
+    ],
+    [
+     "message.delta",
+     9.32
+    ],
+    [
+     "citation.added",
+     9.687
+    ],
+    [
+     "message.completed",
+     9.798
+    ]
+   ],
+   "final": {
+    "message_id": "01a19cee-bae4-78b6-9281-66ecd482d891",
+    "conversation_id": "01a19cee-bac9-7ef8-8b09-f334350d33d8",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Hiệu trưởng ký quyết định kỷ luật sinh viên. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19cee-df1e-7265-8c1a-297bc6f5cc09",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-5ec6-7a35-9897-04926c0d1259",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 45 · chars 0:1899",
+        "page_start": 45,
+        "page_end": 45
+       },
+       "quote": "Trang 45\nTRÁCH NHIỆM TRÌNH TỰ CÔNG VIỆC DIỄN GIẢI\n- Tùy thuộc tính chất, mức độ, hậu quả của hành \nvi vi phạm của sinh viên, các đơn vị gửi đề đề \nxuất kỷ luật về Khoa/Ban quản lý sinh viên.\nĐƠN VỊ\nPHÒNG\nCTCT&QLSV\nCHUYÊN VIÊN\nPHỤ TRÁCH\nKHOA/BAN\nLỚP SINH VIÊN\nĐỀ XUẤT KỶ LUẬT SINH \nHĐKT & KLSV CẤP TRƯỜNG \nQUYẾT ĐỊNH\nSINH VIÊN\nHĐ KHEN THƯỞNG\n& KỶ LUẬT SINH VIÊN\nCẤP TRƯỜNG\nLÃNH ĐẠO PHÒNG\nCTCT&QLSV\nHĐ KHEN THƯỞNG\nVÀ KỶ LUẬT\nSINH VIÊN\nCẤP TRƯỜNG\nHIỆU TRƯỞNG\nLÃNH ĐẠO PHÒNG\nCTCT&QLSV\nCHUYÊN VIÊN\nPHỤ",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "2546565b1ce685151887480b12829567e834bd5230584df104c2ab487df999d6",
+       "unit_id": "39d5d633e5093252"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Hiệu trưởng ký quyết định kỷ luật sinh viên. [CIT-001]",
+   "seconds": 9.79851040005451,
+   "user": 0
+  },
+  {
+   "case_id": "L12-V2",
+   "question": "Quyết định kỷ luật sinh viên do ai ký?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04989600001135841,
+   "first_content_seconds": 1.387,
+   "started_at": 1793634265.3086429,
+   "conversation_id": "01a19cee-e8e3-74e1-b4fe-2f4d8e29b796",
+   "timeline": [
+    [
+     "message.started",
+     0.05
+    ],
+    [
+     "message.delta",
+     1.387
+    ],
+    [
+     "message.delta",
+     1.387
+    ],
+    [
+     "message.delta",
+     1.388
+    ],
+    [
+     "message.delta",
+     1.389
+    ],
+    [
+     "message.delta",
+     1.389
+    ],
+    [
+     "message.delta",
+     1.39
+    ],
+    [
+     "message.delta",
+     1.39
+    ],
+    [
+     "message.delta",
+     1.391
+    ],
+    [
+     "message.delta",
+     1.392
+    ],
+    [
+     "message.delta",
+     1.392
+    ],
+    [
+     "message.delta",
+     1.393
+    ],
+    [
+     "message.delta",
+     1.393
+    ],
+    [
+     "message.delta",
+     1.394
+    ],
+    [
+     "message.delta",
+     1.394
+    ],
+    [
+     "message.delta",
+     1.395
+    ],
+    [
+     "message.delta",
+     1.396
+    ],
+    [
+     "message.delta",
+     1.396
+    ],
+    [
+     "message.completed",
+     1.43
+    ]
+   ],
+   "final": {
+    "message_id": "01a19cee-e908-7280-b241-f245d5e711ae",
+    "conversation_id": "01a19cee-e8e3-74e1-b4fe-2f4d8e29b796",
+    "status": "abstained",
+    "response_class": "clarification_request",
+    "content": "Câu hỏi chưa rõ nội dung. Bạn muốn hỏi về học phí, học bổng, đăng ký học phần, bảo lưu, tốt nghiệp hay ký túc xá?",
+    "citations": []
+   },
+   "outcome_class": "clarify",
+   "answer_text": "Câu hỏi chưa rõ nội dung. Bạn muốn hỏi về học phí, học bổng, đăng ký học phần, bảo lưu, tốt nghiệp hay ký túc xá?",
+   "seconds": 1.4297021999955177,
+   "user": 0
+  },
+  {
+   "case_id": "L12-V3",
+   "question": "Theo Sổ tay sinh viên, ai ký quyết định kỷ luật đối với sinh viên vi phạm?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03652720001991838,
+   "first_content_seconds": 9.673,
+   "started_at": 1793634268.7388985,
+   "conversation_id": "01a19cee-f647-7676-bdb1-9a4938a45471",
+   "timeline": [
+    [
+     "message.started",
+     0.037
+    ],
+    [
+     "message.delta",
+     9.673
+    ],
+    [
+     "message.delta",
+     9.674
+    ],
+    [
+     "message.delta",
+     9.674
+    ],
+    [
+     "message.delta",
+     9.675
+    ],
+    [
+     "message.delta",
+     9.676
+    ],
+    [
+     "message.delta",
+     9.676
+    ],
+    [
+     "message.delta",
+     9.677
+    ],
+    [
+     "citation.added",
+     10.037
+    ],
+    [
+     "message.completed",
+     10.153
+    ]
+   ],
+   "final": {
+    "message_id": "01a19cee-f661-78d8-952e-b129a40b84dc",
+    "conversation_id": "01a19cee-f647-7676-bdb1-9a4938a45471",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Hiệu trưởng ký quyết định kỷ luật sinh viên. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19cef-1c09-75fe-986c-d1f71f79f65e",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-5ec6-7a35-9897-04926c0d1259",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 45 · chars 0:1899",
+        "page_start": 45,
+        "page_end": 45
+       },
+       "quote": "Trang 45\nTRÁCH NHIỆM TRÌNH TỰ CÔNG VIỆC DIỄN GIẢI\n- Tùy thuộc tính chất, mức độ, hậu quả của hành \nvi vi phạm của sinh viên, các đơn vị gửi đề đề \nxuất kỷ luật về Khoa/Ban quản lý sinh viên.\nĐƠN VỊ\nPHÒNG\nCTCT&QLSV\nCHUYÊN VIÊN\nPHỤ TRÁCH\nKHOA/BAN\nLỚP SINH VIÊN\nĐỀ XUẤT KỶ LUẬT SINH \nHĐKT & KLSV CẤP TRƯỜNG \nQUYẾT ĐỊNH\nSINH VIÊN\nHĐ KHEN THƯỞNG\n& KỶ LUẬT SINH VIÊN\nCẤP TRƯỜNG\nLÃNH ĐẠO PHÒNG\nCTCT&QLSV\nHĐ KHEN THƯỞNG\nVÀ KỶ LUẬT\nSINH VIÊN\nCẤP TRƯỜNG\nHIỆU TRƯỞNG\nLÃNH ĐẠO PHÒNG\nCTCT&QLSV\nCHUYÊN VIÊN\nPHỤ",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "2546565b1ce685151887480b12829567e834bd5230584df104c2ab487df999d6",
+       "unit_id": "39d5d633e5093252"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Hiệu trưởng ký quyết định kỷ luật sinh viên. [CIT-001]",
+   "seconds": 10.152656499994919,
+   "user": 0
+  }
+ ]
+}
