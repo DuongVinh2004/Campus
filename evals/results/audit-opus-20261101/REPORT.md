@@ -393,3 +393,10 @@ Bằng chứng: lượt chạy thật trên 8015 sau khi khởi động lại b�
 
 ## Cập nhật cuối 5 (02/11) — xác nhận test đỏ có từ trước
 Chạy trực tiếp trên snapshot trước khi sửa (`backup/worktree-20261101-audit`, worktree tạm, `PYTHONPATH` trỏ vào snapshot, dữ liệu dùng chung chỉ đọc): `test_public_rag_wiring::test_retained_huce_index_loads…`, `test_huce_service_release::test_qlda_visual_correction…`, `test_multi_agent_api::test_corrective_worker_calls_actual_lexical_search…`, hai test `dependency_resolution/test_verifier` và `test_write_route_inventory` **đều đã đỏ trước mọi thay đổi của phiên audit**. Trên snapshot còn đỏ thêm một số test khác (các sửa hôm nay đã làm xanh vài test, ví dụ `test_huce_discovery`). Kết luận: các test đỏ còn lại không do thay đổi của tôi; sửa chúng đòi hỏi đổi bằng chứng/kỳ vọng đã duyệt hoặc ghi vào cây fixture lịch sử nên để chờ người sở hữu. Worktree tạm và liên kết dữ liệu đã gỡ; `data/` còn nguyên.
+
+## Cập nhật cuối 6 (02/11) — đọc lại ba ca "thiếu ý" của lượt 45 ca
+Bằng chứng: đọc đáp án trong `final2-seq.json` đối chiếu `required_facts`; bộ chấm chung `rag_v2_scoring.fact_matches` chạy lại trên chính đáp án.
+- **AU-A02:** đáp án nêu đúng "trong thời hạn 03 năm tính từ khi thôi học…"; bộ chấm báo thiếu vì câu dài chứa "chưa" làm lệch phân cực với dữ kiện khẳng định "03 năm".
+- **AU-A08:** đáp án nêu đúng việc được chuyển sang "vừa làm vừa học"; bộ chấm báo thiếu vì cụm này nằm cùng mệnh đề với "không tốt nghiệp được".
+- **AU-A10:** đáp án "05 Phó Giáo sư và 26 Tiến sĩ" đúng; dữ kiện gold viết ngược thứ tự ("Tiến sĩ 26", "Phó Giáo sư 05").
+- Kết luận: ba ca này là giới hạn của bộ chấm tự động (chặt hơn cần thiết), không phải lỗi nội dung. Ở lượt 45 ca, theo bộ chấm: 20 đủ ý / 3 thiếu ý / 2 từ chối nhầm; sau khi đọc tay, 23/25 ca có đáp án đã trả lời đúng; 2 ca còn lại là AU-A25 (L-12, chờ phê duyệt) và AU-A23 (giao động giữa các lần chạy). Không sửa bộ chấm vì nó được dùng chung cho nhiều bộ đo cũ; việc nới sẽ làm số liệu cũ không so sánh được.
