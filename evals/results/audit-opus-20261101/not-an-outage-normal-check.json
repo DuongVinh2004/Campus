@@ -1,0 +1,246 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793548248.5125666,
+ "wall_seconds": 15.572448253631592,
+ "paid_calls": 8,
+ "ledger_before": 72658,
+ "ledger_after": 72666,
+ "records": [
+  {
+   "case_id": "AU-A03",
+   "question": "Đi thực hành phòng máy của trung tâm CNTT muộn bao nhiêu phút thì không được vào nữa?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03199029999086633,
+   "first_content_seconds": 5.515,
+   "started_at": 1793548248.5161383,
+   "conversation_id": "01a197ce-65c7-7827-89a4-76289090df47",
+   "timeline": [
+    [
+     "message.started",
+     0.032
+    ],
+    [
+     "message.delta",
+     5.515
+    ],
+    [
+     "message.delta",
+     5.516
+    ],
+    [
+     "message.delta",
+     5.517
+    ],
+    [
+     "message.delta",
+     5.518
+    ],
+    [
+     "message.delta",
+     5.519
+    ],
+    [
+     "message.delta",
+     5.519
+    ],
+    [
+     "message.delta",
+     5.52
+    ],
+    [
+     "message.delta",
+     5.521
+    ],
+    [
+     "message.delta",
+     5.521
+    ],
+    [
+     "message.delta",
+     5.522
+    ],
+    [
+     "citation.added",
+     5.592
+    ],
+    [
+     "citation.added",
+     5.613
+    ],
+    [
+     "message.completed",
+     5.628
+    ]
+   ],
+   "final": {
+    "message_id": "01a197ce-65df-769b-8116-c978abd9bacd",
+    "conversation_id": "01a197ce-65c7-7827-89a4-76289090df47",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Sinh viên đến muộn sau 15 phút thì không được vào phòng máy. [CIT-001] [CIT-002]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a197ce-7b4e-718e-92c7-caaf56b6e8bd",
+       "source_id": "2d8c1b76-749f-7a7a-890b-e41c8646affe",
+       "document_version_id": "01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "chunk_id": "01a168c6-d1d1-7d9a-b71d-c82f306d0ed2",
+       "source_title": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024",
+       "canonical_uri": "https://drive.google.com/file/d/17fHGSp05BTd0tp2qwJKtX_wdO6ykJu1G/preview?",
+       "version_label": "original-span-01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024 — Trang 2",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "NỘI QUY PHÒNG THỰC HÀNH MÁY TÍNH\nTRUNG TÂM CNTT & CSDL\n***\n1. Sinh viên học, thực hành, thi tại phòng máy tính phải chấp hành đúng nội quy & quy chế của Nhà trường, nội quy của phòng máy.\n2. Tuyệt đối chấp hành đúng theo sự hướng dẫn của cán bộ phòng máy và giảng viên hướng dẫn.\n3. Sinh viên vào học, thực hành, thi phải đến đúng giờ theo lịch đăng ký của giảng viên hướng dẫn, đến muộn sau 15 phút không được vào phòng máy.\n4. Khi vào phòng máy phải đeo thẻ sinh viên, xếp hàng trật tự, để giầy dép",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "10edebadcfe495536d4606b62f68befb0588f93b5ee802d69b4c84c51b453d17",
+       "unit_id": "359e819dcfdd6dda"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-002",
+      "citation": {
+       "citation_id": "01a197ce-7b4e-7e59-b540-94fcba181eb1",
+       "source_id": "2d8c1b76-749f-7a7a-890b-e41c8646affe",
+       "document_version_id": "01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "chunk_id": "01a168c6-d24e-7d82-91e9-4278a3b3571e",
+       "source_title": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024",
+       "canonical_uri": "https://drive.google.com/file/d/17fHGSp05BTd0tp2qwJKtX_wdO6ykJu1G/preview?",
+       "version_label": "original-span-01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024 — Nội quy — khoản3",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "3. Sinh viên vào học, thực hành, thi phải đến đúng giờ theo lịch đăng ký của giảng viên hướng dẫn, đến muộn sau 15 phút không được vào phòng máy",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "3f5dd2cb610bbab4628d529859a8e9733dec669ae5c06a8dfe11058afad81f6a",
+       "unit_id": "c6558764d6ab5061"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Sinh viên đến muộn sau 15 phút thì không được vào phòng máy. [CIT-001] [CIT-002]",
+   "seconds": 5.628398499975447,
+   "user": 0
+  },
+  {
+   "case_id": "AU-A09",
+   "question": "Đại hội Hội Sinh viên trường lần thứ 20 tổ chức ngày nào?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03480550000676885,
+   "first_content_seconds": 6.968,
+   "started_at": 1793548255.1447322,
+   "conversation_id": "01a197ce-7fae-7bef-9a73-7c10d303a464",
+   "timeline": [
+    [
+     "message.started",
+     0.035
+    ],
+    [
+     "message.delta",
+     6.968
+    ],
+    [
+     "message.delta",
+     6.968
+    ],
+    [
+     "message.delta",
+     6.969
+    ],
+    [
+     "message.delta",
+     6.97
+    ],
+    [
+     "message.delta",
+     6.97
+    ],
+    [
+     "message.delta",
+     6.971
+    ],
+    [
+     "message.delta",
+     6.971
+    ],
+    [
+     "message.delta",
+     6.972
+    ],
+    [
+     "message.delta",
+     6.973
+    ],
+    [
+     "message.delta",
+     6.973
+    ],
+    [
+     "message.delta",
+     6.974
+    ],
+    [
+     "message.delta",
+     6.975
+    ],
+    [
+     "citation.added",
+     7.359
+    ],
+    [
+     "message.completed",
+     7.483
+    ]
+   ],
+   "final": {
+    "message_id": "01a197ce-7fc5-7edf-b795-f9fb499f4828",
+    "conversation_id": "01a197ce-7fae-7bef-9a73-7c10d303a464",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Đại hội đại biểu Hội Sinh viên trường lần thứ 20 được tổ chức vào ngày 17/6/2023. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a197ce-9ade-7cbe-9cb4-cbddad2d430f",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-6101-7e28-9676-1dbc8d68835c",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 91 · chars 0:683",
+        "page_start": 91,
+        "page_end": 91
+       },
+       "quote": "CÓ NÊN \nTHAM GIA \nHỘI SINH \nVIÊN?\nHội Sinh viên trường Đại học Xây \ndựng Hà Nội đã trải qua 20 kỳ đại \nhội với lần gần nhất là Đại hội đại \nbiểu Hội Sinh viên trường lần thứ 20 \ntổ chức vào ngày 17/6/2023\nBẠN CÓ KỸ NĂNG TỔ CHỨC CÔNG VIỆC?\nBẠN CÓ KỸ NĂNG LẬP KẾ HOẠCH CHƯƠNG TRÌNH?\nBẠN ĐAM MÊ CHỤP ẢNH, QUAY VIDEO?\nBẠN CÓ NĂNG KHIỂU VỀ THIẾT KẾ, TẠO VISUAL?\nBẠN CÓ KHẢ NĂNG ĐỐI NGOẠI?\nBẠN CÓ KHẢ NĂNG VỀ CA HÁT, GUITAR, NHẢY, MÚA, VÕ THUẬT?\nBẠN THÍCH CÁC HOẠT ĐỘNG XÃ HỘI, TÌNH NGUYỆN?\nBẠN CÓ NĂNG",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "f5d9e0958388efb5d801a3c61238d31d813dba87c6a649c158ec00db58d8f1d9",
+       "unit_id": "99bb3e919779c4f7"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Đại hội đại biểu Hội Sinh viên trường lần thứ 20 được tổ chức vào ngày 17/6/2023. [CIT-001]",
+   "seconds": 7.483366800006479,
+   "user": 0
+  }
+ ]
+}

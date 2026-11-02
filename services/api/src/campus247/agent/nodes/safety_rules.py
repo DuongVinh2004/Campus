@@ -62,7 +62,14 @@ _HIGH_RULES: tuple[tuple[str, str], ...] = (
 
 _PROMPT_INJECTION_RULE = re.compile(
     r"(?:\bignore\s+previous\s+instructions\b|\bsystem\s+prompt\b|"
-    r"\bbo\s*qua\s*(?:cac\s*)?chi\s*thi\s*truoc\b|\btiet\s*lo\b.{0,30}\bhuong\s*dan\s*he\s*thong\b)"
+    r"\bbo\s*qua\s*(?:cac\s*)?chi\s*thi\s*truoc\b|\btiet\s*lo\b.{0,30}\bhuong\s*dan\s*he\s*thong\b|"
+    # Requests for secrets, hidden instructions, debug bypasses or other users' conversations.
+    r"\b(?:api\s*key|khoa\s*api|secret\s*key)\b|"
+    r"\bmat\s*khau\s+(?:he\s*thong|co\s*so\s*du\s*lieu|database|quan\s*tri|admin|server|may\s*chu)\b|"
+    r"\btoken\s+(?:he\s*thong|truy\s*cap|quan\s*tri|admin)\b|\bchi\s*dan\s*an\b|"
+    r"\b(?:bat|che\s*do)\s*debug\b|\bbo\s*qua\s*(?:viec\s*)?kiem\s*(?:tra\s*)?nguon\b|"
+    r"\b(?:noi\s*dung|lich\s*su)\s+(?:cac\s*)?(?:cuoc\s*tro\s*chuyen|hoi\s*thoai)\s+cua\s+"
+    r"(?:sinh\s*vien|nguoi\s*dung|user|nguoi)\s+khac\b)"
 )
 
 
@@ -74,6 +81,79 @@ def _normalize(text: str) -> str:
 
 def _decision(severity: SafetySeverity, reason: str | None, *, crisis: bool = False) -> SafetyDecision:
     return SafetyDecision(severity=severity, is_crisis=crisis, reason=reason)
+
+
+def _generic_public_rule_question(query_text: str, text: str) -> bool:
+    """Human-authorized distinction for generic rules, never an individual case."""
+    if "?" not in query_text or not re.match(
+            r"^(?:theo (?:noi quy|quy che|quy dinh)[^,?]{0,160},\s*)?"
+            r"sinh vien (?:nao )?vi pham noi quy\b", text):
+        return False
+    if re.search(r"\b(?:toi|em|minh|mssv|ma sinh vien|sv\d+|sinh vien nay|sinh vien do|"
+                 r"sinh vien ten|ho so|to cao|khieu nai|chay diem)\b", text):
+        return False
+    if re.search(r"\b(?:bạn|anh|chị|ông|bà)\b", query_text, re.I):
+        return False
+    # Names cannot be introduced inside the otherwise generic subject/rule.
+    if re.search(r"\b[A-ZĐ][a-zà-ỹ]+(?:\s+[A-ZĐ][a-zà-ỹ]+)+\b", query_text):
+        return False
+    return True
+
+
+def _public_waiver_deadline_reference(query_text: str, text: str) -> bool:
+    if "?" not in query_text:
+        return False
+    if not any(term in text for term in ("han nop ho so", "thoi han nop", "thoi gian tiep nhan ho so")):
+        return False
+    # The question must be bounded to a numbered notice or an explicit school year; a
+    # bare "thông báo miễn giảm" stays protected. It no longer has to start with "thông báo".
+    if not (re.search(r"\bthong bao(?:\s+so)?\s+\d{1,6}\b", text)
+            or re.search(r"\b20\d{2}\s*[-–/]\s*20\d{2}\b", text)):
+        return False
+    # Other money signals (refund, debt, unaffordable fees) are never excused by a deadline.
+    if re.search(r"\b(?:hoan\s*tien|no\s*hoc\s*phi|tang\s*hoc\s*phi|khong\s*du\s*tien)\b", text):
+        return False
+    if re.search(r"\b(?:toi|em|minh|ban|mssv|ma sinh vien|sv\d+|ho so cua|sinh vien ten|"
+                 r"gia han|ngoai le|tre han|qua han|duoc mien|xin mien)\b", text):
+        return False
+    if re.search(r"\b[A-ZĐ][a-zà-ỹ]+(?:\s+[A-ZĐ][a-zà-ỹ]+)+\b", query_text):
+        return False
+    return not bool(_PROMPT_INJECTION_RULE.search(text))
+
+
+def is_public_policy_question(query_text: str) -> bool:
+    """Separate reading a policy from deciding or acting on a private case."""
+    from campus247.agent.nodes.intent import (
+        is_human_handover_request, is_information_request, is_other_person_data_request,
+    )
+    text = _normalize(query_text)
+    # Deadline questions retain the narrower, bounded notice/year exception below.
+    if re.search(r"\b(?:han nop|thoi han|het han|gia han|khi nao|ngay nao|bao gio|"
+                 r"truoc ngay|deadline|han chot|tre han|qua han|han dong|han cuoi|chot han|"
+                 r"thoi gian nop|thoi gian tiep nhan ho so)\b", text):
+        return False
+    if (not is_information_request(query_text) or is_human_handover_request(query_text)
+            or is_other_person_data_request(query_text) or _PROMPT_INJECTION_RULE.search(text)):
+        return False
+    policy = bool(re.search(r"\b(?:quy dinh|quy che|thu tuc|quy trinh|huong dan)\b", text))
+    if re.search(r"\b(?:ket luan|kiem tra ho so|xem ho so|quyet dinh ky luat cua|phe duyet|duyet ho so)\b", text):
+        return False
+    if re.search(r"\b(?:toi|em|minh)\s+(?:(?:muon|can|yeu cau)\s+)?(?:khieu nai|to cao|gia han)\b", text):
+        return False
+    if not policy and re.search(r"\b(?:khieu nai|to cao|chay diem|gia han|ngoai le)\b", text):
+        return False
+    if (re.search(r"\b(?:mssv|ma sinh vien|sv\d+)\b", text)
+            or re.search(r"\b[A-ZĐ][a-zà-ỹ]+(?:\s+[A-ZĐ][a-zà-ỹ]+){2,}\b", query_text)):
+        return False
+    if (re.search(r"\b(?:no hoc phi|khong du tien)\b", text)
+            and not any(p in text for p in ("quy dinh", "quy che", "thu tuc", "dieu kien"))):
+        return False
+    topic = bool(re.search(r"\b(?:hoc phi|hoc bong|mien|giam|ho tro chi phi|ky luat|"
+                           r"dinh chi|phong thi|cam thi|quy dinh|quy che|thu tuc)\b", text))
+    read = bool(re.search(r"\b(?:quy dinh|quy che|thu tuc|dieu kien|ho so|giay to|"
+                          r"bao nhieu|bao lau|nhu the nao|dung khong|phai nop|can nop|"
+                          r"nop lai|moi hoc ky|mot lan|duoc khong)\b", text))
+    return topic and read
 
 
 def evaluate_deterministic_safety(query_text: str) -> SafetyDecision:
@@ -88,6 +168,15 @@ def evaluate_deterministic_safety(query_text: str) -> SafetyDecision:
 
     for reason, pattern in _HIGH_RULES:
         if re.search(pattern, text):
+            if (reason in {"financial_impact", "disciplinary_or_legal", "academic_rights_impact"}
+                    and is_public_policy_question(query_text)):
+                continue
+            if reason == "financial_impact" and _public_waiver_deadline_reference(query_text, text):
+                continue
+            if reason == "disciplinary_or_legal" and _generic_public_rule_question(query_text, text):
+                # Only the broad 'bị đình chỉ' branch is disambiguated. Other
+                # high-priority rules continue below; critical rules ran first.
+                continue
             return _decision(SafetySeverity.HIGH, reason)
 
     if _PROMPT_INJECTION_RULE.search(text):

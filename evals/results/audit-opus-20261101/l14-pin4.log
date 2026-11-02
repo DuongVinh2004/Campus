@@ -1,0 +1,7 @@
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.643,"total":1.662}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.734,"total":0.749}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.091,"total":1.102}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.089,"total":1.1}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.01,"total":1.022}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.678,"total":0.691}}
+4 {'facts_in_context': 281, 'dev': 262, 'audit': 19}

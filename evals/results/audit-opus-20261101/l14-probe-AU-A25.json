@@ -1,0 +1,13 @@
+{
+  "summary": {
+    "base": {
+      "n": 1,
+      "all_facts": 1,
+      "gold_row": 1,
+      "v_form": 1
+    }
+  },
+  "contexts": [],
+  "authorized": false,
+  "embedding_mode": "http"
+}

@@ -10,7 +10,15 @@ pnpm build      # chỉ tạo artifact frontend để kiểm, không khởi đ�
 .venv/Scripts/python.exe -B scripts/campus.py status
 ```
 
-`start` tự build khi mã đổi, không đổi cổng, không tắt tiến trình đang chiếm cổng. Chạy `status` để biết trạng thái thật; `ConnectError` nghĩa là runtime chưa chạy. `pnpm lint` (tsc) đã kiểm chạy được. Hạ tầng cục bộ: `compose.yaml` (Postgres pgvector 5433, Redis 6380).
+`start` không đổi cổng, không tắt tiến trình đang chiếm cổng; tiến trình đang chạy được tái dùng, nên mã API/web mới chỉ có hiệu lực sau khi dừng đúng tiến trình đó. Chạy `status` để biết trạng thái thật.
+
+Runtime 8015 gồm: API (`scripts/knowledge_platform.py serve --generation --port 8015 --frontend-port 3015`, proxy luôn cả trang web), frontend là một snapshot build bất biến phục vụ ở 3015 (`scripts/knowledge_platform_frontend.py build --name <tên mới>`), Postgres native `127.0.0.1:55437`, mô hình nhúng local `127.0.0.1:18081`. Lệnh khởi động đầy đủ (RAG v2, chỉ mục đã kiểm định):
+
+```bash
+PYTHONPATH=data/rag_v2_vendor infra/local/rag-fixture/.venv/Scripts/python.exe -B -X utf8 scripts/knowledge_platform_runtime.py start --defer-worker --engine v2 --rag-v2-index data/rag_v2_index/embedded2 --frontend-name <snapshot>
+```
+
+`PYTHONPATH=data/rag_v2_vendor` cần cho numpy của v2 (venv runtime không có numpy). API nạp chỉ mục khoảng 40 s; sau đó tác vụ làm nóng nguồn chạy nền, `/health/ready` → `rag_v2.warm` = `pending|ready|failed`. Kiểm `rag_v2.enabled: true` sau khi khởi động. `pnpm lint` (tsc) đã kiểm chạy được. Hạ tầng compose (`compose.yaml`: Postgres pgvector 5433, Redis 6380) không phải DB của runtime 8015.
 
 ## Bảng kiểm tra theo loại thay đổi
 
@@ -33,4 +41,4 @@ Nguyên tắc: kiểm tra vừa đủ với rủi ro. Thay đổi nhỏ không c
 
 ## Trung thực khi báo xong
 
-Nêu lệnh đã chạy và kết quả. Test tổng hợp đạt không chứng minh dùng được thật với dữ liệu trường. Phần chưa chạy, chưa kết nối, hoặc bị chặn phải ghi rõ.
+Nêu lệnh đã chạy và kết quả. Ghi bằng chứng là gì trong một câu. Ca tổng hợp có đáp án chuẩn kiểm bằng mã là bằng chứng nghiệm thu hợp lệ; mức dùng được với người dùng thật vẫn ghi là chưa đo. Phần chưa chạy, chưa kết nối, hoặc bị chặn phải ghi rõ.

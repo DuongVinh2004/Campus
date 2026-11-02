@@ -1215,7 +1215,7 @@ a {
   justify-content: center;
   gap: 8px;
   background-color: var(--color-primary);
-  color: #ffffff !important;
+  color: var(--color-on-primary) !important;
   font-weight: 600;
   font-size: 14.5px;
   min-height: var(--target-size-min, 44px);

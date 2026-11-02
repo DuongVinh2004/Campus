@@ -1,0 +1,1498 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793549183.0829215,
+ "wall_seconds": 46.2184784412384,
+ "paid_calls": 14,
+ "ledger_before": 72666,
+ "ledger_after": 72680,
+ "records": [
+  {
+   "case_id": "AU-A18",
+   "question": "Hồ sơ minh chứng miễn giảm học phí em phải nộp lại mỗi học kỳ hay chỉ nộp một lần?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04784250000375323,
+   "first_content_seconds": 11.007,
+   "started_at": 1793549183.0901072,
+   "conversation_id": "01a197dc-a878-73a7-839c-31008b52c815",
+   "timeline": [
+    [
+     "message.started",
+     0.048
+    ],
+    [
+     "message.delta",
+     11.007
+    ],
+    [
+     "message.delta",
+     11.008
+    ],
+    [
+     "message.delta",
+     11.008
+    ],
+    [
+     "message.delta",
+     11.009
+    ],
+    [
+     "message.delta",
+     11.01
+    ],
+    [
+     "message.delta",
+     11.01
+    ],
+    [
+     "message.delta",
+     11.011
+    ],
+    [
+     "message.delta",
+     11.011
+    ],
+    [
+     "message.delta",
+     11.012
+    ],
+    [
+     "message.delta",
+     11.013
+    ],
+    [
+     "message.delta",
+     11.013
+    ],
+    [
+     "message.delta",
+     11.014
+    ],
+    [
+     "message.delta",
+     11.015
+    ],
+    [
+     "message.delta",
+     11.015
+    ],
+    [
+     "message.delta",
+     11.016
+    ],
+    [
+     "message.delta",
+     11.016
+    ],
+    [
+     "message.delta",
+     11.017
+    ],
+    [
+     "message.delta",
+     11.018
+    ],
+    [
+     "message.delta",
+     11.018
+    ],
+    [
+     "message.delta",
+     11.019
+    ],
+    [
+     "message.delta",
+     11.019
+    ],
+    [
+     "message.delta",
+     11.02
+    ],
+    [
+     "message.delta",
+     11.021
+    ],
+    [
+     "message.delta",
+     11.022
+    ],
+    [
+     "message.delta",
+     11.022
+    ],
+    [
+     "message.delta",
+     11.023
+    ],
+    [
+     "message.delta",
+     11.024
+    ],
+    [
+     "message.delta",
+     11.024
+    ],
+    [
+     "message.delta",
+     11.025
+    ],
+    [
+     "message.delta",
+     11.026
+    ],
+    [
+     "message.delta",
+     11.026
+    ],
+    [
+     "message.delta",
+     11.027
+    ],
+    [
+     "message.delta",
+     11.027
+    ],
+    [
+     "message.delta",
+     11.028
+    ],
+    [
+     "message.delta",
+     11.029
+    ],
+    [
+     "message.delta",
+     11.029
+    ],
+    [
+     "message.delta",
+     11.03
+    ],
+    [
+     "message.delta",
+     11.03
+    ],
+    [
+     "message.delta",
+     11.031
+    ],
+    [
+     "message.delta",
+     11.032
+    ],
+    [
+     "message.delta",
+     11.032
+    ],
+    [
+     "message.delta",
+     11.033
+    ],
+    [
+     "message.delta",
+     11.033
+    ],
+    [
+     "message.delta",
+     11.034
+    ],
+    [
+     "message.delta",
+     11.035
+    ],
+    [
+     "message.delta",
+     11.035
+    ],
+    [
+     "message.delta",
+     11.036
+    ],
+    [
+     "message.delta",
+     11.036
+    ],
+    [
+     "message.delta",
+     11.037
+    ],
+    [
+     "message.delta",
+     11.038
+    ],
+    [
+     "message.delta",
+     11.039
+    ],
+    [
+     "message.delta",
+     11.039
+    ],
+    [
+     "message.delta",
+     11.04
+    ],
+    [
+     "message.delta",
+     11.041
+    ],
+    [
+     "message.delta",
+     11.041
+    ],
+    [
+     "message.delta",
+     11.042
+    ],
+    [
+     "message.delta",
+     11.042
+    ],
+    [
+     "message.delta",
+     11.043
+    ],
+    [
+     "message.delta",
+     11.044
+    ],
+    [
+     "message.delta",
+     11.044
+    ],
+    [
+     "message.delta",
+     11.045
+    ],
+    [
+     "message.delta",
+     11.045
+    ],
+    [
+     "message.delta",
+     11.046
+    ],
+    [
+     "message.delta",
+     11.047
+    ],
+    [
+     "message.delta",
+     11.047
+    ],
+    [
+     "message.delta",
+     11.048
+    ],
+    [
+     "message.delta",
+     11.048
+    ],
+    [
+     "message.delta",
+     11.049
+    ],
+    [
+     "message.delta",
+     11.05
+    ],
+    [
+     "message.delta",
+     11.05
+    ],
+    [
+     "message.delta",
+     11.051
+    ],
+    [
+     "message.delta",
+     11.051
+    ],
+    [
+     "message.delta",
+     11.052
+    ],
+    [
+     "message.delta",
+     11.053
+    ],
+    [
+     "message.delta",
+     11.053
+    ],
+    [
+     "message.delta",
+     11.054
+    ],
+    [
+     "message.delta",
+     11.055
+    ],
+    [
+     "message.delta",
+     11.056
+    ],
+    [
+     "message.delta",
+     11.057
+    ],
+    [
+     "message.delta",
+     11.057
+    ],
+    [
+     "message.delta",
+     11.058
+    ],
+    [
+     "message.delta",
+     11.058
+    ],
+    [
+     "message.delta",
+     11.059
+    ],
+    [
+     "message.delta",
+     11.06
+    ],
+    [
+     "message.delta",
+     11.06
+    ],
+    [
+     "message.delta",
+     11.061
+    ],
+    [
+     "message.delta",
+     11.061
+    ],
+    [
+     "message.delta",
+     11.062
+    ],
+    [
+     "message.delta",
+     11.063
+    ],
+    [
+     "message.delta",
+     11.063
+    ],
+    [
+     "message.delta",
+     11.064
+    ],
+    [
+     "message.delta",
+     11.064
+    ],
+    [
+     "message.delta",
+     11.065
+    ],
+    [
+     "message.delta",
+     11.066
+    ],
+    [
+     "message.delta",
+     11.066
+    ],
+    [
+     "message.delta",
+     11.067
+    ],
+    [
+     "message.delta",
+     11.067
+    ],
+    [
+     "message.delta",
+     11.068
+    ],
+    [
+     "message.delta",
+     11.069
+    ],
+    [
+     "message.delta",
+     11.069
+    ],
+    [
+     "message.delta",
+     11.07
+    ],
+    [
+     "message.delta",
+     11.071
+    ],
+    [
+     "message.delta",
+     11.071
+    ],
+    [
+     "message.delta",
+     11.072
+    ],
+    [
+     "message.delta",
+     11.073
+    ],
+    [
+     "message.delta",
+     11.073
+    ],
+    [
+     "message.delta",
+     11.074
+    ],
+    [
+     "message.delta",
+     11.074
+    ],
+    [
+     "message.delta",
+     11.075
+    ],
+    [
+     "message.delta",
+     11.076
+    ],
+    [
+     "message.delta",
+     11.076
+    ],
+    [
+     "message.delta",
+     11.077
+    ],
+    [
+     "message.delta",
+     11.077
+    ],
+    [
+     "message.delta",
+     11.078
+    ],
+    [
+     "message.delta",
+     11.079
+    ],
+    [
+     "message.delta",
+     11.079
+    ],
+    [
+     "message.delta",
+     11.08
+    ],
+    [
+     "message.delta",
+     11.08
+    ],
+    [
+     "message.delta",
+     11.081
+    ],
+    [
+     "message.delta",
+     11.082
+    ],
+    [
+     "message.delta",
+     11.082
+    ],
+    [
+     "message.delta",
+     11.083
+    ],
+    [
+     "message.delta",
+     11.083
+    ],
+    [
+     "message.delta",
+     11.084
+    ],
+    [
+     "message.delta",
+     11.085
+    ],
+    [
+     "message.delta",
+     11.085
+    ],
+    [
+     "message.delta",
+     11.086
+    ],
+    [
+     "message.delta",
+     11.087
+    ],
+    [
+     "message.delta",
+     11.088
+    ],
+    [
+     "message.delta",
+     11.088
+    ],
+    [
+     "message.delta",
+     11.089
+    ],
+    [
+     "message.delta",
+     11.089
+    ],
+    [
+     "message.delta",
+     11.09
+    ],
+    [
+     "message.delta",
+     11.091
+    ],
+    [
+     "message.delta",
+     11.091
+    ],
+    [
+     "message.delta",
+     11.092
+    ],
+    [
+     "message.delta",
+     11.092
+    ],
+    [
+     "message.delta",
+     11.093
+    ],
+    [
+     "message.delta",
+     11.094
+    ],
+    [
+     "message.delta",
+     11.094
+    ],
+    [
+     "message.delta",
+     11.095
+    ],
+    [
+     "message.delta",
+     11.095
+    ],
+    [
+     "message.delta",
+     11.096
+    ],
+    [
+     "message.delta",
+     11.097
+    ],
+    [
+     "message.delta",
+     11.097
+    ],
+    [
+     "message.delta",
+     11.098
+    ],
+    [
+     "message.delta",
+     11.098
+    ],
+    [
+     "message.delta",
+     11.099
+    ],
+    [
+     "message.delta",
+     11.1
+    ],
+    [
+     "message.delta",
+     11.1
+    ],
+    [
+     "message.delta",
+     11.101
+    ],
+    [
+     "message.delta",
+     11.102
+    ],
+    [
+     "message.delta",
+     11.102
+    ],
+    [
+     "message.delta",
+     11.103
+    ],
+    [
+     "message.delta",
+     11.104
+    ],
+    [
+     "message.delta",
+     11.104
+    ],
+    [
+     "message.delta",
+     11.105
+    ],
+    [
+     "message.delta",
+     11.106
+    ],
+    [
+     "message.delta",
+     11.106
+    ],
+    [
+     "message.delta",
+     11.107
+    ],
+    [
+     "message.delta",
+     11.107
+    ],
+    [
+     "message.delta",
+     11.108
+    ],
+    [
+     "message.delta",
+     11.109
+    ],
+    [
+     "message.delta",
+     11.109
+    ],
+    [
+     "message.delta",
+     11.11
+    ],
+    [
+     "message.delta",
+     11.111
+    ],
+    [
+     "message.delta",
+     11.111
+    ],
+    [
+     "citation.added",
+     11.381
+    ],
+    [
+     "citation.added",
+     11.467
+    ],
+    [
+     "citation.added",
+     11.554
+    ],
+    [
+     "citation.added",
+     11.643
+    ],
+    [
+     "citation.added",
+     11.737
+    ],
+    [
+     "citation.added",
+     11.842
+    ],
+    [
+     "citation.added",
+     11.939
+    ],
+    [
+     "citation.added",
+     12.039
+    ],
+    [
+     "message.completed",
+     12.128
+    ]
+   ],
+   "final": {
+    "message_id": "01a197dc-a89c-746a-b28d-d7c4b3e3ef23",
+    "conversation_id": "01a197dc-a878-73a7-839c-31008b52c815",
+    "status": "answered",
+    "response_class": "partial_answer",
+    "content": "Sinh viên là người khuyết tật thuộc diện miễn học phí 100% chỉ cần nộp hồ sơ minh chứng 01 lần cho đến khi kết thúc khóa học hoặc cho đến khi có văn bản hướng dẫn mới của chính phủ. [CIT-001] [CIT-002]\nSinh viên từ 16 đến 22 tuổi không có nguồn nuôi dưỡng đang học đại học văn bằng thứ nhất thuộc đối tượng hưởng trợ cấp xã hội hàng tháng theo khoản 1 và 2 Điều 5 Nghị định số 20/2021/NĐ-CP ngày 15/3/2021 chỉ cần nộp hồ sơ minh chứng 01 lần cho đến khi kết thúc khóa học hoặc cho đến khi có văn bản hướng dẫn mới của chính phủ. [CIT-003] [CIT-004] [CIT-005]\nCon của người hoạt động kháng chiến bị nhiễm chất độc hoá học thuộc diện miễn học phí 100% chỉ cần nộp hồ sơ minh chứng 01 lần cho đến khi kết thúc khóa học hoặc cho đến khi có văn bản hướng dẫn mới của chính phủ. [CIT-006] [CIT-007]\nSinh viên là người dân tộc thiểu số (ngoài đối tượng dân tộc thiểu số rất ít người) ở thôn/bản đặc biệt khó khăn, xã khu vực III vùng dân tộc và miền núi, xã đặc biệt khó khăn vùng bãi ngang ven biển hải đảo thuộc diện giảm 70% học phí nộp Giấy xác nhận vào đầu năm tài chính hằng năm. [CIT-008]\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a197dc-d369-7739-a6a0-b15f3041e8f6",
+       "source_id": "39a92ade-e644-717e-8dbf-f33a8331fcc4",
+       "document_version_id": "01a16d17-b928-7db7-bf1d-08bbd78d4b07",
+       "chunk_id": "01a16d17-b9d2-7970-a504-378d2031eba0",
+       "source_title": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027",
+       "canonical_uri": "https://drive.google.com/file/d/1e7MfG8izM0SG-zc703eqirh8_HWO5DtG/preview?",
+       "version_label": "public-snapshot-01a16d17-b928-7db7-bf1d-08bbd78d4b07",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027 · trang 3 · chars 0:349",
+        "page_start": 3,
+        "page_end": 3
+       },
+       "quote": "Đối tượng và điều kiện xét miễn, giảm học phí.\nMiễn học phí 100%\nĐối tượng và điều kiện: Sinh viên là người khuyết tật\nHồ sơ cần nộp: 1. Đơn đề nghị miễn, giảm học phí (Theo\nmẫu)\n2. Giấy xác nhận khuyết tật.\nGhi chú: Sinh viên chỉ cần nộp hồ sơ\nminh chứng 01 lần cho đến khi\nkết thúc khóa học hoặc cho đến\nkhi có văn bản hướng dẫn mới\ncủa chính phủ.",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "b836f4ac5462fb5bc9f6204cc2fae894b82d11fdf18d79df82a19b96b25feed3",
+       "unit_id": "5663ea783fbc2416"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-002",
+      "citation": {
+       "citation_id": "01a197dc-d36c-79a9-a525-3853223822ac",
+       "source_id": "9e93d171-6bf4-7fb4-81af-a23463ca1857",
+       "document_version_id": "01a16d21-99a2-7db4-80b9-264896a68ca5",
+       "chunk_id": "01a16d21-9a01-769e-92ea-06b3ed88d28c",
+       "source_title": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027",
+       "canonical_uri": "https://drive.google.com/file/d/100VapcqNY8xePerDa6vqN6gaitLkyrs1/preview?",
+       "version_label": "public-snapshot-01a16d21-99a2-7db4-80b9-264896a68ca5",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027 · trang 3 · chars 0:349",
+        "page_start": 3,
+        "page_end": 3
+       },
+       "quote": "Đối tượng và điều kiện xét miễn, giảm học phí.\nMiễn học phí 100%\nĐối tượng và điều kiện: Sinh viên là người khuyết tật\nHồ sơ cần nộp: 1. Đơn đề nghị miễn, giảm học phí (Theo\nmẫu)\n2. Giấy xác nhận khuyết tật.\nGhi chú: Sinh viên chỉ cần nộp hồ sơ\nminh chứng 01 lần cho đến khi\nkết thúc khóa học hoặc cho đến\nkhi có văn bản hướng dẫn mới\ncủa chính phủ.",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "b836f4ac5462fb5bc9f6204cc2fae894b82d11fdf18d79df82a19b96b25feed3",
+       "unit_id": "1b55255df7959e8a"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-003",
+      "citation": {
+       "citation_id": "01a197dc-d36c-75ac-8f19-0dcebce5290a",
+       "source_id": "9e93d171-6bf4-7fb4-81af-a23463ca1857",
+       "document_version_id": "01a16d21-99a2-7db4-80b9-264896a68ca5",
+       "chunk_id": "01a16d21-9a03-7b05-9bb2-d7f0768a4714",
+       "source_title": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027",
+       "canonical_uri": "https://drive.google.com/file/d/100VapcqNY8xePerDa6vqN6gaitLkyrs1/preview?",
+       "version_label": "public-snapshot-01a16d21-99a2-7db4-80b9-264896a68ca5",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027 · trang 4 · chars 0:654",
+        "page_start": 4,
+        "page_end": 4
+       },
+       "quote": "từ 16 đến 22 tuổi không có nguồn nuôi dưỡng đang\nhọc đại học văn bằng thứ nhất thuộc đối tượng hưởng trợ cấp xã\nhội hàng tháng theo quy định tại khoản 1 và 2 Điều 5 Nghị định\nsố 20/2021/NĐ-CP ngày 15/3/2021 của Chính phủ.\nHồ sơ cần nộp: 1. Đơn đề nghị miễn, giảm học phí\n(Theo mẫu)\n2. Quyết định về việc trợ cấp xã hội hoặc\nGiấy xác nhận mồ côi cả cha lẫn mẹ do\nỦy ban nhân dân xã, phường, đặc khu\nthuộc cấp tỉnh.\nGhi chú: Sinh viên chỉ cần nộp hồ sơ\nminh chứng 01 lần cho đến khi\nkết thúc khóa",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "c4ae720fe912bd63938007d84e1b5b3c8ff7bf00aef2174bed067feb5265ba61",
+       "unit_id": "3f74ca9baaf70929"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-004",
+      "citation": {
+       "citation_id": "01a197dc-d36c-7e8c-a89d-b7aeff09c2d8",
+       "source_id": "39a92ade-e644-717e-8dbf-f33a8331fcc4",
+       "document_version_id": "01a16d17-b928-7db7-bf1d-08bbd78d4b07",
+       "chunk_id": "01a16d17-b9d6-76dd-a5d0-bff3aee12a0c",
+       "source_title": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027",
+       "canonical_uri": "https://drive.google.com/file/d/1e7MfG8izM0SG-zc703eqirh8_HWO5DtG/preview?",
+       "version_label": "public-snapshot-01a16d17-b928-7db7-bf1d-08bbd78d4b07",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027 · trang 4 · chars 0:654",
+        "page_start": 4,
+        "page_end": 4
+       },
+       "quote": "từ 16 đến 22 tuổi không có nguồn nuôi dưỡng đang\nhọc đại học văn bằng thứ nhất thuộc đối tượng hưởng trợ cấp xã\nhội hàng tháng theo quy định tại khoản 1 và 2 Điều 5 Nghị định\nsố 20/2021/NĐ-CP ngày 15/3/2021 của Chính phủ.\nHồ sơ cần nộp: 1. Đơn đề nghị miễn, giảm học phí\n(Theo mẫu)\n2. Quyết định về việc trợ cấp xã hội hoặc\nGiấy xác nhận mồ côi cả cha lẫn mẹ do\nỦy ban nhân dân xã, phường, đặc khu\nthuộc cấp tỉnh.\nGhi chú: Sinh viên chỉ cần nộp hồ sơ\nminh chứng 01 lần cho đến khi\nkết thúc khóa",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "c4ae720fe912bd63938007d84e1b5b3c8ff7bf00aef2174bed067feb5265ba61",
+       "unit_id": "68ad03933ebb247f"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-005",
+      "citation": {
+       "citation_id": "01a197dc-d36c-74de-aae2-557f2c9ad519",
+       "source_id": "39a92ade-e644-717e-8dbf-f33a8331fcc4",
+       "document_version_id": "01a16d17-b928-7db7-bf1d-08bbd78d4b07",
+       "chunk_id": "01a16d17-b95f-7780-aba4-e94960009cf0",
+       "source_title": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027",
+       "canonical_uri": "https://drive.google.com/file/d/1e7MfG8izM0SG-zc703eqirh8_HWO5DtG/preview?",
+       "version_label": "public-snapshot-01a16d17-b928-7db7-bf1d-08bbd78d4b07",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027 · trang 4 · chars 0:2452",
+        "page_start": 4,
+        "page_end": 4
+       },
+       "quote": "2. Quyết định về việc trợ cấp xã hội hoặc \nGiấy xác nhận mồ côi cả cha lẫn mẹ do \nỦy ban nhân dân xã, phường, đặc khu \nthuộc cấp tỉnh. \nSinh viên chỉ cần nộp hồ sơ \nminh chứng 01 lần cho đến khi \nkết thúc khóa học hoặc cho đến \nkhi có văn bản hướng dẫn mới \ncủa chính phủ.  \n",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "091bd20e95817ac96a02890905f476101eed706f319b51b1ada1ee0567d41fee",
+       "unit_id": "fd610b609ec9e1d9"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-006",
+      "citation": {
+       "citation_id": "01a197dc-d36c-7659-a404-c5d27958c071",
+       "source_id": "9e93d171-6bf4-7fb4-81af-a23463ca1857",
+       "document_version_id": "01a16d21-99a2-7db4-80b9-264896a68ca5",
+       "chunk_id": "01a16d21-99fd-7ee5-8fc5-7cded9edd7f4",
+       "source_title": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027",
+       "canonical_uri": "https://drive.google.com/file/d/100VapcqNY8xePerDa6vqN6gaitLkyrs1/preview?",
+       "version_label": "public-snapshot-01a16d21-99a2-7db4-80b9-264896a68ca5",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027 · trang 3 · chars 0:768",
+        "page_start": 3,
+        "page_end": 3
+       },
+       "quote": "dân.\nĐối tượng và điều kiện: + Con của người hoạt động kháng chiến bị nhiễm chất độc hoá\nhọc\nHồ sơ cần nộp: 1. Đơn đề nghị miễn, giảm học phí (Theo\nmẫu).\n2. Giấy xác nhận của cơ quan quản lý đối\nvới người có công với cách mạng\n3. Bản sao Thẻ thương binh, bệnh binh,\ngiấy xác nhận cơn liệt sĩ, giấy xác nhận\nđược hưởng chính sách như thương binh\nhoặc biên bản giám định y khoa bị nhiễm\nchất độc hóa học của bố (mẹ).\nGhi chú: Sinh viên chỉ cần nộp hồ sơ\nminh chứng 01 lần cho đến khi\nkết thúc khóa",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "f5be8271382402adb099f0c8d501c5b0796f7741870d2f55dd17a9ba705bdf09",
+       "unit_id": "541f74774d5e0d96"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-007",
+      "citation": {
+       "citation_id": "01a197dc-d36c-7296-a56e-f9a8d912e224",
+       "source_id": "39a92ade-e644-717e-8dbf-f33a8331fcc4",
+       "document_version_id": "01a16d17-b928-7db7-bf1d-08bbd78d4b07",
+       "chunk_id": "01a16d17-b9c9-7cdc-9da6-31e0fd2e26c3",
+       "source_title": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027",
+       "canonical_uri": "https://drive.google.com/file/d/1e7MfG8izM0SG-zc703eqirh8_HWO5DtG/preview?",
+       "version_label": "public-snapshot-01a16d17-b928-7db7-bf1d-08bbd78d4b07",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027 · trang 3 · chars 0:768",
+        "page_start": 3,
+        "page_end": 3
+       },
+       "quote": "3. Bản sao Thẻ thương binh, bệnh binh,\ngiấy xác nhận cơn liệt sĩ, giấy xác nhận\nđược hưởng chính sách như thương binh\nhoặc biên bản giám định y khoa bị nhiễm\nchất độc hóa học của bố (mẹ).\nGhi chú: Sinh viên chỉ cần nộp hồ sơ\nminh chứng 01 lần cho đến khi\nkết thúc khóa học hoặc cho đến\nkhi có văn bản hướng dẫn mới\ncủa chính phủ.",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "f5be8271382402adb099f0c8d501c5b0796f7741870d2f55dd17a9ba705bdf09",
+       "unit_id": "12a08f847f10dcb2"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-008",
+      "citation": {
+       "citation_id": "01a197dc-d36c-7b50-9213-f43a9bd1c596",
+       "source_id": "9e93d171-6bf4-7fb4-81af-a23463ca1857",
+       "document_version_id": "01a16d21-99a2-7db4-80b9-264896a68ca5",
+       "chunk_id": "01a16d21-99ca-78b1-a8a4-20729bc4bd52",
+       "source_title": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027",
+       "canonical_uri": "https://drive.google.com/file/d/100VapcqNY8xePerDa6vqN6gaitLkyrs1/preview?",
+       "version_label": "public-snapshot-01a16d21-99a2-7db4-80b9-264896a68ca5",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Thông báo338/TB-ĐHXDHN-CTSV và toàn bộ phụ lục miễn giảm học phí hỗ trợ học tập HKI2026–2027 · trang 4 · chars 0:2452",
+        "page_start": 4,
+        "page_end": 4
+       },
+       "quote": "Đơn đề nghị miễn, giảm học phí \n(Theo mẫu) \n2. Giấy xác nhận nơi cư trú ở vùng có \nđiều kiện kinh tế - xã hội khó khăn hoặc \nđặc biệt khó khăn do UBND xã cấp.  \nSinh viên nộp giấy xác nhận nơi \ncư trú  vào đầu khóa học và vào \nđầu năm tài chính hàng năm.  \n2 Giảm 70% học phí \n  \nSinh viên là người dân tộc thiểu số (ngoài đối tượng dân tộc \nthiểu số rất ít người) ở thôn/bản đặc biệt khó khăn, xã khu vực \nIII vùng dân tộc và miền núi, xã đặc biệt khó khăn vùng bãi \nngang ven biển hải đảo theo quy",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "091bd20e95817ac96a02890905f476101eed706f319b51b1ada1ee0567d41fee",
+       "unit_id": "10c18521b8fa0981"
+      }
+     }
+    ]
+   },
+   "outcome_class": "partial",
+   "answer_text": "Sinh viên là người khuyết tật thuộc diện miễn học phí 100% chỉ cần nộp hồ sơ minh chứng 01 lần cho đến khi kết thúc khóa học hoặc cho đến khi có văn bản hướng dẫn mới của chính phủ. [CIT-001] [CIT-002]\nSinh viên từ 16 đến 22 tuổi không có nguồn nuôi dưỡng đang học đại học văn bằng thứ nhất thuộc đối tượng hưởng trợ cấp xã hội hàng tháng theo khoản 1 và 2 Điều 5 Nghị định số 20/2021/NĐ-CP ngày 15/3/2021 chỉ cần nộp hồ sơ minh chứng 01 lần cho đến khi kết thúc khóa học hoặc cho đến khi có văn bản hướng dẫn mới của chính phủ. [CIT-003] [CIT-004] [CIT-005]\nCon của người hoạt động kháng chiến bị nhiễm chất độc hoá học thuộc diện miễn học phí 100% chỉ cần nộp hồ sơ minh chứng 01 lần cho đến khi kết thúc khóa học hoặc cho đến khi có văn bản hướng dẫn mới của chính phủ. [CIT-006] [CIT-007]\nSinh viên là người dân tộc thiểu số (ngoài đối tượng dân tộc thiểu số rất ít người) ở thôn/bản đặc biệt khó khăn, xã khu vực III vùng dân tộc và miền núi, xã đặc biệt khó khăn vùng bãi ngang ven biển hải đảo thuộc diện giảm 70% học phí nộp Giấy xác nhận vào đầu năm tài chính hằng năm. [CIT-008]\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "seconds": 12.128341100004036,
+   "user": 0
+  },
+  {
+   "case_id": "AU-C06",
+   "question": "Điều kiện để được miễn là gì?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04779310000594705,
+   "first_content_seconds": 2.289,
+   "started_at": 1793549208.3838284,
+   "conversation_id": "01a197dd-0b4c-7b22-9e19-91a29078e3b7",
+   "timeline": [
+    [
+     "message.started",
+     0.048
+    ],
+    [
+     "message.delta",
+     2.289
+    ],
+    [
+     "message.delta",
+     2.29
+    ],
+    [
+     "message.delta",
+     2.29
+    ],
+    [
+     "message.delta",
+     2.291
+    ],
+    [
+     "message.delta",
+     2.292
+    ],
+    [
+     "message.delta",
+     2.292
+    ],
+    [
+     "message.delta",
+     2.293
+    ],
+    [
+     "message.delta",
+     2.293
+    ],
+    [
+     "message.delta",
+     2.294
+    ],
+    [
+     "message.delta",
+     2.295
+    ],
+    [
+     "message.delta",
+     2.296
+    ],
+    [
+     "message.delta",
+     2.296
+    ],
+    [
+     "message.delta",
+     2.297
+    ],
+    [
+     "message.completed",
+     2.327
+    ]
+   ],
+   "final": {
+    "message_id": "01a197dd-0b69-7129-a280-8041b7527e10",
+    "conversation_id": "01a197dd-0b4c-7b22-9e19-91a29078e3b7",
+    "status": "abstained",
+    "response_class": "clarification_request",
+    "content": "Bạn muốn hỏi điều kiện miễn học phí, miễn thi, miễn học phần, ngoại ngữ hay giáo dục thể chất?",
+    "citations": []
+   },
+   "outcome_class": "clarify",
+   "answer_text": "Bạn muốn hỏi điều kiện miễn học phí, miễn thi, miễn học phần, ngoại ngữ hay giáo dục thể chất?",
+   "seconds": 2.3272151999990456,
+   "user": 0
+  },
+  {
+   "case_id": "AU-O06",
+   "question": "Trường có cho sinh viên mượn xe đạp miễn phí để đi giữa các cơ sở không?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.06473330000881106,
+   "first_content_seconds": 6.73,
+   "started_at": 1793549198.2193346,
+   "conversation_id": "01a197dc-e39b-77e8-a0eb-38a85540321d",
+   "timeline": [
+    [
+     "message.started",
+     0.065
+    ],
+    [
+     "message.delta",
+     6.73
+    ],
+    [
+     "message.delta",
+     6.73
+    ],
+    [
+     "message.delta",
+     6.731
+    ],
+    [
+     "message.delta",
+     6.731
+    ],
+    [
+     "message.delta",
+     6.732
+    ],
+    [
+     "message.delta",
+     6.733
+    ],
+    [
+     "message.delta",
+     6.733
+    ],
+    [
+     "message.delta",
+     6.734
+    ],
+    [
+     "message.delta",
+     6.735
+    ],
+    [
+     "message.completed",
+     7.164
+    ]
+   ],
+   "final": {
+    "message_id": "01a197dc-e3c6-7677-b65e-d9dc09f4976d",
+    "conversation_id": "01a197dc-e39b-77e8-a0eb-38a85540321d",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "seconds": 7.1642139999894425,
+   "user": 0
+  },
+  {
+   "case_id": "AU-P04",
+   "question": "Lịch thi cá nhân của em tuần sau gồm những môn nào?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03897910000523552,
+   "first_content_seconds": 1.129,
+   "started_at": 1793549213.7115397,
+   "conversation_id": "01a197dd-2013-7788-88b4-a82b28033443",
+   "timeline": [
+    [
+     "message.started",
+     0.039
+    ],
+    [
+     "message.delta",
+     1.129
+    ],
+    [
+     "message.delta",
+     1.129
+    ],
+    [
+     "message.delta",
+     1.13
+    ],
+    [
+     "message.delta",
+     1.131
+    ],
+    [
+     "message.delta",
+     1.131
+    ],
+    [
+     "message.delta",
+     1.132
+    ],
+    [
+     "message.delta",
+     1.133
+    ],
+    [
+     "message.delta",
+     1.134
+    ],
+    [
+     "message.delta",
+     1.135
+    ],
+    [
+     "message.delta",
+     1.136
+    ],
+    [
+     "message.delta",
+     1.136
+    ],
+    [
+     "message.delta",
+     1.137
+    ],
+    [
+     "message.delta",
+     1.137
+    ],
+    [
+     "message.delta",
+     1.138
+    ],
+    [
+     "message.delta",
+     1.139
+    ],
+    [
+     "message.delta",
+     1.139
+    ],
+    [
+     "message.delta",
+     1.14
+    ],
+    [
+     "message.delta",
+     1.14
+    ],
+    [
+     "message.delta",
+     1.141
+    ],
+    [
+     "message.delta",
+     1.142
+    ],
+    [
+     "message.delta",
+     1.142
+    ],
+    [
+     "message.delta",
+     1.143
+    ],
+    [
+     "message.delta",
+     1.144
+    ],
+    [
+     "message.delta",
+     1.144
+    ],
+    [
+     "message.delta",
+     1.145
+    ],
+    [
+     "message.delta",
+     1.145
+    ],
+    [
+     "message.delta",
+     1.146
+    ],
+    [
+     "message.completed",
+     1.172
+    ]
+   ],
+   "final": {
+    "message_id": "01a197dd-2031-7d34-8d58-cf76d1d73255",
+    "conversation_id": "01a197dd-2013-7788-88b4-a82b28033443",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Nội dung này cần cán bộ hỗ trợ xem xét trực tiếp, và hiện chưa có kênh liên hệ ưu tiên được cấu hình. Bạn vui lòng liên hệ bộ phận phụ trách qua kênh chính thức trên website của trường.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Nội dung này cần cán bộ hỗ trợ xem xét trực tiếp, và hiện chưa có kênh liên hệ ưu tiên được cấu hình. Bạn vui lòng liên hệ bộ phận phụ trách qua kênh chính thức trên website của trường.",
+   "seconds": 1.1724400999955833,
+   "user": 0
+  },
+  {
+   "case_id": "AU-P06",
+   "question": "Em bị bắt quả tang dùng điện thoại trong phòng thi thì chắc chắn bị đình chỉ học đúng không?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04224380000960082,
+   "first_content_seconds": 7.592,
+   "started_at": 1793549217.8845766,
+   "conversation_id": "01a197dd-3060-7a03-affc-1e7d691f53a8",
+   "timeline": [
+    [
+     "message.started",
+     0.042
+    ],
+    [
+     "message.delta",
+     7.592
+    ],
+    [
+     "message.delta",
+     7.593
+    ],
+    [
+     "message.delta",
+     7.594
+    ],
+    [
+     "message.delta",
+     7.595
+    ],
+    [
+     "message.delta",
+     7.595
+    ],
+    [
+     "message.delta",
+     7.596
+    ],
+    [
+     "message.delta",
+     7.597
+    ],
+    [
+     "message.delta",
+     7.597
+    ],
+    [
+     "message.delta",
+     7.598
+    ],
+    [
+     "message.delta",
+     7.599
+    ],
+    [
+     "message.delta",
+     7.599
+    ],
+    [
+     "message.delta",
+     7.6
+    ],
+    [
+     "message.delta",
+     7.6
+    ],
+    [
+     "message.delta",
+     7.601
+    ],
+    [
+     "message.delta",
+     7.602
+    ],
+    [
+     "message.delta",
+     7.602
+    ],
+    [
+     "message.delta",
+     7.603
+    ],
+    [
+     "message.delta",
+     7.603
+    ],
+    [
+     "message.delta",
+     7.604
+    ],
+    [
+     "message.delta",
+     7.605
+    ],
+    [
+     "message.delta",
+     7.605
+    ],
+    [
+     "message.delta",
+     7.606
+    ],
+    [
+     "message.delta",
+     7.607
+    ],
+    [
+     "message.delta",
+     7.607
+    ],
+    [
+     "message.delta",
+     7.608
+    ],
+    [
+     "message.delta",
+     7.608
+    ],
+    [
+     "message.delta",
+     7.609
+    ],
+    [
+     "message.delta",
+     7.61
+    ],
+    [
+     "message.delta",
+     7.611
+    ],
+    [
+     "message.delta",
+     7.612
+    ],
+    [
+     "message.delta",
+     7.612
+    ],
+    [
+     "message.delta",
+     7.613
+    ],
+    [
+     "message.delta",
+     7.614
+    ],
+    [
+     "message.delta",
+     7.614
+    ],
+    [
+     "message.delta",
+     7.615
+    ],
+    [
+     "message.delta",
+     7.616
+    ],
+    [
+     "message.delta",
+     7.616
+    ],
+    [
+     "message.delta",
+     7.617
+    ],
+    [
+     "message.delta",
+     7.617
+    ],
+    [
+     "message.delta",
+     7.618
+    ],
+    [
+     "message.delta",
+     7.619
+    ],
+    [
+     "citation.added",
+     7.801
+    ],
+    [
+     "citation.added",
+     7.854
+    ],
+    [
+     "citation.added",
+     7.914
+    ],
+    [
+     "message.completed",
+     7.967
+    ]
+   ],
+   "final": {
+    "message_id": "01a197dd-3082-7023-b103-8274eaa67b53",
+    "conversation_id": "01a197dd-3060-7a03-affc-1e7d691f53a8",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Theo Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL, không được sử dụng điện thoại di động trong phòng máy. [CIT-001] [CIT-002]\nSinh viên vi phạm một trong những điều quy định của nội quy phòng máy sẽ bị đình chỉ học tại phòng máy và bị xử lý kỷ luật theo quy chế của nhà trường. [CIT-003] [CIT-002]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a197dd-4e03-7c7a-b3df-8528b887c7f7",
+       "source_id": "2d8c1b76-749f-7a7a-890b-e41c8646affe",
+       "document_version_id": "01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "chunk_id": "01a168c6-d256-7d8d-babd-fcec2dfc7eed",
+       "source_title": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024",
+       "canonical_uri": "https://drive.google.com/file/d/17fHGSp05BTd0tp2qwJKtX_wdO6ykJu1G/preview?",
+       "version_label": "original-span-01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024 — Nội quy — khoản6",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "6. Trang phục gọn gàng, lịch sự, tư thế ngồi học phải ngay ngắn, nghiêm túc. Không: nói chuyện, đi lại tự do, sử dụng điện thoại di động, sử dụng máy tính xách tay",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "871e6794a3d216c0757957438e6d146efb585696eb69593d3efbd93a89aba55b",
+       "unit_id": "722557b39e8883b4"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-002",
+      "citation": {
+       "citation_id": "01a197dd-4e03-76ae-8fd5-74e49b565bd5",
+       "source_id": "2d8c1b76-749f-7a7a-890b-e41c8646affe",
+       "document_version_id": "01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "chunk_id": "01a168c6-d1d1-7d9a-b71d-c82f306d0ed2",
+       "source_title": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024",
+       "canonical_uri": "https://drive.google.com/file/d/17fHGSp05BTd0tp2qwJKtX_wdO6ykJu1G/preview?",
+       "version_label": "original-span-01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024 — Trang 2",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "phải được sự đồng ý của cán bộ phòng máy. Cấm mang thiết bị, máy móc, dụng cụ, vật tư ra ngoài phòng máy.\n10. Không ra ngoài trong giờ học, thực hành.\n11. Khi kết thúc ca học, thực hành phải tắt máy, sắp xếp: màn hình, chuột, bàn phím, ghế ngay ngắn theo quy định, làm tốt vệ sinh phòng máy. Cán bộ lớp bàn giao phòng máy cho giảng viên hướng dẫn.\n12. Sinh viên nào vi phạm một trong những điều quy định trên sẽ bị đình chỉ học tại phòng máy và bị xử lý kỷ luật theo quy chế của nhà trường. Làm mất,",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "10edebadcfe495536d4606b62f68befb0588f93b5ee802d69b4c84c51b453d17",
+       "unit_id": "359e819dcfdd6dda"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-003",
+      "citation": {
+       "citation_id": "01a197dd-4e03-77e3-90ef-2a7eeb7efca8",
+       "source_id": "2d8c1b76-749f-7a7a-890b-e41c8646affe",
+       "document_version_id": "01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "chunk_id": "01a168c6-d266-7eb9-95c9-d9106cef6bb7",
+       "source_title": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024",
+       "canonical_uri": "https://drive.google.com/file/d/17fHGSp05BTd0tp2qwJKtX_wdO6ykJu1G/preview?",
+       "version_label": "original-span-01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024 — Nội quy — khoản12",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "12. Sinh viên nào vi phạm một trong những điều quy định trên sẽ bị đình chỉ học tại phòng máy và bị xử lý kỷ luật theo quy chế của nhà trường. Làm mất, hỏng thiết bị của phòng máy phải bồi thường",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "71b839742d77b4a8464208c54efd96f1765b4ab6a7bce70bd9e400356d0d4da6",
+       "unit_id": "4e058fe0c1d6984b"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Theo Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL, không được sử dụng điện thoại di động trong phòng máy. [CIT-001] [CIT-002]\nSinh viên vi phạm một trong những điều quy định của nội quy phòng máy sẽ bị đình chỉ học tại phòng máy và bị xử lý kỷ luật theo quy chế của nhà trường. [CIT-003] [CIT-002]",
+   "seconds": 7.9672908000065945,
+   "user": 0
+  }
+ ]
+}

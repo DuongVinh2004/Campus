@@ -1,0 +1,12 @@
+{
+ "normal": {
+  "cases": 60,
+  "facts_in_context": 45,
+  "empty_context": 1
+ },
+ "embedding_down": {
+  "cases": 60,
+  "facts_in_context": 41,
+  "empty_context": 1
+ }
+}

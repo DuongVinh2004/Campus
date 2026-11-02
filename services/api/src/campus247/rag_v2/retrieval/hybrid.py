@@ -13,6 +13,12 @@ from campus247.rag_v2.understanding.analyze import contains, program_key
 from campus247.rag_v2.understanding.normalize import fold, normalize_query
 
 
+RRF_K = 60
+# Without a reranker, lexical hits at this rank or better stay inside the packed rows (0 disables).
+LEXICAL_PIN = 4
+PACK_WINDOW = 6
+
+
 @dataclass(frozen=True)
 class RetrievalResult:
     candidates: tuple[Candidate, ...]
@@ -129,7 +135,8 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
                 continue
             seen.add(uid)
             ranks.setdefault(uid, [None, None, None])[branch] = rank
-    ranked = [Candidate(uid, pair[0], pair[1], sum(1 / (60 + rank) for rank in pair if rank is not None))
+    k = RRF_K
+    ranked = [Candidate(uid, pair[0], pair[1], sum(1 / (k + rank) for rank in pair if rank is not None))
               for uid, pair in ranks.items()]
     ranked.sort(key=lambda c: (-c.fused_score, c.unit_id))
     # Diversity is a shortlist for the reranker, not a relevance filter. When
@@ -159,6 +166,17 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
             fallback = True
             chosen.sort(key=lambda c: (-c.fused_score, c.unit_id))
             trace["status"] = "RRF_TIMEOUT" if isinstance(error, TimeoutError) else "RRF_ERROR"
+    if LEXICAL_PIN and chosen and rerank_deadline_s == 0:
+        # Context packing reads only the first PACK_WINDOW rows, so the strongest lexical hits
+        # (exact codes and names that vectors miss) must sit inside that window.
+        pinned = sorted((c for c in ranked if c.lexical_rank is not None and c.lexical_rank <= LEXICAL_PIN),
+                        key=lambda c: c.lexical_rank)
+        head = chosen[:PACK_WINDOW]
+        missing = [c for c in pinned if all(c.unit_id != h.unit_id for h in head)]
+        if missing:
+            head = head[:max(0, PACK_WINDOW - len(missing))] + missing
+            kept = {c.unit_id for c in head}
+            chosen = head + [c for c in chosen if c.unit_id not in kept]
     final = tuple(replace(c, final_rank=i) for i, c in enumerate(chosen[:final_limit], 1))
     trace["returned"] = len(final)
     return RetrievalResult(final, fallback, trace)

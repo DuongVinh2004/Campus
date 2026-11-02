@@ -1,10 +1,32 @@
+"use client";
+
+import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import React, { useState, useEffect, useCallback } from "react";
+import {
+  Search,
+  RefreshCw,
+  AlertTriangle,
+  Sparkles,
+  Printer,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  RotateCcw,
+  X,
+} from "lucide-react";
+import {
+  staffButton,
+  staffPrimary,
+  staffField,
+  staffSurface,
+} from "../../components/staff/StaffShell";
 
 export interface StaffAttachment {
   name: string;
   ocrBadge: string;
   confidence: string;
   type?: "pdf" | "image";
+  evidence?: { state: "unchecked" | "checked" | "missing_source" | "error" | "conflicting"; reason: string; locator?: string; version?: string };
 }
 
 export interface StaffQueueItem {
@@ -28,6 +50,8 @@ export interface StaffQueueItem {
   conflictStaffId?: string;
   targetDepartment?: string;
   attachments?: StaffAttachment[];
+  classification?: "synthetic" | "live";
+  sla?: { deadline: string; locator: string; version: string };
 }
 
 export interface StaffTicketQueueProps {
@@ -40,6 +64,7 @@ export interface StaffTicketQueueProps {
   onRequestSupplement?: (queueId: string, payload: { requestMessage: string }) => void;
   onFinalizeIntake?: (queueId: string, payload: { checklistPassed: boolean; exceptionReason?: string }) => void;
   onReconcile?: (queueId: string) => void;
+  businessActionsAvailable?: boolean;
 }
 
 type FilterType = "all" | "unassigned" | "my" | "urgent";
@@ -49,8 +74,7 @@ interface IntakeGate {
   id: string;
   label: string;
   sourceBadge: string;
-  sourceBadgeBg: string;
-  sourceBadgeColor: string;
+  sourceBadgeClass: string;
   aiEvidence: string;
   confidence: string;
 }
@@ -59,60 +83,53 @@ const INTAKE_CHECKLIST_GATES: IntakeGate[] = [
   {
     id: "gate_identity",
     label: "Xác minh danh tính & MSSV qua tài khoản định danh",
-    sourceBadge: "VNeID Mức 2",
-    sourceBadgeBg: "#ecfdf5",
-    sourceBadgeColor: "#065f46",
-    aiEvidence: "Khớp hồ sơ sinh viên chính quy K68. SSO xác thực bảo mật.",
-    confidence: "99.8%",
+    sourceBadge: "Chưa kiểm định danh",
+    sourceBadgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800",
+    aiEvidence: "Cần đối chiếu nguồn định danh được cấp quyền.",
+    confidence: "Chưa xác minh",
   },
   {
     id: "gate_scope",
     label: "Kiểm tra thẩm quyền xử lý Một cửa số (tránh nhận nhầm phạm vi)",
-    sourceBadge: "Quy chế Đào tạo",
-    sourceBadgeBg: "#eff6ff",
-    sourceBadgeColor: "#1e40af",
-    aiEvidence: "Thẩm quyền trực tiếp của Phòng Quản lý Đào tạo / CTSV.",
-    confidence: "100%",
+    sourceBadge: "Cần nguồn thẩm quyền",
+    sourceBadgeClass: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800",
+    aiEvidence: "Cán bộ đối chiếu phạm vi và quy trình áp dụng.",
+    confidence: "Chưa xác minh",
   },
   {
     id: "gate_duplicate",
     label: "Kiểm tra tiền sử đơn trùng lặp trong 30 ngày qua",
     sourceBadge: "Lịch sử Hệ thống",
-    sourceBadgeBg: "#f0fdf4",
-    sourceBadgeColor: "#166534",
-    aiEvidence: "Không có đơn trùng lặp cùng nội dung trong 30 ngày gần nhất.",
-    confidence: "98.5%",
+    sourceBadgeClass: "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800",
+    aiEvidence: "Chưa có kết quả truy vấn đơn trùng lặp được xác minh.",
+    confidence: "Chưa kiểm",
   },
   {
     id: "gate_attachment",
     label: "Kiểm tra tính hợp lệ minh chứng đính kèm (dấu đỏ, ảnh, văn bản)",
-    sourceBadge: "AI OCR Thẩm định",
-    sourceBadgeBg: "#faf5ff",
-    sourceBadgeColor: "#6b21a8",
-    aiEvidence: "Phát hiện con dấu đỏ tròn hợp lệ và chữ ký xác nhận của phụ huynh/địa phương.",
-    confidence: "97.4%",
+    sourceBadge: "OCR chưa cấu hình",
+    sourceBadgeClass: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800",
+    aiEvidence: "Đối chiếu tài liệu thủ công; chưa xác minh chữ ký hoặc con dấu.",
+    confidence: "Chưa kiểm",
   },
   {
     id: "gate_sla",
     label: "Xác định mức độ khẩn cấp & thời hạn cam kết SLA tiếp nhận",
-    sourceBadge: "SLA Chuẩn 24h",
-    sourceBadgeBg: "#fffbeb",
-    sourceBadgeColor: "#92400e",
-    aiEvidence: "Cam kết phản hồi trong 24h làm việc. Tự động tính hạn chót.",
-    confidence: "100%",
+    sourceBadge: "Cần nguồn thời hạn",
+    sourceBadgeClass: "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
+    aiEvidence: "Chưa có thời hạn xử lý đã được ràng buộc với nguồn áp dụng.",
+    confidence: "Thiếu nguồn",
   },
   {
     id: "gate_privacy",
     label: "Rà soát thông tin nhạy cảm trước khi xử lý theo Nghị định 13",
-    sourceBadge: "NĐ 13/2023/NĐ-CP",
-    sourceBadgeBg: "#fdf2f8",
-    sourceBadgeColor: "#9d174d",
-    aiEvidence: "Dữ liệu cá nhân nhạy cảm đã được gắn cờ bảo mật và hạn chế truy cập.",
-    confidence: "99.0%",
+    sourceBadge: "Cán bộ kiểm tra",
+    sourceBadgeClass: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800",
+    aiEvidence: "Cần đối chiếu phạm vi dữ liệu và quyền truy cập trước khi chia sẻ.",
+    confidence: "Chưa kiểm",
   },
 ];
 
-// Audit log entry type
 export interface AuditLogEntry {
   timestamp: string;
   staffId: string;
@@ -121,13 +138,11 @@ export interface AuditLogEntry {
   detail: string;
 }
 
-// localStorage keys
 const LS_CHECKED_GATES = "campus247_checkedGates";
 const LS_EXCEPTION_REASONS = "campus247_exceptionReasons";
 const LS_FINALIZED = "campus247_finalizedTickets";
 const LS_AUDIT_LOG = "campus247_auditLog";
 const LS_GATE_TIMESTAMPS = "campus247_gateTimestamps";
-const LS_PRIVATE_NOTES = "campus247_privateNotes";
 
 function loadLS<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -148,34 +163,21 @@ function saveLS<T>(key: string, value: T): void {
   }
 }
 
-/** Calculate SLA remaining from createdAt string */
-function getSlaInfo(createdAt: string): { remaining: string; urgencyColor: string; percentUsed: number } {
-  const SLA_HOURS = 24;
-  const now = new Date();
-  // Parse relative times like "Hôm nay, 08:30"
-  let created: Date;
-  if (createdAt.includes("Hôm nay")) {
-    const timePart = createdAt.match(/(\d{2}):(\d{2})/);
-    created = new Date(now);
-    if (timePart) {
-      created.setHours(parseInt(timePart[1]), parseInt(timePart[2]), 0, 0);
-    }
-  } else {
-    created = new Date(createdAt);
-    if (isNaN(created.getTime())) created = now;
-  }
-
-  const deadline = new Date(created.getTime() + SLA_HOURS * 60 * 60 * 1000);
-  const diffMs = deadline.getTime() - now.getTime();
+function getSlaInfo(item: StaffQueueItem): { remaining: string; urgencyColor: string; percentUsed: number } {
+  const unverified = { remaining: "Chưa xác minh thời hạn", urgencyColor: "text-slate-500", percentUsed: 0 };
+  if (!item.sla?.locator || !item.sla.version) return unverified;
+  const created = new Date(item.createdAt), deadline = new Date(item.sla.deadline);
+  const totalMs = deadline.getTime() - created.getTime();
+  if (!Number.isFinite(totalMs) || totalMs <= 0) return unverified;
+  const diffMs = deadline.getTime() - Date.now();
   const diffH = Math.floor(diffMs / (1000 * 60 * 60));
   const diffM = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  const totalMs = SLA_HOURS * 60 * 60 * 1000;
   const percentUsed = Math.min(100, Math.max(0, ((totalMs - diffMs) / totalMs) * 100));
 
-  if (diffMs <= 0) return { remaining: "QUÁ HẠN", urgencyColor: "#dc2626", percentUsed: 100 };
-  if (diffH < 1) return { remaining: `${diffM} phút`, urgencyColor: "#dc2626", percentUsed };
-  if (diffH < 4) return { remaining: `${diffH}h ${diffM}p`, urgencyColor: "#f59e0b", percentUsed };
-  return { remaining: `${diffH}h ${diffM}p`, urgencyColor: "#16a34a", percentUsed };
+  if (diffMs <= 0) return { remaining: "QUÁ HẠN", urgencyColor: "text-rose-600 dark:text-rose-400", percentUsed: 100 };
+  if (diffH < 1) return { remaining: `${diffM} phút`, urgencyColor: "text-rose-600 dark:text-rose-400", percentUsed };
+  if (diffH < 4) return { remaining: `${diffH}h ${diffM}p`, urgencyColor: "text-amber-600 dark:text-amber-400", percentUsed };
+  return { remaining: `${diffH}h ${diffM}p`, urgencyColor: "text-emerald-600 dark:text-emerald-400", percentUsed };
 }
 
 export function StaffTicketQueue({
@@ -188,24 +190,23 @@ export function StaffTicketQueue({
   onRequestSupplement,
   onFinalizeIntake,
   onReconcile,
+  businessActionsAvailable = false,
 }: StaffTicketQueueProps) {
   if (userRole && userRole !== "STAFF" && userRole !== "ADMIN") {
     return (
       <div
         role="alert"
-        style={{
-          padding: "24px 28px",
-          borderRadius: "12px",
-          backgroundColor: "#fff1f2",
-          border: "1px solid #fecaca",
-          color: "#991b1b",
-          maxWidth: "800px",
-        }}
+        className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-900 shadow-xs dark:border-red-900/60 dark:bg-red-950/60 dark:text-red-200"
       >
-        <h3 style={{ margin: "0 0 8px 0", fontSize: "18px", fontWeight: 700 }}>Từ chối quyền truy cập</h3>
-        <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.6 }}>
-          Bạn không có thẩm quyền truy cập hàng đợi cán bộ một cửa. Chức năng này chỉ dành cho tài khoản có vai trò Cán bộ tiếp nhận hoặc Quản trị viên hệ thống.
-        </p>
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" aria-hidden="true" />
+          <div>
+            <h3 className="mb-2 text-lg font-bold">Từ chối quyền truy cập</h3>
+            <p className="text-sm leading-relaxed text-red-800 dark:text-red-300">
+              Bạn không có thẩm quyền truy cập hàng đợi cán bộ một cửa. Chức năng này chỉ dành cho tài khoản có vai trò Cán bộ tiếp nhận hoặc Quản trị viên hệ thống.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -215,33 +216,26 @@ export function StaffTicketQueue({
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
-  // Checklist state per ticket — persisted in localStorage
   const [checkedGates, setCheckedGates] = useState<Record<string, Record<string, boolean>>>(() => loadLS(LS_CHECKED_GATES, {}));
   const [exceptionReasons, setExceptionReasons] = useState<Record<string, string>>(() => loadLS(LS_EXCEPTION_REASONS, {}));
   const [finalizedTickets, setFinalizedTickets] = useState<Record<string, boolean>>(() => loadLS(LS_FINALIZED, {}));
   const [gateTimestamps, setGateTimestamps] = useState<Record<string, Record<string, string>>>(() => loadLS(LS_GATE_TIMESTAMPS, {}));
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>(() => loadLS(LS_AUDIT_LOG, []));
-  const [privateNotes, setPrivateNotes] = useState<Record<string, string>>(() => loadLS(LS_PRIVATE_NOTES, {}));
 
-  // Show/hide audit log panel
   const [showAuditLog, setShowAuditLog] = useState(false);
 
-  // SLA timer tick
-  const [, setTick] = useState(0);
+  const [, setTimerTick] = useState(0);
   useEffect(() => {
-    const interval = setInterval(() => setTick((t) => t + 1), 60000); // update every minute
+    const interval = setInterval(() => setTimerTick((t) => t + 1), 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Persist to localStorage on change
   useEffect(() => { saveLS(LS_CHECKED_GATES, checkedGates); }, [checkedGates]);
   useEffect(() => { saveLS(LS_EXCEPTION_REASONS, exceptionReasons); }, [exceptionReasons]);
   useEffect(() => { saveLS(LS_FINALIZED, finalizedTickets); }, [finalizedTickets]);
   useEffect(() => { saveLS(LS_GATE_TIMESTAMPS, gateTimestamps); }, [gateTimestamps]);
   useEffect(() => { saveLS(LS_AUDIT_LOG, auditLog); }, [auditLog]);
-  useEffect(() => { saveLS(LS_PRIVATE_NOTES, privateNotes); }, [privateNotes]);
 
-  // Audit log helper
   const addAuditEntry = useCallback((ticketId: string, action: string, detail: string) => {
     const entry: AuditLogEntry = {
       timestamp: new Date().toISOString(),
@@ -250,34 +244,30 @@ export function StaffTicketQueue({
       action,
       detail,
     };
-    setAuditLog((prev) => [entry, ...prev].slice(0, 200)); // keep last 200
+    setAuditLog((prev) => [entry, ...prev].slice(0, 200));
   }, [currentStaffId]);
 
-  // Transfer case state
   const [transferModalId, setTransferModalId] = useState<string | null>(null);
   const [targetDept, setTargetDept] = useState("phong_dao_tao");
   const [transferReason, setTransferReason] = useState("");
 
-  // Supplement request state
   const [supplementModalId, setSupplementModalId] = useState<string | null>(null);
   const [supplementMsg, setSupplementMsg] = useState("");
 
-  // AI Draft Response state
   const [aiDraftModalId, setAiDraftModalId] = useState<string | null>(null);
   const [aiDraftType, setAiDraftType] = useState<"approve" | "supplement" | "forward">("approve");
   const [aiDraftContent, setAiDraftContent] = useState("");
   const [draftCopied, setDraftCopied] = useState(false);
 
-  // Official Receipt Print Modal state
   const [receiptModalId, setReceiptModalId] = useState<string | null>(null);
 
   const getAiDraftText = (type: "approve" | "supplement" | "forward", item: StaffQueueItem) => {
     if (type === "approve") {
-      return `Kính gửi sinh viên ${item.studentName} (MSSV: ${item.studentId}),\n\nBộ phận Một cửa số - Trường Đại học Xây dựng Hà Nội (HUCE) xin thông báo: Hồ sơ "${item.title}" (Mã tiếp nhận: ${item.ticketCode}) của em đã hoàn tất 6/6 cổng thẩm định nghiệp vụ và chính thức được tiếp nhận.\n\n- Thời hạn xử lý cam kết: Trong vòng 24 giờ làm việc.\n- Bộ phận chuyên môn thụ lý: ${item.targetDepartment || "Phòng Quản lý Đào tạo"}.\n- Địa điểm nhận kết quả: P.102 Nhà H1 (hoặc nhận bản điện tử trên Cổng sinh viên).\n\nTrân trọng,\nCán bộ Một cửa số HUCE`;
+      return `Bản nháp cần cán bộ kiểm tra.\n\nChào bạn ${item.studentName} (MSSV: ${item.studentId}),\nHồ sơ ${item.ticketCode}: ${item.title}. Cán bộ đang đối chiếu thông tin và nguồn áp dụng.\n[Điền kết quả đã xác minh và thời hạn có căn cứ trước khi gửi.]`;
     } else if (type === "supplement") {
-      return `Kính gửi sinh viên ${item.studentName} (MSSV: ${item.studentId}),\n\nSau khi thẩm định hồ sơ "${item.title}" (Mã tiếp nhận: ${item.ticketCode}), Bộ phận Một cửa nhận thấy hồ sơ của em còn thiếu minh chứng theo Quy chế Đào tạo:\n\n- Cần bổ sung: Bản scan có dấu đỏ hoặc bản chụp CCCD/thẻ BHYT/đơn xác nhận có chữ ký.\n- Thời hạn hoàn thiện: Trước 17:00 ngày làm việc tiếp theo.\n\nEm vui lòng bấm "Nộp bổ sung hồ sơ" trên Cổng sinh viên để tải tài liệu trực tuyến.\n\nTrân trọng,\nCán bộ Một cửa số HUCE`;
+      return `Bản nháp cần cán bộ kiểm tra.\n\nChào bạn ${item.studentName}, hồ sơ ${item.ticketCode}: ${item.title}.\n[Cán bộ ghi rõ thông tin cần bổ sung, lý do và nguồn áp dụng; chưa xác định thời hạn.]`;
     } else {
-      return `Kính gửi sinh viên ${item.studentName} (MSSV: ${item.studentId}),\n\nHồ sơ "${item.title}" (Mã tiếp nhận: ${item.ticketCode}) của em đã được Bộ phận Một cửa chuyển tiếp sang ${item.targetDepartment || "Phòng Quản lý Đào tạo"} để giải quyết theo thẩm quyền chuyên môn cấp Phòng.\n\nCán bộ phụ trách sẽ liên hệ hoặc thông báo quyết định trên hệ thống.\n\nTrân trọng,\nCán bộ Một cửa số HUCE`;
+      return `Bản nháp cần cán bộ kiểm tra.\n\nHồ sơ ${item.ticketCode}: ${item.title}.\n[Cán bộ xác minh đơn vị có thẩm quyền và receipt chuyển hồ sơ trước khi thông báo.]`;
     }
   };
 
@@ -322,7 +312,6 @@ export function StaffTicketQueue({
         [gateId]: !wasChecked,
       },
     }));
-    // Record timestamp
     if (!wasChecked) {
       setGateTimestamps((prev) => ({
         ...prev,
@@ -345,26 +334,17 @@ export function StaffTicketQueue({
   };
 
   const handleAiAutoCheck = (ticketId: string) => {
-    const allChecked: Record<string, boolean> = {};
-    const allTimestamps: Record<string, string> = {};
-    const now = new Date().toISOString();
-    INTAKE_CHECKLIST_GATES.forEach((g) => {
-      allChecked[g.id] = true;
-      allTimestamps[g.id] = now;
-    });
-    setCheckedGates((prev) => ({ ...prev, [ticketId]: allChecked }));
-    setGateTimestamps((prev) => ({ ...prev, [ticketId]: allTimestamps }));
-    addAuditEntry(ticketId, "AI_AUTO_CHECK", "AI đã tự động đối chiếu 6/6 cổng thẩm định");
+    addAuditEntry(ticketId, "AI_UNAVAILABLE", "Chưa có consumer kiểm chứng; cán bộ cần đối chiếu từng mục, không tự đánh dấu kiểm tra.");
   };
 
   const isChecklistComplete = (ticketId: string) => {
     const ticketGates = checkedGates[ticketId] || {};
     const checkedCount = INTAKE_CHECKLIST_GATES.filter((g) => !!ticketGates[g.id]).length;
-    const hasException = !!(exceptionReasons[ticketId] || "").trim();
-    return checkedCount === INTAKE_CHECKLIST_GATES.length || hasException;
+    return checkedCount === INTAKE_CHECKLIST_GATES.length;
   };
 
   const handleFinalize = (ticketId: string) => {
+    if (!businessActionsAvailable || !onFinalizeIntake) return;
     const complete = isChecklistComplete(ticketId);
     if (!complete) return;
     onFinalizeIntake?.(ticketId, {
@@ -376,6 +356,7 @@ export function StaffTicketQueue({
   };
 
   const handleConfirmTransfer = (ticketId: string) => {
+    if (!businessActionsAvailable || !onTransferTicket) return;
     onTransferTicket?.(ticketId, {
       targetDepartment: targetDept,
       transferReason: transferReason || undefined,
@@ -386,6 +367,7 @@ export function StaffTicketQueue({
   };
 
   const handleConfirmSupplement = (ticketId: string) => {
+    if (!businessActionsAvailable || !onRequestSupplement) return;
     if (!supplementMsg.trim()) return;
     onRequestSupplement?.(ticketId, { requestMessage: supplementMsg.trim() });
     addAuditEntry(ticketId, "SUPPLEMENT_REQUEST", `Yêu cầu SV bổ sung: ${supplementMsg.trim().slice(0, 80)}...`);
@@ -393,7 +375,6 @@ export function StaffTicketQueue({
     setSupplementMsg("");
   };
 
-  // Filter items
   const filteredItems = items
     .filter((item) => {
       if (filter === "unassigned") return item.status === "unassigned";
@@ -414,8 +395,8 @@ export function StaffTicketQueue({
     })
     .sort((a, b) => {
       if (sortBy === "urgent") {
-        const pOrder: Record<StaffQueueItem["priority"], number> = { urgent: 0, high: 1, normal: 2 };
-        return pOrder[a.priority] - pOrder[b.priority];
+        const priorityOrder: Record<StaffQueueItem["priority"], number> = { urgent: 0, high: 1, normal: 2 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
       }
       return 0;
     });
@@ -424,114 +405,53 @@ export function StaffTicketQueue({
     switch (priority) {
       case "urgent":
         return {
-          label: "[!] Khẩn cấp",
           text: "[!] Khẩn cấp",
-          bg: "#fef2f2",
-          border: "#f87171",
-          color: "#991b1b",
+          className: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800",
         };
       case "high":
         return {
-          label: "[▲] Cao",
           text: "[▲] Cao",
-          bg: "#fffbeb",
-          border: "#fde68a",
-          color: "#92400e",
+          className: "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
         };
       case "normal":
       default:
         return {
-          label: "[•] Thường",
           text: "[•] Thường",
-          bg: "var(--color-slate-100, #f1f5f9)",
-          border: "var(--color-slate-200, #cbd5e1)",
-          color: "var(--color-slate-700, #334155)",
+          className: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
         };
     }
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div className="flex flex-col gap-5">
+      <p className="text-sm text-amber-800 dark:text-amber-200">Checklist cục bộ cần đối chiếu nguồn trước khi xử lý. Dữ liệu mô phỏng phải được nhận diện theo hồ sơ; trạng thái chưa có bằng chứng luôn là chưa xác minh.</p>
+      {!businessActionsAvailable && <p role="status" className="text-sm">Hàng đợi này chưa có consumer nghiệp vụ bền vững. Tiếp nhận, chuyển, yêu cầu bổ sung và hoàn tất đang khóa; mở workspace nghiệp vụ có hỗ trợ hoặc liên hệ đơn vị phụ trách để xử lý thủ công.</p>}
       {/* Header and Staff Identity */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "12px",
-        }}
-      >
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2
-            style={{
-              margin: "0 0 4px 0",
-              fontSize: "18px",
-              fontWeight: 700,
-              color: "var(--color-slate-900, #0f172a)",
-            }}
-          >
+          <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             Hàng đợi tiếp nhận yêu cầu (Cán bộ một cửa)
           </h2>
-          <p
-            style={{
-              margin: 0,
-              fontSize: "13px",
-              color: "var(--color-slate-500, #64748b)",
-            }}
-          >
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Không gian phân loại mật độ cao với kiểm soát quyền sở hữu và giải quyết xung đột
           </p>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div className="flex items-center gap-3">
           {onRefresh && (
             <button
               type="button"
               onClick={onRefresh}
               aria-label="Làm mới hàng đợi"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 14px",
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "var(--color-primary, #1e3a8a)",
-                backgroundColor: "#ffffff",
-                border: "1px solid var(--color-slate-300, #cbd5e1)",
-                borderRadius: "var(--radius-sm, 6px)",
-                cursor: "pointer",
-                minHeight: "36px",
-              }}
+              className={staffButton}
             >
-              <span aria-hidden="true">↻</span>
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
               <span>Làm mới</span>
             </button>
           )}
 
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              fontSize: "13px",
-              color: "var(--color-slate-700, #334155)",
-              backgroundColor: "var(--color-slate-100, #f1f5f9)",
-              padding: "6px 14px",
-              borderRadius: "9999px",
-              border: "1px solid var(--color-slate-200, #e2e8f0)",
-            }}
-          >
-            <span
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                backgroundColor: "#10b981",
-              }}
-              aria-hidden="true"
-            />
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
             <span>
               Cán bộ trực: <strong>{currentStaffId || "Chưa xác định"}</strong>
             </span>
@@ -540,51 +460,28 @@ export function StaffTicketQueue({
       </div>
 
       {/* Search & Sort Toolbar */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "12px",
-          backgroundColor: "#ffffff",
-          padding: "12px 16px",
-          borderRadius: "var(--radius-md, 10px)",
-          border: "1px solid var(--color-slate-200, #e2e8f0)",
-        }}
-      >
-        <div style={{ flex: 1, minWidth: "260px" }}>
+      <div className={`${staffSurface} flex flex-wrap items-center justify-between gap-3 p-3 shadow-xs`}>
+        <div className="relative min-w-[280px] flex-1">
+          <span className="sr-only">Tìm theo mã, tên sinh viên hoặc tiêu đề...</span>
+          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
           <input
             type="search"
             placeholder="Tìm theo mã, tên sinh viên hoặc tiêu đề..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "8px 14px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-slate-300, #cbd5e1)",
-              fontSize: "13px",
-              boxSizing: "border-box",
-            }}
+            className={`${staffField} pl-9`}
           />
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <label htmlFor="sort-queue" style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-slate-600, #475569)" }}>
+        <div className="flex items-center gap-2">
+          <label htmlFor="sort-queue" className="whitespace-nowrap text-xs font-semibold text-slate-600 dark:text-slate-400">
             Sắp xếp:
           </label>
           <select
             id="sort-queue"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortType)}
-            style={{
-              padding: "6px 12px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-slate-300, #cbd5e1)",
-              fontSize: "13px",
-              backgroundColor: "#ffffff",
-            }}
+            className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option value="default">Theo thứ tự tiếp nhận</option>
             <option value="urgent">Độ khẩn cấp ưu tiên</option>
@@ -596,15 +493,7 @@ export function StaffTicketQueue({
       <div
         role="tablist"
         aria-label="Bộ lọc hàng đợi tiếp nhận"
-        style={{
-          display: "flex",
-          backgroundColor: "var(--color-slate-100, #f1f5f9)",
-          padding: "3px",
-          borderRadius: "var(--radius-md, 10px)",
-          gap: "2px",
-          alignSelf: "flex-start",
-          flexWrap: "wrap",
-        }}
+        className="flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800/80"
       >
         <button
           type="button"
@@ -613,18 +502,11 @@ export function StaffTicketQueue({
           aria-selected={filter === "all"}
           aria-controls="queue-panel"
           onClick={() => setFilter("all")}
-          style={{
-            padding: "6px 16px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: filter === "all" ? "#ffffff" : "transparent",
-            color: filter === "all" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-600, #475569)",
-            fontWeight: filter === "all" ? 600 : 500,
-            fontSize: "13px",
-            cursor: "pointer",
-            boxShadow: filter === "all" ? "var(--shadow-xs)" : "none",
-            transition: "var(--transition-fast, 150ms ease)",
-          }}
+          className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
+            filter === "all"
+              ? "bg-white text-blue-700 shadow-xs dark:bg-slate-900 dark:text-blue-300"
+              : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
         >
           Tất cả ({items.length})
         </button>
@@ -635,18 +517,11 @@ export function StaffTicketQueue({
           aria-selected={filter === "unassigned"}
           aria-controls="queue-panel"
           onClick={() => setFilter("unassigned")}
-          style={{
-            padding: "6px 16px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: filter === "unassigned" ? "#ffffff" : "transparent",
-            color: filter === "unassigned" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-600, #475569)",
-            fontWeight: filter === "unassigned" ? 600 : 500,
-            fontSize: "13px",
-            cursor: "pointer",
-            boxShadow: filter === "unassigned" ? "var(--shadow-xs)" : "none",
-            transition: "var(--transition-fast, 150ms ease)",
-          }}
+          className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
+            filter === "unassigned"
+              ? "bg-white text-blue-700 shadow-xs dark:bg-slate-900 dark:text-blue-300"
+              : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
         >
           Chưa nhận
         </button>
@@ -657,18 +532,11 @@ export function StaffTicketQueue({
           aria-selected={filter === "my"}
           aria-controls="queue-panel"
           onClick={() => setFilter("my")}
-          style={{
-            padding: "6px 16px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: filter === "my" ? "#ffffff" : "transparent",
-            color: filter === "my" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-600, #475569)",
-            fontWeight: filter === "my" ? 600 : 500,
-            fontSize: "13px",
-            cursor: "pointer",
-            boxShadow: filter === "my" ? "var(--shadow-xs)" : "none",
-            transition: "var(--transition-fast, 150ms ease)",
-          }}
+          className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
+            filter === "my"
+              ? "bg-white text-blue-700 shadow-xs dark:bg-slate-900 dark:text-blue-300"
+              : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
         >
           Ca của tôi
         </button>
@@ -679,58 +547,35 @@ export function StaffTicketQueue({
           aria-selected={filter === "urgent"}
           aria-controls="queue-panel"
           onClick={() => setFilter("urgent")}
-          style={{
-            padding: "6px 16px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: filter === "urgent" ? "#ffffff" : "transparent",
-            color: filter === "urgent" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-600, #475569)",
-            fontWeight: filter === "urgent" ? 600 : 500,
-            fontSize: "13px",
-            cursor: "pointer",
-            boxShadow: filter === "urgent" ? "var(--shadow-xs)" : "none",
-            transition: "var(--transition-fast, 150ms ease)",
-          }}
+          className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
+            filter === "urgent"
+              ? "bg-white text-blue-700 shadow-xs dark:bg-slate-900 dark:text-blue-300"
+              : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
         >
           Khẩn cấp
         </button>
       </div>
 
-      {/* Queue Table with Semantic reflow support */}
+      {/* Queue Table */}
       <div
         id="queue-panel"
         role="region"
         aria-label="Danh sách yêu cầu tiếp nhận"
-        style={{
-          overflowX: "auto",
-          backgroundColor: "#ffffff",
-          borderRadius: "var(--radius-lg, 14px)",
-          border: "1px solid var(--color-slate-200, #e2e8f0)",
-          boxShadow: "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.04))",
-        }}
+        className={`${staffSurface} overflow-x-auto shadow-xs`}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "14px" }}>
-          <thead>
-            <tr
-              style={{
-                backgroundColor: "var(--color-slate-50, #f8fafc)",
-                borderBottom: "1px solid var(--color-slate-200, #e2e8f0)",
-                color: "var(--color-slate-600, #475569)",
-                fontSize: "12px",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-              }}
-            >
-              <th scope="col" style={{ padding: "14px 18px" }}>Mã yêu cầu</th>
-              <th scope="col" style={{ padding: "14px 18px" }}>Sinh viên</th>
-              <th scope="col" style={{ padding: "14px 18px" }}>Nội dung & Thời gian chờ</th>
-              <th scope="col" style={{ padding: "14px 18px" }}>Ưu tiên</th>
-              <th scope="col" style={{ padding: "14px 18px" }}>Trạng thái</th>
-              <th scope="col" style={{ padding: "14px 18px" }}>Hành động</th>
+        <table className="campus-staff-table w-full text-left text-sm fluent-table">
+          <thead className="bg-slate-50 text-xs font-medium uppercase tracking-wider text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+            <tr>
+              <th scope="col" className="px-4 py-3.5">Mã yêu cầu</th>
+              <th scope="col" className="px-4 py-3.5">Sinh viên</th>
+              <th scope="col" className="px-4 py-3.5">Nội dung & Thời gian chờ</th>
+              <th scope="col" className="px-4 py-3.5">Ưu tiên</th>
+              <th scope="col" className="px-4 py-3.5">Trạng thái</th>
+              <th scope="col" className="px-4 py-3.5">Hành động</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {filteredItems.map((item) => {
               const isUnassigned = item.status === "unassigned";
               const isMyItem = item.assignedStaffId === currentStaffId;
@@ -738,49 +583,54 @@ export function StaffTicketQueue({
               const isRestricted = item.isRestricted === true;
               const isStale = item.isStale === true;
               const isUnknown = item.actionOutcome === "unknown";
-              const canClaim = isUnassigned && !hasConflict && !isRestricted && !isStale && !isUnknown;
+              const canClaim = businessActionsAvailable && isUnassigned && !hasConflict && !isRestricted && !isStale && !isUnknown;
               const isExpanded = !!expandedItems[item.id];
-              const pBadge = getPriorityBadge(item.priority);
+              const priorityBadge = getPriorityBadge(item.priority);
 
               const ticketGates = checkedGates[item.id] || {};
               const checkedCount = INTAKE_CHECKLIST_GATES.filter((g) => !!ticketGates[g.id]).length;
               const checklistDone = isChecklistComplete(item.id);
               const isFinalized = !!finalizedTickets[item.id];
-              const sla = getSlaInfo(item.createdAt);
+              const sla = getSlaInfo(item);
 
               return (
                 <React.Fragment key={item.id}>
                   <tr
-                    style={{
-                      borderBottom: isExpanded ? "none" : "1px solid var(--color-slate-100, #f1f5f9)",
-                      backgroundColor: hasConflict || isStale ? "#fffbeb" : isRestricted ? "#f8fafc" : "#ffffff",
-                      transition: "var(--transition-fast, 150ms ease)",
-                    }}
+                    className={`align-top transition ${
+                      hasConflict || isStale
+                        ? "bg-amber-50/50 dark:bg-amber-950/30"
+                        : isRestricted
+                        ? "bg-slate-50/60 dark:bg-slate-900/60"
+                        : "hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
+                    }`}
                   >
-                    <td style={{ padding: "14px 18px", fontWeight: 700, color: "var(--color-primary, #1e3a8a)" }}>
+                    <td className="px-4 py-3.5 font-bold text-blue-700 dark:text-blue-300">
                       <div>{item.ticketCode}</div>
+                      <p className="text-xs text-slate-500">{item.classification === "synthetic" ? "Dữ liệu mô phỏng" : item.classification === "live" ? "Hồ sơ nghiệp vụ" : "Chưa xác minh phân loại dữ liệu"}</p>
                       <button
                         type="button"
                         onClick={() => toggleExpand(item.id)}
                         aria-expanded={isExpanded}
                         aria-label={`Chi tiết ${item.ticketCode}`}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          padding: "2px 0",
-                          color: "var(--color-slate-500, #64748b)",
-                          fontSize: "11px",
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                        }}
+                        className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-blue-600 hover:underline dark:text-slate-400"
                       >
-                        {isExpanded ? "▲ Thu gọn" : "▼ Xem chi tiết"}
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp className="h-3 w-3" aria-hidden="true" />
+                            <span>▲ Thu gọn</span>
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                            <span>▼ Xem chi tiết</span>
+                          </>
+                        )}
                       </button>
                     </td>
 
-                    <td style={{ padding: "14px 18px", color: "var(--color-slate-800, #1e293b)", fontWeight: 500 }}>
+                    <td className="px-4 py-3.5 font-medium text-slate-900 dark:text-slate-100">
                       {isRestricted ? (
-                        <span style={{ color: "var(--color-slate-500, #64748b)", fontStyle: "italic" }}>
+                        <span className="italic text-slate-500 dark:text-slate-400">
                           [Bảo mật danh tính]
                         </span>
                       ) : (
@@ -788,134 +638,86 @@ export function StaffTicketQueue({
                       )}
                     </td>
 
-                    <td style={{ padding: "14px 18px", color: "var(--color-slate-700, #334155)" }}>
+                    <td className="px-4 py-3.5 text-slate-700 dark:text-slate-300">
                       {isRestricted ? (
-                        <div style={{ color: "#b45309", fontWeight: 600 }}>
+                        <div className="font-semibold text-amber-700 dark:text-amber-400">
                           Hồ sơ hạn chế truy cập (Chỉ dành cho cán bộ thẩm quyền)
                         </div>
                       ) : (
                         <div>
-                          <div>{item.title}</div>
+                          <div className="font-medium text-slate-900 dark:text-slate-100">{item.title}</div>
                           {item.age && (
-                            <div style={{ fontSize: "12px", color: "var(--color-slate-500, #64748b)", marginTop: "2px" }}>
+                            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                               Thời gian chờ: <strong>{item.age}</strong>
                             </div>
                           )}
-                          {/* SLA Countdown Timer */}
-                          <div style={{ marginTop: "6px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
-                              <span style={{ fontWeight: 700, color: sla.urgencyColor }}>⏱ SLA: {sla.remaining}</span>
-                              <div style={{ flex: 1, maxWidth: "100px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden" }}>
-                                <div style={{ width: `${sla.percentUsed}%`, height: "100%", backgroundColor: sla.urgencyColor, transition: "width 500ms ease" }} />
-                              </div>
+                          <div className="mt-2 flex items-center gap-2 text-xs">
+                            <span className={`font-bold ${sla.urgencyColor}`}>
+                              ⏱ SLA: {sla.remaining}
+                            </span>
+                            <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                              <div
+                                className="h-full bg-blue-600 transition-all duration-500"
+                                style={{ width: `${sla.percentUsed}%` }}
+                              />
                             </div>
                           </div>
                         </div>
                       )}
 
                       {hasConflict && (
-                        <div
-                          style={{
-                            marginTop: "6px",
-                            padding: "4px 8px",
-                            backgroundColor: "#fef3c7",
-                            border: "1px solid #fde68a",
-                            borderRadius: "4px",
-                            fontSize: "12px",
-                            color: "#92400e",
-                          }}
-                        >
+                        <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/60 dark:text-amber-300">
                           <strong>Xung đột tiếp nhận:</strong> Ca này đã được cán bộ{" "}
                           <strong>{item.conflictStaffId || "khác"}</strong> nhận xử lý trước đó.
                         </div>
                       )}
 
                       {isStale && (
-                        <div
-                          style={{
-                            marginTop: "6px",
-                            padding: "6px 10px",
-                            backgroundColor: "#fffbeb",
-                            border: "1px solid #fde68a",
-                            borderRadius: "4px",
-                            fontSize: "12px",
-                            color: "#92400e",
-                          }}
-                        >
+                        <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/60 dark:text-amber-300">
                           <strong>Xung đột phiên bản:</strong> Dữ liệu đã thay đổi trên máy chủ. Vui lòng làm mới hàng đợi.
                         </div>
                       )}
 
                       {isUnknown && (
-                        <div
-                          style={{
-                            marginTop: "6px",
-                            padding: "6px 10px",
-                            backgroundColor: "#fff7ed",
-                            border: "1px solid #fdba74",
-                            borderRadius: "4px",
-                            fontSize: "12px",
-                            color: "#9a3412",
-                          }}
-                        >
+                        <div className="mt-2 rounded-lg border border-orange-200 bg-orange-50 p-2 text-xs text-orange-800 dark:border-orange-900/60 dark:bg-orange-950/60 dark:text-orange-300">
                           <strong>Chưa rõ kết quả:</strong> Đang đối soát kết quả ghi nhận từ máy chủ. Vui lòng thử lại.
                         </div>
                       )}
                     </td>
 
-                    <td style={{ padding: "14px 18px" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "3px 10px",
-                          borderRadius: "9999px",
-                          fontSize: "12px",
-                          fontWeight: 600,
-                          backgroundColor: pBadge.bg,
-                          color: pBadge.color,
-                          border: `1px solid ${pBadge.border}`,
-                        }}
-                      >
-                        {pBadge.text}
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${priorityBadge.className}`}>
+                        {priorityBadge.text}
                       </span>
                     </td>
 
-                    <td style={{ padding: "14px 18px", fontSize: "13px", color: "var(--color-slate-600, #475569)" }}>
-                        {isStale
-                          ? "Xung đột phiên bản"
-                          : isUnknown
-                          ? "Đang đối soát"
-                          : hasConflict
-                          ? "Xung đột ghi nhận"
-                          : isRestricted
-                          ? "Hạn chế quyền"
-                          : isFinalized
-                          ? "Đã tiếp nhận"
-                          : isUnassigned
-                          ? "Chờ tiếp nhận"
-                          : isMyItem
-                          ? "Đang xử lý"
-                          : `Đã nhận (${item.assignedStaffId})`}
+                    <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-600 dark:text-slate-400">
+                      {isStale
+                        ? "Xung đột phiên bản"
+                        : isUnknown
+                        ? "Đang đối soát"
+                        : hasConflict
+                        ? "Xung đột ghi nhận"
+                        : isRestricted
+                        ? "Hạn chế quyền"
+                        : isFinalized
+                        ? "Đã tiếp nhận"
+                        : isUnassigned
+                        ? "Chờ tiếp nhận"
+                        : isMyItem
+                        ? "Đang xử lý"
+                        : `Đã nhận (${item.assignedStaffId})`}
                     </td>
 
-                    <td style={{ padding: "14px 18px" }}>
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       {isUnknown ? (
                         <button
                           type="button"
                           onClick={() => onReconcile?.(item.id)}
-                          style={{
-                            padding: "8px 14px",
-                            borderRadius: "6px",
-                            border: "none",
-                            backgroundColor: "#ea580c",
-                            color: "#ffffff",
-                            fontWeight: 600,
-                            fontSize: "12px",
-                            cursor: "pointer",
-                            minHeight: "40px",
-                          }}
+                          className="inline-flex min-h-10 items-center justify-center rounded-xl bg-orange-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-orange-700"
                         >
-                          Thử đối soát lại
+                          <RotateCcw className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                          <span>Thử đối soát lại</span>
                         </button>
                       ) : (
                         <button
@@ -923,7 +725,9 @@ export function StaffTicketQueue({
                           onClick={() => onClaimTicket?.(item.id)}
                           disabled={!canClaim}
                           aria-label={
-                            isStale
+                            !businessActionsAvailable
+                              ? `Chưa có consumer - ${item.ticketCode}`
+                              : isStale
                               ? `Xung đột phiên bản - ${item.ticketCode}`
                               : hasConflict
                               ? `Xung đột - ${item.ticketCode}`
@@ -933,19 +737,7 @@ export function StaffTicketQueue({
                               ? `Nhận xử lý ${item.ticketCode}`
                               : `Đã nhận - ${item.ticketCode}`
                           }
-                          style={{
-                            padding: "8px 16px",
-                            borderRadius: "var(--radius-sm, 6px)",
-                            border: "none",
-                            backgroundColor: canClaim ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-200, #e2e8f0)",
-                            color: canClaim ? "#ffffff" : "var(--color-slate-500, #64748b)",
-                            fontWeight: 600,
-                            fontSize: "13px",
-                            cursor: canClaim ? "pointer" : "not-allowed",
-                            minHeight: "44px",
-                            boxShadow: canClaim ? "var(--shadow-xs)" : "none",
-                            transition: "var(--transition-fast, 150ms ease)",
-                          }}
+                          className={canClaim ? staffPrimary : staffButton}
                         >
                           {isStale
                             ? "Xung đột phiên bản"
@@ -955,7 +747,7 @@ export function StaffTicketQueue({
                             ? "Hạn chế"
                             : canClaim
                             ? "Nhận xử lý"
-                            : "Đã nhận"}
+                            : !businessActionsAvailable ? "Chưa có consumer" : "Đã nhận"}
                         </button>
                       )}
                     </td>
@@ -963,113 +755,57 @@ export function StaffTicketQueue({
 
                   {/* Expandable detail region with Intake Checklist & AI Copilot */}
                   {isExpanded && !isRestricted && (
-                    <tr style={{ backgroundColor: "var(--color-slate-50, #f8fafc)", borderBottom: "1px solid var(--color-slate-200, #e2e8f0)" }}>
-                      <td colSpan={6} style={{ padding: "20px 24px" }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                    <tr className="bg-slate-50/80 dark:bg-slate-900/80">
+                      <td colSpan={6} className="border-t border-slate-200 p-5 dark:border-slate-800">
+                        <div className="flex flex-col gap-5">
                           {/* Public Context & Internal Staff Notes */}
-                          <div
-                            style={{
-                              display: "grid",
-                              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                              gap: "16px",
-                            }}
-                          >
-                            <div
-                              style={{
-                                backgroundColor: "#ffffff",
-                                padding: "14px 18px",
-                                borderRadius: "8px",
-                                border: "1px solid var(--color-slate-200, #e2e8f0)",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "6px",
-                                  fontSize: "12px",
-                                  fontWeight: 700,
-                                  textTransform: "uppercase",
-                                  color: "var(--color-slate-700, #334155)",
-                                  marginBottom: "8px",
-                                }}
-                              >
-                                <span style={{ color: "#2563eb" }}>●</span> Nội dung công khai (Sinh viên thấy)
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className={`${staffSurface} p-4 shadow-xs`}>
+                              <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase text-blue-600 dark:text-blue-400">
+                                <span>●</span>
+                                <span>Nội dung công khai (Sinh viên thấy)</span>
                               </div>
-                              <p style={{ margin: 0, fontSize: "13px", color: "var(--color-slate-800, #1e293b)", lineHeight: 1.5 }}>
+                              <p className="text-sm leading-relaxed text-slate-800 dark:text-slate-200">
                                 {item.publicContent || item.title}
                               </p>
                             </div>
 
-                            <div
-                              style={{
-                                backgroundColor: "#fefce8",
-                                padding: "14px 18px",
-                                borderRadius: "8px",
-                                border: "1px solid #fef08a",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "6px",
-                                  fontSize: "12px",
-                                  fontWeight: 700,
-                                  textTransform: "uppercase",
-                                  color: "#854d0e",
-                                  marginBottom: "8px",
-                                }}
-                              >
-                                <span>🔒</span> Ghi chú nội bộ (Chỉ lưu hành nội bộ)
+                            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 shadow-xs dark:border-amber-900/60 dark:bg-amber-950/40">
+                              <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase text-amber-800 dark:text-amber-400">
+                                <span>🔒</span>
+                                <span>Ghi chú nội bộ (Chỉ lưu hành nội bộ)</span>
                               </div>
-                              <p style={{ margin: 0, fontSize: "13px", color: "#713f12", lineHeight: 1.5 }}>
+                              <p className="text-sm leading-relaxed text-amber-900 dark:text-amber-200">
                                 {item.internalNotes || "Không có ghi chú nội bộ cho ca này."}
                               </p>
                             </div>
                           </div>
 
                           {/* AI Copilot Triage Assistant Card */}
-                          <div
-                            style={{
-                              backgroundColor: "#f5f3ff",
-                              border: "1px solid #ddd6fe",
-                              borderRadius: "10px",
-                              padding: "16px 20px",
-                            }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                              <span style={{ fontSize: "16px" }}>🤖</span>
-                              <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#5b21b6" }}>
+                          <div className="rounded-2xl border border-purple-200 bg-purple-50/60 p-5 shadow-xs dark:border-purple-900/60 dark:bg-purple-950/40">
+                            <div className="mb-3 flex items-center gap-2 text-purple-800 dark:text-purple-300">
+                              <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                              <h4 className="text-sm font-bold">
                                 Trợ lý AI Tiếp nhận & Phân loại thông minh
                               </h4>
                             </div>
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px", color: "#4c1d95" }}>
+                            <div className="space-y-2 text-sm text-purple-900 dark:text-purple-200">
                               <div>
-                                <strong>Tóm tắt AI:</strong> Hồ sơ Một cửa: {item.title} ({item.priority === "urgent" ? "Mức độ khẩn cấp cao - cần xử lý trong 24h" : "Thời hạn tiêu chuẩn 48h"})
+                                <strong>Tóm tắt AI:</strong> Hồ sơ Một cửa: {item.title}{item.priority === "urgent" ? " (được đánh dấu khẩn)" : ""}. Hạn xử lý theo quy trình của đơn vị; hệ thống chưa có căn cứ thời hạn cho loại hồ sơ này.
                               </div>
                               <div>
-                                <strong>Đánh giá rủi ro trùng lặp:</strong> Không phát hiện hồ sơ trùng lặp trong hệ thống (Độ tin cậy 98%).
+                                <strong>Kiểm tra trùng lặp:</strong> Chưa kết nối dữ liệu hồ sơ để kiểm trùng; cán bộ đối chiếu trực tiếp.
                               </div>
-                              <div>
-                                <strong>Đề xuất câu trả lời nhanh:</strong>{" "}
+                              <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <strong>Đề xuất câu trả lời nhanh:</strong>
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setSupplementModalId(item.id);
                                     setSupplementMsg("Chào bạn, Nhà trường đã tiếp nhận hồ sơ. Vui lòng bổ sung bản chụp CCCD hai mặt để hoàn thiện thủ tục.");
                                   }}
-                                  style={{
-                                    background: "#ede9fe",
-                                    border: "1px solid #c4b5fd",
-                                    borderRadius: "4px",
-                                    padding: "2px 8px",
-                                    fontSize: "12px",
-                                    color: "#5b21b6",
-                                    cursor: "pointer",
-                                    fontWeight: 600,
-                                  }}
+                                  className="rounded-lg border border-purple-300 bg-white px-3 py-1 text-xs font-semibold text-purple-800 shadow-xs hover:bg-purple-50 dark:border-purple-700 dark:bg-slate-900 dark:text-purple-300"
                                 >
                                   Mẫu: Yêu cầu bổ sung CCCD
                                 </button>
@@ -1079,52 +815,29 @@ export function StaffTicketQueue({
 
                           {/* Student Attachments with OCR Badges */}
                           {item.attachments && item.attachments.length > 0 && (
-                            <div
-                              style={{
-                                backgroundColor: "#ffffff",
-                                borderRadius: "10px",
-                                border: "1px solid var(--color-slate-200, #e2e8f0)",
-                                padding: "16px 20px",
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-                                <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+                            <div className={`${staffSurface} p-5 shadow-xs`}>
+                              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                                   📎 Minh chứng & Hồ sơ sinh viên đính kèm ({item.attachments.length})
                                 </h4>
-                                <span style={{ fontSize: "12px", color: "#16a34a", fontWeight: 600 }}>
-                                  ✓ AI OCR thẩm định tự động
+                                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                  OCR chưa được xác minh
                                 </span>
                               </div>
-                              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "10px" }}>
+                              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                                 {item.attachments.map((att, attIdx) => (
                                   <div
                                     key={attIdx}
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "space-between",
-                                      backgroundColor: "#f8fafc",
-                                      border: "1px solid #e2e8f0",
-                                      borderRadius: "8px",
-                                      padding: "10px 14px",
-                                    }}
+                                    className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 p-3 dark:border-slate-800 dark:bg-slate-900"
                                   >
-                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                      <span style={{ fontSize: "16px" }}>{att.type === "pdf" ? "📄" : "🖼️"}</span>
-                                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#1e293b" }}>{att.name}</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-base">{att.type === "pdf" ? "📄" : "🖼️"}</span>
+                                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{att.name}</span>
                                     </div>
-                                    <span
-                                      style={{
-                                        fontSize: "11px",
-                                        fontWeight: 700,
-                                        padding: "2px 8px",
-                                        borderRadius: "4px",
-                                        backgroundColor: "#dcfce7",
-                                        color: "#15803d",
-                                        border: "1px solid #86efac",
-                                      }}
-                                    >
-                                      {att.ocrBadge} ({att.confidence})
+                                    <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                      {att.evidence?.state === "checked" && att.evidence.locator && att.evidence.version
+                                        ? `Đã kiểm · ${att.evidence.locator} · ${att.evidence.version}`
+                                        : att.evidence?.state === "conflicting" ? "Xung đột" : att.evidence?.state === "error" ? "Lỗi kiểm tra" : att.evidence?.state === "missing_source" ? "Thiếu nguồn" : "Chưa kiểm"}
                                     </span>
                                   </div>
                                 ))}
@@ -1133,51 +846,20 @@ export function StaffTicketQueue({
                           )}
 
                           {/* Adaptive Intake Checklist */}
-                          <div
-                            style={{
-                              backgroundColor: "#ffffff",
-                              borderRadius: "10px",
-                              border: "1px solid var(--color-slate-200, #e2e8f0)",
-                              padding: "16px 20px",
-                            }}
-                          >
+                          <div className={`${staffSurface} p-5 shadow-xs`}>
                             {/* Preset Actions Bar */}
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                flexWrap: "wrap",
-                                gap: "10px",
-                                backgroundColor: "#eff6ff",
-                                border: "1px solid #bfdbfe",
-                                borderRadius: "8px",
-                                padding: "10px 16px",
-                                marginBottom: "14px",
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <span style={{ fontSize: "14px" }}>⚡</span>
-                                <span style={{ fontSize: "13px", fontWeight: 700, color: "#1e40af" }}>
-                                  Thao tác chuẩn 1-chạm:
-                                </span>
+                            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50/70 p-3 dark:border-blue-900/60 dark:bg-blue-950/40">
+                              <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900 dark:text-blue-300">
+                                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                                <span>Thao tác chuẩn 1-chạm:</span>
                               </div>
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                              <div className="flex flex-wrap items-center gap-2">
                                 <button
                                   type="button"
                                   onClick={() => handleAiAutoCheck(item.id)}
-                                  style={{
-                                    padding: "6px 12px",
-                                    borderRadius: "6px",
-                                    border: "1px solid #60a5fa",
-                                    backgroundColor: "#ffffff",
-                                    color: "#1d4ed8",
-                                    fontSize: "12px",
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
+                                  className="rounded-lg border border-blue-400 bg-white px-3 py-1.5 text-xs font-bold text-blue-700 shadow-xs hover:bg-blue-50 dark:border-blue-700 dark:bg-slate-900 dark:text-blue-300"
                                 >
-                                  ✨ Duyệt chuẩn 6/6 cổng
+                                  Cán bộ đối chiếu từng mục
                                 </button>
                                 <button
                                   type="button"
@@ -1185,121 +867,83 @@ export function StaffTicketQueue({
                                     setSupplementModalId(item.id);
                                     setSupplementMsg("Chào em, hồ sơ còn thiếu bản scan có con dấu tròn đỏ xác nhận. Vui lòng bổ sung.");
                                   }}
-                                  style={{
-                                    padding: "6px 12px",
-                                    borderRadius: "6px",
-                                    border: "1px solid #cbd5e1",
-                                    backgroundColor: "#ffffff",
-                                    color: "#475569",
-                                    fontSize: "12px",
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
+                                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
                                 >
                                   ⚠️ Mẫu: Yêu cầu bổ sung dấu đỏ
                                 </button>
                               </div>
                             </div>
 
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "8px" }}>
+                            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                               <div>
-                                <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                                   Checklist tiếp nhận hồ sơ (Bắt buộc {checkedCount}/{INTAKE_CHECKLIST_GATES.length})
                                 </h4>
-                                <span style={{ fontSize: "12px", color: checkedCount === INTAKE_CHECKLIST_GATES.length ? "#16a34a" : "var(--color-slate-500, #64748b)", fontWeight: 500 }}>
+                                <span className={`text-xs font-medium ${checkedCount === INTAKE_CHECKLIST_GATES.length ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}>
                                   {checkedCount === INTAKE_CHECKLIST_GATES.length ? "Đã đạt 100% tiêu chí hợp lệ" : `Tiến độ thẩm định: ${Math.round((checkedCount / INTAKE_CHECKLIST_GATES.length) * 100)}%`}
                                 </span>
                               </div>
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <div className="flex items-center gap-2">
                                 <button
                                   type="button"
                                   onClick={() => handleAiAutoCheck(item.id)}
                                   disabled={isFinalized}
-                                  style={{
-                                    padding: "5px 12px",
-                                    borderRadius: "6px",
-                                    border: "1px solid #c4b5fd",
-                                    backgroundColor: "#f5f3ff",
-                                    color: "#6d28d9",
-                                    fontSize: "12px",
-                                    fontWeight: 600,
-                                    cursor: isFinalized ? "not-allowed" : "pointer",
-                                  }}
+                                  className="rounded-lg border border-purple-300 bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-700 hover:bg-purple-100 disabled:opacity-50 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300"
                                 >
-                                  ✨ AI Đối chiếu tự động
+                                  Kiểm tra khả năng đối chiếu
                                 </button>
                                 {isFinalized && (
-                                  <span style={{ color: "#16a34a", fontWeight: 700, fontSize: "12px" }}>
-                                    ✓ Đã hoàn tất tiếp nhận
+                                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                    Đánh dấu cục bộ · chưa có receipt nghiệp vụ
                                   </span>
                                 )}
                               </div>
                             </div>
 
-                            <div style={{ width: "100%", height: "6px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden", marginBottom: "14px" }}>
+                            <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                               <div
-                                style={{
-                                  width: `${(checkedCount / INTAKE_CHECKLIST_GATES.length) * 100}%`,
-                                  height: "100%",
-                                  backgroundColor: checkedCount === INTAKE_CHECKLIST_GATES.length ? "#16a34a" : "#2563eb",
-                                  transition: "all 250ms ease",
-                                }}
+                                className={`h-full transition-all duration-300 ${
+                                  checkedCount === INTAKE_CHECKLIST_GATES.length ? "bg-emerald-600" : "bg-blue-600"
+                                }`}
+                                style={{ width: `${(checkedCount / INTAKE_CHECKLIST_GATES.length) * 100}%` }}
                               />
                             </div>
 
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "10px" }}>
+                            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                               {INTAKE_CHECKLIST_GATES.map((gate) => (
                                 <label
                                   key={gate.id}
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "flex-start",
-                                    gap: "10px",
-                                    fontSize: "13px",
-                                    color: "var(--color-slate-800, #1e293b)",
-                                    cursor: "pointer",
-                                    padding: "8px 12px",
-                                    borderRadius: "8px",
-                                    backgroundColor: ticketGates[gate.id] ? "#f8fafc" : "#ffffff",
-                                    border: ticketGates[gate.id] ? "1.5px solid #2563eb" : "1px solid var(--color-slate-200, #e2e8f0)",
-                                    boxShadow: ticketGates[gate.id] ? "0 1px 3px rgba(37,99,235,0.08)" : "none",
-                                    transition: "all 150ms ease",
-                                  }}
+                                  className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition ${
+                                    ticketGates[gate.id]
+                                      ? "border-blue-500 bg-blue-50/50 shadow-xs dark:border-blue-700 dark:bg-blue-950/30"
+                                      : "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900"
+                                  }`}
                                 >
                                   <input
                                     type="checkbox"
                                     checked={!!ticketGates[gate.id]}
                                     onChange={() => handleGateToggle(item.id, gate.id)}
-                                    style={{ width: "16px", height: "16px", cursor: "pointer", marginTop: "2px" }}
+                                    className="mt-0.5 h-4 w-4 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                                   />
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "3px", flex: 1 }}>
-                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
-                                      <span style={{ fontWeight: 600 }}>{gate.label}</span>
-                                      <span
-                                        style={{
-                                          fontSize: "11px",
-                                          padding: "1px 6px",
-                                          borderRadius: "4px",
-                                          backgroundColor: gate.sourceBadgeBg,
-                                          color: gate.sourceBadgeColor,
-                                          fontWeight: 700,
-                                        }}
-                                      >
+                                  <div className="flex flex-1 flex-col gap-1">
+                                    <div className="flex flex-wrap items-center justify-between gap-1.5">
+                                      <span className="font-semibold text-slate-900 dark:text-slate-100">{gate.label}</span>
+                                      <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold ${gate.sourceBadgeClass}`}>
                                         {gate.sourceBadge}
                                       </span>
                                     </div>
-                                    <span style={{ fontSize: "11px", color: "var(--color-slate-500, #64748b)" }}>
-                                      {gate.aiEvidence} <strong style={{ color: "#16a34a" }}>({gate.confidence})</strong>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                      {gate.aiEvidence} <strong className="text-emerald-600 dark:text-emerald-400">({gate.confidence})</strong>
                                     </span>
                                   </div>
                                 </label>
                               ))}
                             </div>
 
-                            <div style={{ marginTop: "14px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                <label htmlFor={`ex-${item.id}`} style={{ fontSize: "12px", color: "var(--color-slate-600, #475569)" }}>
-                                  Ngoại lệ duyệt nhanh (ghi lý do nếu chưa đủ 6 mục):
+                            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <label htmlFor={`ex-${item.id}`} className="text-xs text-slate-600 dark:text-slate-400">
+                                  Ghi chú vấn đề cần xử lý (không thay kiểm tra bắt buộc):
                                 </label>
                                 <input
                                   id={`ex-${item.id}`}
@@ -1309,110 +953,55 @@ export function StaffTicketQueue({
                                   onChange={(e) =>
                                     setExceptionReasons((prev) => ({ ...prev, [item.id]: e.target.value }))
                                   }
-                                  style={{
-                                    padding: "4px 8px",
-                                    borderRadius: "4px",
-                                    border: "1px solid var(--color-slate-300, #cbd5e1)",
-                                    fontSize: "12px",
-                                    width: "240px",
-                                  }}
+                                  className="w-64 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-900 shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                                 />
                               </div>
 
                               <button
                                 type="button"
                                 onClick={() => handleFinalize(item.id)}
-                                disabled={!checklistDone || isFinalized}
-                                style={{
-                                  padding: "8px 18px",
-                                  borderRadius: "6px",
-                                  border: "none",
-                                  backgroundColor: checklistDone && !isFinalized ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-200, #e2e8f0)",
-                                  color: checklistDone && !isFinalized ? "#ffffff" : "var(--color-slate-500, #64748b)",
-                                  fontWeight: 600,
-                                  fontSize: "13px",
-                                  cursor: checklistDone && !isFinalized ? "pointer" : "not-allowed",
-                                }}
+                                disabled={!businessActionsAvailable || !checklistDone || isFinalized}
+                                className={checklistDone && !isFinalized ? staffPrimary : staffButton}
                               >
-                                {isFinalized ? "Đã tiếp nhận" : "Xác nhận hoàn tất tiếp nhận"}
+                                {isFinalized ? "Đánh dấu cục bộ" : "Xác nhận hoàn tất tiếp nhận"}
                               </button>
                             </div>
                           </div>
 
                           {/* Quick Staff Workflow Actions */}
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "flex-end", alignItems: "center" }}>
+                          <div className="flex flex-wrap items-center justify-end gap-2.5">
                             <button
                               type="button"
                               onClick={() => handleOpenAiDraft(item)}
-                              style={{
-                                padding: "8px 14px",
-                                borderRadius: "6px",
-                                border: "1px solid #c4b5fd",
-                                backgroundColor: "#f5f3ff",
-                                color: "#6d28d9",
-                                fontWeight: 600,
-                                fontSize: "13px",
-                                cursor: "pointer",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "6px",
-                              }}
+                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/60 dark:text-purple-300"
                             >
-                              <span>✨ AI Dự thảo phản hồi cho SV</span>
+                              <Sparkles className="h-4 w-4" aria-hidden="true" />
+                              <span>AI Dự thảo phản hồi cho SV</span>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setReceiptModalId(item.id)}
-                              style={{
-                                padding: "8px 14px",
-                                borderRadius: "6px",
-                                border: "1px solid var(--color-slate-300, #cbd5e1)",
-                                backgroundColor: "#ffffff",
-                                color: "var(--color-slate-700, #334155)",
-                                fontWeight: 600,
-                                fontSize: "13px",
-                                cursor: "pointer",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "6px",
-                              }}
+                              className={staffButton}
                             >
-                              <span>🖨️ In Phiếu Tiếp Nhận (Mẫu 01/MC)</span>
+                              <Printer className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                              <span>In Phiếu Tiếp Nhận (Mẫu 01/MC)</span>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setSupplementModalId(item.id)}
-                              style={{
-                                padding: "8px 14px",
-                                borderRadius: "6px",
-                                border: "1px solid #fde68a",
-                                backgroundColor: "#fffbeb",
-                                color: "#92400e",
-                                fontWeight: 600,
-                                fontSize: "13px",
-                                cursor: "pointer",
-                              }}
+                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
                             >
-                              Yêu cầu bổ sung thông tin
+                              <span>Yêu cầu bổ sung thông tin</span>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setTransferModalId(item.id)}
-                              style={{
-                                padding: "8px 14px",
-                                borderRadius: "6px",
-                                border: "1px solid #bfdbfe",
-                                backgroundColor: "#eff6ff",
-                                color: "#1e3a8a",
-                                fontWeight: 600,
-                                fontSize: "13px",
-                                cursor: "pointer",
-                              }}
+                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
                             >
-                              Chuyển đơn vị chuyên môn
+                              <span>Chuyển đơn vị chuyên môn</span>
                             </button>
                           </div>
                         </div>
@@ -1428,53 +1017,21 @@ export function StaffTicketQueue({
 
       {/* Transfer Department Modal */}
       {transferModalId && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="transfer-title"
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(15, 23, 42, 0.5)",
-            backdropFilter: "blur(2px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            padding: "16px",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "12px",
-              padding: "24px",
-              maxWidth: "480px",
-              width: "100%",
-              boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)",
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-            }}
-          >
-            <h3 id="transfer-title" style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+        <AccessibleDialog open onClose={() => setTransferModalId(null)} labelledBy="transfer-title" className="campus-decision-sheet">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <h3 id="transfer-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
               Chuyển hồ sơ sang đơn vị chuyên môn
             </h3>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label htmlFor="dept-select" style={{ fontSize: "13px", fontWeight: 600, color: "var(--color-slate-800, #1e293b)" }}>
+            <div className="space-y-1.5">
+              <label htmlFor="dept-select" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Đơn vị tiếp nhận mới
               </label>
               <select
                 id="dept-select"
                 value={targetDept}
                 onChange={(e) => setTargetDept(e.target.value)}
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "14px",
-                }}
+                className={staffField}
               >
                 <option value="phong_dao_tao">Phòng Quản lý Đào tạo</option>
                 <option value="phong_ctsv">Phòng Công tác Sinh viên (CTSV)</option>
@@ -1484,8 +1041,8 @@ export function StaffTicketQueue({
               </select>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label htmlFor="transfer-reason" style={{ fontSize: "13px", fontWeight: 600, color: "var(--color-slate-800, #1e293b)" }}>
+            <div className="space-y-1.5">
+              <label htmlFor="transfer-reason" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Lý do chuyển tiếp (Lưu lịch sử kiểm toán)
               </label>
               <textarea
@@ -1494,139 +1051,72 @@ export function StaffTicketQueue({
                 placeholder="Nhập ghi chú chuyển ca giải thích thẩm quyền..."
                 value={transferReason}
                 onChange={(e) => setTransferReason(e.target.value)}
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "13px",
-                }}
+                className={staffField}
               />
             </div>
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "8px" }}>
+            <div className="flex justify-end gap-2.5 pt-2">
               <button
                 type="button"
                 onClick={() => setTransferModalId(null)}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  backgroundColor: "#ffffff",
-                  fontSize: "13px",
-                  cursor: "pointer",
-                }}
+                className={staffButton}
               >
                 Hủy
               </button>
               <button
                 type="button"
                 onClick={() => handleConfirmTransfer(transferModalId)}
-                style={{
-                  padding: "8px 18px",
-                  borderRadius: "6px",
-                  border: "none",
-                  backgroundColor: "var(--color-primary, #1e3a8a)",
-                  color: "#ffffff",
-                  fontWeight: 600,
-                  fontSize: "13px",
-                  cursor: "pointer",
-                }}
+                disabled={!businessActionsAvailable}
+                className={staffPrimary}
               >
                 Xác nhận chuyển đơn
               </button>
             </div>
           </div>
-        </div>
+        </AccessibleDialog>
       )}
 
       {/* Request Supplement Modal */}
       {supplementModalId && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="supp-title"
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(15, 23, 42, 0.5)",
-            backdropFilter: "blur(2px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            padding: "16px",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "12px",
-              padding: "24px",
-              maxWidth: "480px",
-              width: "100%",
-              boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)",
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-            }}
-          >
-            <h3 id="supp-title" style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+        <AccessibleDialog open onClose={() => setSupplementModalId(null)} labelledBy="supp-title" className="campus-decision-sheet">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <h3 id="supp-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
               Yêu cầu sinh viên bổ sung thông tin hồ sơ
             </h3>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label htmlFor="supp-msg" style={{ fontSize: "13px", fontWeight: 600, color: "var(--color-slate-800, #1e293b)" }}>
+            <div className="space-y-1.5">
+              <label htmlFor="supp-msg" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Nội dung yêu cầu gửi tới sinh viên
               </label>
               <textarea
                 id="supp-msg"
-                rows={3}
+                rows={4}
                 placeholder="Nêu rõ loại giấy tờ hoặc thông tin cần bổ sung..."
                 value={supplementMsg}
                 onChange={(e) => setSupplementMsg(e.target.value)}
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "13px",
-                }}
+                className={staffField}
               />
             </div>
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "8px" }}>
+            <div className="flex justify-end gap-2.5 pt-2">
               <button
                 type="button"
                 onClick={() => setSupplementModalId(null)}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  backgroundColor: "#ffffff",
-                  fontSize: "13px",
-                  cursor: "pointer",
-                }}
+                className={staffButton}
               >
                 Hủy
               </button>
               <button
                 type="button"
                 onClick={() => handleConfirmSupplement(supplementModalId)}
-                style={{
-                  padding: "8px 18px",
-                  borderRadius: "6px",
-                  border: "none",
-                  backgroundColor: "#d97706",
-                  color: "#ffffff",
-                  fontWeight: 600,
-                  fontSize: "13px",
-                  cursor: "pointer",
-                }}
+                disabled={!businessActionsAvailable}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 shadow-xs"
               >
                 Gửi yêu cầu bổ sung
               </button>
             </div>
           </div>
-        </div>
+        </AccessibleDialog>
       )}
 
       {/* AI Draft Response Modal */}
@@ -1634,112 +1124,68 @@ export function StaffTicketQueue({
         const item = items.find((i) => i.id === aiDraftModalId);
         if (!item) return null;
         return (
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="ai-draft-title"
-            style={{
-              position: "fixed",
-              inset: 0,
-              backgroundColor: "rgba(15, 23, 42, 0.55)",
-              backdropFilter: "blur(4px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-              padding: "16px",
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "#ffffff",
-                borderRadius: "12px",
-                padding: "24px",
-                maxWidth: "620px",
-                width: "100%",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-                maxHeight: "90vh",
-                overflowY: "auto",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "20px" }}>✨</span>
-                  <h3 id="ai-draft-title" style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#4c1d95" }}>
+          <AccessibleDialog open onClose={() => setAiDraftModalId(null)} labelledBy="ai-draft-title" className="campus-decision-sheet">
+            <div className="flex max-h-[90vh] w-full max-w-2xl flex-col gap-4 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                  <Sparkles className="h-5 w-5" aria-hidden="true" />
+                  <h3 id="ai-draft-title" className="text-base font-bold">
                     Trợ lý AI Soạn Thảo Phản Hồi Cho Sinh Viên
                   </h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setAiDraftModalId(null)}
-                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: "18px", color: "#64748b" }}
+                  className="rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                   aria-label="Đóng hộp thoại"
                 >
-                  ✕
+                  <X className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
 
-              <div style={{ fontSize: "13px", color: "var(--color-slate-600, #475569)" }}>
+              <div className="text-xs text-slate-600 dark:text-slate-400">
                 Hồ sơ: <strong>{item.ticketCode}</strong> — {item.studentName} ({item.studentId})
               </div>
 
               {/* Template selector tabs */}
-              <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid #e2e8f0", paddingBottom: "8px", flexWrap: "wrap" }}>
+              <div className="flex flex-wrap gap-2 border-b border-slate-100 pb-2 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => handleAiDraftTypeChange("approve", item)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "6px",
-                    border: "none",
-                    backgroundColor: aiDraftType === "approve" ? "#eff6ff" : "transparent",
-                    color: aiDraftType === "approve" ? "#1e40af" : "#64748b",
-                    fontWeight: aiDraftType === "approve" ? 700 : 500,
-                    fontSize: "12px",
-                    cursor: "pointer",
-                  }}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                    aiDraftType === "approve"
+                      ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  }`}
                 >
                   ✓ Tiếp nhận & Hẹn trả kết quả
                 </button>
                 <button
                   type="button"
                   onClick={() => handleAiDraftTypeChange("supplement", item)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "6px",
-                    border: "none",
-                    backgroundColor: aiDraftType === "supplement" ? "#fffbeb" : "transparent",
-                    color: aiDraftType === "supplement" ? "#92400e" : "#64748b",
-                    fontWeight: aiDraftType === "supplement" ? 700 : 500,
-                    fontSize: "12px",
-                    cursor: "pointer",
-                  }}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                    aiDraftType === "supplement"
+                      ? "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  }`}
                 >
                   ⚠️ Yêu cầu bổ sung hồ sơ
                 </button>
                 <button
                   type="button"
                   onClick={() => handleAiDraftTypeChange("forward", item)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "6px",
-                    border: "none",
-                    backgroundColor: aiDraftType === "forward" ? "#faf5ff" : "transparent",
-                    color: aiDraftType === "forward" ? "#6b21a8" : "#64748b",
-                    fontWeight: aiDraftType === "forward" ? 700 : 500,
-                    fontSize: "12px",
-                    cursor: "pointer",
-                  }}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                    aiDraftType === "forward"
+                      ? "bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
+                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  }`}
                 >
                   ↗ Hướng dẫn chuyển tuyến
                 </button>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label htmlFor="ai-draft-content" style={{ fontSize: "13px", fontWeight: 600, color: "var(--color-slate-800, #1e293b)" }}>
+              <div className="space-y-1.5">
+                <label htmlFor="ai-draft-content" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Nội dung phản hồi (có thể chỉnh sửa trực tiếp)
                 </label>
                 <textarea
@@ -1747,38 +1193,23 @@ export function StaffTicketQueue({
                   rows={8}
                   value={aiDraftContent}
                   onChange={(e) => setAiDraftContent(e.target.value)}
-                  style={{
-                    padding: "10px 12px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                    fontSize: "13px",
-                    lineHeight: 1.5,
-                    fontFamily: "inherit",
-                    resize: "vertical",
-                  }}
+                  className={`${staffField} font-sans leading-relaxed`}
                 />
               </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", flexWrap: "wrap", gap: "10px" }}>
-                <span style={{ fontSize: "12px", color: draftCopied ? "#16a34a" : "#64748b", fontWeight: 500 }}>
-                  {draftCopied ? "✓ Đã sao chép vào bộ nhớ tạm!" : "Trợ lý AI tự động trích dẫn quy chế đào tạo HUCE"}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  {draftCopied ? "✓ Đã sao chép vào bộ nhớ tạm!" : "Mẫu nháp tham khảo; chưa có nguồn để kết luận nghiệp vụ"}
                 </span>
 
-                <div style={{ display: "flex", gap: "10px" }}>
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={handleCopyDraft}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "6px",
-                      border: "1px solid #cbd5e1",
-                      backgroundColor: "#ffffff",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
+                    className={staffButton}
                   >
-                    {draftCopied ? "✓ Đã sao chép" : "📋 Sao chép văn bản"}
+                    <Copy className="h-4 w-4" aria-hidden="true" />
+                    <span>{draftCopied ? "✓ Đã sao chép" : "📋 Sao chép văn bản"}</span>
                   </button>
                   <button
                     type="button"
@@ -1789,23 +1220,14 @@ export function StaffTicketQueue({
                       }
                       setAiDraftModalId(null);
                     }}
-                    style={{
-                      padding: "8px 18px",
-                      borderRadius: "6px",
-                      border: "none",
-                      backgroundColor: "#6d28d9",
-                      color: "#ffffff",
-                      fontWeight: 600,
-                      fontSize: "13px",
-                      cursor: "pointer",
-                    }}
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-purple-700"
                   >
                     Áp dụng phản hồi này
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          </AccessibleDialog>
         );
       })()}
 
@@ -1814,106 +1236,64 @@ export function StaffTicketQueue({
         const item = items.find((i) => i.id === receiptModalId);
         if (!item) return null;
         return (
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="receipt-title"
-            style={{
-              position: "fixed",
-              inset: 0,
-              backgroundColor: "rgba(15, 23, 42, 0.6)",
-              backdropFilter: "blur(4px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-              padding: "16px",
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "#ffffff",
-                borderRadius: "12px",
-                padding: "32px",
-                maxWidth: "680px",
-                width: "100%",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                display: "flex",
-                flexDirection: "column",
-                gap: "20px",
-                maxHeight: "90vh",
-                overflowY: "auto",
-                border: "2px solid #0f172a",
-              }}
-            >
+          <AccessibleDialog open onClose={() => setReceiptModalId(null)} labelledBy="receipt-title" className="campus-decision-sheet">
+            <div className="flex max-h-[90vh] w-full max-w-2xl flex-col gap-5 overflow-y-auto rounded-2xl border-2 border-slate-900 bg-white p-8 shadow-2xl dark:border-slate-100 dark:bg-slate-900">
               {/* Official Header */}
-              <div style={{ textAlign: "center", borderBottom: "2px solid #0f172a", paddingBottom: "16px" }}>
-                <div style={{ fontSize: "13px", fontWeight: 700, textTransform: "uppercase" }}>
+              <div className="border-b-2 border-slate-900 pb-4 text-center dark:border-slate-100">
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
                   TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI
                 </div>
-                <div style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+                <div className="text-xs font-medium text-slate-600 dark:text-slate-400">
                   BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ MỘT CỬA SỐ
                 </div>
-                <div style={{ width: "80px", height: "1px", backgroundColor: "#000", margin: "6px auto" }} />
-                <h2 id="receipt-title" style={{ margin: "10px 0 4px 0", fontSize: "18px", fontWeight: 800, textTransform: "uppercase" }}>
+                <div className="mx-auto my-2 h-0.5 w-20 bg-slate-900 dark:bg-slate-100" />
+                <h2 id="receipt-title" className="text-lg font-extrabold uppercase tracking-tight text-slate-900 dark:text-slate-100">
                   GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ
                 </h2>
-                <div style={{ fontSize: "13px", fontStyle: "italic", color: "#475569" }}>
-                  (Mẫu số 01/MC - Ban hành theo Quy chế Một cửa số HUCE)
+                <div className="text-xs italic text-slate-500 dark:text-slate-400">
+                  Bản tham khảo cục bộ · chưa xác minh mẫu chính thức hoặc receipt nghiệp vụ
                 </div>
-                <div style={{ marginTop: "6px", fontSize: "13px", fontWeight: 700, color: "#1e3a8a" }}>
+                <div className="mt-2 text-xs font-bold text-blue-700 dark:text-blue-300">
                   Mã số biên nhận: {item.ticketCode}
                 </div>
               </div>
 
               {/* Receipt Body */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "14px", lineHeight: 1.6 }}>
+              <div className="space-y-2.5 text-sm leading-relaxed text-slate-800 dark:text-slate-200">
                 <div><strong>Người nộp hồ sơ:</strong> {item.studentName} — MSSV: <strong>{item.studentId}</strong></div>
                 <div><strong>Nội dung thủ tục:</strong> {item.title}</div>
                 <div><strong>Đơn vị chuyên môn xử lý:</strong> {item.targetDepartment || "Phòng Quản lý Đào tạo"}</div>
                 <div><strong>Thời điểm tiếp nhận:</strong> {item.createdAt} (Ghi nhận trên CSDL số)</div>
-                <div><strong>Thời hạn cam kết trả kết quả (SLA):</strong> Trước 17:00 ngày làm việc tiếp theo</div>
+                <div><strong>Thời hạn xử lý:</strong> {item.sla?.locator && item.sla.version ? `${item.sla.deadline} · ${item.sla.locator} · ${item.sla.version}` : "Chưa có căn cứ được xác minh"}</div>
                 <div>
-                  <strong>Kết quả kiểm tra checklist tiếp nhận (6/6 cổng):</strong>
-                  <ul style={{ margin: "4px 0 0 0", paddingLeft: "20px", fontSize: "13px", color: "#166534" }}>
-                    <li>✓ Định danh & MSSV qua tài khoản số (VNeID Mức 2)</li>
-                    <li>✓ Thẩm quyền Một cửa số theo Quy chế Đào tạo</li>
-                    <li>✓ Kiểm tra không trùng lặp đơn trong 30 ngày</li>
-                    <li>✓ Minh chứng đính kèm hợp lệ (AI OCR chữ ký & dấu đỏ)</li>
-                    <li>✓ Xác định thời hạn xử lý SLA chuẩn</li>
-                    <li>✓ Rà soát tuân thủ bảo vệ dữ liệu cá nhân Nghị định 13/2023</li>
+                  <strong>Checklist cục bộ cần cán bộ đối chiếu với bằng chứng:</strong>
+                  <ul className="mt-1 list-none space-y-1 pl-4 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                    {INTAKE_CHECKLIST_GATES.map(g => <li key={g.id}>{checkedGates[item.id]?.[g.id] ? "Cán bộ đánh dấu cục bộ" : "Chưa kiểm"} · {g.label}</li>)}
                   </ul>
                 </div>
               </div>
 
               {/* Signature block */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", paddingTop: "16px", borderTop: "1px dashed #cbd5e1" }}>
-                <div style={{ textAlign: "center", width: "45%" }}>
-                  <div style={{ fontSize: "13px", fontWeight: 600 }}>NGƯỜI NỘP HỒ SƠ</div>
-                  <div style={{ fontSize: "12px", fontStyle: "italic", color: "#64748b" }}>(Ký điện tử qua SSO)</div>
-                  <div style={{ marginTop: "30px", fontWeight: 700 }}>{item.studentName}</div>
+              <div className="flex items-center justify-between border-t border-dashed border-slate-300 pt-4 dark:border-slate-700">
+                <div className="w-1/2 text-center">
+                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">NGƯỜI NỘP HỒ SƠ</div>
+                  <div className="text-[11px] italic text-slate-500">(Chưa xác minh chữ ký điện tử)</div>
+                  <div className="mt-6 font-bold text-slate-900 dark:text-slate-100">{item.studentName}</div>
                 </div>
 
-                <div style={{ textAlign: "center", width: "45%" }}>
-                  <div style={{ fontSize: "13px", fontWeight: 600 }}>CÁN BỘ TIẾP NHẬN</div>
-                  <div style={{ fontSize: "12px", fontStyle: "italic", color: "#64748b" }}>(Đã thẩm định & xác nhận số)</div>
-                  <div style={{ marginTop: "30px", fontWeight: 700, color: "#1e3a8a" }}>{item.assignedStaffId || "Cán bộ Một cửa HUCE"}</div>
+                <div className="w-1/2 text-center">
+                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">CÁN BỘ TIẾP NHẬN</div>
+                  <div className="text-[11px] italic text-slate-500">(Cần receipt xác nhận nghiệp vụ)</div>
+                  <div className="mt-6 font-bold text-blue-700 dark:text-blue-300">{item.assignedStaffId || "Cán bộ Một cửa HUCE"}</div>
                 </div>
               </div>
 
               {/* Action buttons */}
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "12px" }}>
+              <div className="flex justify-end gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setReceiptModalId(null)}
-                  style={{
-                    padding: "8px 18px",
-                    borderRadius: "6px",
-                    border: "1px solid #cbd5e1",
-                    backgroundColor: "#ffffff",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                  }}
+                  className={staffButton}
                 >
                   Đóng
                 </button>
@@ -1924,88 +1304,52 @@ export function StaffTicketQueue({
                       window.print();
                     }
                   }}
-                  style={{
-                    padding: "8px 20px",
-                    borderRadius: "6px",
-                    border: "none",
-                    backgroundColor: "var(--color-primary, #1e3a8a)",
-                    color: "#ffffff",
-                    fontWeight: 600,
-                    fontSize: "13px",
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
+                  className={staffPrimary}
                 >
-                  <span>🖨️ In Biên Nhận / Lưu PDF</span>
+                  <Printer className="h-4 w-4" aria-hidden="true" />
+                  <span>In Biên Nhận / Lưu PDF</span>
                 </button>
               </div>
             </div>
-          </div>
+          </AccessibleDialog>
         );
       })()}
 
-      {/* Audit Log Panel */}
-      <div
-        style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "var(--radius-lg, 14px)",
-          border: "1px solid var(--color-slate-200, #e2e8f0)",
-          overflow: "hidden",
-        }}
-      >
+      {/* Audit Log Drawer / Panel */}
+      <div className={`${staffSurface} overflow-hidden shadow-xs`}>
         <button
           type="button"
           onClick={() => setShowAuditLog((prev) => !prev)}
-          style={{
-            width: "100%",
-            padding: "14px 20px",
-            border: "none",
-            backgroundColor: "transparent",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: 700,
-            color: "var(--color-slate-800, #1e293b)",
-          }}
+          className="flex w-full items-center justify-between px-5 py-3.5 text-left text-sm font-bold text-slate-800 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/50"
         >
           <span>📋 Nhật ký thao tác (Audit Trail) — {auditLog.length} bản ghi</span>
-          <span style={{ fontSize: "12px", color: "var(--color-slate-500)" }}>
+          <span className="text-xs font-normal text-slate-500">
             {showAuditLog ? "▲ Thu gọn" : "▼ Mở rộng"}
           </span>
         </button>
 
         {showAuditLog && (
-          <div style={{ padding: "0 20px 16px 20px" }}>
+          <div className="border-t border-slate-100 p-5 dark:border-slate-800">
             {auditLog.length === 0 ? (
-              <div style={{ padding: "20px", textAlign: "center", color: "var(--color-slate-500)", fontSize: "13px" }}>
+              <div className="py-6 text-center text-xs text-slate-500">
                 Chưa có thao tác nào được ghi nhận.
               </div>
             ) : (
-              <div style={{ maxHeight: "300px", overflowY: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
-                  <thead>
-                    <tr style={{ borderBottom: "1px solid #e2e8f0", color: "#64748b", textTransform: "uppercase", fontSize: "11px", fontWeight: 700 }}>
-                      <th style={{ padding: "8px 10px", textAlign: "left" }}>Thời điểm</th>
-                      <th style={{ padding: "8px 10px", textAlign: "left" }}>Cán bộ</th>
-                      <th style={{ padding: "8px 10px", textAlign: "left" }}>Mã hồ sơ</th>
-                      <th style={{ padding: "8px 10px", textAlign: "left" }}>Hành động</th>
-                      <th style={{ padding: "8px 10px", textAlign: "left" }}>Chi tiết</th>
+              <div className="max-h-72 overflow-y-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                    <tr>
+                      <th scope="col" className="px-3 py-2">Thời điểm</th>
+                      <th scope="col" className="px-3 py-2">Cán bộ</th>
+                      <th scope="col" className="px-3 py-2">Mã hồ sơ</th>
+                      <th scope="col" className="px-3 py-2">Hành động</th>
+                      <th scope="col" className="px-3 py-2">Chi tiết</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {auditLog.slice(0, 50).map((entry, idx) => (
-                      <tr
-                        key={`audit-${idx}`}
-                        style={{
-                          borderBottom: "1px solid #f1f5f9",
-                          backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f8fafc",
-                        }}
-                      >
-                        <td style={{ padding: "6px 10px", color: "#64748b", whiteSpace: "nowrap" }}>
+                      <tr key={`audit-${idx}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-slate-500">
                           {new Date(entry.timestamp).toLocaleString("vi-VN", {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -2014,37 +1358,30 @@ export function StaffTicketQueue({
                             month: "2-digit",
                           })}
                         </td>
-                        <td style={{ padding: "6px 10px", fontWeight: 600, color: "#1e3a8a" }}>
+                        <td className="whitespace-nowrap px-3 py-2 font-semibold text-blue-700 dark:text-blue-300">
                           {entry.staffId}
                         </td>
-                        <td style={{ padding: "6px 10px", fontWeight: 600 }}>
+                        <td className="whitespace-nowrap px-3 py-2 font-semibold">
                           {entry.ticketId.slice(0, 8)}
                         </td>
-                        <td style={{ padding: "6px 10px" }}>
+                        <td className="whitespace-nowrap px-3 py-2">
                           <span
-                            style={{
-                              padding: "1px 6px",
-                              borderRadius: "4px",
-                              fontSize: "10px",
-                              fontWeight: 700,
-                              backgroundColor:
-                                entry.action === "FINALIZE_INTAKE" ? "#ecfdf5" :
-                                entry.action === "AI_AUTO_CHECK" ? "#f5f3ff" :
-                                entry.action === "TRANSFER" ? "#eff6ff" :
-                                entry.action === "GATE_UNCHECK" ? "#fef2f2" :
-                                "#f1f5f9",
-                              color:
-                                entry.action === "FINALIZE_INTAKE" ? "#065f46" :
-                                entry.action === "AI_AUTO_CHECK" ? "#5b21b6" :
-                                entry.action === "TRANSFER" ? "#1e40af" :
-                                entry.action === "GATE_UNCHECK" ? "#991b1b" :
-                                "#334155",
-                            }}
+                            className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-bold ${
+                              entry.action === "FINALIZE_INTAKE"
+                                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                                : entry.action === "AI_AUTO_CHECK"
+                                ? "bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
+                                : entry.action === "TRANSFER"
+                                ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                                : entry.action === "GATE_UNCHECK"
+                                ? "bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
+                                : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                            }`}
                           >
                             {entry.action}
                           </span>
                         </td>
-                        <td style={{ padding: "6px 10px", color: "#475569", maxWidth: "300px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <td className="max-w-xs truncate px-3 py-2 text-slate-600 dark:text-slate-400">
                           {entry.detail}
                         </td>
                       </tr>

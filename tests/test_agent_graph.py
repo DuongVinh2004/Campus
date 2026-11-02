@@ -84,7 +84,7 @@ def test_graph_execution_personal_schedule(fake_llm: DeterministicFakeProvider) 
     assert final_state.terminal == Terminal.ANSWERED
     assert final_state.tool_phase == ToolPhase.SUCCEEDED
     assert final_state.draft is not None
-    assert "Thời khóa biểu" in final_state.draft.text
+    assert "chưa kết nối dữ liệu lịch học cá nhân" in final_state.draft.text
 
 
 def test_graph_execution_ticket_create_write_flow(fake_llm: DeterministicFakeProvider) -> None:

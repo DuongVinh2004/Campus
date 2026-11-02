@@ -234,3 +234,21 @@ async def test_stalled_vector_preserves_lexical_fallback():
     result = await asyncio.wait_for(retrieve(U, index, Reranker()), timeout=1.5)
     assert result.trace["vector_failed"] and len(result.candidates) == 1
 
+
+
+def test_strong_lexical_hit_is_kept_inside_the_packing_window():
+    from campus247.rag_v2.retrieval import hybrid
+    units = [unit(i, document=f"doc-{i}") for i in range(30)]
+    ids = [u.unit_id for u in units]
+    # Unit "20" is fourth for BM25 and absent from the vector list, so RRF alone leaves it far down.
+    lexical = [(ids[i], 100 - n) for n, i in enumerate((1, 2, 3, 20, 4, 5, 6, 7, 8, 9))]
+    vector = [(ids[i], 100 - n) for n, i in enumerate((10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 1, 2, 3))]
+    u = analyze("Quy định bảo lưu học tập", ())
+    result = asyncio.run(retrieve(u, Index(units, lexical, vector), Reranker(), rerank_deadline_s=0, final_limit=12))
+    assert "20" in [c.unit_id for c in result.candidates][:hybrid.PACK_WINDOW]
+    previous, hybrid.LEXICAL_PIN = hybrid.LEXICAL_PIN, 0
+    try:
+        result = asyncio.run(retrieve(u, Index(units, lexical, vector), Reranker(), rerank_deadline_s=0, final_limit=12))
+    finally:
+        hybrid.LEXICAL_PIN = previous
+    assert "20" not in [c.unit_id for c in result.candidates][:hybrid.PACK_WINDOW]

@@ -1,10 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { OperationalServiceWorkspace } from "./OperationalServiceWorkspace";
 const calls = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }));
 vi.mock("@/lib/api/client", () => ({ ApiClient: class { get = calls.get; post = calls.post; }, ApiClientError: class extends Error {} }));
 vi.mock("@/components/AppShell", () => ({ AppShell: ({ children }: { children: React.ReactNode }) => <main>{children}</main> }));
-afterEach(() => { cleanup(); vi.resetAllMocks(); window.history.replaceState(null, "", "/services"); });
+const originalScroll = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
+beforeEach(() => Object.defineProperty(HTMLElement.prototype, "scrollIntoView", { configurable: true, value: vi.fn() }));
+afterEach(() => {
+  cleanup(); vi.resetAllMocks(); window.history.replaceState(null, "", "/services");
+  if (originalScroll) Object.defineProperty(HTMLElement.prototype, "scrollIntoView", originalScroll);
+  else Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+});
 const actor = { display_name: "Sinh viên local", roles: ["STUDENT"] };
 function ready() { calls.get.mockImplementation((path: string) => Promise.resolve(path === "/v1/users/me" ? actor : { items: [] })); }
 
@@ -38,6 +44,6 @@ describe("one main student service workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Đọc lại kết quả bằng cùng mã lưu" }));
     await screen.findByText(/Đã lưu nháp · Biên nhận receipt-test/);
     expect(calls.post.mock.calls[1][1]).toEqual(calls.post.mock.calls[2][1]);
-    await waitFor(() => expect(screen.getByRole("button", { name: /Hỗ trợ thủ tục học vụ Nháp/ })).toBeDefined());
+    await waitFor(() => expect(screen.getByRole("button", { name: /Hỗ trợ thủ tục học vụ Cần hỏi thủ tục Nháp/ })).toBeDefined());
   });
 });

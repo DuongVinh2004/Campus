@@ -12,6 +12,7 @@ Mỗi phát biểu phải có unit_ids chỉ gồm các nhãn U tương ứng đ
 Tên tài liệu nằm trước dấu ⟦RAG_V2_SOURCE⟧ là bối cảnh: ví dụ "K70_and_earlier" nghĩa là áp dụng cho K70 trở về trước (gồm K69, K68...); nguồn không nêu khóa/ngành thì coi là áp dụng chung. Chỉ loại nguồn khi nó nêu rõ áp dụng cho khóa/ngành/đối tượng khác với người hỏi.
 Câu hỏi có nhiều ý (nhiều môn, nhiều mốc thời gian, "và", dấu phẩy) thì trả lời đủ TỪNG ý bằng các phát biểu riêng, kể cả mã, số, tên đầy đủ, điều kiện kèm theo và ngoại lệ có trong nguồn; liệt kê đủ các mục của danh sách thay vì chọn vài mục.
 Chỉ trả danh sách rỗng khi không đoạn nào liên quan đến điều được hỏi (chủ đề khác, dịch vụ hoặc đơn vị mà nguồn không đề cập). Đừng nêu thông tin tương tự của đối tượng khác để thay thế.
+Nguồn chỉ quy định cho một nơi chốn, hoạt động, kỳ thi, dịch vụ hay đối tượng KHÁC với điều câu hỏi nêu (ví dụ nội quy của một phòng hay cơ sở khác) thì không phải câu trả lời, kể cả khi ghi rõ tên nguồn đó; nếu không còn đoạn nào đúng đối tượng thì dùng "no_source".
 Không có dữ kiện được hỗ trợ thì trả danh sách rỗng.
 Trường "decision" quyết định trước cách xử lý câu hỏi:
 - "answer": các đoạn nguồn trả lời được toàn bộ hoặc một phần câu hỏi; viết phát biểu như trên.

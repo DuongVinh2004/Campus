@@ -14,7 +14,7 @@ Skill này thay thế mọi quy trình cũ (governance, task catalog, DEC-023): 
 1. Chạy `git status --short` trước khi sửa. Không ghi đè việc đang dở của người dùng.
 2. Đọc code liên quan rồi làm thay đổi nhỏ, đúng phạm vi yêu cầu.
 3. Chọn mức kiểm tra theo loại thay đổi (xem [references/verification.md](references/verification.md)); chỉ chạy thứ liên quan, không chạy cả bộ để cho chắc.
-4. Báo cáo ngắn, trung thực: đã làm gì, bằng chứng, phần chưa kiểm hoặc chưa xong. Kết quả `not_verified` không được kể là thành công.
+4. Báo cáo ngắn, trung thực: đã làm gì, bằng chứng, phần chưa kiểm hoặc chưa xong. Nêu bằng chứng là gì trong một câu (ví dụ: ca do mô hình viết, đoạn nguồn kiểm bằng mã). Ca tổng hợp/do mô hình tạo có đáp án chuẩn kiểm tự động là bằng chứng nghiệm thu hợp lệ, không cần nhãn "chưa có người kiểm" và không bị `not_verified` chỉ vì thiếu người kiểm. Kết quả thật sự thất bại hoặc bị chặn không được kể là thành công.
 
 ### Làm đến cùng
 
@@ -30,7 +30,7 @@ Skill này thay thế mọi quy trình cũ (governance, task catalog, DEC-023): 
 Mục tiêu là an toàn vừa đủ, không rườm rà:
 
 - **Bí mật:** không in khóa, token, mật khẩu ra chat/log/commit. Được dùng tài khoản test local để đăng nhập kiểm thử, nhưng không đổi, xóa hay tạo lại tài khoản admin/`student-local` và khóa.
-- **Dữ liệu:** không xóa hoặc ghi đè build cũ, backup, evidence, dữ liệu trong DB local (cổng 5433). Test migration và test phá hủy dùng DB tạm. Việc xóa cần được người dùng nói rõ.
+- **Dữ liệu:** không xóa hoặc ghi đè build cũ, backup, evidence, dữ liệu trong DB local (Postgres native của runtime 8015 ở `127.0.0.1:55437`, cluster `.tooling/knowledge-postgres-20261023`; Postgres compose ở 5433). Test migration và test phá hủy dùng DB tạm. Việc xóa cần được người dùng nói rõ.
 - **Git:** `git status` trước khi sửa. Commit/push/deploy chỉ khi người dùng yêu cầu. Không `reset --hard`, `clean -fd`, ghi lại lịch sử khi chưa được bảo.
 - **Chi phí:** không gọi API trả phí hay production nếu chưa được cho phép; test mặc định dùng fake provider.
 - **Trung thực với dữ liệu:** chưa có kết nối HUCE thật (SSO, bảng điểm, lịch cá nhân, tiếp nhận hồ sơ, đặt phòng). Không dùng fixture thay dữ liệu trường rồi nói như thật.

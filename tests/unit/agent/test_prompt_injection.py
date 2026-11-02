@@ -10,12 +10,11 @@ API_SRC = ROOT / "services" / "api" / "src"
 if str(API_SRC) not in sys.path:
     sys.path.insert(0, str(API_SRC))
 
-import importlib.util
-_composer_path = API_SRC / "campus247" / "agent" / "prompts" / "composer.py"
-_spec = importlib.util.spec_from_file_location("campus247.agent.prompts.composer", _composer_path)
-_composer_mod = importlib.util.module_from_spec(_spec)
-sys.modules["campus247.agent.prompts.composer"] = _composer_mod
-_spec.loader.exec_module(_composer_mod)
+import importlib
+
+# Import the one shared module: loading a second copy under the same name would give other tests
+# in the session a different TrustDomain/PromptBlock class than the production code uses.
+_composer_mod = importlib.import_module("campus247.agent.prompts.composer")
 
 PromptBlock = _composer_mod.PromptBlock
 PromptComposer = _composer_mod.PromptComposer

@@ -34,10 +34,18 @@ _NO_SUBJECT_WORDS = ("la gi nao the sao ai dau o bao nhieu may khi luc co khong 
                    "bi ma neu thu tuc quy dinh thong tin van de huong dan noi dung truong huce sinh vien nha")
 _NO_SUBJECT = set(_NO_SUBJECT_WORDS.split())
 _SUGGEST = "Bạn muốn hỏi về học phí, học bổng, đăng ký học phần, bảo lưu, tốt nghiệp hay ký túc xá?"
+_EXEMPTION_OBJECTS = ("hoc phi", "thi", "hoc phan", "mon hoc", "ngoai ngu", "gdtc", "gdqp",
+                      "giao duc the chat", "giao duc quoc phong", "nghia vu", "le phi")
 
 
 def contains(text: str, phrase: str) -> bool:
     return bool(re.search(r"(?<!\w)" + re.escape(phrase) + r"(?!\w)", text))
+
+
+def _exemption_object(query: str) -> bool:
+    # Folding makes the conjunction "thì" indistinguishable from the exam "thi".
+    return (any(contains(fold(query), p) for p in _EXEMPTION_OBJECTS if p != "thi")
+            or contains(query, "thi"))
 
 
 def program_key(value: str) -> str:
@@ -73,6 +81,9 @@ def _scope(text: str):
 def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
     query = normalize_query(question)
     text = fold(query)
+    # "miễn phí" (free of charge) is not an exemption question.
+    exemption = bool(re.search(r"\bmien\b(?!\s+phi\b)", text))
+    unnamed_exemption = exemption and not _exemption_object(query)
     topics = tuple(key for key, phrases in _TOPICS.items() if any(contains(text, p) for p in phrases))
     cohort, program, year = _scope(text)
     many_cohort, many_year, many_program = _many(text)
@@ -80,11 +91,11 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
     # Carry context only for elliptical follow-ups, never for a new named topic.
     elliptical = bool(re.fullmatch(
         r"(?:con |the con |vay )?(?:k\s*\d{2,3}|20\d{2}-20\d{2}|hoc ky\s*[123]|bao nhieu|khi nao|bao gio)[?!. ]*", text))
-    followup = bool(history_turns) and (elliptical or text.startswith(("con ", "the con ", "vay ")))
+    followup = bool(history_turns) and (elliptical or unnamed_exemption or text.startswith(("con ", "the con ", "vay ")))
     if followup:
         for previous in reversed(history_turns[-4:]):
             prior = analyze(previous, ())
-            if not prior.topics or prior.out_of_scope:
+            if (not prior.topics and not _exemption_object(prior.search_query)) or prior.out_of_scope:
                 continue
             if topics and not set(topics).intersection(prior.topics):
                 break
@@ -95,6 +106,8 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
                 text = fold(query)
             semester = semester or bool(re.search(r"\bhoc ky\s*(?:[123]|i{1,3})\b", fold(prior.search_query)))
             break
+
+    unnamed_exemption = exemption and not _exemption_object(query)
 
     foreign_school = bool(re.search(
         r"\b(?:bach khoa|ngoai thuong|kinh te quoc dan|fpt|vinuni|hust|hcmut|harvard|stanford)\b", text)
@@ -137,8 +150,10 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
     # A named decision fixes its own scope ("Quyết định 924 …"); a degree level selects the fee row like a programme.
     named_document = bool(re.search(r"\b(?:quyet dinh|thong bao|van ban|nghi dinh|cong van)\s+\d+", text))
     degree = bool(re.search(r"\b(?:cu nhan|ky su|kien truc su|ks|kts)\b", text))
+    benefit = (bool(re.search(r"\b(?:mien|giam)\b.{0,80}\bhoc phi\b|\bhoc phi\b.{0,80}\b(?:mien|giam)\b", text))
+               or contains(text, "ho tro chi phi hoc tap"))
     if not out and not partial and not named_document:
-        if "hoc_phi" in topics and qtype == "number":
+        if "hoc_phi" in topics and qtype == "number" and not benefit:
             required = ["cohort|academic_year", "program"]
             missing = (["cohort|academic_year"] if not (cohort or year or many_cohort or many_year) else []) + (
                 ["program"] if not (program or degree or many_program) else [])
@@ -152,7 +167,9 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
                 and bool(re.search(r"\b(?:do|nay|kia|no)\b", text)))
     unclear = dangling or not topics and (not subject or (len(subject) == 1 and subject[0] in {"diem", "thi", "hoc", "phi", "lop", "mon"})
                               or (len(subject) <= 2 and not re.search(r"\d", text)))
-    if not out and qtype != "smalltalk" and unclear:
+    if not out and unnamed_exemption:
+        qtype, prompt = "unclear", "Bạn muốn hỏi điều kiện miễn học phí, miễn thi, miễn học phần, ngoại ngữ hay giáo dục thể chất?"
+    elif not out and qtype != "smalltalk" and unclear:
         qtype, prompt = "unclear", "Câu hỏi chưa rõ nội dung. " + _SUGGEST
     elif missing:
         labels = {"cohort|academic_year": "khóa hoặc năm học", "program": "ngành, hệ hoặc chương trình đào tạo",

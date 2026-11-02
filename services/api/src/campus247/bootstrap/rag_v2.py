@@ -1,10 +1,15 @@
 """One startup binding of the v2 snapshot, existing gateway and loopback models."""
 from __future__ import annotations
 
-from pathlib import Path
+import asyncio
 import inspect
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+from uuid import uuid4
 
 from campus247.agent.nodes.rag_v2 import RagV2Node
+from campus247.domain.shared.values import generate_uuid7
+from campus247.ports.identity import IdentityContext, IdentityRole
 from campus247.rag_v2.adapters.http_reranker import HTTPReranker
 from campus247.rag_v2.adapters.index_store import ROOT, read_index
 from campus247.rag_v2.adapters.memory_index import MemoryIndex
@@ -88,4 +93,35 @@ def load_rag_v2(settings, *, gateway, knowledge_runtime, inventory_reader=None):
             query, context, tuple(dict.fromkeys(chunk for unit in snapshot.units for chunk in unit.chunk_ids))),
         revalidate=knowledge_runtime.rag_v2_revalidate)
     node.rag_v2_status = RagV2Status(manifest, knowledge_runtime, inventory_reader)
+    node.start_injection_warmup()
     return node
+
+
+def start_rag_v2_warmup(node, runtime, context_factory):
+    """Read the public student scope through the existing factory and source gate."""
+    node.rag_v2_status.warm = "pending"
+
+    async def warm():
+        try:
+            now = datetime.now(UTC)
+            actor = IdentityContext(subject_id=generate_uuid7(), external_subject="rag-v2-warmup",
+                issuer="internal:rag-v2-warmup", roles=(IdentityRole.STUDENT,), display_name="RAG warmup",
+                auth_time=now, expires_at=now + timedelta(hours=1), tenant_id=runtime.repo.tenant,
+                session_id=generate_uuid7(), is_synthetic=True, student_code="internal-rag-v2-warmup")
+            context = context_factory.create(actor, effective_at=now, locale="vi-VN",
+                trace_id=uuid4().hex, allow_simulation=False)
+            scope = context.authorized_scope
+            if scope.roles != frozenset({"STUDENT"}) or not scope.audiences <= {"PUBLIC", "STUDENT"}:
+                raise ValueError("RAG_V2_WARMUP_SCOPE_INVALID")
+            rows = await node.authorize_sources("", context)
+            await asyncio.to_thread(node._prepare_index, rows)
+            node.rag_v2_status.warm = "ready"
+        except asyncio.CancelledError:
+            node.rag_v2_status.warm = "failed"
+            raise
+        except Exception as exc:  # noqa: BLE001 -- optional warmup must not prevent startup
+            node.rag_v2_status.warm = "failed"
+            import logging
+            logging.getLogger("campus247.rag_v2").warning("rag_v2_warmup_failed kind=%s", type(exc).__name__)
+
+    return asyncio.create_task(warm(), name="rag-v2-warmup")

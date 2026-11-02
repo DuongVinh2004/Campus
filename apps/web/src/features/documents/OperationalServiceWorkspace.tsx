@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AppShell, type Role } from "@/components/AppShell";
 import { ApiClient, ApiClientError } from "@/lib/api/client";
@@ -24,9 +24,18 @@ export function OperationalServiceWorkspace({ history = false }: { history?: boo
   const [preview, setPreview] = useState<Preview | null>(null), [pending, setPending] = useState<Pending | null>(null);
   const [reviewed, setReviewed] = useState(false), [busy, setBusy] = useState(true), [uncertain, setUncertain] = useState(false);
   const [error, setError] = useState(""), [notice, setNotice] = useState("");
+  const [focusRequest, setFocusRequest] = useState(0);
+  const formPanel = useRef<HTMLElement>(null);
   const student = actor?.roles.includes("STUDENT");
   const role: Role = actor?.roles.some(r => ["KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"].includes(r)) ? "admin" : actor ? "student" : "guest";
   const api = () => new ApiClient();
+
+  useEffect(() => {
+    if (editing) {
+      formPanel.current?.scrollIntoView({ block: "start", behavior: "instant" });
+      formPanel.current?.focus({ preventScroll: true });
+    }
+  }, [editing, selected?.id, focusRequest]);
 
   useEffect(() => {
     let active = true;
@@ -98,9 +107,10 @@ export function OperationalServiceWorkspace({ history = false }: { history?: boo
       {!editing && !history && <ServiceCatalog preparationOnly authenticated={!!student} onChoose={choose} onCertificate={() => choose("STUDENT_CERTIFICATE")} onHistory={() => setShowHistory(true)} />}
       {student && showHistory && <section className="campus-panel space-y-3"><h2 className="text-lg font-semibold">Nháp đã lưu của tôi</h2>{!rows.length && !busy && <p>Chưa có nháp đã lưu.</p>}<ul className="space-y-2">{rows.map(row => <li key={row.id}><button type="button" disabled={busy || uncertain} className="campus-record-option w-full rounded-xl border p-3 text-left" onClick={() => {
         setSelected(row); setForm(row.form); setEditing(true); setPreview(null); setPending(null); setReviewed(false); setNotice(""); setError("");
+        setFocusRequest(value => value + 1);
         window.history.replaceState(window.history.state, "", `${window.location.pathname}?request=${row.id}`);
-      }}><strong>{titles[row.form.kind]}</strong><span className="block text-sm">Nháp · v{row.version} · Chưa gửi đến trường · {new Date(row.updated_at).toLocaleString("vi-VN")}</span></button></li>)}</ul></section>}
-      {student && editing && <section className="campus-panel space-y-4">
+      }}><strong>{titles[row.form.kind]}</strong><span className="block truncate text-sm">{(row.form.reason.trim() || row.form.purpose).replace(/\s+/g, " ").trim().slice(0, 80)}</span><span className="block text-sm">Nháp · v{row.version} · Chưa gửi đến trường · {new Date(row.updated_at).toLocaleString("vi-VN")}</span></button></li>)}</ul></section>}
+      {student && editing && <section ref={formPanel} tabIndex={-1} aria-label="Biểu mẫu nháp" className="campus-panel space-y-4">
         <button type="button" className="fluent-btn-secondary" disabled={busy || uncertain} onClick={() => { setEditing(false); setPreview(null); setPending(null); }}>{history ? "← Hồ sơ của tôi" : "← Danh mục dịch vụ"}</button>
         <h2 className="text-xl font-semibold">Chuẩn bị {titles[form.kind].toLocaleLowerCase("vi")}</h2>
         {selected && <p className="text-sm">Mã nháp {selected.id} · v{selected.version}</p>}

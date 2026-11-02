@@ -6,6 +6,7 @@ import re
 from dataclasses import replace
 from datetime import UTC, datetime
 from hashlib import sha256
+from threading import Lock, Thread
 from time import monotonic
 
 from campus247.agent.guardrails.prompt_injection import PromptInjectionDetector
@@ -37,6 +38,19 @@ _BOUND: dict[tuple[str, str], tuple[tuple, str]] = {}
 # One entry per (unit, chunk) pair: the current index has ~48,000, so the bound leaves room for several
 # index generations and still stops growth (a bound below the working set clears the cache every turn).
 _CACHE_LIMIT = 250_000
+_CACHE_LOCK = Lock()
+
+
+def _cached(cache, key):
+    with _CACHE_LOCK:
+        return cache.get(key)
+
+
+def _remember(cache, key, value):
+    with _CACHE_LOCK:
+        if len(cache) >= _CACHE_LIMIT:
+            cache.clear()
+        cache[key] = value
 
 
 def _scope_is_grounded(unit, row):
@@ -49,12 +63,11 @@ def _scope_is_grounded(unit, row):
     if not claims:
         return True
     key = (str(row.get("chunk_id")), len(row.get("content_text") or ""))
-    haystack = _HAYSTACKS.get(key)
+    haystack = _cached(_HAYSTACKS, key)
     if haystack is None:
         raw = " ".join(str(part) for part in (row.get("title"), row.get("section_path"), row.get("content_text")))
-        if len(_HAYSTACKS) >= _CACHE_LIMIT:
-            _HAYSTACKS.clear()
-        haystack = _HAYSTACKS[key] = re.sub(r"\s*[\u2013\u2014-]\s*", "-", fold(raw))
+        haystack = re.sub(r"\s*[\u2013\u2014-]\s*", "-", fold(raw))
+        _remember(_HAYSTACKS, key, haystack)
     return all(re.sub(r"\s*[\u2013\u2014-]\s*", "-", fold(claim)) in haystack for claim in claims)
 
 
@@ -71,7 +84,7 @@ def _binding_failure(unit, rows):
             return "row"
         fingerprint = (row.get("evidence_sha256"), row.get("source_id"), row.get("document_version_id"),
                        row.get("title"), row.get("section_path"))
-        memo = _BOUND.get((unit.unit_id, chunk))
+        memo = _cached(_BOUND, (unit.unit_id, chunk))
         text = row.get("content_text") or ""
         if memo is not None and memo[0] == fingerprint and (memo[1] is text or memo[1] == text):
             continue
@@ -87,9 +100,7 @@ def _binding_failure(unit, rows):
             return "scope"
         if sha256(row["content_text"].encode()).hexdigest() != row["evidence_sha256"]:
             return "hash"
-        if len(_BOUND) >= _CACHE_LIMIT:
-            _BOUND.clear()
-        _BOUND[(unit.unit_id, chunk)] = (fingerprint, row["content_text"])
+        _remember(_BOUND, (unit.unit_id, chunk), (fingerprint, row["content_text"]))
     return None
 
 
@@ -98,7 +109,51 @@ class RagV2Node:
         self.service, self.index, self.reranker = service, index, reranker
         self.embed, self.gateway = embed, gateway
         self.authorize_sources, self.revalidate = authorize_sources, revalidate
-        self._injection: dict[str, bool] = {}
+        self._injection: dict[str | tuple, bool] = {}
+        self._injection_lock = Lock()
+
+    def _scan(self, key, text, detector):
+        with self._injection_lock:
+            flagged = self._injection.get(key)
+        if flagged is None:
+            flagged = detector.scan(text, TrustDomain.RETRIEVED_EVIDENCE).is_injection
+            with self._injection_lock:
+                self._injection[key] = flagged
+        return flagged
+
+    def start_injection_warmup(self):
+        def scan():
+            try:
+                detector = PromptInjectionDetector()
+                for uid in self.index.all_ids():
+                    unit = self.index.get(uid)
+                    if unit is not None and unit.chunk_ids:
+                        self._scan(uid, unit.text, detector)
+            except Exception as exc:  # noqa: BLE001 -- optional warmup must not interrupt serving
+                import logging
+                logging.getLogger("campus247.rag_v2").warning(
+                    "rag_v2_injection_warmup_failed kind=%s", type(exc).__name__)
+        self._injection_thread = Thread(target=scan, name="rag-v2-injection", daemon=True)
+        self._injection_thread.start()
+
+    def _prepare_index(self, rows):
+        detector = PromptInjectionDetector()
+        units, drops = {}, {}
+        for uid in self.index.all_ids():
+            unit = self.index.get(uid)
+            if unit is None or not unit.chunk_ids:
+                continue
+            # The authoritative row must match both identifiers and the
+            # original slice; an index file never confers a source grant.
+            failed = _binding_failure(unit, rows)
+            if failed:
+                drops[(unit.kind, failed)] = drops.get((unit.kind, failed), 0) + 1
+                continue
+            if not self._scan(uid, unit.text, detector):
+                units[uid] = unit
+        # Parent-row injection checks also scan the corpus, so keep them off the loop.
+        return AuthorizedIndex(self.index, units, rows=rows,
+            injection_check=self._chunk_injection(detector)), len(units), drops
 
     async def __call__(self, state, *, context=None):
         started = monotonic()
@@ -153,34 +208,16 @@ class RagV2Node:
                     return self.map_outcome(state, outcome, {})
                 rows = await self.authorize_sources(resolved.resolved, context)
                 t_auth = int((monotonic() - started) * 1000)
-                detector = PromptInjectionDetector()
-                units, drops = {}, {}
-                for uid in self.index.all_ids():
-                    unit = self.index.get(uid)
-                    if unit is None or not unit.chunk_ids:
-                        continue
-                    # The authoritative row must match both identifiers and the
-                    # original slice; an index file never confers a source grant.
-                    failed = _binding_failure(unit, rows)
-                    if failed:
-                        drops[(unit.kind, failed)] = drops.get((unit.kind, failed), 0) + 1
-                        continue
-                    # The index text is immutable for this process, so scan each unit once.
-                    flagged = self._injection.get(uid)
-                    if flagged is None:
-                        flagged = self._injection[uid] = detector.scan(unit.text, TrustDomain.RETRIEVED_EVIDENCE).is_injection
-                    if flagged:
-                        continue
-                    units[uid] = unit
+                index, unit_count, drops = await asyncio.to_thread(self._prepare_index, rows)
                 t_units = int((monotonic() - started) * 1000)
                 if drops:
                     import logging
                     logging.getLogger("campus247.rag_v2").warning("rag_v2_unit_drops %s", sorted(
                         ((f"{kind}:{reason}", count) for (kind, reason), count in drops.items()), key=lambda item: -item[1])[:8])
                 import logging
-                logging.getLogger("campus247.rag_v2").warning("rag_v2_node_stage auth_ms=%d units_ms=%d units=%d", t_auth, t_units, len(units))
+                logging.getLogger("campus247.rag_v2").warning("rag_v2_node_stage auth_ms=%d units_ms=%d units=%d", t_auth, t_units, unit_count)
                 outcome = await self.service.answer(resolved.resolved, history, gateway=guarded_gateway,
-                    index=AuthorizedIndex(self.index, units, rows=rows, injection_check=self._chunk_injection(detector)), reranker=self.reranker, embed=self.embed,
+                    index=index, reranker=self.reranker, embed=self.embed,
                     deadline_s=12 - (monotonic() - started), revalidate=revalidate)
                 guard()  # Recheck after all model awaits.
                 cited_chunks = tuple(dict.fromkeys(chunk for c in outcome.citations for chunk in c.chunk_ids))
@@ -226,10 +263,7 @@ class RagV2Node:
         def flagged(chunk_id, text):
             # Rows are immutable per checksum, so the verdict is cached per chunk id and length.
             key = ("chunk", chunk_id, len(text))
-            verdict = self._injection.get(key)
-            if verdict is None:
-                verdict = self._injection[key] = detector.scan(text, TrustDomain.RETRIEVED_EVIDENCE).is_injection
-            return verdict
+            return self._scan(key, text, detector)
         return flagged
 
     @staticmethod

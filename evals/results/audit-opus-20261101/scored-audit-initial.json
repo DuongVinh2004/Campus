@@ -1,0 +1,1228 @@
+{
+ "summary": {
+  "full": 17,
+  "thin": 4,
+  "refused_or_clarified": 4,
+  "correctly_declined": 19,
+  "wrongly_answered": 1
+ },
+ "rows": [
+  {
+   "case_id": "AU-A01",
+   "run": "pilot.json",
+   "outcome_class": "answer",
+   "answer_text": "Đối với đào tạo theo hình thức chính quy và vừa làm vừa học, tối đa 30% tổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 16.44,
+   "first_content": 10.059500599978492,
+   "users": 1,
+   "timeline_tail": [],
+   "deltas": 0
+  },
+  {
+   "case_id": "AU-A02",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Sinh viên đã hết thời gian học tập tối đa theo quy định nhưng chưa đủ điều kiện tốt nghiệp do chưa hoàn thành những học phần Giáo dục quốc phòng-an ninh hoặc Giáo dục thể chất hoặc chưa đạt chuẩn đầu ra về ngoại ngữ, công nghệ thông tin, trong thời hạn 03 năm tính từ khi thôi học được hoàn thiện các điều kiện còn thiếu và đề nghị xét công nhận tốt nghiệp. [CIT-001] [CIT-002] [CIT-003]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "thin",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 3,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [
+    "03 năm"
+   ],
+   "unsupported_literals": [],
+   "seconds": 23.17,
+   "first_content": 12.05,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     23.173
+    ]
+   ],
+   "deltas": 53
+  },
+  {
+   "case_id": "AU-A03",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Sinh viên đến muộn sau 15 phút thì không được vào phòng máy. [CIT-001] [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "khac",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 14.63,
+   "first_content": 13.173,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     14.623
+    ]
+   ],
+   "deltas": 10
+  },
+  {
+   "case_id": "AU-A04",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Khi vào phòng thực hành máy tính, sinh viên không được mang nước uống (nước uống nằm trong danh mục bị cấm mang vào phòng máy). [CIT-001] [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "khac",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 19.5,
+   "first_content": 14.041,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     19.497
+    ]
+   ],
+   "deltas": 19
+  },
+  {
+   "case_id": "AU-A05",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Trung tâm Công nghệ thông tin và Cơ sở dữ liệu, trường Đại học Xây dựng Hà Nội ở Phòng 101 - H1. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 9.19,
+   "first_content": 7.621,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     9.186
+    ]
+   ],
+   "deltas": 16
+  },
+  {
+   "case_id": "AU-A06",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Đối với mỗi học phần, điểm học phần được đánh giá qua tối thiểu hai điểm thành phần, ngoại trừ các học phần có khối lượng 01 tín chỉ. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 21.13,
+   "first_content": 12.061,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     21.131
+    ]
+   ],
+   "deltas": 20
+  },
+  {
+   "case_id": "AU-A07",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Quyết định số 1486/QĐ-ĐHXDHN ngày 06 tháng 11 năm 2023 thay thế cho Quyết định số 1053/QĐ-ĐHXDHN ngày 23 tháng 9 năm 2022 của Hiệu trưởng Trường Đại học Xây dựng Hà Nội về việc ban hành Quy chế đào tạo trình độ đại học. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 23.2,
+   "first_content": 15.382,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     23.204
+    ]
+   ],
+   "deltas": 31
+  },
+  {
+   "case_id": "AU-A08",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Sinh viên hết thời gian học chính quy, không tốt nghiệp được bảo lưu, công nhận kết quả học tập đã tích lũy để chuyển qua học hình thức vừa làm vừa học, đào tạo từ xa tương ứng (nếu có) của Trường nếu còn trong thời gian học tập theo quy định đối với hình thức đào tạo chuyển đến. [CIT-001]\nSinh viên được xem xét chuyển từ đào tạo theo hình thức chính quy sang hình thức vừa làm vừa học hoặc đào tạo từ xa của Trường nếu còn đủ thời gian học tập theo quy định đối với hình thức chuyển đến (Quy trình xem phụ lục 10). [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "thin",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [
+    "vừa làm vừa học"
+   ],
+   "unsupported_literals": [],
+   "seconds": 35.59,
+   "first_content": 16.002,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     35.594
+    ]
+   ],
+   "deltas": 76
+  },
+  {
+   "case_id": "AU-A09",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Đại hội đại biểu Hội Sinh viên trường lần thứ 20 được tổ chức vào ngày 17/6/2023. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 14.47,
+   "first_content": 10.184,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     14.469
+    ]
+   ],
+   "deltas": 12
+  },
+  {
+   "case_id": "AU-A10",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Khoa Kinh tế và Quản lý Xây dựng có 05 Phó Giáo sư và 26 Tiến sĩ. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "thin",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [
+    "Tiến sĩ 26",
+    "Phó Giáo sư 05"
+   ],
+   "unsupported_literals": [],
+   "seconds": 12.32,
+   "first_content": 8.872,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     12.321
+    ]
+   ],
+   "deltas": 12
+  },
+  {
+   "case_id": "AU-A11",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Hotline tuyển sinh Đại học chính quy của Trường Đại học Xây dựng Hà Nội là 086 9071382 (Phòng Truyền thông và Tuyển sinh, Phòng 304, Tòa nhà A1). [CIT-001]\nHotline tuyển sinh của Trường được nêu là 0329 076 099 – 0869 071 382. [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 26.22,
+   "first_content": 13.984,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     26.223
+    ]
+   ],
+   "deltas": 31
+  },
+  {
+   "case_id": "AU-A12",
+   "run": "main3.json",
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "refused_or_clarified",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": false,
+   "missing_facts": [
+    "XDS"
+   ],
+   "unsupported_literals": [],
+   "seconds": 15.42,
+   "first_content": 11.851,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     15.416
+    ]
+   ],
+   "deltas": 9
+  },
+  {
+   "case_id": "AU-A13",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Sau khi kết thúc học kỳ 2, Phòng Đào tạo cung cấp danh sách và khóa tài khoản của các sinh viên CQ, LT, B2 thuộc diện xử lý hết hạn khóa học; thời gian cung cấp không muộn hơn 04 tuần kể từ khi kết thúc học kỳ. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 25.31,
+   "first_content": 15.319,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     25.311
+    ]
+   ],
+   "deltas": 33
+  },
+  {
+   "case_id": "AU-A14",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Bước 1: Khi có kết quả giải thưởng Sinh viên Nghiên cứu khoa học, khởi nghiệp và đổi mới sáng tạo các cấp; bài báo quốc tế hoặc Bằng độc quyền sáng chế/giải pháp hữu ích được công bố, sinh viên lựa chọn học phần tính điểm (có xác nhận của giáo viên hướng dẫn), sau đó gửi về các Khoa/Ban quản lý đề tài. [CIT-001]\nBước 2: Các Khoa/Ban tập hợp danh sách và xét duyệt; kết quả xét duyệt kèm theo tờ trình gửi về Phòng Khoa học và Công nghệ. [CIT-001]\nBước 3: Phòng Khoa học và Công nghệ kiểm tra thông tin, tổng hợp danh sách học phần thưởng điểm và chuyển về Phòng Quản lý Đào tạo. [CIT-001]\nBước 4: Phòng Quản lý Đào tạo thực hiện việc cộng điểm thưởng vào điểm tổng kết học phần cho sinh viên. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 34.09,
+   "first_content": 12.336,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     34.091
+    ]
+   ],
+   "deltas": 98
+  },
+  {
+   "case_id": "AU-A15",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Phần mềm, ứng dụng phải được cấu hình để xác thực người sử dụng; giới hạn số lần đăng nhập sai liên tiếp; giới hạn thời gian chờ để đóng phiên kết nối; mã hóa thông tin xác thực trên hệ thống; không khuyến khích việc đăng nhập tự động. [CIT-001] [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 12.96,
+   "first_content": 8.746,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     12.955
+    ]
+   ],
+   "deltas": 35
+  },
+  {
+   "case_id": "AU-A16",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Theo quy chế, xâm phạm an toàn thông tin là hành vi truy nhập, sử dụng, tiết lộ, làm gián đoạn, sửa đổi, làm sai lệch chức năng, hủy hoại trái phép thông tin và hệ thống thông tin. [CIT-001] [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 11.3,
+   "first_content": 8.508,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     11.302
+    ]
+   ],
+   "deltas": 27
+  },
+  {
+   "case_id": "AU-A17",
+   "run": "main3.json",
+   "outcome_class": "clarify",
+   "answer_text": "Bạn cho biết khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo để tra đúng mức hoặc thời hạn áp dụng.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "refused_or_clarified",
+   "expected": "answer",
+   "family": "hoc_phi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": false,
+   "missing_facts": [
+    "50%"
+   ],
+   "unsupported_literals": [],
+   "seconds": 2.3,
+   "first_content": 1.813,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     2.299
+    ]
+   ],
+   "deltas": 16
+  },
+  {
+   "case_id": "AU-A18",
+   "run": "main3.json",
+   "outcome_class": "refuse",
+   "answer_text": "Nội dung này cần cán bộ hỗ trợ xem xét trực tiếp, và hiện chưa có kênh liên hệ ưu tiên được cấu hình. Bạn vui lòng liên hệ bộ phận phụ trách qua kênh chính thức trên website của trường.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "refused_or_clarified",
+   "expected": "answer",
+   "family": "hoc_phi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": false,
+   "missing_facts": [
+    "01 lần"
+   ],
+   "unsupported_literals": [],
+   "seconds": 1.85,
+   "first_content": 1.184,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     1.852
+    ]
+   ],
+   "deltas": 27
+  },
+  {
+   "case_id": "AU-A19",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Học phần tiếng Anh, tiếng Pháp là môn học bắt buộc tương ứng trong chương trình đào tạo của sinh viên các lớp Anh ngữ, Pháp ngữ; thời lượng các học phần tiếng Anh, tiếng Pháp được tính tương đương 18 TC. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 13.17,
+   "first_content": 7.721,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     13.172
+    ]
+   ],
+   "deltas": 29
+  },
+  {
+   "case_id": "AU-A20",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Kế hoạch học kỳ bao gồm kế hoạch mở lớp, hình thức dạy và học (trực tiếp hoặc trực tuyến), lịch học, lịch thi của các học phần được tổ chức trong học kỳ cho các khoá học, chương trình đào tạo và hình thức đào tạo. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "quy_che",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 19.37,
+   "first_content": 12.509,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     19.36
+    ]
+   ],
+   "deltas": 32
+  },
+  {
+   "case_id": "AU-A21",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Giai đoạn 2 A1 -> A2 (Starter) có thời lượng 20 buổi × 120 phút. [CIT-001] [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "khac",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": true,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 9.52,
+   "first_content": 7.686,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     9.52
+    ]
+   ],
+   "deltas": 11
+  },
+  {
+   "case_id": "AU-A22",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Chuyên ngành Kỹ thuật ô tô thuộc Khoa Cơ khí. [CIT-001] [CIT-002]\nChương trình đào tạo Kỹ thuật ô tô là chương trình đào tạo trình độ kỹ sư. [CIT-001] [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": false,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 8.93,
+   "first_content": 8.162,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     8.929
+    ]
+   ],
+   "deltas": 21
+  },
+  {
+   "case_id": "AU-A23",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Ngành Logistics và quản lý chuỗi cung ứng — chuyên ngành Logistics đô thị (K71LGTDT) là chương trình đào tạo trình độ cử nhân. [CIT-001]\nKế hoạch giảng dạy ghi người lập là Trưởng khoa Cầu đường và Trưởng phòng Quản lý Đào tạo. [CIT-001]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "full",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 1,
+   "bad_citations": [],
+   "cites_gold": false,
+   "missing_facts": [],
+   "unsupported_literals": [],
+   "seconds": 9.99,
+   "first_content": 9.352,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     9.989
+    ]
+   ],
+   "deltas": 30
+  },
+  {
+   "case_id": "AU-A24",
+   "run": "main3.json",
+   "outcome_class": "answer",
+   "answer_text": "Giáo viên chủ nhiệm đăng nhập vào trang website eoffice.huce.edu.vn để đánh giá điểm rèn luyện cho sinh viên trong lớp. [CIT-001] [CIT-002]",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "thin",
+   "expected": "answer",
+   "family": "khac",
+   "citations": 2,
+   "bad_citations": [],
+   "cites_gold": false,
+   "missing_facts": [
+    "E-Office"
+   ],
+   "unsupported_literals": [],
+   "seconds": 21.29,
+   "first_content": 14.956,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     21.286
+    ]
+   ],
+   "deltas": 15
+  },
+  {
+   "case_id": "AU-A25",
+   "run": "main3.json",
+   "outcome_class": "refuse",
+   "answer_text": "Nội dung này liên quan đến quy định cần được xác nhận trực tiếp. Bạn vui lòng mở tài liệu chính thức được trích dẫn hoặc liên hệ Phòng Đào tạo.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "refused_or_clarified",
+   "expected": "answer",
+   "family": "so_tay",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": false,
+   "missing_facts": [
+    "Hiệu trưởng"
+   ],
+   "unsupported_literals": [],
+   "seconds": 20.32,
+   "first_content": 14.937,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     20.321
+    ]
+   ],
+   "deltas": 21
+  },
+  {
+   "case_id": "AU-O01",
+   "run": "pilot.json",
+   "outcome_class": "refuse",
+   "answer_text": "Hiện tại hệ thống chưa hỗ trợ nội dung này hoặc chưa tìm thấy tài liệu liên quan.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ngoai_pham_vi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 1.61,
+   "first_content": 1.3966718000010587,
+   "users": 1,
+   "timeline_tail": [],
+   "deltas": 0
+  },
+  {
+   "case_id": "AU-O02",
+   "run": "main3.json",
+   "outcome_class": "refuse",
+   "answer_text": "Câu hỏi này nằm ngoài phạm vi thông tin mình hỗ trợ.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ngoai_pham_vi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 5.07,
+   "first_content": 4.658,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     5.07
+    ]
+   ],
+   "deltas": 8
+  },
+  {
+   "case_id": "AU-O03",
+   "run": "main3.json",
+   "outcome_class": "refuse",
+   "answer_text": "Hiện tại hệ thống chưa hỗ trợ nội dung này hoặc chưa tìm thấy tài liệu liên quan.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ngoai_pham_vi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 2.57,
+   "first_content": 2.016,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     2.566
+    ]
+   ],
+   "deltas": 12
+  },
+  {
+   "case_id": "AU-O04",
+   "run": "main3.json",
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ngoai_pham_vi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 12.86,
+   "first_content": 8.848,
+   "users": 3,
+   "timeline_tail": [
+    [
+     "message.completed",
+     12.859
+    ]
+   ],
+   "deltas": 9
+  },
+  {
+   "case_id": "AU-O05",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ngoai_pham_vi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 6.81,
+   "first_content": 5.497,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     6.806
+    ]
+   ],
+   "deltas": 9
+  },
+  {
+   "case_id": "AU-O06",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ngoai_pham_vi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 6.67,
+   "first_content": 5.23,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     6.667
+    ]
+   ],
+   "deltas": 9
+  },
+  {
+   "case_id": "AU-O07",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ngoai_pham_vi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 5.78,
+   "first_content": 4.984,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     5.783
+    ]
+   ],
+   "deltas": 9
+  },
+  {
+   "case_id": "AU-O08",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ngoai_pham_vi",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 7.8,
+   "first_content": 6.104,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     7.796
+    ]
+   ],
+   "deltas": 9
+  },
+  {
+   "case_id": "AU-C01",
+   "run": "pilot.json",
+   "outcome_class": "clarify",
+   "answer_text": "Bạn cho biết khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo để tra đúng mức hoặc thời hạn áp dụng.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "clarify",
+   "family": "can_hoi_lai",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 3.59,
+   "first_content": 1.9459099000087008,
+   "users": 1,
+   "timeline_tail": [],
+   "deltas": 0
+  },
+  {
+   "case_id": "AU-C02",
+   "run": "rerun429.json",
+   "outcome_class": "clarify",
+   "answer_text": "Câu hỏi chưa nêu rõ nội dung cần tra cứu. Bạn muốn hỏi về chủ đề nào, ví dụ: học phí, học bổng, đăng ký hoặc rút học phần, bảo lưu và nghỉ học tạm thời, thôi học, tốt nghiệp, ký túc xá hay thư viện? Nếu có chương trình, khóa hoặc năm học cụ thể, bạn cho biết thêm để tôi tra đúng nguồn.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "clarify",
+   "family": "can_hoi_lai",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 1.15,
+   "first_content": 0.876,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     1.152
+    ]
+   ],
+   "deltas": 43
+  },
+  {
+   "case_id": "AU-C03",
+   "run": "rerun429.json",
+   "outcome_class": "clarify",
+   "answer_text": "Câu hỏi chưa nêu rõ nội dung cần tra cứu. Bạn muốn hỏi về chủ đề nào, ví dụ: học phí, học bổng, đăng ký hoặc rút học phần, bảo lưu và nghỉ học tạm thời, thôi học, tốt nghiệp, ký túc xá hay thư viện? Nếu có chương trình, khóa hoặc năm học cụ thể, bạn cho biết thêm để tôi tra đúng nguồn.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "clarify",
+   "family": "can_hoi_lai",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 0.98,
+   "first_content": 0.723,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     0.985
+    ]
+   ],
+   "deltas": 43
+  },
+  {
+   "case_id": "AU-C04",
+   "run": "rerun429.json",
+   "outcome_class": "clarify",
+   "answer_text": "Câu hỏi chưa đủ rõ để tra đúng nguồn. Bạn cho biết ngành hoặc chương trình đào tạo để mình tra đúng nguồn nhé?",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "clarify",
+   "family": "can_hoi_lai",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 7.54,
+   "first_content": 5.534,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     7.538
+    ]
+   ],
+   "deltas": 16
+  },
+  {
+   "case_id": "AU-C05",
+   "run": "rerun429.json",
+   "outcome_class": "clarify",
+   "answer_text": "Câu hỏi chưa rõ nội dung. Bạn muốn hỏi về học phí, học bổng, đăng ký học phần, bảo lưu, tốt nghiệp hay ký túc xá?",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "clarify",
+   "family": "can_hoi_lai",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 1.58,
+   "first_content": 1.464,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     1.584
+    ]
+   ],
+   "deltas": 17
+  },
+  {
+   "case_id": "AU-C06",
+   "run": "rerun429.json",
+   "outcome_class": "partial",
+   "answer_text": "Miễn học phí 100% cho sinh viên là người dân tộc thiểu số có cha hoặc mẹ hoặc cả cha và mẹ hoặc ông, bà (trong trường hợp ở với ông, bà) thuộc hộ nghèo hoặc hộ cận nghèo theo quy định của Thủ tướng Chính phủ. [CIT-001] [CIT-002]\nMiễn học phí 100% cho sinh viên là người khuyết tật. [CIT-003] [CIT-004]\nGiảm 50% học phí cho sinh viên là con cán bộ, công chức, viên chức, công nhân mà cha hoặc mẹ bị tai nạn lao động hoặc mắc bệnh nghề nghiệp được hưởng trợ cấp thường xuyên. [CIT-005]\nMiễn học phí 100% cho các đối tượng theo quy định tại Pháp lệnh Ưu đãi người có công với cách mạng nếu đang theo học tại các cơ sở giáo dục thuộc hệ thống giáo dục quốc dân. [CIT-006]\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "wrongly_answered",
+   "expected": "clarify",
+   "family": "can_hoi_lai",
+   "citations": 6,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 14.17,
+   "first_content": 6.77,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     14.175
+    ]
+   ],
+   "deltas": 106
+  },
+  {
+   "case_id": "AU-P01",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Kênh chuyển yêu cầu từ trợ lý chưa có consumer/receipt được xác nhận. Bạn cần mở chức năng hỗ trợ để xem trước và gửi; tôi chưa chuyển yêu cầu này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ca_nhan",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 1.69,
+   "first_content": 1.551,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     1.693
+    ]
+   ],
+   "deltas": 21
+  },
+  {
+   "case_id": "AU-P02",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Kênh chuyển yêu cầu từ trợ lý chưa có consumer/receipt được xác nhận. Bạn cần mở chức năng hỗ trợ để xem trước và gửi; tôi chưa chuyển yêu cầu này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ca_nhan",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 1.73,
+   "first_content": 1.592,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     1.726
+    ]
+   ],
+   "deltas": 21
+  },
+  {
+   "case_id": "AU-P03",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ca_nhan",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 7.81,
+   "first_content": 6.431,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     7.807
+    ]
+   ],
+   "deltas": 9
+  },
+  {
+   "case_id": "AU-P04",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Chức năng này chưa kết nối dữ liệu hoặc hệ thống xử lý HUCE. Tôi chưa đọc lịch cá nhân, tạo hồ sơ hay gửi yêu cầu. Bạn cần dùng cổng HUCE chính thức.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ca_nhan",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 2.36,
+   "first_content": 2.21,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     2.359
+    ]
+   ],
+   "deltas": 23
+  },
+  {
+   "case_id": "AU-P05",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Kênh chuyển yêu cầu từ trợ lý chưa có consumer/receipt được xác nhận. Bạn cần mở chức năng hỗ trợ để xem trước và gửi; tôi chưa chuyển yêu cầu này.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ca_nhan",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 1.99,
+   "first_content": 1.845,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     1.987
+    ]
+   ],
+   "deltas": 21
+  },
+  {
+   "case_id": "AU-P06",
+   "run": "rerun429.json",
+   "outcome_class": "refuse",
+   "answer_text": "Nội dung này cần cán bộ hỗ trợ xem xét trực tiếp, và hiện chưa có kênh liên hệ ưu tiên được cấu hình. Bạn vui lòng liên hệ bộ phận phụ trách qua kênh chính thức trên website của trường.",
+   "error": null,
+   "http_status": 200,
+   "final_event": true,
+   "class": "correctly_declined",
+   "expected": "refuse",
+   "family": "ca_nhan",
+   "citations": 0,
+   "bad_citations": [],
+   "cites_gold": null,
+   "missing_facts": null,
+   "unsupported_literals": [],
+   "seconds": 0.98,
+   "first_content": 0.815,
+   "users": 1,
+   "timeline_tail": [
+    [
+     "message.completed",
+     0.981
+    ]
+   ],
+   "deltas": 27
+  }
+ ]
+}

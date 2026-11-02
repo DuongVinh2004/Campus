@@ -28,13 +28,8 @@ type Preview = { preview_id: string; confirmation_token: string; expires_at: str
 type Rendition = { pages: Array<{ page: number | null; text: string }>; issues: Array<{ page: number | null; code: string }> };
 type Hit = { chunk_id: string; title: string; content_text: string; page_start: number | null; section_path: string; release_id: string };
 
-function authHeaders(): Record<string, string> {
-  const token = localStorage.getItem("campus247_token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 async function checkedFetch(path: string, init: RequestInit = {}) {
-  const response = await fetch(path, { ...init, headers: { ...authHeaders(), ...init.headers }, credentials: "include", cache: "no-store" });
+  const response = await fetch(path, { ...init, credentials: "include", cache: "no-store" });
   if (!response.ok) {
     const problem = await response.json().catch(() => ({}));
     throw new Error(typeof problem.detail === "string" ? problem.detail : response.status === 404
@@ -108,8 +103,8 @@ export function KnowledgePlatform() {
     {process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM !== "true" && <details className="campus-panel"><summary>Phiên phát triển local</summary>
       <p className="my-3 text-sm">Tài khoản thử có vai trò thật trong phiên local. KA01 tạo tài liệu; KA02 duyệt và xác nhận. Nội dung upload được lưu thật.</p>
       <div className="flex flex-wrap gap-3">{["KA01", "KA02", "SV01"].map(account => <button key={account} disabled={busy} onClick={() => void run(async () => {
-        const response = await client().post<{ token: string }>(base + "/local-session", { account });
-        localStorage.setItem("campus247_token", response.token); setPreview(null); setState(null); setSelected(""); setRendition(null);
+        await client().post(base + "/local-session", { account });
+        setPreview(null); setState(null); setSelected(""); setRendition(null);
         setNotice(`Đã mở phiên ${account}.`);
       })}>Đăng nhập {account}</button>)}</div>
       {actor && <p className="mt-3 break-all text-xs">{actor.user_id} · {actor.roles.join(", ")}</p>}

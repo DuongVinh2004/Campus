@@ -16,6 +16,7 @@ from campus247.rag_v2.ingest.units import context_text, source_text
 from campus247.rag_v2.observability.trace import TurnTrace, emit
 from campus247.rag_v2.outcome.compose import build_outcome
 from campus247.rag_v2.retrieval.hybrid import retrieve, scope_allows
+from campus247.rag_v2.verification.venue import venue_conflict
 from campus247.rag_v2.types import Fact, Outcome, Statement
 from campus247.rag_v2.understanding.analyze import analyze, contains, program_key
 from campus247.rag_v2.understanding.normalize import fold, normalize_query
@@ -332,7 +333,11 @@ class RagV2Service:
                 iterator = iter(semantic)
                 aligned = [next(iterator) if verdict.passed else False for verdict in verdicts]
                 for i, (verdict, supported) in enumerate(zip(verdicts, aligned)):
-                    if verdict.passed and not supported:
+                    if verdict.passed and supported and venue_conflict(
+                            u.search_query, [units[ref] for ref in verdict.statement.unit_ids]):
+                        aligned[i] = supported = False
+                        trace.statement_rejections[i] = ("SCOPE_MISMATCH",)
+                    elif verdict.passed and not supported:
                         trace.statement_rejections[i] = ("SEMANTIC_UNSUPPORTED",)
                 missing = _uncovered(facets, facet_of, verdicts, aligned)
                 return await finish(build_outcome(u, verdicts, units, semantic_results=aligned,
