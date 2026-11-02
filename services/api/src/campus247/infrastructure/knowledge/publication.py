@@ -15,7 +15,7 @@ _REGULATION_ACQUISITION_SHA256 = "4065e765eedf739f4e580fab6163dacb60c25909aa93bc
 _STEM_ACQUISITION = "infra/local/huce-completion-20261025-02/stem-publication-acquisition-01.json"
 _STEM_ACQUISITION_SHA256 = "5e987a7c79c488bce2c0e610fde964593e2abad903f55b31b6ce0124b4359bbf"
 _HANDBOOK_ACQUISITION = "infra/local/huce-completion-20261102-01/handbook-publication-acquisition-01.json"
-_HANDBOOK_ACQUISITION_SHA256 = "ef890b5a1c0561e32c799dfe1a5a89d51bdab199b61562eb9c6cdacfb5f61f1a"
+_HANDBOOK_ACQUISITION_SHA256 = "8cfa1cc2ebfdac86f1355d07e163a6fc42f8249ad0b8f1b0de7ff4966288788c"
 
 
 def same_flipbook_pdf(published, canonical, viewer):
