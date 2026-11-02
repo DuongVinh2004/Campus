@@ -386,3 +386,7 @@ Bằng chứng: lượt chạy thật trên 8015 sau khi khởi động lại b�
 **Mật khẩu và Sổ tay vẫn chờ bạn:** L-03 (đổi mật khẩu, bị chặn quyền), L-12 (có coi Sổ tay SV 2026–2027 là nguồn chính thống cho chốt kỷ luật không; không nới kiểm nguồn nếu chưa có quyết định).
 
 **Commit:** theo yêu cầu "Commit" của bạn (02/11), các thay đổi của phiên audit được commit riêng trên nhánh `rag-v2-hardening`. Không commit khối công việc có từ trước ngoài phạm vi này (xem tin nhắn commit). Nhật ký Codex lớn (`impl/*.log`) và `pytest-final.log` (có chuỗi Bearer của test) được loại khỏi commit.
+
+## Cập nhật cuối 4 (02/11) — L-29 đã xử lý, L-12 dừng chờ quyền
+- **L-29 đã sửa:** gỡ đăng ký route hành động giả khỏi `bootstrap/app.py`, xoá `presentation/actions.py` và `tests/api/test_actions_route.py` (chỉ ghim hành vi giả; vẫn nằm trong git). `tests/contract/test_write_route_inventory.py` nay xanh; `tests/api` + `tests/architecture` + inventory: 310 đạt, 1 đỏ có sẵn (`test_multi_agent_api`, dữ liệu legacy). Chưa commit.
+- **L-12 chưa làm:** hướng đúng là thêm một biên nhận xuất bản ghim hash cho Sổ tay (bài viết huce.edu.vn → liên kết flipbook → PDF trên CDN, dùng tệp đã lưu `handbook-publication.html`, `handbook-viewer.html`, `handbook-2026-2027.pdf`), kèm mở rộng `same_published_attachment` cho ánh xạ flipbook→PDF, không tin theo host. Hệ thống phân quyền đã chặn thao tác tạo biên nhận mới (thay đổi niềm tin nguồn), nên dừng ở đây chờ bạn cho phép rõ.

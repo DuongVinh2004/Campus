@@ -628,9 +628,6 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
     # Capabilities: /v1/capabilities, /v1/operations/capabilities
     app.include_router(capabilities.create_capabilities_router(manager=capability_manager))
 
-    from campus247.presentation.actions import create_actions_router
-    app.include_router(create_actions_router())
-
     # Logout: /v1/auth/logout & /v1/logout
     app.include_router(logout.create_logout_router(logout_service=logout_service,session_service=session_service), prefix="/v1/auth")
     app.include_router(logout.create_logout_router(logout_service=logout_service,session_service=session_service), prefix="/v1")
