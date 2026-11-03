@@ -421,4 +421,14 @@ Phê duyệt: bạn chọn "Cho phép tạo backend-09". Bằng chứng: `infra/
 - Lệnh: `pytest tests/unified_final tests/unified_completion tests/unified_personal13b tests/unified_workflow13a tests/integration/test_unified_staff12.py tests/integration/test_unified_storage_completion.py -p unified_completion_pytest --basetemp=…/checks/backend-09/basetemp` với `PYTHONPATH` gồm `scripts`, `services/api/src`, `services/worker/src`, `packages/synthetic/src`.
 - Kết quả: **264 đạt, 0 đỏ, 0 lỗi thiết lập**. Vậy 32 lỗi thiết lập và 7 đỏ hai tiến trình trong lượt chạy toàn repo trước chỉ do các test này yêu cầu fixture đã đăng ký (plugin `unified_completion_pytest`), không phải lỗi mã.
 - Quyết định về phụ thuộc: bạn chọn "Không, tôi sẽ tự duyệt" nên hai test `dependency_resolution/test_verifier` giữ đỏ (cổng báo 168 lỗi: 133 gói đã resolve + 21 gói khai báo chưa được người duyệt phê duyệt; `uv.lock` tăng ~2.800 dòng). `runtime_review/test_m1_*` (5, sổ cái lịch sử không idempotent) giữ nguyên.
-- Bức tranh test còn đỏ sau mọi bước: 2 `test_verifier` (chờ bạn duyệt), 5 `test_m1_*` (sổ cái lịch sử), 1 `test_huce_service_release::test_office_excerpt…`/`withdrawal` chưa xác nhận lại sau khi sửa cờ (xem lượt chạy kế tiếp nếu cần).
+- Bức tranh test còn đỏ: 2 `test_verifier` (chờ bạn duyệt) và 5 `test_m1_*` (sổ cái lịch sử không idempotent); số liệu toàn repo cuối cùng ở mục sau.
+
+## Cập nhật cuối 10 (03/11) — số liệu test cuối cùng
+Bằng chứng: `pytest-final3-20261103.log` (toàn `tests/` trừ nhóm unified, chạy sau mọi sửa), `checks/backend-09/backend.log` (nhóm unified qua harness đã đăng ký).
+- **Toàn repo (trừ unified):** 4272 đạt, 10 đỏ (trước phiên cập nhật test: 22 đỏ + 32 lỗi thiết lập). **Nhóm unified qua harness:** 264 đạt, 0 đỏ.
+- **Đã sửa thêm:** `test_migration_0009::test_historical_0009_0010_ancestry_is_preserved` — test ghim đầu chuỗi migration ở 0013 trong khi 0014–0022 đã được thêm sau đó; khẳng định nay giữ nguyên ý (tổ tiên 0009/0010 không đổi, đầu mới chỉ là hậu duệ tuyến tính, ba revision 0011–0013 không bị đổi cha) và chấp nhận các revision cộng thêm.
+- **10 test còn đỏ, mỗi cái có lý do và không do thay đổi của phiên này:**
+  - 2 × `dependency_resolution/test_verifier`: cổng phê duyệt phụ thuộc (168 lỗi: 133 gói resolve + 21 gói khai báo chưa được duyệt). Bạn chọn tự duyệt.
+  - 2 × `rag_fixture/test_guard`, `test_retrieval_scope_migration`: cổng hash-ghim "migration source changed or unreviewed" (các migration 0014–0022 chưa có hash được duyệt). Sửa là tự duyệt migration; chờ người duyệt.
+  - 5 × `runtime_review/test_m1_*` (+ `test_m1_additive_journal_33`): sổ cái lịch sử không idempotent ("fresh process cannot reset an existing ledger"); chạy lại sẽ cần đặt lại sổ cái nên không làm.
+- L-03 (đổi mật khẩu) vẫn do bạn quyết (bạn bảo kệ).
