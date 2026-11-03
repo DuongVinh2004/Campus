@@ -1,0 +1,117 @@
+"""W12: strict flat rows, exact source spans, and unchanged pipe parsing."""
+import json
+from dataclasses import replace
+from pathlib import Path
+
+import pytest
+
+from campus247.rag_v2.ingest.checks import check_units, coverage_stats
+from campus247.rag_v2.ingest.tables import flat_list_rows
+from campus247.rag_v2.ingest import units as splitter
+from campus247.rag_v2.ingest.units import SPAN, build_units, context_text, source_text
+
+ROOT = Path(__file__).resolve().parents[2]
+PAGE25_IDS = {
+    "01a16d1e-5dfd-71bf-9f08-60dd0a0d5a3f",
+    "01a16d1e-5e00-7e06-b5a8-f4e3b6817b57",
+    "01a16d1e-5e03-7aa1-92fd-b1de97dd4cc6",
+}
+
+
+def chunk(text):
+    return dict(chunk_id="c", document_id="d", version_id="v",
+                doc_title="Danh mục đào tạo", doc_family="so_tay", page=25,
+                section_label="Ngành, khoa và văn bằng", text=text)
+
+
+def numbered(ordinals, newline="\n"):
+    return newline.join(f"{n} Ngành {n} Khoa A Cử nhân" for n in ordinals)
+
+
+def assert_lossless(row, units):
+    own = [u for u in units if row["chunk_id"] in u.chunk_ids]
+    own.sort(key=lambda u: int(SPAN.search(context_text(u))[1]))
+    assert "".join(source_text(u) for u in own) == row["text"]
+    for u in own:
+        start, end = map(int, SPAN.search(context_text(u)).groups())
+        assert row["text"][start:end] == source_text(u)
+    own = [replace(u, chunk_ids=(row["chunk_id"],)) for u in own]
+    assert check_units([row], own) == []
+    assert all(s["coverage"] == s["min_chunk_coverage"] == 1
+               for s in coverage_stats([row], own).values())
+
+
+def test_real_page25_rows_and_complete_source_coverage():
+    rows = [row for line in (ROOT / "evals/corpus/served-chunks.jsonl").read_text(encoding="utf-8").splitlines()
+            if (row := json.loads(line))["chunk_id"] in PAGE25_IDS]
+    assert {row["chunk_id"] for row in rows} == PAGE25_IDS
+    units = build_units(rows)
+    for row in rows:
+        detected = flat_list_rows(row["text"])
+        # 26..45 are consecutive; wrapped row 45 ends the block.
+        assert len(detected) == 20
+        actual = {int(SPAN.search(context_text(u))[1]): u for u in units
+                  if row["chunk_id"] in u.chunk_ids and u.kind == "table_row"}
+        assert set(actual) == set(detected)
+        for start, (end, _) in detected.items():
+            assert source_text(actual[start]) == row["text"][start:end]
+        logistics = next(u for u in actual.values() if source_text(u).startswith("29 "))
+        assert source_text(logistics) == "29 Logistics đô thị Cầu Đường Cử nhân\n"
+        assert row["doc_title"] in context_text(logistics)
+        assert_lossless(row, units)
+    assert check_units(rows, units) == []
+    assert all(s["min_chunk_coverage"] == 1 for s in coverage_stats(rows, units).values())
+
+
+@pytest.mark.parametrize("ordinals", [range(1, 8), [1, 2, 3, 4, 4, 5, 6, 7],
+                                    [1, 2, 3, 4, 6, 7, 8, 9], range(8, 0, -1),
+                                    [*range(1, 10), 9]])
+def test_short_or_invalid_blocks_are_unchanged(ordinals, monkeypatch):
+    row = chunk(numbered(ordinals))
+    assert flat_list_rows(row["text"]) == {}
+    actual = build_units([row])
+    monkeypatch.setattr(splitter, "flat_list_rows", lambda _: {})
+    assert actual == build_units([row])
+    assert not any(u.kind == "table_row" for u in actual)
+    assert_lossless(row, actual)
+
+
+@pytest.mark.parametrize("interruption", ["\n\n", "\nTrang 26\n", "\nDòng bị ngắt\n"])
+def test_no_joining_across_blank_header_or_wrapped_line(interruption):
+    text = numbered(range(1, 5)) + interruption + numbered(range(5, 9))
+    assert flat_list_rows(text) == {}
+    assert not any(u.kind == "table_row" for u in build_units([chunk(text)]))
+
+
+@pytest.mark.parametrize("newline", ["\n", "\r\n"])
+def test_headings_are_context_and_run_ends_at_exact_line_boundary(newline):
+    heading = "Danh sách ngành" + newline + "Số thứ tự Ngành Khoa Bằng"
+    text = heading + newline + numbered(range(21, 29), newline) + newline + "Đoạn tiếp theo."
+    row = chunk(text)
+    units = build_units([row])
+    rows = [u for u in units if u.kind == "table_row"]
+    assert len(rows) == 8
+    for u in rows:
+        assert "Danh sách ngành\nSố thứ tự Ngành Khoa Bằng" in context_text(u)
+        assert source_text(u).endswith(newline)
+        assert "Đoạn tiếp theo" not in source_text(u)
+    assert_lossless(row, units)
+
+
+def test_pipe_table_units_are_identical_with_detector_disabled(monkeypatch):
+    text = "STT | Ngành | Khoa | Bằng\n" + "\n".join(
+        f"{n} | Ngành {n} | Khoa A | Cử nhân" for n in range(1, 10))
+    assert flat_list_rows(text) == {}
+    row = chunk(text)
+    actual = build_units([row])
+    monkeypatch.setattr(splitter, "flat_list_rows", lambda _: {})
+    assert actual == build_units([row])
+    assert len(actual) == 10
+    assert all(u.kind == "table_row" for u in actual)
+    assert_lossless(row, actual)
+
+
+@pytest.mark.parametrize("prefix", [" ", "1000 ", "1. "])
+def test_ordinal_shape_is_strict(prefix):
+    text = "\n".join(prefix + f"{n} Ngành" for n in range(1, 9))
+    assert flat_list_rows(text) == {}

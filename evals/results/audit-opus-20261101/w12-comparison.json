@@ -1,0 +1,115 @@
+{
+  "case_count": 477,
+  "dev_cases": 452,
+  "audit_cases": 25,
+  "rrf_k": 60,
+  "lexical_pin": 4,
+  "embedded2": {
+    "facts_in_context": 281,
+    "dev": 262,
+    "audit": 19
+  },
+  "embedded3": {
+    "facts_in_context": 281,
+    "dev": 262,
+    "audit": 19
+  },
+  "gained": [],
+  "lost": [],
+  "changed_context_cases": [
+    "R2-A0-0005",
+    "R2-A0-0019",
+    "R2-A0-0101",
+    "R2-A0-0104",
+    "R2-A0-0109",
+    "R2-A0-0112",
+    "R2-A0-0134",
+    "R2-A1-0085",
+    "R2-A1-0126",
+    "R2-A1-0127",
+    "R2-A1-0128",
+    "R2-A2-0001",
+    "R2-A2-0015",
+    "R2-A2-0029",
+    "R2-A2-0030",
+    "R2-A2-0031",
+    "R2-A2-0035",
+    "R2-A2-0043",
+    "R2-A2-0075",
+    "R2-A2-0076",
+    "R2-A2-0102",
+    "R2-A2-0107",
+    "R2-A2-0119",
+    "R2-A2-0145",
+    "R2-A2-0151",
+    "R2-A2-0152",
+    "R2-A3-0022",
+    "R2-A3-0024",
+    "R2-A3-0054",
+    "R2-A3-0065",
+    "R2-A3-0068",
+    "R2-A3-0075",
+    "R2-A3-0076",
+    "R2-A3-0078",
+    "R2-A3-0080",
+    "R2-A3-0120",
+    "R2-A3-0121",
+    "R2-A3-0123",
+    "R2-A3-0150",
+    "R2-A3-0151",
+    "R2-Q1-0001",
+    "R2-Q1-0002",
+    "R2-Q1-0012",
+    "R2-Q1-0017",
+    "R2-Q1-0069",
+    "R2-Q1-0072",
+    "R2-Q1-0111",
+    "R2-Q2-0046",
+    "R2-Q2-0092",
+    "AU-A07",
+    "AU-A10",
+    "AU-A20",
+    "AU-A21"
+  ],
+  "AU-A23": {
+    "embedded2": {
+      "case_id": "AU-A23",
+      "facts_in_context": true,
+      "chunk_ids": [
+        "01a16d41-d718-76e3-95f7-90b0009ba0f0"
+      ],
+      "context_sha256": "12a7c6a7fdae3e345a2dc2837874ce5b91cd9127a4edd734d96a08e095e636fc"
+    },
+    "embedded3": {
+      "case_id": "AU-A23",
+      "facts_in_context": true,
+      "chunk_ids": [
+        "01a16d41-d718-76e3-95f7-90b0009ba0f0"
+      ],
+      "context_sha256": "12a7c6a7fdae3e345a2dc2837874ce5b91cd9127a4edd734d96a08e095e636fc"
+    }
+  },
+  "protected_files_unchanged": {
+    "evals/corpus/served-chunks.jsonl": true,
+    "data/rag_v2_index/embedded2/manifest.json": true,
+    "data/rag_v2_index/embedded2/units.jsonl": true,
+    "data/rag_v2_index/embedded2/facts.jsonl": true,
+    "data/rag_v2_index/embedded2/embeddings.npy": true,
+    "services/api/src/campus247/rag_v2/retrieval/hybrid.py": true,
+    "evals/results/audit-opus-20261101/l14_sweep.py": true,
+    "evals/datasets/rag-v2/cases.jsonl": true,
+    "evals/results/audit-opus-20261101/cases.jsonl": true
+  },
+  "chunk_gaps_unchanged": true,
+  "pytest": {
+    "exit_code": 0,
+    "passed": 620,
+    "warnings": 2,
+    "seconds": 148.59
+  },
+  "build_exit_code": 0,
+  "sweep_exit_codes": {
+    "embedded2": 0,
+    "embedded3": 0
+  }
+}
