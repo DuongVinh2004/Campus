@@ -432,3 +432,10 @@ Bằng chứng: `pytest-final3-20261103.log` (toàn `tests/` trừ nhóm unified
   - 2 × `rag_fixture/test_guard`, `test_retrieval_scope_migration`: cổng hash-ghim "migration source changed or unreviewed" (các migration 0014–0022 chưa có hash được duyệt). Sửa là tự duyệt migration; chờ người duyệt.
   - 5 × `runtime_review/test_m1_*` (+ `test_m1_additive_journal_33`): sổ cái lịch sử không idempotent ("fresh process cannot reset an existing ledger"); chạy lại sẽ cần đặt lại sổ cái nên không làm.
 - L-03 (đổi mật khẩu) vẫn do bạn quyết (bạn bảo kệ).
+
+## Cập nhật cuối 11 (03/11) — duyệt migration 0015–0022 (có phê duyệt rõ ràng của bạn)
+Phê duyệt: bạn chọn "Duyệt và ghi hash" sau khi tôi báo kết quả rà soát nguồn. Bằng chứng: quét nguồn `services/api/migrations/versions/0014–0022`; chạy lại `tests/integration` (409 đạt, 6 bỏ qua, 0 đỏ).
+- **Rà soát:** toàn bộ cộng thêm (bảng, cột, chỉ mục, trigger bất biến); 0019 và 0020 forward-only (downgrade ném lỗi); không có DROP TABLE/DELETE/TRUNCATE. Chỉ có nới rộng ràng buộc: `DROP NOT NULL` cho `knowledge_ingestion_job.version_id` và `knowledge_intake.original_id`, thay CHECK trạng thái bằng bản rộng hơn. Đây là rà soát nguồn, chưa chạy các migration này trên một DB trống mới trong phiên này.
+- **Ghi nhận:** hash SHA-256 của `0015…0022` vào `REVIEWED_ADDITIONS` trong `infra/local/rag-fixture/fixture.py` (kèm chú thích người duyệt). Hash trôi hoặc nguồn lạ vẫn bị chặn (các test `source_drift`/`unknown_migration` vẫn đạt). Bản "candidate" lịch sử không đổi.
+- **Cập nhật test:** `rag_fixture/test_guard` và `test_retrieval_scope_migration` ghim đầu chuỗi ở 0012/0013 và tập phụ lục cũ; nay khẳng định đầu là 0022, ba revision 0011–0013 giữ nguyên cha, chuỗi tuyến tính, phụ lục chứa 0011/0012.
+- **Còn đỏ sau bước này:** 2 `test_verifier` (bạn tự duyệt phụ thuộc) và 5–6 `test_m1_*` (sổ cái lịch sử).
