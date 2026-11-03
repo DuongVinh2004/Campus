@@ -469,3 +469,10 @@ Phê duyệt: bạn chọn "Đổi mật khẩu" và "Giữ xfail" khi tôi hỏ
 - **Việc còn lại cho bạn (tùy chọn):** thư mục `rotation-backup-20261103/` chứa mật khẩu cũ (đã vô hiệu). Tôi giữ lại theo nguyên tắc không xóa dữ liệu; bạn có thể xóa khi chắc chắn không cần khôi phục.
 - **`test_m1_*`:** giữ `xfail(strict=False)` theo lựa chọn của bạn.
 - **Trạng thái cuối:** mọi mục trong báo cáo đã được xử lý hoặc có quyết định rõ ràng của bạn.
+
+## Cập nhật cuối 16 (03/11) — kết quả toàn repo sau mọi thay đổi
+Bằng chứng: `pytest-final4-20261103.log` (toàn `tests/` trừ nhóm unified) và `infra/local/unified-ai-completion-20261015-01/checks/backend-10/backend.log` (nhóm unified qua harness đã đăng ký, thư mục kiểm mới), chạy sau khi ghi phê duyệt phụ thuộc, xoay mật khẩu và đánh dấu `xfail`.
+- **Toàn repo (trừ unified):** 4277 đạt, 47 bỏ qua, 5 xfail, **0 đỏ, 0 lỗi** (14 subtest đạt).
+- **Nhóm unified qua harness:** 264 đạt, 0 đỏ.
+- **Khởi đầu của phiên cập nhật test:** 22 đỏ + 32 lỗi thiết lập. Các nguyên nhân đã xử lý: dữ liệu thay đổi hợp lệ (cập nhật test), harness fixture đăng ký, cổng phụ thuộc (bạn duyệt), cổng hash migration (bạn duyệt), chuỗi migration kéo dài (cập nhật test), route giả L-29 (đã gỡ), nhiễm thứ tự (đã sửa), 5 test sổ cái lịch sử (xfail theo lựa chọn của bạn).
+- **Trạng thái cuối của các mục kiểm định:** L-01…L-29 đã xử lý; AU-A25, L-12, L-14, L-27, L-03 có bằng chứng chạy thật; các quyết định chính sách đều có phê duyệt rõ ràng của bạn.
