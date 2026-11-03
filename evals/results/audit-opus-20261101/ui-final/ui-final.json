@@ -1,7 +1,7 @@
 {
  "redirect_after_login": "/chat",
  "localStorage_token": null,
- "history_items": 7,
+ "history_items": 8,
  "history_has_region": 1,
  "restore_error": 0,
  "restored_articles": 2,
@@ -17,11 +17,11 @@
  ],
  "mobile_horizontal_scroll": false,
  "dark_button_contrast": 10.4,
- "draft_items": 3,
+ "draft_items": 4,
  "draft_snippets": [
-  "[Kiểm định 01/11] Em cần hướng dẫn thủ tục bảo lưu kết quả h",
   "Kiểm định 2026-11-01: nháp thử, không gửi trường.",
-  "Kiểm tra bản hợp nhất: chuẩn bị nội dung hỏi về thủ tục học "
+  "[Kiểm định 01/11] Em cần hướng dẫn thủ tục bảo lưu kết quả h",
+  "Kiểm định 2026-11-01: nháp thử, không gửi trường."
  ],
  "draft_form_in_view": true,
  "expired_login_links": 1,
