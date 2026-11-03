@@ -1,0 +1,97 @@
+"""Fourth RRF input, original-query isolation and legacy compatibility."""
+from dataclasses import replace
+
+import pytest
+
+from campus247.rag_v2.retrieval import hybrid
+from campus247.rag_v2.types import Scope, Unit
+from campus247.rag_v2.understanding.analyze import analyze
+
+
+class Index:
+    def __init__(self, query, lexical, vector, focused=(), anchored=()):
+        self.query = query
+        self.rows = lexical, vector, focused, anchored
+        self.units = {uid: Unit(uid, (uid,), uid, "v", "title", "so_tay",
+                               "table_row", uid, 25, uid,
+                               scope=Scope(cohorts=("K65",)) if uid == "forbidden" else Scope())
+                      for rows in self.rows for uid, _ in rows}
+        self.calls = []
+
+    def get(self, uid):
+        return self.units.get(uid)
+
+    def all_ids(self):
+        return tuple(self.units)
+
+    def lexical(self, query, limit, *, allowed):
+        self.calls.append(("lexical", query, limit, allowed))
+        rows = self.rows[0 if query == self.query else 2]
+        return [r for r in rows if r[0] in allowed][:limit]
+
+    async def vector(self, query, limit, *, allowed):
+        self.calls.append(("vector", query, limit, allowed))
+        return [r for r in self.rows[1] if r[0] in allowed][:limit]
+
+    def anchored(self, query, limit, *, allowed):
+        self.calls.append(("anchored", query, limit, allowed))
+        return [r for r in self.rows[3] if r[0] in allowed][:limit]
+
+
+def understanding(query):
+    return replace(analyze("Quy định học phí K64", ()), search_query=query)
+
+
+@pytest.mark.asyncio
+async def test_focused_branch_lifts_distant_row_without_extra_vector_or_changed_ranks(monkeypatch):
+    query = "Ngành Logistics đô thị do khoa nào quản lý, bằng gì?"
+    lexical = [(f"row-{i:02}", 100 - i) for i in range(30)] + [("target", 1)]
+    vector = lexical[-2:-1]
+    index = Index(query, lexical, vector, [("target", 1), ("forbidden", 1)])
+    monkeypatch.setattr(hybrid, "FOCUSED_LEXICAL", False)
+    off = await hybrid.retrieve(understanding(query), index, None, rerank_deadline_s=0)
+    assert "target" not in [c.unit_id for c in off.candidates]
+    index.calls.clear()
+    monkeypatch.setattr(hybrid, "FOCUSED_LEXICAL", True)
+    on = await hybrid.retrieve(understanding(query), index, None, rerank_deadline_s=0)
+    assert "target" in [c.unit_id for c in on.candidates][:hybrid.PACK_WINDOW]
+    target = next(c for c in on.candidates if c.unit_id == "target")
+    assert target.lexical_rank == 31 and target.vector_rank is None
+    assert target.fused_score == pytest.approx(1 / (hybrid.RRF_K + 31) + 1 / (hybrid.RRF_K + 1))
+    assert [(kind, q) for kind, q, _, _ in index.calls] == [
+        ("lexical", query), ("lexical", hybrid.focused_query(query)),
+        ("vector", query), ("anchored", query)]
+    assert all("forbidden" not in allowed for _, _, _, allowed in index.calls)
+
+
+@pytest.mark.parametrize("query", ["học phí K64", "  học phí K64  ", "xin gì?", "em học", "nào K64"])
+@pytest.mark.asyncio
+async def test_unchanged_or_short_focused_query_skips_branch_and_preserves_result(query, monkeypatch):
+    rows = [("a", 1), ("b", 0.5)]
+    index = Index(query, rows, rows)
+    monkeypatch.setattr(hybrid, "FOCUSED_LEXICAL", False)
+    off = await hybrid.retrieve(understanding(query), index, None, rerank_deadline_s=0)
+    index.calls.clear()
+    monkeypatch.setattr(hybrid, "FOCUSED_LEXICAL", True)
+    on = await hybrid.retrieve(understanding(query), index, None, rerank_deadline_s=0)
+    assert on == off
+    assert [kind for kind, *_ in index.calls].count("lexical") == 1
+
+
+@pytest.mark.asyncio
+async def test_disabled_flag_matches_three_branch_rrf_and_original_rank_metadata(monkeypatch):
+    query = "Điều kiện bảo lưu là gì?"
+    index = Index(query, [("a", 1e9), ("b", 1)], [("c", 1), ("b", 0.1)],
+                  [("c", 100)], [("c", 1)])
+    monkeypatch.setattr(hybrid, "FOCUSED_LEXICAL", False)
+    result = await hybrid.retrieve(understanding(query), index, None, rerank_deadline_s=0)
+    assert [(c.unit_id, c.lexical_rank, c.vector_rank) for c in result.candidates] == [
+        ("c", None, 1), ("b", 2, 2), ("a", 1, None)]
+    assert [c.fused_score for c in result.candidates] == pytest.approx([2 / 61, 2 / 62, 1 / 61])
+    assert [kind for kind, *_ in index.calls].count("lexical") == 1
+
+
+def test_focused_query_keeps_numbers_codes_and_all_non_filler_words():
+    assert hybrid.focused_query("Xin hỏi, học phí 580.500 924/QĐ-ĐHXDHN K64 là gì?") == (
+        "học phí 580.500 924/QĐ-ĐHXDHN K64")
+    assert hybrid.focused_query("học phí 924/QĐ-ĐHXDHN") == "học phí 924/QĐ-ĐHXDHN"

@@ -556,3 +556,19 @@ Trạng thái cuối = mã đã push (`85cc2a1f8`), API 8015 khởi động lạ
 - **Toàn repo trên mã cuối (sau W13):** `tests/` trừ unified: **4293 đạt, 47 bỏ qua, 5 xfail, 0 đỏ** (`pytest-final9-20261103.log`); nhóm unified qua harness (`checks/backend-11`): **264 đạt**; vitest 414/414 và `tsc` sạch (lượt kiểm trước, web không đổi); API 8015 `warm=ready`.
 - **AU-A23 ("Ngành Logistics đô thị do khoa nào quản lý, bằng gì?") — kết luận cuối: hành vi thận trọng đúng, không ép sửa.** Ngữ cảnh gửi mô hình chỉ có kế hoạch giảng dạy ngành, ghi "Người lập: Trưởng khoa Cầu đường, Trưởng phòng Quản lý Đào tạo". Đó là người lập kế hoạch, nên suy ra "khoa Cầu đường quản lý ngành" là một bước suy diễn; việc mô hình nêu bằng cấp mà không khẳng định khoa phù hợp quy tắc "không đoán phần nguồn thiếu". Bằng chứng trực tiếp là dòng "29 Logistics đô thị Cầu Đường Cử nhân" của bảng ngành trang 25, mà truy hồi không đưa vào top 80 kể cả sau khi tách dòng (W12, đã hoàn tác). Ép mô hình suy diễn từ chữ ký sẽ đánh đổi độ tin cậy lấy một ca, nên không làm. Muốn trả lời đủ cần cải thiện truy hồi cho bảng dạng này (ví dụ truy vấn mở rộng theo "khoa/bằng"), một hạng mục riêng cần đo dev136.
 - **Trạng thái cuối của mọi mục:** L-01…L-30, L-12, L-14, L-27, L-03, AU-A25, INJ-06 đã xử lý và kiểm lại; còn lại duy nhất AU-A23 như trên.
+
+## Cập nhật cuối 25 (04/11) — AU-A23: bốn thí nghiệm có đo, không áp dụng; kết luận cuối
+Bằng chứng: các lượt quét ngoại tuyến 477 ca (vector thật 18081, 0 lời gọi trả phí) trên cùng bộ ca và cùng tiêu chí "mọi dữ kiện bắt buộc có trong ngữ cảnh gửi mô hình" (đường cơ sở `w12-embedded2-sweep.json`: 281/477, dev 262, audit 19); mã W14 và test của nó lưu trong `w14-shelved/` (diff + `.txt`).
+
+| Thí nghiệm | Facts-in-context | Được / mất so với cơ sở | Dòng "29 Logistics đô thị…" vào ngữ cảnh |
+|---|---|---|---|
+| Ghim BM25 (đang chạy, cơ sở) | 281 | — | không |
+| Làm sạch truy vấn BM25 toàn cục (bỏ từ hỏi) | 279 | +2 / −4 | không |
+| Tách dòng bảng (W12) | 281 | 0 / 0 | không |
+| Tách dòng + nhánh từ vựng tập trung bổ sung (W14, tập từ lọc đúng dấu) | 281 | +4 / −4 | không (thứ hạng BM25 thật 330) |
+| Như trên + chỉ mục dòng bảng bằng "tên tài liệu + nội dung" (bỏ đường dẫn) (W15, thử nghiệm tại script quét) | 284 | +7 / −4 | **không** |
+
+- **Phát hiện kỹ thuật:** chỉ mục từ vựng đánh `tên tài liệu + đường dẫn + nội dung` cho mọi đơn vị. Với một dòng bảng ngắn, đường dẫn ("… trang 25 · chars 0:1409 > Dòng 181") làm loãng điểm (hạng 331; chỉ nội dung thì ~14). Nhưng dù dòng đích lên hạng ~14 ở nhánh tập trung, nó vẫn nằm dưới ngưỡng đưa vào cửa sổ đóng gói (12 ứng viên, 6 dòng đầu): mỗi nhánh RRF chỉ đóng góp tối đa ~1/74 và nhánh vector xếp nó thấp. Để ép vào ngữ cảnh cần thêm một núm chỉnh (ghim nhánh tập trung với ngưỡng ≥ 14) có rủi ro hồi quy rõ ràng.
+- **Quyết định: không áp dụng bất kỳ thí nghiệm nào.** Lý do: không thí nghiệm nào đưa dòng đích vào ngữ cảnh (mục tiêu duy nhất); lợi ích phụ ở W15 chỉ +3/477 (7 được, 4 mất) và đòi nâng phiên bản bộ tách (`structural-spans-v3`, làm `embedded2` không đọc được), dựng và chuyển sang chỉ mục mới, cộng đo lại dev136 thật (~500 lời gọi trả phí) cho một cải thiện nhỏ, không phải mục tiêu. Đã hoàn tác mã (`tables.py`, `units.py`, `hybrid.py` về HEAD), `embedded2` nguyên vẹn (hash manifest không đổi), API 8015 không đổi.
+- **Hiện vật còn lại:** `data/rag_v2_index/embedded3` (chỉ mục thử W14, 4 tệp, không dùng; xóa được khi bạn đồng ý), `embed-cache.jsonl` có thêm vector của các dòng bảng mới (chỉ nối thêm).
+- **Kết luận AU-A23:** không phải lỗi sản phẩm cần sửa ngay. Ngữ cảnh đã có đủ dữ kiện qua chương trình học (chữ ký "Người lập: Trưởng khoa Cầu đường"), mô hình thận trọng không suy diễn khoa từ chữ ký. Cải thiện thật cần thiết kế truy hồi cho bảng dạng này (ví dụ nhánh riêng cho bảng tra cứu ngành–khoa–bằng với kiểm chứng riêng), một dự án riêng có đo dev136; số liệu thử nghiệm ở trên là đầu vào cho dự án đó.
