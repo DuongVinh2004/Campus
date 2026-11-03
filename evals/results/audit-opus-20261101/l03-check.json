@@ -1,0 +1,163 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793706766.027837,
+ "wall_seconds": 10.026437282562256,
+ "paid_calls": 4,
+ "ledger_before": 74515,
+ "ledger_after": 74519,
+ "records": [
+  {
+   "case_id": "AU-A01",
+   "question": "Cho em hỏi lớp học online được chiếm tối đa bao nhiêu phần trăm chương trình đào tạo chính quy ạ?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04265209997538477,
+   "first_content_seconds": 9.158,
+   "started_at": 1793706766.0343065,
+   "conversation_id": "01a1a141-2ed6-7ad1-8b7f-5bca2ff1e925",
+   "timeline": [
+    [
+     "message.started",
+     0.043
+    ],
+    [
+     "message.delta",
+     9.158
+    ],
+    [
+     "message.delta",
+     9.158
+    ],
+    [
+     "message.delta",
+     9.159
+    ],
+    [
+     "message.delta",
+     9.159
+    ],
+    [
+     "message.delta",
+     9.16
+    ],
+    [
+     "message.delta",
+     9.16
+    ],
+    [
+     "message.delta",
+     9.161
+    ],
+    [
+     "message.delta",
+     9.161
+    ],
+    [
+     "message.delta",
+     9.162
+    ],
+    [
+     "message.delta",
+     9.163
+    ],
+    [
+     "message.delta",
+     9.163
+    ],
+    [
+     "message.delta",
+     9.164
+    ],
+    [
+     "message.delta",
+     9.164
+    ],
+    [
+     "message.delta",
+     9.165
+    ],
+    [
+     "message.delta",
+     9.166
+    ],
+    [
+     "message.delta",
+     9.166
+    ],
+    [
+     "message.delta",
+     9.167
+    ],
+    [
+     "message.delta",
+     9.167
+    ],
+    [
+     "message.delta",
+     9.168
+    ],
+    [
+     "message.delta",
+     9.168
+    ],
+    [
+     "message.delta",
+     9.169
+    ],
+    [
+     "message.delta",
+     9.17
+    ],
+    [
+     "message.delta",
+     9.17
+    ],
+    [
+     "citation.added",
+     9.49
+    ],
+    [
+     "message.completed",
+     9.587
+    ]
+   ],
+   "final": {
+    "message_id": "01a1a141-2ef7-72d0-97b8-97c51600b017",
+    "conversation_id": "01a1a141-2ed6-7ad1-8b7f-5bca2ff1e925",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Đối với đào tạo theo hình thức chính quy và vừa làm vừa học, tối đa 30% tổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a1a141-5290-7e54-8bb7-9af62baa2ab4",
+       "source_id": "253eb450-c57a-79a7-84a4-b0d85e12de1c",
+       "document_version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+       "chunk_id": "01a17057-0d62-76af-8733-fb90d72a2762",
+       "source_title": "Quy chế đào tạo HUCE — Quyết định 1486 ngày 06/11/2023",
+       "canonical_uri": "https://drive.google.com/file/d/1vyhUdenpbRKFC_hlFIgnh5oyEz56s8sF/preview?",
+       "version_label": "verified-effective-01a17057-0cbd-7504-a63c-b4c0ca345694",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Quy chế 1486 — Điều 8, khoản 2 — PDF 10",
+        "page_start": 10,
+        "page_end": 10
+       },
+       "quote": "tổ chức các lớp học phương thức trực tuyến khi đáp ứng các quy\nđịnh về ứng dụng công nghệ thông tin trong quản lý và tổ chức đào tạo qua mạng:\ncó các giải pháp bảo đảm chất lượng và minh chứng về chất lượng tổ chức lớp học\nphương thức trực tuyến không thấp hơn chất lượng lớp học phương thức trực tiếp;\n\nb) Đối với đào tạo theo hình thức chính quy và vừa làm vừa học, tối đa 30%\ntổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến.\nTrong trường hợp thiên tai, dịch bệnh",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "6e2d5044b4308a73e85ab30059d232a37fac1bed3306a98ceedcc11b305c7dd6",
+       "unit_id": "96425620e206054d"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Đối với đào tạo theo hình thức chính quy và vừa làm vừa học, tối đa 30% tổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến. [CIT-001]",
+   "seconds": 9.586847099999432,
+   "user": 0
+  }
+ ]
+}

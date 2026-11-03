@@ -461,3 +461,11 @@ Phê duyệt: bạn trả lời "oke duyệt, dùng codex để làm" sau khi c�
 - Ba lỗi "lock drift"/"== pin" trước đó không phải lệch thật: chúng là hệ quả của việc phê duyệt cũ không khớp, khiến 4 pin OpenTelemetry `0.66b0` bị loại khỏi bản đồ khai báo. Khi phê duyệt khớp, 31 khai báo production và 9 dev khớp metadata trong `uv.lock`.
 - Các test phủ định vẫn đạt: số gói sai, byte `uv.lock` trôi, tự duyệt ứng viên khác đều bị từ chối.
 - **Kết quả:** hai test `test_verifier` đã xanh. Mục duy nhất còn mở: L-03 (đổi mật khẩu, bạn bảo kệ).
+
+## Cập nhật cuối 15 (03/11) — L-03 đã xử lý; giữ xfail cho `test_m1_*`
+Phê duyệt: bạn chọn "Đổi mật khẩu" và "Giữ xfail" khi tôi hỏi trực tiếp. Mật khẩu mới không được in ra ở bất kỳ đâu.
+- **L-03 (mật khẩu student-local):** script `rotate_student.py` (trong thư mục tạm của phiên) đã (1) kiểm hàm băm scrypt (n=16384, r=8, p=1) bằng mật khẩu cũ trước khi đổi, (2) sao lưu hai tệp vào `infra/local/knowledge-platform-20261023/rotation-backup-20261103/`, (3) sinh mật khẩu ngẫu nhiên 24 ký tự, muối 16 byte và khoá ký 32 byte mới, ghi vào `student-credentials.json` và `student-identity.json` (mọi trường khác giữ nguyên), (4) tự xác minh sau khi ghi.
+- **Bằng chứng sau khi khởi động lại API 8015:** đăng nhập bằng mật khẩu mới → 200, có cookie, gọi `/v1/assistant/conversations` → 200; mật khẩu cũ → 401; khoá ký và muối đã đổi nên mọi phiên/cookie ký bằng khoá cũ không còn hợp lệ. Quét nội dung `evals`, `tests`, `scripts`, `docs`, `.claude`, `services`, `apps/web`, `.playwright-mcp` và thư mục bộ nhớ của Claude: mật khẩu cũ chỉ từng có trong chính tệp thông tin đăng nhập.
+- **Việc còn lại cho bạn (tùy chọn):** thư mục `rotation-backup-20261103/` chứa mật khẩu cũ (đã vô hiệu). Tôi giữ lại theo nguyên tắc không xóa dữ liệu; bạn có thể xóa khi chắc chắn không cần khôi phục.
+- **`test_m1_*`:** giữ `xfail(strict=False)` theo lựa chọn của bạn.
+- **Trạng thái cuối:** mọi mục trong báo cáo đã được xử lý hoặc có quyết định rõ ràng của bạn.
