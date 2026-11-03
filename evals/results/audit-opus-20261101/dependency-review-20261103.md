@@ -159,3 +159,15 @@ Tạo bởi `scripts/verify_dependencies.py` + `uv.lock`; KHÔNG phải phê duy
 
 ## Sau khi bạn duyệt
 Cập nhật `APPROVED_CANDIDATE_SHA256`, `APPROVED_ADDITIONAL_PACKAGE_COUNT` và tham chiếu phê duyệt trong `scripts/verify_dependencies.py` (hoặc nhắn để tôi ghi theo đúng quyết định của bạn), rồi chạy `tests/unit/dependency_resolution/test_verifier.py`.
+
+## Kiểm tra sáu gói có tên lạ (PyPI JSON API, chỉ đọc, 2026-11-03)
+| gói | phiên bản | người phát hành (theo PyPI) | repo/nguồn | số bản | hash trong `uv.lock` khớp tệp trên PyPI |
+|---|---|---|---|---|---|
+| `httpx2` | 2.13.1 | Tom Christie | github.com/pydantic/httpx2 | 22 (từ 2026-05-11) | có (2/2) |
+| `httpcore2` | 2.13.1 | Tom Christie | pydantic/httpx2 (src/httpcore2) | 22 | có (2/2) |
+| `httpx2-jsfetch` | 1.0 | Hood Chatham | — | 2 (từ 2026-08-05) | có (2/2) |
+| `py-cpuinfo2` | 10.1.1 | Matthew Brennan Jones, Aarni Koskela | — | 3 (từ 2026-03-25) | có (2/2) |
+| `ast-serialize` | 0.12.1 | Jukka Lehtosalo (mypy) | — | 23 | có (37/37) |
+| `librt` | 0.16.0 | Jukka Lehtosalo, Ivan Levkivskyi (mypy) | — | 33 | có (32/32) |
+
+Kết luận: người phát hành khớp với người bảo trì dự án gốc (httpx, mypy, py-cpuinfo), và các tệp bị khoá đúng là tệp đang được phân phối trên PyPI. Siêu dữ liệu PyPI do người phát hành tự khai nên đây là tín hiệu tốt, không phải bằng chứng tuyệt đối; `httpx2-jsfetch` và `py-cpuinfo2` mới và ít bản, nên đáng xem kỹ hơn. Quyết định duyệt vẫn là của bạn.
