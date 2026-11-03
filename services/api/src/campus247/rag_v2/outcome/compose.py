@@ -24,6 +24,9 @@ REFUSAL_MESSAGES = {
 PARTIAL_NOTE = "Mình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ."
 TRANSIENT_MESSAGE = "Mình đang gặp lỗi kết nối khi kiểm tra thông tin."
 RETRY_HINT = "Bạn vui lòng thử lại sau ít phút."
+# The turn ran out of its time budget while checking sources; nothing unverified is shown.
+TIMEOUT_MESSAGE = "Câu hỏi này cần đối chiếu nhiều nguồn nên mình chưa kịp xác minh xong trong thời gian cho phép."
+TIMEOUT_HINT = "Bạn thử hỏi từng ý riêng, hoặc hỏi lại sau ít phút."
 
 
 def build_outcome(

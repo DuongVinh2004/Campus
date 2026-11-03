@@ -14,7 +14,7 @@ from campus247.rag_v2.generation.generate import clarification_question, generat
 from campus247.rag_v2.generation.packing import pack_context
 from campus247.rag_v2.ingest.units import context_text, source_text
 from campus247.rag_v2.observability.trace import TurnTrace, emit
-from campus247.rag_v2.outcome.compose import build_outcome
+from campus247.rag_v2.outcome.compose import TIMEOUT_HINT, TIMEOUT_MESSAGE, build_outcome
 from campus247.rag_v2.retrieval.hybrid import retrieve, scope_allows
 from campus247.rag_v2.verification.venue import venue_conflict
 from campus247.rag_v2.types import Fact, Outcome, Statement
@@ -346,4 +346,6 @@ class RagV2Service:
             logging.getLogger("campus247.rag_v2").warning("rag_v2_failure kind=%s where=%s detail=%s", type(exc).__name__,
                 exc.__traceback__.tb_next.tb_frame.f_code.co_name if exc.__traceback__ and exc.__traceback__.tb_next else "?",
                 str(getattr(getattr(exc, "response", None), "status_code", "")))
+            if isinstance(exc, TimeoutError):
+                return await finish(Outcome("transient_error", TIMEOUT_MESSAGE, retry_hint=TIMEOUT_HINT))
             return await finish(build_outcome(u, infra_error=True))

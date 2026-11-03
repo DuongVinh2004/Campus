@@ -93,3 +93,22 @@ async def test_unparseable_generation_is_a_transient_error_not_unverified():
     result = await answer(gateway=Garbage())
     assert result.kind == "transient_error"
 
+
+
+class TimesOut(FakeGateway):
+    async def generate(self, request):
+        if request.request_id == "rag_v2_generation":
+            self.requests.append(request)
+            raise TimeoutError
+        return await super().generate(request)
+
+
+@pytest.mark.asyncio
+async def test_running_out_of_time_says_so_and_a_real_outage_still_says_connection_error():
+    from campus247.rag_v2.outcome.compose import TIMEOUT_HINT, TIMEOUT_MESSAGE, TRANSIENT_MESSAGE
+    slow = await answer(gateway=TimesOut())
+    assert slow.kind == "transient_error" and not slow.citations and not slow.statements
+    assert slow.text == TIMEOUT_MESSAGE and slow.retry_hint == TIMEOUT_HINT
+    assert "lỗi kết nối" not in slow.text
+    outage = await answer(index=Down(), gateway=FakeGateway())
+    assert outage.kind == "transient_error" and outage.text == TRANSIENT_MESSAGE

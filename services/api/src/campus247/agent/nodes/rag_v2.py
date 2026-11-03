@@ -18,7 +18,7 @@ from campus247.application.retrieval.evidence_gate import GroundedClaim
 from campus247.rag_v2.adapters.runtime import AuthorizedIndex
 from campus247.rag_v2.discipline import discipline_failure
 from campus247.rag_v2.ingest.units import source_text
-from campus247.rag_v2.outcome.compose import RETRY_HINT, TRANSIENT_MESSAGE
+from campus247.rag_v2.outcome.compose import RETRY_HINT, TIMEOUT_HINT, TIMEOUT_MESSAGE, TRANSIENT_MESSAGE
 from campus247.rag_v2.retrieval.hybrid import rerank_excerpt
 from campus247.rag_v2.types import Outcome
 from campus247.rag_v2.understanding.normalize import fold
@@ -256,6 +256,9 @@ class RagV2Node:
             import logging
             logging.getLogger("campus247.rag_v2").warning("rag_v2_node_failure kind=%s elapsed_ms=%d",
                 type(exc).__name__, int((monotonic() - started) * 1000))
+            if isinstance(exc, TimeoutError):
+                return self.map_outcome(state, Outcome("transient_error", TIMEOUT_MESSAGE,
+                    retry_hint=TIMEOUT_HINT), {})
             return self.map_outcome(state, Outcome("transient_error", TRANSIENT_MESSAGE,
                 retry_hint=RETRY_HINT), {})
 
