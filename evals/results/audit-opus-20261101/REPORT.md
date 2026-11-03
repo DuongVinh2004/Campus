@@ -439,3 +439,11 @@ Phê duyệt: bạn chọn "Duyệt và ghi hash" sau khi tôi báo kết quả 
 - **Ghi nhận:** hash SHA-256 của `0015…0022` vào `REVIEWED_ADDITIONS` trong `infra/local/rag-fixture/fixture.py` (kèm chú thích người duyệt). Hash trôi hoặc nguồn lạ vẫn bị chặn (các test `source_drift`/`unknown_migration` vẫn đạt). Bản "candidate" lịch sử không đổi.
 - **Cập nhật test:** `rag_fixture/test_guard` và `test_retrieval_scope_migration` ghim đầu chuỗi ở 0012/0013 và tập phụ lục cũ; nay khẳng định đầu là 0022, ba revision 0011–0013 giữ nguyên cha, chuỗi tuyến tính, phụ lục chứa 0011/0012.
 - **Còn đỏ sau bước này:** 2 `test_verifier` (bạn tự duyệt phụ thuộc) và 5–6 `test_m1_*` (sổ cái lịch sử).
+
+## Cập nhật cuối 12 (03/11) — AU-A25 (câu hỏi kỷ luật gốc) đã trả lời đúng
+Bằng chứng: chạy thật trên 8015 (nhiều lần lặp), bộ chấm chung cho 6 ca kỷ luật của dev, test tự động. Không nới bước kiểm nào.
+- **Nguyên nhân còn lại của AU-A25:** nguồn đã được xác nhận (L-12) nhưng câu trả lời của bộ sinh dùng từ ngữ ngoài nguồn nên `word_not_in_source` từ chối. Bước kiểm từ giữ nguyên có chủ đích; chỉ sửa cách bộ sinh viết.
+- **Sửa:** thêm vào `rag_v2/generation/prompt.py` một câu: chỉ khi chính câu hỏi hỏi về kỷ luật (ai ký/ra quyết định, hình thức, mức, thủ tục) thì phát biểu về kỷ luật phải chép nguyên cụm từ của nguồn. Bản đầu (áp dụng cho mọi câu có chữ "kỷ luật") quá rộng, nên đã thu hẹp.
+- **Kết quả:** AU-A25 gốc → "Trong quy trình kỷ luật sinh viên, Hiệu trưởng ký quyết định [CIT-001]", 2/2 lần chạy với bản thu hẹp. R2-Q1-0056 (dev) từ từ chối thành đủ ý, 2/2 lần. R2-Q2-0025 giữ nguyên thiếu ý. R2-Q1-0054 và R2-Q2-0028 dao động giữa các lượt chạy ngay cả trước thay đổi này (đã thấy trong các lượt dev136 trước), nên coi là phương sai của mô hình. Các ca dữ liệu cá nhân AU-P01/P02/P05 và AU-P06 vẫn từ chối. rag_v2 + unit/agent + architecture: 972 đạt, 0 đỏ.
+- **Giới hạn:** chỉ là bộ sinh chép sát nguồn hơn; câu hỏi kỷ luật diễn đạt khác vẫn có thể bị từ chối an toàn (ví dụ một cách hỏi trong biến thể vẫn từ chối).
+- **`test_m1_*` (5 + 1):** kiểm tra đã đọc: test ghim bộ đếm lịch sử của sổ cái trả phí (133, 9477104) và khẳng định "không đặt lại sổ cái hiện có"; sổ cái nay đã tăng nên chúng không thể khớp lại. Giữ nguyên làm bằng chứng lịch sử; đổi chúng là đổi bằng chứng đã duyệt.
