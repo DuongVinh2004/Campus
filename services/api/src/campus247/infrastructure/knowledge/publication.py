@@ -2,6 +2,7 @@
 import json
 import re
 from html.parser import HTMLParser
+from time import monotonic
 from urllib.parse import urlsplit
 
 from campus247.application.knowledge.platform_models import digest
@@ -16,6 +17,15 @@ _STEM_ACQUISITION = "infra/local/huce-completion-20261025-02/stem-publication-ac
 _STEM_ACQUISITION_SHA256 = "5e987a7c79c488bce2c0e610fde964593e2abad903f55b31b6ce0124b4359bbf"
 _HANDBOOK_ACQUISITION = "infra/local/huce-completion-20261102-01/handbook-publication-acquisition-01.json"
 _HANDBOOK_ACQUISITION_SHA256 = "8cfa1cc2ebfdac86f1355d07e163a6fc42f8249ad0b8f1b0de7ff4966288788c"
+
+ATTACHMENT_CACHE_TTL_SECONDS = 30
+ATTACHMENT_CACHE_MAX_ENTRIES = 512
+_attachment_cache = {}
+
+
+def clear_attachment_cache():
+    """Discard memoized attestations, including negative results."""
+    _attachment_cache.clear()
 
 
 def same_flipbook_pdf(published, canonical, viewer):
@@ -58,6 +68,26 @@ class _Links(HTMLParser):
 
 
 async def verified_attachment(platform, conn, row, release_id):
+    """Reuse an identical platform-scoped attestation for at most 30 seconds."""
+    key = (id(platform), str(platform.storage.workspace.resolve()), platform.repo.tenant,
+           row.get("id"), row["content_checksum"], row["document_version_id"], release_id,
+           row["canonical_uri"], row["source_id"], row["content_text"])
+    started = monotonic()
+    cached = _attachment_cache.get(key)
+    if cached is not None and started - cached[0] < ATTACHMENT_CACHE_TTL_SECONDS:
+        return cached[1]
+    _attachment_cache.pop(key, None)
+    result = await _verify_attachment(platform, conn, row, release_id)
+    # Keep the platform alive with its entry so its identity cannot be reused.
+    # Insert only after successful completion: exceptions are never memoized.
+    _attachment_cache.pop(key, None)
+    if len(_attachment_cache) >= ATTACHMENT_CACHE_MAX_ENTRIES:
+        _attachment_cache.pop(next(iter(_attachment_cache)))
+    _attachment_cache[key] = (started, result, platform)
+    return result
+
+
+async def _verify_attachment(platform, conn, row, release_id):
     """Unknown/missing acquisition stays unverified; ordinary evidence still works.
 
     Publication is additional provenance, never publication approval. Caller has
