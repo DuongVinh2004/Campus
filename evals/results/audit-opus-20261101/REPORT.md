@@ -454,3 +454,10 @@ Bằng chứng: chạy thật trên 8015 (nhiều lần lặp), bộ chấm chun
 - **Phát hiện cần bạn kiểm (chuỗi cung ứng):** `httpx2`, `httpcore2`, `httpx2-jsfetch` (do `openai`/`langsmith` kéo vào), `py-cpuinfo2` (do `pytest-benchmark`), `ast-serialize`, `librt` (do `mypy`) có tên giống gói phổ biến. Tất cả lấy từ pypi.org và được gói quen thuộc yêu cầu, nhưng tôi không kiểm được trên mạng xem có phải bản chính chủ. Nên xác minh trên PyPI trước khi duyệt.
 - **Còn mở:** 2 `test_verifier` (chờ bạn duyệt) và L-03 (bạn bảo kệ).
 - **Bổ sung (03/11):** đã kiểm sáu gói có tên lạ trên PyPI. Người phát hành khớp người bảo trì dự án gốc (httpx/pydantic, mypy, py-cpuinfo), và mọi hash trong `uv.lock` khớp tệp trên PyPI. Chi tiết trong `dependency-review-20261103.md`. Duyệt vẫn chờ bạn.
+
+## Cập nhật cuối 14 (03/11) — phê duyệt phụ thuộc đã ghi (Codex W11)
+Phê duyệt: bạn trả lời "oke duyệt, dùng codex để làm" sau khi có bảng rà soát `dependency-review-20261103.md`. Bằng chứng: diff so với bản sao lưu trước W11 (`fix-backup/*.pre-W11`), `scripts/verify_dependencies.py` thoát 0, `tests/unit/dependency_resolution` 34 đạt + 14 subtest.
+- Codex chỉ đổi `APPROVAL_REFERENCE` → `DIRECT-HUMAN-2026-11-03-STACK-002`, `APPROVED_CANDIDATE_SHA256` → sha256 của `uv.lock` hiện tại (`251e0a8f…ce46`, không đổi trước/sau), `APPROVED_ADDITIONAL_PACKAGE_COUNT` 132 → 133, chú thích, và hai trường tương ứng trong `[tool.campus247.dependency-approval]` của `pyproject.toml`. Không chạy `uv lock`/cài đặt; quy tắc cổng, allowlist, `APPROVED_OTEL_PRERELEASES` và test không đổi.
+- Ba lỗi "lock drift"/"== pin" trước đó không phải lệch thật: chúng là hệ quả của việc phê duyệt cũ không khớp, khiến 4 pin OpenTelemetry `0.66b0` bị loại khỏi bản đồ khai báo. Khi phê duyệt khớp, 31 khai báo production và 9 dev khớp metadata trong `uv.lock`.
+- Các test phủ định vẫn đạt: số gói sai, byte `uv.lock` trôi, tự duyệt ứng viên khác đều bị từ chối.
+- **Kết quả:** hai test `test_verifier` đã xanh. Mục duy nhất còn mở: L-03 (đổi mật khẩu, bạn bảo kệ).
