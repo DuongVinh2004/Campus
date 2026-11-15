@@ -32,8 +32,12 @@ from knowledge_platform import (
     connection,
     retain,
 )
+from runtime_profile import ProfileError, check_memory, load_profile
 
 FRONTEND = None
+# The launcher starts exactly one API process today. Profiles may declare more (cloud does); step 1.8 adds the app
+# factory that makes N workers possible, and raises this together with local.toml.
+SUPPORTED_API_WORKERS = 1
 HIDDEN = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 RAG_V2_INDEX = "data/rag_v2_index/embedded2"
 
@@ -263,11 +267,15 @@ def frontend_ready():
     return True
 
 
-def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RAG_V2_INDEX):
+def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RAG_V2_INDEX, profile="local"):
     if os.name != "nt":
         raise RuntimeError("This retained runtime is configured for Windows only")
     if engine not in {"v1", "v2"}:
         raise ValueError("Explicit RAG engine v1 or v2 required")
+    profile = load_profile(profile)
+    if profile.api_workers != SUPPORTED_API_WORKERS:
+        raise RuntimeError(f"Profile '{profile.name}' asks for {profile.api_workers} API workers; this launcher "
+                           f"supports {SUPPORTED_API_WORKERS} until step 1.8")
     index = Path(rag_v2_index)
     index = checked_path(index if index.is_absolute() else ROOT / index, ROOT)
     if engine == "v2" and not index.is_dir():
@@ -280,16 +288,35 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
             raise RuntimeError("Required retained runtime file missing; no bootstrap attempted")
     connection()
     model_identity()
+    rows = process_inventory(frontend)
+    commands = {
+        "frontend": ["scripts/knowledge_platform_frontend.py", "serve", "--name", frontend, "--port", "3015"],
+        "api": ["scripts/knowledge_platform.py", "serve", "--generation", "--port", "8015", "--frontend-port", "3015"],
+        "worker": ["scripts/knowledge_platform.py", "worker", "--worker-heartbeat", None],
+    }
+    if defer_worker:
+        commands.pop("worker")  # Preserve deferred legacy queue without claiming its jobs.
+    # Refuse before anything starts when the components that are not already running do not fit in free memory.
+    to_start = (["postgres"] if not listening(DB_PORT) else []) + [
+        kind for kind in commands if not matching_processes(rows, kind, frontend)]
+    try:
+        needed_mb = check_memory(profile, to_start)
+    except ProfileError as error:
+        raise RuntimeError(str(error)) from None
     scope = checked_path(STATE / ("resume-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%S%f")), ROOT)
     scope.mkdir(exist_ok=False)
+    commands = {kind: [str(scope / "worker-health.jsonl") if item is None else item for item in command]
+                for kind, command in commands.items()}
     report = {"started": {}, "reused": {}, "database_reset": False, "security_policy_changed": False,
-        "worker_deferred": defer_worker, "engine": engine, "rag_v2_index": str(index)}
+        "worker_deferred": defer_worker, "engine": engine, "rag_v2_index": str(index),
+        "profile": profile.name, "memory_estimate_mb": needed_mb}
     try:
         if not listening(DB_PORT):
             with checked_path(scope / "postgres-control.log", ROOT).open("xb") as log:
                 result = subprocess.run([str(PGROOT / "bin/pg_ctl.exe"), "-D", str(CLUSTER),
                     "-l", str(checked_path(scope / "postgres.log", ROOT)), "-o",
-                    "-h 127.0.0.1 -p 55437 -c shared_buffers=128MB -c max_connections=20 -c log_min_error_statement=panic",
+                    f"-h 127.0.0.1 -p 55437 -c shared_buffers={profile.pg_shared_buffers} "
+                    f"-c max_connections={profile.pg_max_connections} -c log_min_error_statement=panic",
                     "-w", "-t", "30", "start"], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
                     creationflags=HIDDEN, check=False)
             if result.returncode:
@@ -297,14 +324,6 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
             report["started"]["postgres"] = True
         report["database"] = asyncio.run(database_identity())
         report["queue"] = asyncio.run(queue_state())
-        rows = process_inventory(frontend)
-        commands = {
-            "frontend": ["scripts/knowledge_platform_frontend.py", "serve", "--name", frontend, "--port", "3015"],
-            "api": ["scripts/knowledge_platform.py", "serve", "--generation", "--port", "8015", "--frontend-port", "3015"],
-            "worker": ["scripts/knowledge_platform.py", "worker", "--worker-heartbeat", str(scope / "worker-health.jsonl")],
-        }
-        if defer_worker:
-            commands.pop("worker")  # Preserve deferred legacy queue without claiming its jobs.
         for kind, command in commands.items():
             existing = matching_processes(rows, kind, frontend)
             port = {"frontend": 3015, "api": 8015}.get(kind)
@@ -346,10 +365,12 @@ def main():
     parser.add_argument("--defer-worker", action="store_true", help="Start/check serving only; preserve the queued legacy documents for later review")
     parser.add_argument("--engine", choices=("v1", "v2"), default="v2", help="Required API engine; never silently reuse a different engine")
     parser.add_argument("--rag-v2-index", default=RAG_V2_INDEX, help="Existing RAG v2 index inside this workspace")
+    parser.add_argument("--profile", default="local", help="Runtime profile in infra/profiles (local or cloud)")
     args = parser.parse_args()
     try:
         if args.command == "start":
-            start(args.frontend_name, defer_worker=args.defer_worker, engine=args.engine, rag_v2_index=args.rag_v2_index)
+            start(args.frontend_name, defer_worker=args.defer_worker, engine=args.engine, rag_v2_index=args.rag_v2_index,
+                  profile=args.profile)
         else:
             args.frontend_name = select_frontend(args.frontend_name)
             model_identity()

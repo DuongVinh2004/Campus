@@ -1,0 +1,19 @@
+# Runtime profile: cloud VM, Linux, 4 vCPU / 8 GB, non-burstable CPU (locked 2026-11-15).
+# Same codebase as local.toml; only these values differ. Not started anywhere yet: phase 2 deploys it.
+name = "cloud"
+
+[api]
+workers = 2
+max_in_flight_per_worker = 16
+provider_concurrency = 24
+
+[postgres]
+shared_buffers = "256MB"
+max_connections = 40
+
+[memory]
+reserve_mb = 768
+postgres_mb = 350
+frontend_mb = 200
+api_worker_mb = 870
+worker_mb = 300

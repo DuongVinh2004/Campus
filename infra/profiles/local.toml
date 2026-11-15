@@ -1,0 +1,26 @@
+# Runtime profile: this Windows machine. Same codebase as cloud.toml; only these values differ.
+# Loaded by scripts/runtime_profile.py. Every key is required; the loader rejects unknown and missing keys.
+name = "local"
+
+[api]
+# Consumed by the launcher from step 1.1. The launcher refuses any value its code cannot honour yet (see
+# SUPPORTED_API_WORKERS in scripts/knowledge_platform_runtime.py). Step 1.8 raises local to 2, then 3 when RAM allows.
+workers = 1
+# Declared now, consumed later: per-worker in-flight turns (step 1.2) and concurrent provider calls (step 1.7).
+max_in_flight_per_worker = 24
+provider_concurrency = 40
+
+[postgres]
+# Identical to the options the launcher used before profiles existed.
+shared_buffers = "128MB"
+max_connections = 20
+
+[memory]
+# Estimated resident memory per component the launcher starts, in MB. Estimates, not guarantees: the API figure is
+# the measured private memory of one worker (about 876 MB); the others are design-document estimates.
+# A component that is already running is reused and is not counted. The check only runs for components to start.
+reserve_mb = 512
+postgres_mb = 350
+frontend_mb = 200
+api_worker_mb = 870
+worker_mb = 300

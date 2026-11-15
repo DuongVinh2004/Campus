@@ -297,6 +297,7 @@ def test_start_passes_explicit_engine_and_index_to_api(monkeypatch, engine, pyth
     monkeypatch.setattr(runtime, "connection", lambda: {})
     monkeypatch.setattr(runtime, "model_identity", lambda: None)
     monkeypatch.setattr(runtime, "listening", lambda port: port == runtime.DB_PORT)
+    monkeypatch.setattr(runtime, "check_memory", lambda profile, components: 0)  # host RAM must not decide this test
     async def empty():
         return {}
     monkeypatch.setattr(runtime, "database_identity", empty)
