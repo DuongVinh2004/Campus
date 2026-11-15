@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import sqlite3
 import tempfile
+import time
 
 from campus247.domain.shared.values import generate_uuid7
 
@@ -46,6 +47,20 @@ class ReservationResult:
     error_code: str | None = None
 
 
+def _enable_wal(connection: sqlite3.Connection, wait_s: float = 30.0) -> None:
+    """WAL needs a file lock that SQLite's busy handler does not wait for, so processes starting together on a fresh
+    file would fail with "database is locked". Retry, and skip once the file is already WAL (the mode is stored in it).
+    A copy of infrastructure/sqlite_wal.py: this layer may not import infrastructure."""
+    deadline = time.monotonic() + wait_s
+    while str(connection.execute("PRAGMA journal_mode").fetchone()[0]).lower() != "wal":
+        try:
+            connection.execute("PRAGMA journal_mode = WAL")
+        except sqlite3.OperationalError as error:
+            if "locked" not in str(error).lower() or time.monotonic() >= deadline:
+                raise
+            time.sleep(0.05)
+
+
 class IdempotencyLedger:
     def __init__(self, database_path: str | Path | None = None, *, environment: str | None = None) -> None:
         configured_path = database_path or os.getenv("CAMPUS247_IDEMPOTENCY_DB")
@@ -66,7 +81,7 @@ class IdempotencyLedger:
         connection = sqlite3.connect(self._database_path, timeout=30, isolation_level=None)
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA busy_timeout = 30000")
-        connection.execute("PRAGMA journal_mode = WAL")
+        _enable_wal(connection)
         connection.execute("PRAGMA synchronous = FULL")
         return connection
 

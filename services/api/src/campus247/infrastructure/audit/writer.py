@@ -13,6 +13,7 @@ import threading
 from typing import Any
 
 from campus247.domain.shared.values import generate_uuid7
+from campus247.infrastructure.sqlite_wal import enable_wal
 
 SENSITIVE_KEY_PATTERNS = {
     "password",
@@ -115,7 +116,7 @@ class AppendOnlyAuditWriter:
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(str(self._database_path), timeout=5, isolation_level=None)
         connection.execute("PRAGMA busy_timeout = 5000")
-        connection.execute("PRAGMA journal_mode = WAL")
+        enable_wal(connection)
         connection.execute("PRAGMA synchronous = FULL")
         return connection
 
