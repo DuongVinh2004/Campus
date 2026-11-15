@@ -40,6 +40,7 @@ FRONTEND = None
 SUPPORTED_API_WORKERS = 1
 HIDDEN = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 RAG_V2_INDEX = "data/rag_v2_index/embedded2"
+GATEWAY_TOKEN = ROOT / "infra/local/public-rag-20261013/gateway-sidecar.token"
 
 
 class EngineMismatch(RuntimeError):
@@ -95,6 +96,7 @@ def process_inventory(frontend=FRONTEND):
     command = (
         "Get-CimInstance Win32_Process | Where-Object { "
         "($_.Name -eq 'python.exe' -and $_.CommandLine -like '*knowledge_platform.py*') "
+        "-or ($_.Name -eq 'python.exe' -and $_.CommandLine -like '*gateway_sidecar.py*') "
         f"-or ($_.Name -eq 'node.exe' -and $_.CommandLine -like '*{frontend}*') "
         "} | Select-Object ProcessId,CommandLine | ConvertTo-Json -Compress"
     )
@@ -114,6 +116,9 @@ def matching_processes(rows, kind, frontend=FRONTEND):
         if kind == "frontend":
             expected = str(frontend_path(frontend)).replace("\\", "/").casefold()
             matches = expected in words and "start" in words and "3015" in words
+        elif kind == "gateway":
+            script = str(ROOT / "scripts/gateway_sidecar.py").replace("\\", "/").casefold()
+            matches = any(word in {script, "scripts/gateway_sidecar.py"} for word in words) and "serve" in words
         else:
             script = str(ROOT / "scripts/knowledge_platform.py").replace("\\", "/").casefold()
             matches = any(word in {script, "scripts/knowledge_platform.py"} for word in words)
@@ -259,6 +264,14 @@ def wait_for(process, check, seconds=35):
     raise RuntimeError("Readiness timeout; inspect retained logs")
 
 
+def gateway_ready(port):
+    response = httpx.get(f"http://127.0.0.1:{port}/health", trust_env=False, timeout=3)
+    response.raise_for_status()
+    if response.json().get("status") != "ok":
+        raise RuntimeError("Gateway sidecar not ready")
+    return True
+
+
 def frontend_ready():
     response = httpx.get("http://127.0.0.1:3015/login", trust_env=False, timeout=3)
     response.raise_for_status()
@@ -291,6 +304,9 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
     rows = process_inventory(frontend)
     commands = {
         "frontend": ["scripts/knowledge_platform_frontend.py", "serve", "--name", frontend, "--port", "3015"],
+        "gateway": ["scripts/gateway_sidecar.py", "serve", "--port", str(profile.gateway_port),
+                    "--concurrency", str(profile.provider_concurrency), "--daily-usd-cap", profile.daily_usd_cap,
+                    "--daily-call-cap", str(profile.daily_call_cap)],
         "api": ["scripts/knowledge_platform.py", "serve", "--generation", "--port", "8015", "--frontend-port", "3015"],
         "worker": ["scripts/knowledge_platform.py", "worker", "--worker-heartbeat", None],
     }
@@ -326,7 +342,7 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
         report["queue"] = asyncio.run(queue_state())
         for kind, command in commands.items():
             existing = matching_processes(rows, kind, frontend)
-            port = {"frontend": 3015, "api": 8015}.get(kind)
+            port = {"frontend": 3015, "api": 8015, "gateway": profile.gateway_port}.get(kind)
             if port is not None and listening(port) and not existing:
                 raise RuntimeError(f"Port {port} belongs to an unrecognized process; listener preserved")
             process = None
@@ -338,7 +354,11 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
                     if kind == "api":
                         environment.update(CAMPUS247_RAG_ENGINE=engine, CAMPUS247_RAG_V2_INDEX=str(index),
                                            CAMPUS247_CHAT_MAX_IN_FLIGHT=str(profile.max_in_flight_per_worker),
-                                           CAMPUS247_RATE_LIMIT_STORE="postgres")
+                                           CAMPUS247_RATE_LIMIT_STORE="postgres",
+                                           # The API holds no provider credential or ledger lease: every model call
+                                           # goes through the gateway sidecar on loopback.
+                                           CAMPUS247_GATEWAY_URL=f"http://127.0.0.1:{profile.gateway_port}",
+                                           CAMPUS247_GATEWAY_TOKEN_FILE=str(GATEWAY_TOKEN))
                         if engine == "v2":
                             vendor = str(checked_path(ROOT / "data/rag_v2_vendor", ROOT))
                             prior = environment.get("PYTHONPATH")
@@ -349,6 +369,8 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
                 report["started"][kind] = process.pid
             if kind == "frontend":
                 wait_for(process, frontend_ready)
+            elif kind == "gateway":
+                wait_for(process, lambda: gateway_ready(profile.gateway_port), seconds=120)
             elif kind == "api":
                 report["release"] = wait_for(process, lambda: api_state(engine=engine), seconds=180)
             else:

@@ -11,9 +11,17 @@ provider_concurrency = 24
 shared_buffers = "256MB"
 max_connections = 40
 
+[gateway]
+# TEMPORARY placeholders so a cloud gateway can never run uncapped. The real daily cap is the owner's decision and
+# must replace these before phase 2 deploys anything.
+port = 8025
+daily_usd_cap = "5.00"
+daily_call_cap = 2000
+
 [memory]
 reserve_mb = 768
 postgres_mb = 350
 frontend_mb = 200
 api_worker_mb = 870
 worker_mb = 300
+gateway_mb = 150

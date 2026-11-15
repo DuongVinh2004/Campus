@@ -10,15 +10,18 @@ import ctypes
 import os
 import tomllib
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 PROFILE_DIR = Path(__file__).resolve().parents[1] / "infra" / "profiles"
-COMPONENTS = ("postgres", "frontend", "api", "worker")
+COMPONENTS = ("postgres", "frontend", "gateway", "api", "worker")
 
 _SCHEMA = {
     "api": {"workers": int, "max_in_flight_per_worker": int, "provider_concurrency": int},
     "postgres": {"shared_buffers": str, "max_connections": int},
-    "memory": {"reserve_mb": int, "postgres_mb": int, "frontend_mb": int, "api_worker_mb": int, "worker_mb": int},
+    "gateway": {"port": int, "daily_usd_cap": str, "daily_call_cap": int},
+    "memory": {"reserve_mb": int, "postgres_mb": int, "frontend_mb": int, "api_worker_mb": int, "worker_mb": int,
+               "gateway_mb": int},
 }
 
 
@@ -39,13 +42,17 @@ class Profile:
     frontend_mb: int
     api_worker_mb: int
     worker_mb: int
+    gateway_mb: int
+    gateway_port: int
+    daily_usd_cap: str
+    daily_call_cap: int
 
     def required_mb(self, components) -> int:
         """Estimated MB needed to start `components` now, including the safety reserve."""
         unknown = set(components) - set(COMPONENTS)
         if unknown:
             raise ValueError(f"unknown component: {sorted(unknown)}")
-        sizes = {"postgres": self.postgres_mb, "frontend": self.frontend_mb,
+        sizes = {"postgres": self.postgres_mb, "frontend": self.frontend_mb, "gateway": self.gateway_mb,
                  "api": self.api_worker_mb * self.api_workers, "worker": self.worker_mb}
         return self.reserve_mb + sum(sizes[item] for item in set(components))
 
@@ -78,9 +85,18 @@ def load_profile(name: str, directory: Path = PROFILE_DIR) -> Profile:
         raise ProfileError("[api] values must be at least 1")
     if pg["max_connections"] < 1:
         raise ProfileError("[postgres] max_connections must be at least 1")
+    gw = data["gateway"]
+    if not 1024 <= gw["port"] <= 65535:
+        raise ProfileError("[gateway] port must be 1024-65535")
+    try:
+        if Decimal(gw["daily_usd_cap"]) < 0:
+            raise ValueError
+    except (InvalidOperation, ValueError):
+        raise ProfileError("[gateway] daily_usd_cap must be a non-negative decimal string (0 = no cap)") from None
     return Profile(name, api["workers"], api["max_in_flight_per_worker"], api["provider_concurrency"],
                    pg["shared_buffers"], pg["max_connections"], mem["reserve_mb"], mem["postgres_mb"],
-                   mem["frontend_mb"], mem["api_worker_mb"], mem["worker_mb"])
+                   mem["frontend_mb"], mem["api_worker_mb"], mem["worker_mb"], mem["gateway_mb"],
+                   gw["port"], gw["daily_usd_cap"], gw["daily_call_cap"])
 
 
 def available_memory_mb() -> int:

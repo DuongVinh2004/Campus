@@ -21,12 +21,17 @@ provider_concurrency = 5
 [postgres]
 shared_buffers = "64MB"
 max_connections = 10
+[gateway]
+port = 8025
+daily_usd_cap = "2.50"
+daily_call_cap = 100
 [memory]
 reserve_mb = 100
 postgres_mb = 10
 frontend_mb = 20
 api_worker_mb = 30
 worker_mb = 40
+gateway_mb = 7
 """
 
 
@@ -40,6 +45,12 @@ def test_local_profile_keeps_the_values_the_launcher_used_before_profiles():
     assert (local.pg_shared_buffers, local.pg_max_connections, local.api_workers) == ("128MB", 20, 1)
 
 
+def test_local_gateway_is_uncapped_as_today_and_cloud_is_never_uncapped():
+    local, cloud = rp.load_profile("local"), rp.load_profile("cloud")
+    assert (local.daily_usd_cap, local.daily_call_cap, local.provider_concurrency) == ("0", 0, 16)
+    assert float(cloud.daily_usd_cap) > 0 and cloud.daily_call_cap > 0
+
+
 def test_cloud_profile_matches_the_design_table():
     cloud = rp.load_profile("cloud")
     assert (cloud.api_workers, cloud.max_in_flight_per_worker, cloud.provider_concurrency) == (2, 16, 24)
@@ -49,6 +60,8 @@ def test_cloud_profile_matches_the_design_table():
 def test_good_profile_loads(tmp_path):
     profile = rp.load_profile("t", write(tmp_path, GOOD))
     assert profile.required_mb(["api", "postgres"]) == 100 + 30 * 1 + 10
+    assert profile.required_mb(["gateway"]) == 107
+    assert (profile.gateway_port, profile.daily_usd_cap, profile.daily_call_cap) == (8025, "2.50", 100)
 
 
 @pytest.mark.parametrize("mutation", [
@@ -61,6 +74,10 @@ def test_good_profile_loads(tmp_path):
     lambda t: t.replace('name = "t"', 'name = "other"'),                   # name differs from file
     lambda t: t + "\n[surprise]\nx = 1\n",                                 # unknown section
     lambda t: "not toml [",
+    lambda t: t.replace('daily_usd_cap = "2.50"', 'daily_usd_cap = "-1"'),         # negative cap
+    lambda t: t.replace('daily_usd_cap = "2.50"', 'daily_usd_cap = "lots"'),       # not a decimal
+    lambda t: t.replace('daily_usd_cap = "2.50"', "daily_usd_cap = 2.5"),          # must be a string, never a float
+    lambda t: t.replace("port = 8025", "port = 80"),                               # privileged port
 ])
 def test_loader_is_strict(tmp_path, mutation):
     with pytest.raises(rp.ProfileError):
@@ -88,7 +105,7 @@ def test_memory_check_is_skipped_when_everything_is_reused(tmp_path):
 def test_unknown_component_is_rejected(tmp_path):
     profile = rp.load_profile("t", write(tmp_path, GOOD))
     with pytest.raises(ValueError):
-        profile.required_mb(["gateway"])
+        profile.required_mb(["queue"])
 
 
 def test_available_memory_reads_the_os():

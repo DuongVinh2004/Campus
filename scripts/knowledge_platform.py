@@ -401,13 +401,19 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         gate_logger.setLevel(logging.INFO)
         gate_logger.addHandler(GateDiagnostics())
         from campus247.application.retrieval.semantic_support import SemanticClaimVerifier
-        from run_public_rag import Gateway
-        from multi_agent_live_resources import restore_paid
-        class RetainedGateway(Gateway):
-            json_mode = True
-            def _restore_budget(self, snapshot, pending):
-                return restore_paid(snapshot, pending)
-        gateway = RetainedGateway()  # Retains paid accounting, lease and egress controls.
+        if os.environ.get("CAMPUS247_GATEWAY_URL"):
+            # Several API processes share one paid gateway: it runs as a sidecar that owns the credential, the ledger
+            # lease, the budget and the spend cap. This process can reach the provider only through it.
+            from campus247.infrastructure.llm.remote_gateway import RemoteGateway, read_token
+            gateway = RemoteGateway(os.environ["CAMPUS247_GATEWAY_URL"], read_token(os.environ["CAMPUS247_GATEWAY_TOKEN_FILE"]))
+        else:
+            from run_public_rag import Gateway
+            from multi_agent_live_resources import restore_paid
+            class RetainedGateway(Gateway):
+                json_mode = True
+                def _restore_budget(self, snapshot, pending):
+                    return restore_paid(snapshot, pending)
+            gateway = RetainedGateway()  # Retains paid accounting, lease and egress controls.
         verifier = SemanticClaimVerifier(gateway)
     learning_ai_flag = os.environ.get("CAMPUS_LEARNING_AI_ENABLED", "false").lower()
     if learning_ai_flag not in {"true", "false"}:
