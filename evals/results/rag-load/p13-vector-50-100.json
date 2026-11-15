@@ -1,0 +1,90 @@
+[
+ {
+  "users": 50,
+  "think_s": [
+   8.0,
+   25.0
+  ],
+  "turns_done": 150,
+  "turns_planned": 150,
+  "aborted_for_errors": false,
+  "wall_seconds": 135.5,
+  "turns_per_minute": 66.4,
+  "outcomes": {
+   "answer": 139,
+   "clarify": 4,
+   "refuse": 5,
+   "gave_up_busy": 2
+  },
+  "failed_questions": [],
+  "busy": {
+   "refusals": 68,
+   "turns_refused_at_least_once": 38,
+   "gave_up": 2,
+   "refusal_seconds_max": 4.36
+  },
+  "http_status": {
+   "200": 148,
+   "503": 2
+  },
+  "exceptions": {},
+  "success_rate": 0.987,
+  "latency_s": {
+   "p50": 10.88,
+   "p90": 13.05,
+   "p95": 13.79,
+   "p99": 14.69,
+   "max": 15.2
+  },
+  "ttfb_p50_s": 2.96,
+  "api_cpu_percent_p50_p95": [
+   96,
+   112
+  ],
+  "api_rss_mb_max": 599
+ },
+ {
+  "users": 100,
+  "think_s": [
+   8.0,
+   25.0
+  ],
+  "turns_done": 300,
+  "turns_planned": 300,
+  "aborted_for_errors": false,
+  "wall_seconds": 170.6,
+  "turns_per_minute": 105.5,
+  "outcomes": {
+   "clarify": 6,
+   "answer": 204,
+   "refuse": 7,
+   "gave_up_busy": 83
+  },
+  "failed_questions": [],
+  "busy": {
+   "refusals": 593,
+   "turns_refused_at_least_once": 186,
+   "gave_up": 83,
+   "refusal_seconds_max": 5.17
+  },
+  "http_status": {
+   "200": 217,
+   "503": 83
+  },
+  "exceptions": {},
+  "success_rate": 0.723,
+  "latency_s": {
+   "p50": 10.88,
+   "p90": 13.01,
+   "p95": 13.54,
+   "p99": 14.3,
+   "max": 15.17
+  },
+  "ttfb_p50_s": 3.89,
+  "api_cpu_percent_p50_p95": [
+   92,
+   122
+  ],
+  "api_rss_mb_max": 641
+ }
+]

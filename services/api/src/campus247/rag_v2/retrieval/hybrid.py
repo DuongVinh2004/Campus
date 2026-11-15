@@ -4,12 +4,15 @@ from __future__ import annotations
 import asyncio
 import math
 import re
+import time
 from collections.abc import Mapping
 from dataclasses import dataclass, replace
 
+from campus247.rag_v2.observability.vector_stats import VECTOR_STATS
 from campus247.rag_v2.ports import Reranker, UnitIndex
+from campus247.rag_v2.scope_ranges import covers
 from campus247.rag_v2.types import Candidate, Understanding, Unit
-from campus247.rag_v2.understanding.analyze import contains, program_key
+from campus247.rag_v2.understanding.analyze import _PROGRAMS, contains, program_key
 from campus247.rag_v2.understanding.normalize import fold, normalize_query
 
 
@@ -28,7 +31,8 @@ class RetrievalResult:
 
 def scope_allows(u: Understanding, unit: Unit) -> bool:
     scope = unit.scope
-    if u.cohort and scope.cohorts and fold(u.cohort) not in {fold(c) for c in scope.cohorts}:
+    if (u.cohort and scope.cohorts and fold(u.cohort) not in {fold(c) for c in scope.cohorts}
+            and not covers(unit.text, u.cohort)):  # "K70 trở về trước" contains K69
         return False
     if u.academic_year and scope.academic_years and u.academic_year not in scope.academic_years:
         return False
@@ -106,6 +110,34 @@ def _diverse(ranked: list[Candidate], index: UnitIndex, count: int) -> list[Cand
     return chosen
 
 
+_FOLDED_TITLES: dict[str, str] = {}
+
+
+def _programme_titled(u: Understanding, index: UnitIndex, allowed: set[str], limit: int) -> list:
+    """A fourth ranked list: the best lexical hits among documents whose title names the programme asked about.
+
+    "Kinh tế xây dựng K70" shares most words with every civil-engineering plan, and the plan of another programme
+    can outrank the right one. A document named after the programme is the strongest evidence of which plan is
+    meant, so it gets its own list in the fusion. Nothing is dropped; questions that name no programme add nothing.
+    """
+    if not u.program:
+        return []
+    names = next((names for code, names in _PROGRAMS if code == u.program), ())
+    if not names:
+        return []
+    titled = set()
+    for uid in allowed:
+        unit = index.get(uid)
+        title = _FOLDED_TITLES.get(unit.doc_title)
+        if title is None:
+            title = _FOLDED_TITLES[unit.doc_title] = fold(unit.doc_title)
+        if any(contains(title, name) for name in names):
+            titled.add(uid)
+    if not titled or len(titled) == len(allowed):
+        return []
+    return index.lexical(u.search_query, limit, allowed=titled)
+
+
 async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
                    lexical_k: int = 40, vector_k: int = 40, preselect: int = 10,
                    rerank_deadline_s: float = 4.5, min_rerank_logit: float = -1.0,
@@ -120,21 +152,23 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
     if not allowed:
         return RetrievalResult((), False, {"status": "EMPTY", "eligible": 0, "preselected": 0, "returned": 0})
     lexical = index.lexical(u.search_query, lexical_k, allowed=allowed)
-    vector_failed = False
+    vector_failed, vector_timeout, vector_started = False, False, time.perf_counter()
     try:
         async with asyncio.timeout(1.0):
             vector = await index.vector(u.search_query, vector_k, allowed=allowed)
-    except Exception:  # noqa: BLE001 -- a vector adapter outage must preserve lexical retrieval
-        vector, vector_failed = [], True
+    except Exception as error:  # noqa: BLE001 -- a vector adapter outage must preserve lexical retrieval
+        vector, vector_failed, vector_timeout = [], True, isinstance(error, TimeoutError)
+    VECTOR_STATS.record(failed=vector_failed, timeout=vector_timeout, seconds=time.perf_counter() - vector_started)
     ranks = {}
     anchored = index.anchored(u.search_query, lexical_k, allowed=allowed) if hasattr(index, "anchored") else []
-    for branch, rows in enumerate((lexical, vector, anchored)):
+    titled = _programme_titled(u, index, allowed, lexical_k)
+    for branch, rows in enumerate((lexical, vector, anchored, titled)):
         seen = set()
         for rank, (uid, _) in enumerate(rows, 1):
             if uid not in allowed or uid in seen:
                 continue
             seen.add(uid)
-            ranks.setdefault(uid, [None, None, None])[branch] = rank
+            ranks.setdefault(uid, [None, None, None, None])[branch] = rank
     k = RRF_K
     ranked = [Candidate(uid, pair[0], pair[1], sum(1 / (k + rank) for rank in pair if rank is not None))
               for uid, pair in ranks.items()]
