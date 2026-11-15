@@ -336,7 +336,8 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
                 with checked_path(scope / (kind + ".log"), ROOT).open("xb") as log:
                     environment = os.environ.copy()
                     if kind == "api":
-                        environment.update(CAMPUS247_RAG_ENGINE=engine, CAMPUS247_RAG_V2_INDEX=str(index))
+                        environment.update(CAMPUS247_RAG_ENGINE=engine, CAMPUS247_RAG_V2_INDEX=str(index),
+                                           CAMPUS247_CHAT_MAX_IN_FLIGHT=str(profile.max_in_flight_per_worker))
                         if engine == "v2":
                             vendor = str(checked_path(ROOT / "data/rag_v2_vendor", ROOT))
                             prior = environment.get("PYTHONPATH")

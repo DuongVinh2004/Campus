@@ -1,0 +1,46 @@
+[
+ {
+  "users": 100,
+  "think_s": [
+   8.0,
+   25.0
+  ],
+  "turns_done": 300,
+  "turns_planned": 300,
+  "aborted_for_errors": false,
+  "wall_seconds": 198.9,
+  "turns_per_minute": 90.5,
+  "outcomes": {
+   "clarify": 6,
+   "answer": 193,
+   "refuse": 4,
+   "gave_up_busy": 97
+  },
+  "failed_questions": [],
+  "busy": {
+   "refusals": 706,
+   "turns_refused_at_least_once": 211,
+   "gave_up": 97,
+   "refusal_seconds_max": 6.0
+  },
+  "http_status": {
+   "200": 203,
+   "503": 97
+  },
+  "exceptions": {},
+  "success_rate": 0.677,
+  "latency_s": {
+   "p50": 13.32,
+   "p90": 16.11,
+   "p95": 16.85,
+   "p99": 18.8,
+   "max": 20.44
+  },
+  "ttfb_p50_s": 5.01,
+  "api_cpu_percent_p50_p95": [
+   92,
+   118
+  ],
+  "api_rss_mb_max": 610
+ }
+]

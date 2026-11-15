@@ -60,8 +60,15 @@ async def one_turn(client: httpx.AsyncClient, question: str) -> dict:
         conv.raise_for_status()
         path = f"/v1/conversations/{conv.json()['id']}/messages:stream"
         buffer, decoder = "", codecs.getincrementaldecoder("utf-8")()
+        stream_started = time.perf_counter()
         async with client.stream("POST", path, json={"content": question}) as response:
             rec["status"] = response.status_code
+            if response.status_code == 503 and response.headers.get("retry-after"):
+                # Admission control refused the turn before it started: nothing was sent, the student may retry.
+                # `seconds` is how long the refusal itself took (the stream request), not the conversation setup.
+                rec["outcome"], rec["retry_after"] = "busy", int(response.headers["retry-after"])
+                rec["seconds"] = round(time.perf_counter() - stream_started, 2)
+                return rec
             response.raise_for_status()
             async for raw in response.aiter_bytes():
                 if rec["ttfb"] is None:
@@ -81,11 +88,21 @@ async def one_turn(client: httpx.AsyncClient, question: str) -> dict:
 
 
 async def virtual_user(index: int, cookies, base_url: str, questions: list[str], turns: int, rng: random.Random, sink: list,
-                       think: tuple[float, float] = (0.0, 2.0)):
+                       think: tuple[float, float] = (0.0, 2.0), busy_retries: int = 3):
     async with httpx.AsyncClient(base_url=base_url, trust_env=False, timeout=120, cookies=cookies) as client:
         await asyncio.sleep(rng.uniform(0, max(3.0, think[1])))  # arrivals are spread out, not simultaneous
         for _ in range(turns):
-            sink.append(await one_turn(client, rng.choice(questions)))
+            question, refusals = rng.choice(questions), []
+            for _attempt in range(busy_retries + 1):
+                rec = await one_turn(client, question)
+                if rec["outcome"] != "busy":
+                    break
+                refusals.append(rec["seconds"])  # a student who is told "busy" waits a moment and asks again
+                await asyncio.sleep(rec.get("retry_after", 5))
+            else:
+                rec["outcome"] = "gave_up_busy"
+            rec["busy_refusals"] = refusals
+            sink.append(rec)
             await asyncio.sleep(rng.uniform(*think))
 
 
@@ -123,14 +140,15 @@ async def sample_resources(stop: asyncio.Event, out: list, port: int):
             out.append({"cpu": max(r[0] for r in rows), "rss_mb": max(r[1] for r in rows)})
 
 
-async def run_stage(users: int, turns: int, base_url: str, abort_rate: float, seed: int, think: tuple[float, float] = (0.0, 2.0)) -> dict:
+async def run_stage(users: int, turns: int, base_url: str, abort_rate: float, seed: int, think: tuple[float, float] = (0.0, 2.0),
+                    busy_retries: int = 3) -> dict:
     cookies = await login(base_url)
     questions = question_pool()
     rng = random.Random(seed + users)
     sink, samples, stop = [], [], asyncio.Event()
     sampler = asyncio.create_task(sample_resources(stop, samples, int(base_url.rsplit(":", 1)[1])))
     started = time.perf_counter()
-    tasks = [asyncio.create_task(virtual_user(i, cookies, base_url, questions, turns, random.Random(seed + users * 100 + i), sink, think))
+    tasks = [asyncio.create_task(virtual_user(i, cookies, base_url, questions, turns, random.Random(seed + users * 100 + i), sink, think, busy_retries))
              for i in range(users)]
 
     async def watchdog():
@@ -148,14 +166,19 @@ async def run_stage(users: int, turns: int, base_url: str, abort_rate: float, se
     stop.set()
     await sampler
     wall = time.perf_counter() - started
-    secs = [r["seconds"] for r in sink if r["seconds"] is not None]
+    served = [r for r in sink if r["outcome"] != "gave_up_busy"]  # latency of turns that actually ran
+    secs = [r["seconds"] for r in served if r["seconds"] is not None]
     ok = [r for r in sink if r["outcome"] in {"answer", "partial", "clarify", "refuse"}]
+    refusals = [s for r in sink for s in r.get("busy_refusals", [])] + [r["seconds"] for r in sink if r["outcome"] == "gave_up_busy"]
     return {
         "users": users, "think_s": list(think), "turns_done": len(sink), "turns_planned": users * turns, "aborted_for_errors": aborted,
         "wall_seconds": round(wall, 1), "turns_per_minute": round(len(sink) / wall * 60, 1),
         "outcomes": dict(Counter(r["outcome"] for r in sink)),
         "failed_questions": [{"question": r["question"], "outcome": r["outcome"], "seconds": r["seconds"]} for r in sink
                              if r["outcome"] in {"error", "timeout_message", "system_error"}],
+        "busy": {"refusals": len(refusals), "turns_refused_at_least_once": sum(bool(r.get("busy_refusals")) for r in sink),
+                 "gave_up": sum(r["outcome"] == "gave_up_busy" for r in sink),
+                 "refusal_seconds_max": max(refusals, default=None)},
         "http_status": dict(Counter(r["status"] for r in sink)),
         "exceptions": dict(Counter(r["error"] for r in sink if r["error"])),
         "success_rate": round(len(ok) / len(sink), 3) if sink else None,
@@ -177,12 +200,15 @@ async def main() -> None:
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--think-min", type=float, default=0.0, help="seconds a user pauses after an answer (realistic: 8-25)")
     parser.add_argument("--think-max", type=float, default=2.0)
+    parser.add_argument("--busy-retries", type=int, default=3,
+                        help="how many times a student asks again after a 503 'busy' (waiting Retry-After seconds)")
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
     results = []
     for n in [int(x) for x in args.stages.split(",")]:
         print(f"--- stage: {n} concurrent users x {args.turns} questions", flush=True)
-        result = await run_stage(n, args.turns, args.base_url, args.abort_error_rate, args.seed, (args.think_min, args.think_max))
+        result = await run_stage(n, args.turns, args.base_url, args.abort_error_rate, args.seed, (args.think_min, args.think_max),
+                                  args.busy_retries)
         results.append(result)
         print(json.dumps(result, ensure_ascii=False), flush=True)
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)

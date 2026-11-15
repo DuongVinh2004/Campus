@@ -287,9 +287,11 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
     egress_policy = EgressPolicy()
 
     def minimize_history_content(content: str) -> str | None:
+        from campus247.application.retrieval.public_notice_contacts import UNIT_MAILBOX
         try:
+            # Shared department mailboxes from official notices are public; everything else is still checked.
             egress_policy.validate_and_minimize({"purpose": "FAQ_ANSWERING",
-                "messages": [{"role": "user", "content": content}]})
+                "messages": [{"role": "user", "content": UNIT_MAILBOX.sub("", content)}]})
             return content
         except EgressViolationError:
             return None
@@ -545,7 +547,12 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
             context = create_current_context(state.request, actor)
             await knowledge_runtime.assert_current(state.knowledge_snapshot, context)
 
+    from campus247.presentation.admission import AdmissionGate
+    chat_admission = (AdmissionGate(settings.chat_max_in_flight, settings.chat_admission_wait_s)
+                      if settings.chat_max_in_flight else None)
+    app.state.chat_admission = chat_admission
     chat_router = chat.create_chat_router(
+        admission=chat_admission,
         conv_service=conv_service, trusted_agent_runner=run_trusted_agent,
         history_service=history_service, turn_preparer=prepare_assistant_turn,
         agent_progress=multi_agent_store is not None,

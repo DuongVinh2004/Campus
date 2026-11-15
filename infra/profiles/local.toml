@@ -6,8 +6,9 @@ name = "local"
 # Consumed by the launcher from step 1.1. The launcher refuses any value its code cannot honour yet (see
 # SUPPORTED_API_WORKERS in scripts/knowledge_platform_runtime.py). Step 1.8 raises local to 2, then 3 when RAM allows.
 workers = 1
-# Declared now, consumed later: per-worker in-flight turns (step 1.2) and concurrent provider calls (step 1.7).
-max_in_flight_per_worker = 24
+# Per-worker turns in flight (admission control, step 1.2; measured: 24 gave 27 s turns, 12 keeps them under 18 s)
+# and concurrent provider calls (declared now, consumed from step 1.7).
+max_in_flight_per_worker = 12
 provider_concurrency = 40
 
 [postgres]
