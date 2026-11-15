@@ -238,7 +238,8 @@ def models():
     from campus247.ports.embedding import EmbeddingProfile
     from campus247.ports.reranker import RerankerProfile
     embedding = TEIEmbeddingAdapter(EmbeddingProfile(EMBED_MODEL, EMBED_REVISION, 1024, batch_limit=1, timeout_ms=30000),
-        lambda: httpx.AsyncClient(base_url="http://127.0.0.1:18081", trust_env=False, follow_redirects=False))
+        # Plain HTTP on loopback: no TLS, so no certificate store to load for every client.
+        lambda: httpx.AsyncClient(base_url="http://127.0.0.1:18081", trust_env=False, follow_redirects=False, verify=False))
     reranker = TEIRerankerAdapter(RerankerProfile(RERANK_MODEL, RERANK_REVISION, 6, 10000),
         lambda: httpx.AsyncClient(base_url="http://127.0.0.1:18082", trust_env=False, follow_redirects=False))
     return embedding, reranker

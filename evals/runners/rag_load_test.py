@@ -88,11 +88,11 @@ async def one_turn(client: httpx.AsyncClient, question: str) -> dict:
 
 
 async def virtual_user(index: int, cookies, base_url: str, questions: list[str], turns: int, rng: random.Random, sink: list,
-                       think: tuple[float, float] = (0.0, 2.0), busy_retries: int = 3):
+                       think: tuple[float, float] = (0.0, 2.0), busy_retries: int = 3, pick=None):
     async with httpx.AsyncClient(base_url=base_url, trust_env=False, timeout=120, cookies=cookies) as client:
         await asyncio.sleep(rng.uniform(0, max(3.0, think[1])))  # arrivals are spread out, not simultaneous
         for _ in range(turns):
-            question, refusals = rng.choice(questions), []
+            question, refusals = (pick() if pick else rng.choice(questions)), []
             for _attempt in range(busy_retries + 1):
                 rec = await one_turn(client, question)
                 if rec["outcome"] != "busy":
@@ -145,14 +145,23 @@ async def sample_resources(stop: asyncio.Event, out: list, port: int):
 
 
 async def run_stage(users: int, turns: int, base_url: str, abort_rate: float, seed: int, think: tuple[float, float] = (0.0, 2.0),
-                    busy_retries: int = 3) -> dict:
+                    busy_retries: int = 3, unique: bool = False) -> dict:
     cookies = await login(base_url)
     questions = question_pool()
     rng = random.Random(seed + users)
+    pick = None
+    if unique:
+        # No question twice in the stage: nothing can be answered from a repeat (query-vector cache, answer reuse).
+        if users * turns > len(questions):
+            raise SystemExit(f"--unique-questions needs at most {len(questions)} turns in a stage, got {users * turns}")
+        shuffled = list(questions)
+        rng.shuffle(shuffled)
+        queue = iter(shuffled)
+        pick = lambda: next(queue)  # noqa: E731
     sink, samples, stop = [], [], asyncio.Event()
     sampler = asyncio.create_task(sample_resources(stop, samples, int(base_url.rsplit(":", 1)[1])))
     started = time.perf_counter()
-    tasks = [asyncio.create_task(virtual_user(i, cookies, base_url, questions, turns, random.Random(seed + users * 100 + i), sink, think, busy_retries))
+    tasks = [asyncio.create_task(virtual_user(i, cookies, base_url, questions, turns, random.Random(seed + users * 100 + i), sink, think, busy_retries, pick))
              for i in range(users)]
 
     async def watchdog():
@@ -206,13 +215,15 @@ async def main() -> None:
     parser.add_argument("--think-max", type=float, default=2.0)
     parser.add_argument("--busy-retries", type=int, default=3,
                         help="how many times a student asks again after a 503 'busy' (waiting Retry-After seconds)")
+    parser.add_argument("--unique-questions", action="store_true",
+                        help="draw questions without replacement, so no turn repeats an earlier question of the stage")
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
     results = []
     for n in [int(x) for x in args.stages.split(",")]:
         print(f"--- stage: {n} concurrent users x {args.turns} questions", flush=True)
         result = await run_stage(n, args.turns, args.base_url, args.abort_error_rate, args.seed, (args.think_min, args.think_max),
-                                  args.busy_retries)
+                                  args.busy_retries, args.unique_questions)
         results.append(result)
         print(json.dumps(result, ensure_ascii=False), flush=True)
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)

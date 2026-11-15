@@ -77,9 +77,13 @@ def load_rag_v2(settings, *, gateway, knowledge_runtime, inventory_reader=None):
             or str(manifest.get("normalization", "")).casefold() != profile.normalization):
         raise ValueError("RAG_V2_EMBEDDING_INCOMPATIBLE")
 
-    async def embed(query):
+    async def embed_uncached(query):
         batch = await knowledge_runtime.embedding._embed((query,))
         return batch.vectors[0].values
+
+    # The same text always gives the same vector: embed it once, share it between callers, and let the node start it early.
+    from campus247.rag_v2.adapters.vector_cache import QueryVectorCache
+    embed = QueryVectorCache(embed_uncached)
 
     # Reuse the validated 18081 embedding adapter and gateway, including their
     # original endpoint identity, egress, accounting and writer-lease controls.

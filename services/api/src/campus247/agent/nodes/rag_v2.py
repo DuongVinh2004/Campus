@@ -22,12 +22,28 @@ from campus247.rag_v2.outcome.compose import RETRY_HINT, TIMEOUT_HINT, TIMEOUT_M
 from campus247.rag_v2.retrieval.hybrid import rerank_excerpt
 from campus247.rag_v2.types import Outcome
 from campus247.rag_v2.understanding.normalize import fold
-from campus247.rag_v2.generation.rewrite import ResolvedQuestion, rewrite_question
+from campus247.rag_v2.generation.rewrite import ResolvedQuestion, clean_question, rewrite_question
+from campus247.rag_v2.understanding.messy import looks_messy
 from campus247.rag_v2.understanding.analyze import analyze
 
 
+# Whole-turn ceiling. Measured on 215 natural questions: median 5.7 s, p90 9.3 s, and 11% of turns that needed two
+# generation attempts or a slow provider were cut at the old 12 s. Every call keeps its own cap (5 s generation, 3.5 s
+# check) and the workflow budget is 30 s, so a longer ceiling only rescues the slow tail; no verification step changes.
+TURN_BUDGET_S = 22.0
+
 GUARD_BLOCKED_MESSAGE = ("Nội dung này liên quan đến quy định cần được xác nhận trực tiếp. "
     "Bạn vui lòng mở tài liệu chính thức được trích dẫn hoặc liên hệ Phòng Đào tạo.")
+
+
+def source_pointers(outcome, limit=2) -> str:
+    """Titles and locators of the documents behind a withheld answer (verified retrieval metadata, no statements)."""
+    labels = []
+    for citation in outcome.citations:
+        label = " ".join(citation.doc_title.split()) + (f" — {' '.join(citation.path.split())}" if citation.path else "")
+        if citation.doc_title and label not in labels:
+            labels.append(label[:160])
+    return ("\n\nVăn bản liên quan: " + "; ".join(labels[:limit]) + ".") if labels else ""
 
 
 _HAYSTACKS: dict[tuple[str, int], str] = {}
@@ -104,18 +120,42 @@ def _binding_failure(unit, rows):
     return None
 
 
+_FINGERPRINT_FIELDS = ("chunk_id", "evidence_sha256", "source_id", "document_version_id", "title", "section_path",
+                       "effective_from", "effective_until")
+# One digest per (text object, chunk), remembered while the text is the same object and the other fields are equal.
+# The bulk read of the authorized rows is cached for minutes and every turn builds its per-turn row dicts from the same
+# cached templates, so the text string objects are the same on every turn. A string cannot change in place, so
+# `text is cached_text` proves the content is the one that was hashed; the other fields are compared by value.
+# This turns "hash every row's text on every turn" (a quarter of the API's CPU under load) into a lookup. Anything that
+# differs (a new read, an edited row) is hashed again, exactly as before.
+_ROW_DIGESTS: dict[tuple[int, str], tuple[str, tuple, bytes]] = {}
+_ROW_DIGESTS_MAX = 60_000
+
+
+def _row_digest(chunk, row) -> bytes:
+    text = row.get("content_text") or ""
+    fields = tuple(row.get(field) for field in _FINGERPRINT_FIELDS)
+    key = (id(text), str(chunk))
+    hit = _ROW_DIGESTS.get(key)
+    if hit is not None and hit[0] is text and hit[1] == fields:
+        return hit[2]
+    digest = sha256()
+    digest.update("\x1f".join(str(value) for value in fields).encode())
+    digest.update(b"\x1e" + str(chunk).encode() + b"\x1e")
+    # The text itself: a row whose text no longer matches its declared hash must still reach the full checks and fail there.
+    digest.update(str(text).encode() + b"\x1d")
+    value = digest.digest()
+    if len(_ROW_DIGESTS) >= _ROW_DIGESTS_MAX:
+        _ROW_DIGESTS.clear()
+    _ROW_DIGESTS[key] = (text, fields, value)
+    return value
+
+
 def _rows_fingerprint(rows) -> str:
     """Everything the binding checks read from the authorized rows, hashed. Equal fingerprints, equal checks."""
     digest = sha256()
     for chunk in sorted(rows):
-        row = rows[chunk]
-        digest.update("\x1f".join(str(row.get(field)) for field in (
-            "chunk_id", "evidence_sha256", "source_id", "document_version_id", "title", "section_path",
-            "effective_from", "effective_until")).encode())
-        digest.update(b"\x1e" + str(chunk).encode() + b"\x1e")
-        # The text itself too (a few ms per turn): a row whose text no longer matches its declared hash must still
-        # reach the full checks and fail there, exactly as before.
-        digest.update(str(row.get("content_text") or "").encode() + b"\x1d")
+        digest.update(_row_digest(chunk, rows[chunk]))
     return digest.hexdigest()
 
 
@@ -150,6 +190,26 @@ class RagV2Node:
                     "rag_v2_injection_warmup_failed kind=%s", type(exc).__name__)
         self._injection_thread = Thread(target=scan, name="rag-v2-injection", daemon=True)
         self._injection_thread.start()
+
+    def prefetch(self, state) -> None:
+        """Start the question's embedding now, while the turn's provider calls (safety and routing, 1-2 s of waiting)
+        are still running, so retrieval finds the vector ready instead of queueing for it inside its 1 s window.
+
+        Only for a question that will be searched as typed: not a follow-up (it is rewritten first) and not one the
+        analysis already knows is out of scope or needs clarification. If the question is later restated, the restated
+        text is simply embedded as before. The vector is the same function of the same text, so nothing changes.
+        """
+        start = getattr(self.embed, "prefetch", None)
+        if start is None:
+            return
+        try:
+            if state.request.history and state.request.history.turns:
+                return
+            understanding = analyze(state.request.query, ())
+            if not (understanding.clarify_prompt or understanding.out_of_scope):
+                start(understanding.search_query)
+        except Exception:  # noqa: BLE001 -- an optimisation must never affect the turn
+            return
 
     def _prepare_index(self, rows):
         """The authorized view of the index for this turn's authorized rows.
@@ -231,7 +291,8 @@ class RagV2Node:
             guarded_gateway = GuardedGateway()
             guard()
             history = tuple(t.content for t in state.request.history.turns if t.role == "user") if state.request.history else ()
-            async with asyncio.timeout(12):
+            rewrote = False
+            async with asyncio.timeout(TURN_BUDGET_S):
                 if history:
                     # A follow-up ("nó bao nhiêu?", "à không, K67") is understood from the earlier user turns;
                     # on failure the original question and history go through the unchanged path.
@@ -239,7 +300,21 @@ class RagV2Node:
                     if rewritten:
                         resolved = ResolvedQuestion(resolved.original, rewritten)
                         history = ()
+                        rewrote = True
                 understanding = analyze(resolved.resolved, history)
+                # A resolved follow-up is already a complete question; cleaning the bare fragment again would
+                # replace it with the elliptical wording ("vậy DELF thì sao?") and lose the resolved subject.
+                if not history and not rewrote:
+                    # The intent router (already issued in parallel with the safety check) restates a messy question
+                    # for free. Only when it gave none, and the wording looks unreliable (no diacritics, rambling, no
+                    # recognised topic), one short extra call does it. Either way the original wording is kept
+                    # unless every number, code, name and negation survived.
+                    cleaned = state.tool_flow.clean_question if state.tool_flow else None
+                    if not cleaned and looks_messy(resolved.original, understanding.topics, understanding.question_type):
+                        cleaned = await clean_question(guarded_gateway, resolved.original, deadline_ms=2200)
+                    if cleaned:
+                        resolved = ResolvedQuestion(resolved.original, cleaned)
+                        understanding = analyze(cleaned, ())
                 if understanding.clarify_prompt or understanding.out_of_scope:
                     outcome = await self.service.answer(resolved.resolved, history, gateway=guarded_gateway,
                         index=self.index, reranker=self.reranker, embed=self.embed, revalidate=revalidate)
@@ -256,7 +331,7 @@ class RagV2Node:
                 logging.getLogger("campus247.rag_v2").warning("rag_v2_node_stage auth_ms=%d units_ms=%d units=%d", t_auth, t_units, unit_count)
                 outcome = await self.service.answer(resolved.resolved, history, gateway=guarded_gateway,
                     index=index, reranker=self.reranker, embed=self.embed,
-                    deadline_s=12 - (monotonic() - started), revalidate=revalidate)
+                    deadline_s=TURN_BUDGET_S - (monotonic() - started), revalidate=revalidate)
                 guard()  # Recheck after all model awaits.
                 cited_chunks = tuple(dict.fromkeys(chunk for c in outcome.citations for chunk in c.chunk_ids))
                 live = await revalidate(cited_chunks)
@@ -287,7 +362,14 @@ class RagV2Node:
                         if guarded.terminal != Terminal.SAFE_FAILURE:
                             mapped = replace(mapped, errors=mapped.errors + ("RAG_V2_DISCIPLINE_RULE_VERIFIED",))
                     if (discipline and not verified_rule) or guarded.terminal == Terminal.SAFE_FAILURE:
-                        mapped = self.map_outcome(state, Outcome("refuse", GUARD_BLOCKED_MESSAGE, reason="unsafe"), {})
+                        import logging
+                        # Only the rule that fired is logged, never the withheld text.
+                        logging.getLogger("campus247.rag_v2").warning(
+                            "rag_v2_output_guard_blocked discipline=%s verified_rule=%s reason=%s", bool(discipline),
+                            verified_rule, (guarded.errors[-1] if guarded.errors else "none")[:120])
+                        # The statements stay hidden, but the user still learns where the rule is written.
+                        mapped = self.map_outcome(state, Outcome("refuse", GUARD_BLOCKED_MESSAGE + source_pointers(outcome),
+                                                                 reason="unsafe"), {})
                 await revalidate(cited_chunks)
                 return mapped
         except Exception as exc:  # noqa: BLE001 -- never propagate denied source content or exception text
@@ -342,4 +424,5 @@ class RagV2Node:
             tool_flow=replace(state.tool_flow or ToolFlowState(), candidates=candidates),
             draft=DraftResponse(text, claim_count=len(claims), is_grounded=bool(claims),
                 gate_decision="grounded" if claims else "abstain", grounded_claims=claims,
-                partial_note=outcome.partial_note), step_count=state.step_count + 1)
+                partial_note=outcome.partial_note, preface=outcome.preface,
+                guidance=tuple(outcome.suggestions)), step_count=state.step_count + 1)

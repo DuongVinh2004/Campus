@@ -62,6 +62,7 @@ if _cprofile_out:
 
 _profile_out = os.environ.get("CAMPUS_PROFILE_SAMPLER")
 if _profile_out:
+    _profile_out = f"{_profile_out}.{os.getpid()}"  # one file per process: several API workers must not overwrite each other
     import collections
     import json
     import threading
