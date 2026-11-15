@@ -1,0 +1,40 @@
+{
+ "api": {
+  "avg_cores": 0.71,
+  "peak_cores": 1.97
+ },
+ "model_server": {
+  "avg_cores": 0.62,
+  "peak_cores": 3.67
+ },
+ "gateway_sidecar": {
+  "avg_cores": 0.05,
+  "peak_cores": 0.21
+ },
+ "postgres": {
+  "avg_cores": 0.17,
+  "peak_cores": 0.71
+ },
+ "frontend": {
+  "avg_cores": 0.0,
+  "peak_cores": 0.0
+ },
+ "load_generator": {
+  "avg_cores": 0.02,
+  "peak_cores": 0.16
+ },
+ "other": {
+  "avg_cores": 0.89,
+  "peak_cores": 1.79
+ },
+ "machine_total_avg_cores": 2.47,
+ "samples": 26,
+ "other_top_avg_cores": {
+  "claude": 0.29,
+  "WmiPrvSE": 0.16,
+  "MsMpEng": 0.09,
+  "dwm": 0.08,
+  "svchost": 0.06,
+  "System": 0.06
+ }
+}

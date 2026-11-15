@@ -45,3 +45,24 @@ không hạ tiêu chí; các lựa chọn là chấp nhận mục tiêu kịch b
 - Máy chủ mô hình: embedding FP32 vẫn khoảng 0,65 s CPU mỗi lượt (không đổi model, không đổi luồng ONNX, không đổi vector).
 - Chưa đo ảnh hưởng lên chất lượng câu trả lời: bước 1.10 chạy gate với provider thật. Vector không đổi nên không kỳ vọng thay đổi, nhưng chưa có số.
 - Bộ nhớ đệm vector mỗi worker giữ riêng (không chia sẻ giữa worker).
+
+## Cập nhật cuối ngày: tái dùng kết nối SQLite đóng nốt kịch bản A
+
+Profile lại ở 100 người cho thấy phần CPU còn lại của API nằm ở việc mở SQLite: kiểm thu hồi phiên và đọc ghi hội thoại mở file hơn chục lần mỗi lượt
+(mỗi lần mở gồm kiểm đường dẫn `resolve` và duyệt reparse point của mọi thư mục cha, hai pragma và kiểm schema), khoảng một phần năm CPU bận của API.
+
+Thay đổi (`sqlite_reuse.py`, dùng ở kho hội thoại và kho trạng thái người dùng): mỗi luồng giữ một kết nối tối đa 2 giây rồi đóng và mở lại qua **toàn bộ** đường kiểm cũ
+(đường dẫn, schema, tenant), nên các lớp bảo vệ vẫn chạy mỗi 2 giây và sau mọi lỗi. Một kết nối chỉ cho một người dùng tại một thời điểm: dùng lồng nhau hoặc xen kẽ trên cùng luồng nhận kết nối mới như cũ,
+nên không giao dịch nào commit hoặc rollback giao dịch khác; mỗi lần dùng vẫn kết thúc bằng `with connection:`, kết nối rảnh không giữ giao dịch hay khóa.
+
+Kịch bản A (100 người × 2 câu, không lặp, API mới khởi động nên bộ nhớ đệm trống), ba lần chạy:
+
+| Lần | Thành công | p50 / p95 / lâu nhất | 503 lâu nhất | Mất vector |
+|---|---|---|---|---|
+| 1 | 100 % | 9,4 / 11,8 / 13,8 s | 4,2 s | 0 |
+| 3 | 99,5 % | 9,1 / 11,6 / 12,8 s | 4,5 s | 0 |
+| 4 | 100 % | 9,4 / 11,9 / 12,7 s | 4,4 s | 0 |
+
+(Lần 2, chạy tiếp trên cùng tiến trình nên có hưởng bộ nhớ đệm, không dùng làm số chính: 99,5 %.) Trung bình 99,8 %.
+Tiêu chí kịch bản A của bước 1.9 **đạt**: `vector_failed` ≤ 1 %, p95 ≤ 15 s, thành công ≥ 99 %, 503 trong 5 s.
+Số đo tại máy này, còn nhiễu từ Chrome, Claude và Defender; mỗi lần chạy 200 lượt nên một lượt hỏng đổi 0,5 điểm.

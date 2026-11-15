@@ -14,6 +14,7 @@ from campus247.application.conversation.messages import (
 )
 from campus247.application.conversation.stream_result import StreamCitation
 from campus247.infrastructure.repositories.sqlite_certificates import workspace_path
+from campus247.infrastructure.repositories.sqlite_reuse import ReusableConnections
 
 
 def encode(record):
@@ -45,6 +46,7 @@ class SQLiteConversationRepository:
     supports_stable_turns = True
 
     def __init__(self, path: Path, *, tenant=None):
+        self._connections = ReusableConnections()
         self.path = workspace_path(path)
         self.tenant = None
         with self.connect(initialize=True) as conn:
@@ -79,26 +81,45 @@ class SQLiteConversationRepository:
             conn.execute("CREATE TABLE IF NOT EXISTS conversation_tenant(tenant TEXT PRIMARY KEY)")
             conn.execute("INSERT OR IGNORE INTO conversation_tenant VALUES(?)",(tenant,))
         self.tenant = tenant
+        self._connections.invalidate()  # cached connections were checked against the old tenant binding
 
-    @contextmanager
-    def connect(self, *, initialize=False):
+    def _open(self, initialize):
+        """A checked connection: workspace path guard, pragmas and (unless initializing) the schema and tenant checks."""
         workspace_path(self.path)
-        conn = None
+        conn = sqlite3.connect(self.path.as_uri()+"?mode="+("rwc" if initialize else "rw"), uri=True, timeout=2)
         try:
-            conn = sqlite3.connect(self.path.as_uri()+"?mode="+("rwc" if initialize else "rw"), uri=True, timeout=2)
             conn.execute("PRAGMA foreign_keys=ON")
             if not initialize:
                 if conn.execute("SELECT version FROM conversation_schema").fetchall() != [(1,)]:
                     raise ConversationStorageCorrupt("CONVERSATION_SCHEMA_UNSUPPORTED")
                 if self.tenant is not None and conn.execute("SELECT tenant FROM conversation_tenant").fetchall() != [(self.tenant,)]:
                     raise ConversationStorageCorrupt("CONVERSATION_TENANT_MISMATCH")
+        except BaseException:
+            conn.close()
+            raise
+        return conn
+
+    @contextmanager
+    def connect(self, *, initialize=False):
+        conn, temporary, sql_failed = None, True, False
+        try:
+            if initialize:
+                conn = self._open(True)
+            else:
+                conn, temporary = self._connections.checkout(lambda: self._open(False))
             with conn:
                 yield conn
-        except sqlite3.OperationalError:
+        except sqlite3.Error as error:
+            sql_failed = True
+            if not isinstance(error, sqlite3.OperationalError):
+                raise
             raise ConversationStorageUnavailable("CONVERSATION_STORAGE_UNAVAILABLE") from None
         finally:
             if conn is not None:
-                conn.close()
+                if initialize:
+                    conn.close()
+                else:
+                    self._connections.release(conn, temporary, sql_failed)
 
     async def save_conversation(self, conv):
         with self.connect() as conn:
