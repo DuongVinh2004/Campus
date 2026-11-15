@@ -1,0 +1,224 @@
+..............................................................FF........ [ 12%]
+....................................................................sF.. [ 24%]
+......s............s.................................................... [ 36%]
+........................s...................sFs......................... [ 49%]
+........................................................................ [ 61%]
+........................................................................ [ 73%]
+................................FF.......................FF............. [ 85%]
+........................................................................ [ 98%]
+...........                                                              [100%]
+================================== FAILURES ===================================
+_______________ test_openapi_negative_missing_problem_response ________________
+
+openapi_doc = {'openapi': '3.1.2', 'jsonSchemaDialect': 'https://json-schema.org/draft/2020-12/schema', 'x-document-control': {'docu...ns are created only through preview and explicit confirmation.', 'contact': {'name': 'Campus 24/7 Architecture'}}, ...}
+validation_catalogs = ({'REQ-F-AUTH-001', 'REQ-F-AUTH-002', 'REQ-F-AUTH-003', 'REQ-F-AUTH-004', 'REQ-F-CHAT-001', 'REQ-F-CHAT-002', ...}, {'...-ACTION-001', 'TASK-TEST-ASYNCAPI-001', 'TASK-TEST-AUTHZ-001', 'TASK-TEST-BOUNDARY-001', 'TASK-TEST-CATALOG-001', ...})
+
+    def test_openapi_negative_missing_problem_response(
+        openapi_doc: dict, validation_catalogs: tuple[set[str], set[str], set[str]]
+    ):
+        """Verify validator rejects operation lacking RFC 9457 Problem error response."""
+        req_ids, ctrl_ids, test_ids = validation_catalogs
+        mutated = copy.deepcopy(openapi_doc)
+        first_path = next(iter(mutated["paths"].values()))
+        first_op = next(iter(first_path.values()))
+        # Remove Problem error response
+>       first_op["responses"] = {"200": {"description": "OK"}}
+        ^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'str' object does not support item assignment
+
+tests\contracts\test_openapi.py:78: TypeError
+________________ test_openapi_negative_duplicate_operation_id _________________
+
+openapi_doc = {'openapi': '3.1.2', 'jsonSchemaDialect': 'https://json-schema.org/draft/2020-12/schema', 'x-document-control': {'docu...ns are created only through preview and explicit confirmation.', 'contact': {'name': 'Campus 24/7 Architecture'}}, ...}
+validation_catalogs = ({'REQ-F-AUTH-001', 'REQ-F-AUTH-002', 'REQ-F-AUTH-003', 'REQ-F-AUTH-004', 'REQ-F-CHAT-001', 'REQ-F-CHAT-002', ...}, {'...-ACTION-001', 'TASK-TEST-ASYNCAPI-001', 'TASK-TEST-AUTHZ-001', 'TASK-TEST-BOUNDARY-001', 'TASK-TEST-CATALOG-001', ...})
+
+    def test_openapi_negative_duplicate_operation_id(
+        openapi_doc: dict, validation_catalogs: tuple[set[str], set[str], set[str]]
+    ):
+        """Verify validator rejects duplicate operationId."""
+        req_ids, ctrl_ids, test_ids = validation_catalogs
+        mutated = copy.deepcopy(openapi_doc)
+        path_items = list(mutated["paths"].values())
+        op1 = next(iter(path_items[0].values()))
+        op2 = next(iter(path_items[1].values()))
+>       op2["operationId"] = op1["operationId"]
+                             ^^^^^^^^^^^^^^^^^^
+E       TypeError: string indices must be integers, not 'str'
+
+tests\contracts\test_openapi.py:92: TypeError
+_ FixtureGuardTests.test_reviewed_addition_preserves_historical_baseline_and_ancestry _
+
+self = <tests.integration.rag_fixture.test_guard.FixtureGuardTests testMethod=test_reviewed_addition_preserves_historical_baseline_and_ancestry>
+
+    def test_reviewed_addition_preserves_historical_baseline_and_ancestry(self):
+>       _, script, head, tables = fixture.chain()
+                                  ^^^^^^^^^^^^^^^
+
+tests\integration\rag_fixture\test_guard.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+infra\local\rag-fixture\fixture.py:219: in chain
+    directory = reviewed_sources()
+                ^^^^^^^^^^^^^^^^^^
+infra\local\rag-fixture\fixture.py:213: in reviewed_sources
+    require(actual == REVIEWED | REVIEWED_ADDITIONS,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False
+message = 'migration source changed or unreviewed; stop before DB mutation'
+
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise FixtureError(message)
+E           rag_fixture_tool.FixtureError: migration source changed or unreviewed; stop before DB mutation
+
+infra\local\rag-fixture\fixture.py:83: FixtureError
+______________ test_reviewed_ancestry_and_forward_only_recovery _______________
+
+    def test_reviewed_ancestry_and_forward_only_recovery():
+        f = load("filter_fixture", HERE / "fixture.py")
+>       _, script, head, _ = f.chain()
+                             ^^^^^^^^^
+
+tests\integration\test_retrieval_scope_migration.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+infra\local\rag-fixture\fixture.py:219: in chain
+    directory = reviewed_sources()
+                ^^^^^^^^^^^^^^^^^^
+infra\local\rag-fixture\fixture.py:213: in reviewed_sources
+    require(actual == REVIEWED | REVIEWED_ADDITIONS,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False
+message = 'migration source changed or unreviewed; stop before DB mutation'
+
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise FixtureError(message)
+E           filter_fixture.FixtureError: migration source changed or unreviewed; stop before DB mutation
+
+infra\local\rag-fixture\fixture.py:83: FixtureError
+__________________ test_actual_two_process_staff_cas[draft] ___________________
+
+runtime = (<fastapi.applications.FastAPI object at 0x000001F35466B390>, <starlette.testclient.TestClient object at 0x000001F3579...91064+00:00', ...}, WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-P1-0b-20261115/test_actual_two_process_staff_0'))
+kind = 'draft'
+
+    @pytest.mark.parametrize("kind", ["draft", "claim"])
+    def test_actual_two_process_staff_cas(runtime, kind):
+        app, client, _, _, record, path = runtime
+        if kind == "claim":
+            _, record, _ = sent(client)
+        actor = identity(client)
+        processes = []
+        for index in range(2):
+            command = [sys.executable, "-B", str(ROOT / "scripts/probe_unified_staff_process12.py"),
+                "--fixture", str(path), "--ready", f"{kind}-ready-{index}.json", "--gate", f"{kind}-gate.json",
+                "--output", f"{kind}-result-{index}.json", "--owner", actor.subject_id, "--case", record["id"],
+                "--client", generate_uuid7(), "--kind", kind, "--version", str(record["version"])]
+            with (path / f"{kind}-worker-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT, creationflags=0x08000000))
+        deadline = time.monotonic() + 20
+        while not all((path / f"{kind}-ready-{i}.json").exists() for i in range(2)):
+>           assert time.monotonic() < deadline, [p.poll() for p in processes]
+E           AssertionError: [1, 1]
+E           assert 148462.0835615 < 148462.0728215
+E            +  where 148462.0835615 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\integration\test_unified_staff12.py:385: AssertionError
+__________________ test_actual_two_process_staff_cas[claim] ___________________
+
+runtime = (<fastapi.applications.FastAPI object at 0x000001F3579C42D0>, <starlette.testclient.TestClient object at 0x000001F3571...40288+00:00', ...}, WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-P1-0b-20261115/test_actual_two_process_staff_1'))
+kind = 'claim'
+
+    @pytest.mark.parametrize("kind", ["draft", "claim"])
+    def test_actual_two_process_staff_cas(runtime, kind):
+        app, client, _, _, record, path = runtime
+        if kind == "claim":
+            _, record, _ = sent(client)
+        actor = identity(client)
+        processes = []
+        for index in range(2):
+            command = [sys.executable, "-B", str(ROOT / "scripts/probe_unified_staff_process12.py"),
+                "--fixture", str(path), "--ready", f"{kind}-ready-{index}.json", "--gate", f"{kind}-gate.json",
+                "--output", f"{kind}-result-{index}.json", "--owner", actor.subject_id, "--case", record["id"],
+                "--client", generate_uuid7(), "--kind", kind, "--version", str(record["version"])]
+            with (path / f"{kind}-worker-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT, creationflags=0x08000000))
+        deadline = time.monotonic() + 20
+        while not all((path / f"{kind}-ready-{i}.json").exists() for i in range(2)):
+>           assert time.monotonic() < deadline, [p.poll() for p in processes]
+E           AssertionError: [1, 1]
+E           assert 148482.5864605 < 148482.5799338
+E            +  where 148482.5864605 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\integration\test_unified_staff12.py:385: AssertionError
+______ test_actual_two_process_cas_or_resume_has_one_commit[preferences] ______
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-P1-0b-20261115/test_actual_two_process_cas_or0')
+kind = 'preferences'
+
+    @pytest.mark.parametrize("kind",["preferences","resume"])
+    def test_actual_two_process_cas_or_resume_has_one_commit(tmp_path,kind):
+        root = Path(__file__).resolve().parents[2];database = tmp_path / "process.sqlite3"
+        run,conversation = generate_uuid7(),generate_uuid7()
+        if kind == "preferences":SQLiteActorStateStore(database)
+        else:
+            store = SQLiteAgentRunStore(database,tenant=TENANT)
+            store.create(run,OWNER,conversation,{"goal":"Process fixture"},10)
+            store.save(run,OWNER,conversation,1,"waiting_user",{"goal":"Process fixture"})
+        gate = tmp_path / "gate.json";processes = []
+        for index in range(2):
+            command = [sys.executable,"-B",str(root / "scripts/probe_unified_storage_process07.py"),"--kind",kind,
+                "--database",str(database),"--gate",str(gate),"--ready",str(tmp_path / f"ready-{index}.json"),
+                "--output",str(tmp_path / f"result-{index}.json"),"--client",generate_uuid7(),"--run",run,"--conversation",conversation,"--fixture-root",str(tmp_path)]
+            with (tmp_path / f"worker-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen(command,cwd=root,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,creationflags=0x08000000))
+        deadline = time.monotonic()+10
+        while not all((tmp_path / f"ready-{index}.json").exists() for index in range(2)):
+>           assert time.monotonic() < deadline
+E           assert 148498.493135 < 148498.492572
+E            +  where 148498.493135 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\integration\test_unified_storage_completion.py:304: AssertionError
+________ test_actual_two_process_cas_or_resume_has_one_commit[resume] _________
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-P1-0b-20261115/test_actual_two_process_cas_or1')
+kind = 'resume'
+
+    @pytest.mark.parametrize("kind",["preferences","resume"])
+    def test_actual_two_process_cas_or_resume_has_one_commit(tmp_path,kind):
+        root = Path(__file__).resolve().parents[2];database = tmp_path / "process.sqlite3"
+        run,conversation = generate_uuid7(),generate_uuid7()
+        if kind == "preferences":SQLiteActorStateStore(database)
+        else:
+            store = SQLiteAgentRunStore(database,tenant=TENANT)
+            store.create(run,OWNER,conversation,{"goal":"Process fixture"},10)
+            store.save(run,OWNER,conversation,1,"waiting_user",{"goal":"Process fixture"})
+        gate = tmp_path / "gate.json";processes = []
+        for index in range(2):
+            command = [sys.executable,"-B",str(root / "scripts/probe_unified_storage_process07.py"),"--kind",kind,
+                "--database",str(database),"--gate",str(gate),"--ready",str(tmp_path / f"ready-{index}.json"),
+                "--output",str(tmp_path / f"result-{index}.json"),"--client",generate_uuid7(),"--run",run,"--conversation",conversation,"--fixture-root",str(tmp_path)]
+            with (tmp_path / f"worker-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen(command,cwd=root,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,creationflags=0x08000000))
+        deadline = time.monotonic()+10
+        while not all((tmp_path / f"ready-{index}.json").exists() for index in range(2)):
+>           assert time.monotonic() < deadline
+E           assert 148508.5647913 < 148508.5604947
+E            +  where 148508.5647913 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\integration\test_unified_storage_completion.py:304: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/contracts/test_openapi.py::test_openapi_negative_missing_problem_response
+FAILED tests/contracts/test_openapi.py::test_openapi_negative_duplicate_operation_id
+FAILED tests/integration/rag_fixture/test_guard.py::FixtureGuardTests::test_reviewed_addition_preserves_historical_baseline_and_ancestry
+FAILED tests/integration/test_retrieval_scope_migration.py::test_reviewed_ancestry_and_forward_only_recovery
+FAILED tests/integration/test_unified_staff12.py::test_actual_two_process_staff_cas[draft]
+FAILED tests/integration/test_unified_staff12.py::test_actual_two_process_staff_cas[claim]
+FAILED tests/integration/test_unified_storage_completion.py::test_actual_two_process_cas_or_resume_has_one_commit[preferences]
+FAILED tests/integration/test_unified_storage_completion.py::test_actual_two_process_cas_or_resume_has_one_commit[resume]
+8 failed, 573 passed, 6 skipped in 217.54s (0:03:37)
+exit=1

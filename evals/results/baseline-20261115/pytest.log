@@ -1,0 +1,52 @@
+........................................................................ [  5%]
+........................................................................ [ 11%]
+........................................................................ [ 16%]
+........................................................................ [ 22%]
+........................................................................ [ 27%]
+........................................................................ [ 33%]
+........................................................................ [ 38%]
+........................................................................ [ 44%]
+........................................................................ [ 49%]
+........................................................................ [ 55%]
+........................................................................ [ 61%]
+........................................................................ [ 66%]
+..................................................................ssssss [ 72%]
+sss........ssssssss.........s.............ss..................ssss...... [ 77%]
+......ssssss................................s....ssss................... [ 83%]
+........................................................................ [ 88%]
+.................ss.s.......................................ss.......... [ 94%]
+.........................................................s.............F [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+_______________________ test_import_boundaries_enforced _______________________
+
+    def test_import_boundaries_enforced():
+        with open(LAYERS_CONFIG, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+    
+        src_root = ROOT / config.get("source_root", "services/api/src/campus247")
+        rules = config.get("forbidden_imports", {})
+    
+        for layer, forbidden_prefixes in rules.items():
+            layer_dir = src_root / layer
+            if not layer_dir.exists():
+                continue
+    
+            for py_file in layer_dir.rglob("*.py"):
+                imports = get_imports(py_file)
+                for imp in imports:
+                    for forbidden in forbidden_prefixes:
+>                       assert not imp.startswith(forbidden), (
+                            f"Layer boundary violation in {py_file.relative_to(ROOT)}: "
+                            f"Layer '{layer}' is forbidden from importing '{forbidden}', but imports '{imp}'"
+                        )
+E                       AssertionError: Layer boundary violation in services\api\src\campus247\application\learning\service.py: Layer 'application' is forbidden from importing 'campus247.infrastructure', but imports 'campus247.infrastructure.learning.metrics'
+E                       assert not True
+E                        +  where True = <built-in method startswith of str object at 0x000002BBDF153510>('campus247.infrastructure')
+E                        +    where <built-in method startswith of str object at 0x000002BBDF153510> = 'campus247.infrastructure.learning.metrics'.startswith
+
+tests\architecture\test_import_boundaries.py:48: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/architecture/test_import_boundaries.py::test_import_boundaries_enforced
+1 failed, 1255 passed, 41 skipped in 198.84s (0:03:18)
+exit=1

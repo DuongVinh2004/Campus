@@ -1,0 +1,145 @@
+[
+ {
+  "users": 100,
+  "think_s": [
+   8.0,
+   25.0
+  ],
+  "turns_done": 300,
+  "turns_planned": 300,
+  "aborted_for_errors": false,
+  "wall_seconds": 161.4,
+  "turns_per_minute": 111.6,
+  "outcomes": {
+   "clarify": 11,
+   "answer": 260,
+   "refuse": 8,
+   "system_error": 21
+  },
+  "failed_questions": [
+   {
+    "question": "Ad hướng dẫn em với ạ, máy em vừa cài lại win nên mất hết app, theo bài hướng dẫn tải Office 365 bằng tài khoản trường cấp thì đầu tiên em phải vào trang nào trước và sau khi nhập tài khoản thì bấm nút gì để tiếp tục ạ, em cảm ơn ad nhiều?",
+    "outcome": "system_error",
+    "seconds": 42.89
+   },
+   {
+    "question": "theo hd tai office 365 bang tk truong cap em vao trang nao trc va sau khi nhap tk thi bam nut j",
+    "outcome": "system_error",
+    "seconds": 40.55
+   },
+   {
+    "question": "Em học khóa K70KAE đang tính đăng ký môn tự chọn, không biết tổng số tín chỉ trong danh mục tự chọn là mấy tín, và nếu chọn học môn Hệ thống vi cơ điện tử (MEMS) thì mã học phần và số tín chỉ của môn này là bao nhiêu ạ?",
+    "outcome": "system_error",
+    "seconds": 40.44
+   },
+   {
+    "question": "Trong bài chỉ dẫn cài bộ phần mềm văn phòng bản quyền bằng tài khoản trường, sau khi đăng nhập xong thì phải ấn vào nút nào trên màn hình để tải file cài về ạ?",
+    "outcome": "system_error",
+    "seconds": 38.52
+   },
+   {
+    "question": "Ad ơi em hỏi chút ạ, bạn cùng phòng em là sinh viên khuyết tật đang muốn làm thủ tục chính sách kỳ này, theo Thông báo 338 về học kỳ I năm học 2026-2027 thì bạn ấy cần nộp những giấy tờ gì để xin miễn học phí và hạn chót nộp hồ sơ là ngày nào vậy ad, bạn ấy sợ bị trễ hạn quá!",
+    "outcome": "system_error",
+    "seconds": 34.86
+   },
+   {
+    "question": "Chào ad ạ, em là sinh viên K70 hệ chính quy đang tính chuyện học tiếng Anh, em có nghe nói trường ban hành Quyết định 94/2026 quy định lại thời lượng học mà hoang mang quá, không biết tổng thời lượng tiếng Anh giữa chương trình chuẩn với lớp Anh ngữ thì chênh nhau bao nhiêu tín chỉ vậy ad?",
+    "outcome": "system_error",
+    "seconds": 36.49
+   },
+   {
+    "question": "Ad xem giúp em với ạ, em đang học ngành K70KAE mà đang lúng túng lúc chọn môn tự chọn quá, không biết trong danh mục tự chọn của khóa em quy định tổng cộng là mấy tín chỉ, và riêng môn Hệ thống vi cơ điện tử MEMS thì có mã học phần là số bao nhiêu với mấy tín chỉ vậy ad, em cảm ơn nhiều!",
+    "outcome": "system_error",
+    "seconds": 36.02
+   },
+   {
+    "question": "Cái đợt khảo sát tiếng Anh tháng 10 năm 2026 nộp tiền với đăng ký các bước ra sao, hạn đến ngày nào, lệ phí mấy trăm nghìn và nếu lỡ hạn thì trường có mở thêm đợt vét không ạ?",
+    "outcome": "system_error",
+    "seconds": 31.89
+   },
+   {
+    "question": "Bên ngành QLDA khóa 69 hệ cử nhân thì đợt đi thực tập tốt nghiệp với làm đồ án cuối khóa được tính mỗi cái mấy tín chỉ thế ạ?",
+    "outcome": "system_error",
+    "seconds": 35.36
+   },
+   {
+    "question": "Theo quy chế đào tạo hiện hành của trường mình, đối với chương trình cử nhân thì sinh viên bị cảnh báo kết quả học tập bao nhiêu lần liên tục hoặc gián đoạn thì sẽ phải nhận quyết định buộc thôi học vậy ạ?",
+    "outcome": "system_error",
+    "seconds": 33.94
+   },
+   {
+    "question": "Theo cái thông báo về học phí đợt kỳ một năm học 2026–2027 thì sinh viên diện khuyết tật cần nộp các giấy tờ chứng nhận nào để được miễn tiền học và hạn chót nộp là bao giờ ạ?",
+    "outcome": "system_error",
+    "seconds": 40.15
+   },
+   {
+    "question": "Ad ơi cho em hỏi với, em đang đổi mật khẩu tài khoản trường cấp để dùng cho bảo mật mà cứ bị báo không đủ mạnh, theo Sổ tay sinh viên 2026–2027 thì nhà trường khuyến nghị mật khẩu an toàn nên có độ dài bao nhiêu ký tự và phải chứa những loại ký tự nào vậy ạ?",
+    "outcome": "system_error",
+    "seconds": 33.18
+   },
+   {
+    "question": "lan dau den tram y te truong kham thi buoc tiep don can dua thong tin j the mn",
+    "outcome": "system_error",
+    "seconds": 35.15
+   },
+   {
+    "question": "Ad ơi em lo quá, em vừa thấy trường có thông báo thi tiếng Anh đợt tháng 10/2026 mà nhiều mốc thời gian quá em sợ quên, ad tóm tắt giúp em quy trình đăng ký với nộp lệ phí gồm những bước nào, thời hạn và tiền phí là bao nhiêu, với lỡ để quá hạn thì có xin đăng ký bổ sung được không ạ?",
+    "outcome": "system_error",
+    "seconds": 32.68
+   },
+   {
+    "question": "e tu danh gia diem ren luyen o trang nao va diem nay de xet nhung gi ha ad",
+    "outcome": "system_error",
+    "seconds": 32.66
+   },
+   {
+    "question": "em là tân sinh viên K71 phân hiệu HCM, nhập học online hạn chót là hôm nào ạ",
+    "outcome": "system_error",
+    "seconds": 33.49
+   },
+   {
+    "question": "Em hết thời gian nghỉ học tạm thời, muốn nhập học lại thì nộp đơn ở đâu, cần xác nhận gì của địa phương và bao lâu nhận quyết định?",
+    "outcome": "system_error",
+    "seconds": 32.24
+   },
+   {
+    "question": "mẹ em bị tai nạn lao động đang nhận trợ cấp thường xuyên, em có thuộc diện miễn giảm ko",
+    "outcome": "system_error",
+    "seconds": 37.5
+   },
+   {
+    "question": "den tram y te truong kham co can mang the bhyt ko va muon kham chuyen vien bhyt thi bat dau o dau",
+    "outcome": "system_error",
+    "seconds": 35.62
+   },
+   {
+    "question": "Theo bài hướng dẫn cài phần mềm văn phòng của trường, đầu tiên mình phải truy cập link nào trước và điền tài khoản xong thì click vào nút gì ạ?",
+    "outcome": "system_error",
+    "seconds": 35.32
+   },
+   {
+    "question": "Ad cho em hỏi chút với ạ, em đang tính điểm để phấn đấu ra trường mà hoang mang quá, theo Quy chế 1486 thì điểm tích lũy tầm bao nhiêu là được xếp loại giỏi ạ, với lại em nghe bảo bằng giỏi vẫn có nguy cơ bị hạ xuống một bậc thì cụ thể rơi vào những trường hợp nào vậy ad?",
+    "outcome": "system_error",
+    "seconds": 33.82
+   }
+  ],
+  "http_status": {
+   "200": 300
+  },
+  "exceptions": {},
+  "success_rate": 0.93,
+  "latency_s": {
+   "p50": 24.42,
+   "p90": 32.7,
+   "p95": 35.65,
+   "p99": 40.44,
+   "max": 42.89
+  },
+  "ttfb_p50_s": 0.39,
+  "api_cpu_percent_p50_p95": [
+   102,
+   128
+  ],
+  "api_rss_mb_max": 623
+ }
+]
