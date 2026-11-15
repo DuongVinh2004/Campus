@@ -24,7 +24,7 @@ WAL tự lưu trong file nên chỉ cần đặt một lần; các lần mở sa
 
 | Trạng thái | Vị trí | Loại | Khi có nhiều tiến trình | Phân loại |
 |---|---|---|---|---|
-| Rate limit theo tài khoản | `presentation/middleware/abuse_limits.InMemoryRateLimiterStore` | Bộ đếm | Mỗi tiến trình đếm riêng: giới hạn 30/phút thành 30 × N | **Phải dùng chung** (bước 1.5) |
+| Rate limit theo tài khoản | `presentation/middleware/abuse_limits.InMemoryRateLimiterStore` | Bộ đếm | Mỗi tiến trình đếm riêng: giới hạn 30/phút thành 30 × N | **Phải dùng chung** (bước 1.5, **đã làm**: `PostgresRateLimiterStore`, chọn bằng `CAMPUS247_RATE_LIMIT_STORE=postgres`) |
 | Điểm kiểm tra liên kết nguồn, quét injection | `agent/nodes/rag_v2._BOUND`, `_HAYSTACKS`, `_prepared` | Cache theo nội dung (khóa bằng băm) | Mỗi tiến trình giữ bản riêng | An toàn (chỉ tốn RAM) |
 | Cache xác nhận publication 30 s | `infrastructure/knowledge/publication._attachment_cache`, `_version_cache`, `_acquisition_cache` | Cache có TTL, khóa bằng mtime/băm | Như trên | An toàn |
 | Cache chuẩn hóa chữ, follow-up, source snapshot | `lru_cache` ở `values`, `followup`, `source_snapshot` | Hàm thuần | Như trên | An toàn |

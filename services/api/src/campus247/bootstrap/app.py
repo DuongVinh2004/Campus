@@ -257,7 +257,14 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
         RateLimitRule(path_prefix="/v1/privacy/operations", max_requests=10, window_seconds=60, fail_closed=True),
         RateLimitRule(path_prefix="/v1/privacy/requests", max_requests=10, window_seconds=60, fail_closed=True),
     ]
-    app.add_middleware(AbuseLimiterMiddleware, store=InMemoryRateLimiterStore(), rules=abuse_rules)
+    if settings.rate_limit_store == "postgres":
+        if knowledge_runtime is None:
+            raise ValueError("the shared rate limiter store needs the knowledge platform database pool")
+        from campus247.infrastructure.rate_limit.postgres_store import PostgresRateLimiterStore
+        limiter_store = PostgresRateLimiterStore(lambda: knowledge_runtime.repo.pool)
+    else:
+        limiter_store = InMemoryRateLimiterStore()
+    app.add_middleware(AbuseLimiterMiddleware, store=limiter_store, rules=abuse_rules)
 
     # 3. Synthetic Identity Middleware for Demo Mode
     identity_adapter = identity_adapter_override or SyntheticIdentityAdapter(

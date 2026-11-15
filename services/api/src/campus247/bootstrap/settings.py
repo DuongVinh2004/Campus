@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO", description="Mức ghi log hệ thống")
     rag_engine: Literal["v1", "v2"] = Field(default="v1",
         validation_alias=AliasChoices("CAMPUS247_RAG_ENGINE", "rag_engine"))
+    # Where the abuse limiter counts requests. "memory" counts per process (tests, one process); "postgres" is shared
+    # by every API process, so N processes still allow exactly the configured rate. Needs the knowledge platform pool.
+    rate_limit_store: Literal["memory", "postgres"] = Field(default="memory",
+        validation_alias=AliasChoices("CAMPUS247_RATE_LIMIT_STORE", "rate_limit_store"))
     # Admission control for chat turns, per API process. 0 disables the bound (tests, tools).
     chat_max_in_flight: int = Field(default=0, ge=0,
         validation_alias=AliasChoices("CAMPUS247_CHAT_MAX_IN_FLIGHT", "chat_max_in_flight"))

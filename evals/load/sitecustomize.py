@@ -18,6 +18,11 @@ if os.environ.get("CAMPUS_LOADTEST_NO_RATE_LIMIT") == "1":
         sys.path.insert(0, str(_ROOT / "services/api/src"))
         from campus247.presentation.middleware import abuse_limits as _al
         _al.InMemoryRateLimiterStore.check_and_increment = lambda self, key, max_requests, window_seconds: (True, max_requests, 0)
+        from campus247.infrastructure.rate_limit import postgres_store as _ps
+
+        async def _lifted(self, key, max_requests, window_seconds):
+            return True, max_requests, 0
+        _ps.PostgresRateLimiterStore.check_and_increment = _lifted
         print("LOADTEST: per-account rate limiter lifted in this process", file=sys.stderr)
     except Exception:  # noqa: BLE001 -- a missing import must never break startup
         pass

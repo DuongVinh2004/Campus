@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import inspect
 import threading
 from typing import Any
 from fastapi import Request
@@ -59,7 +60,7 @@ class AbuseLimiterMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
         app: Any,
-        store: InMemoryRateLimiterStore | None = None,
+        store: Any | None = None,  # InMemoryRateLimiterStore, or any store with (async) check_and_increment
         rules: list[RateLimitRule] | None = None,
         trusted_proxies: set[str] | None = None,
     ) -> None:
@@ -93,11 +94,14 @@ class AbuseLimiterMiddleware(BaseHTTPMiddleware):
         key = self._resolve_limiter_key(request, rule)
 
         try:
-            allowed, remaining, retry_after = self._store.check_and_increment(
+            outcome = self._store.check_and_increment(
                 key=key,
                 max_requests=rule.max_requests,
                 window_seconds=rule.window_seconds,
             )
+            if inspect.isawaitable(outcome):  # a shared (database) store is a coroutine
+                outcome = await outcome
+            allowed, remaining, retry_after = outcome
         except Exception:
             # AC-TASK-API-ABUSE-001-03: Fail-closed on expensive endpoints, bounded-safe otherwise
             if rule.fail_closed:
