@@ -1,0 +1,13 @@
+{
+ "schema": "onnx-linux-release-v1",
+ "version": "1.30.0",
+ "api_version": 30,
+ "source": "https://github.com/microsoft/onnxruntime/releases/download/v1.30.0/onnxruntime-linux-x64-1.30.0.tgz",
+ "tgz_sha256": "a5ed5a3cac51fbb2e90da632ae43d19212faaa20e76484e62bcb7c23ddb3b3fd",
+ "tgz_matches_publisher_digest": true,
+ "acquired": "2026-11-15",
+ "lib": "onnxruntime-linux-x64-1.30.0/lib/libonnxruntime.so.1.30.0",
+ "lib_sha256": "245a6f8c38127551057a1cd1ffd59f0a186a227ade4f3492dea2494eb565542e",
+ "header": "onnxruntime-linux-x64-1.30.0/include/onnxruntime_c_api.h",
+ "header_sha256": "e035e30c27e74c8c00e0f483e576e12b4067d17f12e9237fd6eff8b346c9b381"
+}

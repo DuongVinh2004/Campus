@@ -118,6 +118,8 @@ PS_SAMPLE = (
 
 def api_pids(port: int) -> list[int]:
     import subprocess
+    if sys.platform != "win32":
+        return []  # CPU sampling uses Windows performance counters; on Linux the container's cgroup is read instead
     # The serving process and, with several API workers, the worker processes it started.
     out = subprocess.run(["powershell", "-NoProfile", "-Command",
         "$all = Get-CimInstance Win32_Process; "
