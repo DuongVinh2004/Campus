@@ -23,6 +23,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "scripts"), str(ROOT / "services/api/src")
     str(ROOT / "services/worker/src"), str(ROOT / "packages/synthetic/src"),
     str(ROOT / ".tooling/knowledge-platform-20261023/site-packages")]
 from campus247.infrastructure.knowledge.storage import FileKnowledgeStorage, ReadThroughKnowledgeStorage, checked_path
+from knowledge_parser_runtime import resolve_parser_python
 
 STATE = checked_path(ROOT / "infra/local/knowledge-platform-20261023", ROOT)
 PGROOT = checked_path(ROOT / ".tooling/knowledge-postgres-20261023/pgsql", ROOT)
@@ -52,7 +53,7 @@ def rehearsal_connection(manifest):
     manifest = checked_path(Path(manifest).absolute(), ROOT)
     value = json.loads(manifest.read_text(encoding="utf-8"))
     if (manifest.parent != ROOT / "infra/local/knowledge-automation-20261026"
-        or value.get("status") != "passed" or value.get("revision") not in {"0020", "0021", "0022"}
+        or value.get("status") != "passed" or value.get("revision") not in {"0020", "0021", "0022", "0023", "0024"}
         or not re.fullmatch(r"campus247_automation_20261026_[0-9a-f]{12}", value.get("database", ""))
         or value.get("host") != "127.0.0.1" or value.get("port") != DB_PORT):
         raise ValueError("Only an exact successful local rehearsal database manifest is accepted")
@@ -172,7 +173,7 @@ async def bootstrap_local():
 
 
 def migrate(revision="0018"):
-    if revision not in {"0018", "0022"}:
+    if revision not in {"0018", "0022", "0023", "0024"}:
         raise ValueError("Explicit reviewed local migration revision required")
     value = connection()
     from alembic import command
@@ -243,34 +244,43 @@ def model_budget():
         "inference_cap":latest["caps"]["inference"],"status":"BOUNDED_EXISTING_LEDGER"}
 
 
-async def components(*, rehearsal=None):
+async def components(*, rehearsal=None, learning_rehearsal=None):
     import asyncpg
     from campus247.application.knowledge.platform import KnowledgePlatform
     from campus247.bootstrap.settings import Settings
     from campus247.domain.action.confirmation import ConfirmationTokenService
     from campus247.infrastructure.knowledge.repository import KnowledgeRepository
     from campus247.infrastructure.knowledge.runtime import KnowledgeReleaseRuntime
-    value = rehearsal_connection(rehearsal) if rehearsal else connection()
-    pool = await asyncpg.create_pool(**value, min_size=1, max_size=5, command_timeout=15)
+    value = (learning_rehearsal.connection() if learning_rehearsal else
+             rehearsal_connection(rehearsal) if rehearsal else connection())
+    pool = await asyncpg.create_pool(**value, min_size=1, max_size=5, command_timeout=15,
+        init=learning_rehearsal.verify_connection if learning_rehearsal else None)
     async with pool.acquire() as conn:
         revision = await conn.fetchval("SELECT version_num FROM alembic_version")
-        if revision not in ({"0020", "0021", "0022"} if rehearsal else {"0017", "0018", "0022"}):
+        accepted_revisions = {"0025", "0026", "0027", "0028", "0029", "0030", "0031"} if learning_rehearsal else ({"0020", "0021", "0022", "0023", "0024"} if rehearsal else {"0017", "0018", "0022", "0023", "0024"})
+        if revision not in accepted_revisions:
             raise ValueError("Apply additive platform migrations before running services")
         if rehearsal and revision != json.loads(Path(rehearsal).read_text(encoding="utf-8"))["revision"]:
             raise ValueError("Rehearsal schema differs from the explicit receipt")
         if await conn.fetchval("SELECT current_database()") != value["database"]:
             raise ValueError("Database identity mismatch")
+    scoped_settings = ({"rag_engine": "v1", "parallel_classify": False, "AGENT_RUN_STORAGE_MODE": "disabled",
+                        "AGENT_RUN_SQLITE_PATH": None, "CONVERSATION_STORAGE_MODE": "ephemeral",
+                        "CONVERSATION_SQLITE_PATH": None, "CONFIRMATION_SIGNING_KEY": secrets.token_hex(32)}
+                       if learning_rehearsal else {})
     settings = Settings(_env_file=None, ENVIRONMENT="development", DEMO_MODE=True,
         OPENAI_API_KEY=None, GEMINI_API_KEY=None, DEEPSEEK_API_KEY=None,
         DATABASE_URL=__import__("sqlalchemy").engine.URL.create("postgresql+asyncpg", username=value["user"],
-            password=value["password"], host=value["host"], port=value["port"], database=value["database"]).render_as_string(hide_password=False))
+            password=value["password"], host=value["host"], port=value["port"], database=value["database"]).render_as_string(hide_password=False),
+        **scoped_settings)
     repository = KnowledgeRepository(pool, TENANT)
-    bundle = rehearsal_bundle_paths(rehearsal)
+    bundle = ({"artifacts": learning_rehearsal.directory / "artifacts"} if learning_rehearsal
+              else rehearsal_bundle_paths(rehearsal))
     storage = (FileKnowledgeStorage(ROOT, bundle["artifacts"]) if bundle else
         ReadThroughKnowledgeStorage(ROOT, STATE / "rehearsals" / value["database"] / "artifacts", STATE / "artifacts") if rehearsal else FileKnowledgeStorage(ROOT, STATE / "artifacts"))
     platform = KnowledgePlatform(repository, storage, ConfirmationTokenService(settings.CONFIRMATION_SIGNING_KEY))
     platform.operational = True
-    platform.runtime_environment = "rehearsal" if rehearsal else "operational"
+    platform.runtime_environment = "rehearsal" if rehearsal or learning_rehearsal else "operational"
     platform.model_budget = model_budget
     embedding, reranker = models()
     runtime = KnowledgeReleaseRuntime(platform, embedding, reranker, instance_id="knowledge-local-api")
@@ -286,10 +296,10 @@ async def work(once=False, *, rehearsal=None, heartbeat_file=None):
         heartbeat_file = checked_path(Path(heartbeat_file).absolute(), ROOT)
         if heartbeat_file.parent.parent != STATE or not heartbeat_file.parent.name.startswith("resume-") or heartbeat_file.name != "worker-health.jsonl":
             raise ValueError("Exact new retained runtime worker pulse path required")
+    parser_python = resolve_parser_python(ROOT)
     pool, _, platform, runtime = await components(rehearsal=rehearsal)
-    parser_python = checked_path(ROOT / ".venv/Scripts/python.exe", ROOT)
     worker = KnowledgeIngestionWorker(platform.repo, platform.storage, runtime.embedding, owner="worker-" + str(uuid4()),
-        parser_python=parser_python if parser_python.is_file() else None, platform=platform,
+        parser_python=parser_python, platform=platform,
         ocr_adapter=LocalOcrAdapter(platform.storage,node=NODE,package_root=NODE.parents[1] / "package.json"))
     try:
         await serve_worker(worker, rehearsal_connection(rehearsal)["database"] if rehearsal else DB_NAME,
@@ -298,8 +308,17 @@ async def work(once=False, *, rehearsal=None, heartbeat_file=None):
         await pool.close()
 
 
-async def make_app(*, generation=False, frontend_port=None, rehearsal=None, api_port=8015):
-    if os.environ.get("CAMPUS247_RAG_ENGINE", "v1") == "v2":
+async def make_app(*, generation=False, frontend_port=None, rehearsal=None, learning_rehearsal=None, api_port=8015):
+    learning_flag = os.environ.get("CAMPUS_LEARNING_ENABLED", "true").lower()
+    if learning_flag not in {"true", "false"}:
+        raise ValueError("CAMPUS_LEARNING_ENABLED must be true or false")
+    if learning_rehearsal:
+        from learning_campus_rehearsal import LearningCampusRehearsal
+        if (rehearsal or generation or api_port == 8015 or frontend_port == 3015
+                or os.environ.get("CAMPUS_LEARNING_AI_ENABLED", "false").lower() != "false"):
+            raise ValueError("Learning rehearsal must be isolated from the retained runtime and provider")
+        learning_rehearsal = LearningCampusRehearsal.load(learning_rehearsal, ROOT)
+    if not learning_rehearsal and os.environ.get("CAMPUS247_RAG_ENGINE", "v1") == "v2":
         index_dir = Path(os.environ.get("CAMPUS247_RAG_V2_INDEX", "data/rag_v2_index"))
         index_dir = checked_path(index_dir if index_dir.is_absolute() else ROOT / index_dir, ROOT)
         if not index_dir.is_dir():
@@ -314,16 +333,36 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, api_
     from campus247.ports.llm import LlmResponse, LlmResponseStatus
     from campus247.infrastructure.identity.local_owner import LocalOwnerIdentityAdapter
     from campus247.infrastructure.identity.local_student import LocalCampusIdentityAdapter, LocalStudentIdentityAdapter
-    pool, settings, platform, runtime = await components(rehearsal=rehearsal)
-    if settings.rag_engine == "v2":
+    pool, settings, platform, runtime = await components(rehearsal=rehearsal, learning_rehearsal=learning_rehearsal)
+    if learning_rehearsal:
+        runtime.instance_id = f"knowledge-local-learning-rehearsal-{api_port}"
+    elif settings.rag_engine == "v2":
         runtime.instance_id = f"knowledge-local-api-v2-{api_port}"
     platform.operational = True
-    owner_adapter = LocalOwnerIdentityAdapter(checked_path(STATE / "owner-identity.json", ROOT), TENANT)
+    identity_root = learning_rehearsal.directory if learning_rehearsal else STATE
+    owner_path = identity_root / ("owner/identity.json" if learning_rehearsal else "owner-identity.json")
+    student_path = identity_root / ("student/identity.json" if learning_rehearsal else "student-identity.json")
+    owner_adapter = LocalOwnerIdentityAdapter(checked_path(owner_path, ROOT), TENANT)
     owner_adapter.directory()  # Explicitly provisioned account required; no synthetic fallback.
+    learning_service, learning_adapter = None, None
+    learning_config_override = (str(identity_root / "learning/config.json") if learning_rehearsal
+                                else os.environ.get("CAMPUS_LEARNING_CONFIG"))
+    learning_config = Path(learning_config_override) if learning_config_override else ROOT / "infra/local/learning-materials-20261104-01/config.json"
+    if learning_flag == "true" and (learning_config_override or learning_config.is_file()):
+        from campus247.bootstrap.learning import load_local_learning
+        verified_learning_database = await pool.fetchval("SELECT current_database()")
+        verified_learning_revision = await pool.fetchval("SELECT version_num FROM alembic_version")
+        learning_service, learning_adapter = load_local_learning(learning_config, workspace=ROOT, tenant_id=TENANT,
+            postgres_pool=pool, verified_database_name=verified_learning_database, verified_schema_revision=verified_learning_revision)
+    from campus247.infrastructure.identity.local_staff import LocalStaffIdentityAdapter
+    staff_adapter = LocalStaffIdentityAdapter(checked_path(identity_root / "staff-identity.json", ROOT), TENANT)
     campus_adapter = LocalCampusIdentityAdapter(owner_adapter,
-        LocalStudentIdentityAdapter(checked_path(STATE / "student-identity.json", ROOT), TENANT))
+        LocalStudentIdentityAdapter(checked_path(student_path, ROOT), TENANT), learning=learning_adapter, staff=staff_adapter)
+    if learning_service is not None:
+        learning_service.directory = campus_adapter.learning_directory
     from campus247.infrastructure.repositories.sqlite_actor_state import SQLiteActorStateStore
-    bundle = rehearsal_bundle_paths(rehearsal)
+    bundle = ({name: identity_root / name for name in ("actor-state.sqlite3", "action-idempotency.sqlite3", "conversations.sqlite3")}
+              if learning_rehearsal else rehearsal_bundle_paths(rehearsal))
     actor_database=bundle["actor-state.sqlite3"] if bundle else checked_path(STATE / "actor-state.sqlite3",ROOT)
     if not bundle:
         actor_marker=checked_path(STATE / "actor-storage-initialized.json",ROOT)
@@ -370,6 +409,14 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, api_
                 return restore_paid(snapshot, pending)
         gateway = RetainedGateway()  # Retains paid accounting, lease and egress controls.
         verifier = SemanticClaimVerifier(gateway)
+    learning_ai_flag = os.environ.get("CAMPUS_LEARNING_AI_ENABLED", "false").lower()
+    if learning_ai_flag not in {"true", "false"}:
+        raise ValueError("CAMPUS_LEARNING_AI_ENABLED must be true or false")
+    if learning_ai_flag == "true":
+        if not generation:
+            raise ValueError("Learning AI requires the explicitly enabled guarded generation runtime")
+        from campus247.bootstrap.learning import configure_learning_ai
+        configure_learning_ai(learning_service, gateway, enabled=True)
     factory = RetrievalContextFactory(scope_resolver=LocalScope(), configured_tenant_id=TENANT, configured_campus_id="HUCE")
     os.environ["CAMPUS247_IDEMPOTENCY_DB"] = str(bundle["action-idempotency.sqlite3"] if bundle else checked_path(STATE / "action-idempotency.sqlite3", ROOT))
     conversations = SQLiteConversationRepository(bundle["conversations.sqlite3"] if bundle else checked_path(STATE / "conversations.sqlite3", ROOT))
@@ -384,28 +431,80 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, api_
     from campus247.application.document_request.local_preparation import LocalPreparationService
     from campus247.presentation.local_preparation import create_local_preparation_router
     app.include_router(create_local_preparation_router(LocalPreparationService(app.state.actor_state_store, platform)))
+    # Durable campus operations (rooms, timetable, notifications, tickets, staff queue, admin overview).
+    # The older in-memory demo routes for the same paths are removed so nothing writes to a volatile store.
+    from campus247.application.campus_ops.service import CampusOpsService
+    from campus247.infrastructure.repositories.sqlite_campus_ops import CampusOpsStore
+    from campus247.presentation.campus_ops import create_campus_ops_router, register_ops_errors
+    ops_service = CampusOpsService(CampusOpsStore(checked_path(identity_root / "campus-ops.sqlite3", ROOT)))
+    # FastAPI nests included routers, so route.path cannot be filtered; put the durable routes first so they
+    # win, and the boundary middleware below rejects the volatile demo paths that remain behind them.
+    ops_count = len(app.router.routes)
+    app.include_router(create_campus_ops_router(ops_service))
+    ops_branches = app.router.routes[ops_count:]
+    app.router.routes[ops_count:] = []
+    app.router.routes[0:0] = ops_branches
+    register_ops_errors(app)
+    app.state.campus_ops = ops_service
+    from campus247.presentation.learning import create_learning_router
+    app.include_router(create_learning_router(learning_service))
+    app.state.learning_service = learning_service
 
     @app.get("/health/entry", include_in_schema=False)
     def entry_health():
         return {"entry_url": f"http://127.0.0.1:{api_port}", "api_same_origin": True,
             "authentication": "password_local", "knowledge": "current_release",
             "student_services": "owned_local_preparations", "university_connected": False,
-            "shared_history": True, "shared_actor_storage": True}
+            "synthetic_rehearsal": bool(learning_rehearsal),
+            "shared_history": True, "shared_actor_storage": True,
+            "learning": {"configured": learning_service is not None,
+                "worker": getattr(app.state, "learning_worker_status", "starting" if learning_service else "disabled"),
+                "last_success_at": getattr(app.state, "learning_worker_last_success", None)}}
 
     @asynccontextmanager
     async def owned_lifespan(application):
-        scheduler_task = None
+        leader_task = None
+        async def learning_worker():
+            import logging
+            while True:
+                try:
+                    await learning_service.tick()
+                    application.state.learning_worker_status = "ready"
+                    application.state.learning_worker_last_success = datetime.now(UTC).isoformat()
+                except asyncio.CancelledError:
+                    raise
+                except Exception as error:
+                    application.state.learning_worker_status = "unavailable"
+                    logging.getLogger("campus247.learning").warning("Learning worker unavailable", extra={"error_type": type(error).__name__})
+                await asyncio.sleep(5)
         try:
             async with original_lifespan(application):
                 # Only explicitly configured schedules with a still-valid signed
                 # session can run. No token minting or authority on startup.
-                scheduler_task = asyncio.create_task(platform.schedules.serve())
+                # With several API processes exactly one (the holder of a Postgres advisory lock) runs the
+                # background jobs; the others stand by and take over if the leader's session is lost.
+                from campus247.infrastructure.leader import BackgroundLeader
+                leader = application.state.background_leader = BackgroundLeader(lambda: pool)
+
+                async def start_jobs():
+                    jobs = [asyncio.create_task(platform.schedules.serve())]
+                    if learning_service is not None:
+                        jobs.append(asyncio.create_task(learning_worker()))
+                        if learning_service.accessible_text_pipeline is not None:
+                            jobs.append(asyncio.create_task(learning_service.serve_accessible_text()))
+                    return jobs
+
+                def standby():
+                    if learning_service is not None:
+                        application.state.learning_worker_status = "standby"
+
+                leader_task = asyncio.create_task(leader.run(start_jobs, standby))
                 yield
         finally:
-            if scheduler_task is not None:
-                scheduler_task.cancel()
+            if leader_task is not None:
+                leader_task.cancel()  # its own cleanup cancels the jobs and releases the lock
                 try:
-                    await scheduler_task
+                    await leader_task
                 except asyncio.CancelledError:
                     pass
             await pool.close()
@@ -504,7 +603,11 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, api_
     @app.middleware("http")
     async def operational_boundary(request, call_next):
         path = request.url.path
-        if path.startswith("/v1/") and not (path.startswith(("/v1/knowledge/", "/v1/conversations", "/v1/privacy/", "/v1/assistant/", "/v1/student-preparations"))
+        import re as _re
+        if _re.fullmatch(r"/v1/tickets/preview|/v1/tickets/[^/]+/confirm|/v1/handovers(/.*)?|/v1/staff/handovers", path):
+            return JSONResponse({"detail":"Chức năng này chưa kết nối dữ liệu vận hành."}, status_code=404)
+        if path.startswith("/v1/") and not (path.startswith(("/v1/knowledge/", "/v1/conversations", "/v1/privacy/", "/v1/assistant/", "/v1/student-preparations", "/v1/learning/",
+                "/v1/rooms", "/v1/tickets", "/v1/students/me/schedule", "/v1/staff/tickets", "/v1/notifications", "/v1/admin/overview"))
                 or path in {"/v1/users/me", "/v1/auth/logout"}):
             return JSONResponse({"detail":"Chức năng này chưa kết nối dữ liệu vận hành."}, status_code=404)
         if path in {"/v1/auth/demo-session", "/v1/knowledge/platform/local-session"}:
@@ -515,29 +618,28 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, api_
         return response
 
     if frontend_port is not None:
-        import httpx
-        from fastapi.responses import StreamingResponse
+        from knowledge_frontend_proxy import proxy_frontend
         @app.get("/{page_path:path}", include_in_schema=False)
         async def frontend(page_path: str, request: Request):
             if page_path in {"", "knowledge"}:
                 from starlette.responses import RedirectResponse
                 return RedirectResponse("/chat" if not page_path else "/knowledge/sources")
-            if (not (page_path in {"", "chat", "login", "knowledge/sources", "knowledge", "services", "tickets", "schedule", "rooms", "privacy"}
-                     or page_path.startswith(("_next/", "images/", "fonts/"))) or ".." in page_path or "\\" in page_path):
+            if (not (page_path in {"", "chat", "login", "knowledge/sources", "knowledge", "services", "tickets", "schedule", "rooms", "privacy", "staff", "notifications", "admin"}
+                     or page_path == "learning" or page_path.startswith(("learning/", "_next/", "images/", "fonts/"))) or ".." in page_path or "\\" in page_path):
                 raise HTTPException(404)
-            async with httpx.AsyncClient(trust_env=False, timeout=15) as client:
-                response = await client.get(f"http://127.0.0.1:{frontend_port}/" + page_path, params=request.query_params)
-            if len(response.content) > 10*1024**2:
-                raise HTTPException(502)
-            return Response(response.content, status_code=response.status_code,
-                            media_type=response.headers.get("content-type"))
+            return await proxy_frontend(page_path, request, frontend_port)
     return app
 
 
-async def serve(port, generation=False, frontend_port=None, *, rehearsal=None):
+async def serve(port, generation=False, frontend_port=None, *, rehearsal=None, learning_rehearsal=None):
+    from copy import deepcopy
+
     import uvicorn
-    app = await make_app(generation=generation, frontend_port=frontend_port, rehearsal=rehearsal, api_port=port)
-    await uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, access_log=False)).serve()
+    app = await make_app(generation=generation, frontend_port=frontend_port, rehearsal=rehearsal,
+        learning_rehearsal=learning_rehearsal, api_port=port)
+    logs = deepcopy(uvicorn.config.LOGGING_CONFIG)
+    logs["loggers"]["campus247.learning.metrics"] = {"handlers": ["default"], "level": "INFO", "propagate": False}
+    await uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, access_log=False, log_config=logs)).serve()
 
 
 def main():
@@ -549,9 +651,12 @@ def main():
     parser.add_argument("--frontend-port", type=int)
     parser.add_argument("--generation", action="store_true", help="Use the existing paid gateway only if its retained guards accept")
     parser.add_argument("--rehearsal", help="Exact successful new local test DB manifest; serving DB remains unchanged")
+    parser.add_argument("--learning-rehearsal", help="Exact isolated Campus learning bundle; never uses the retained database or provider")
     parser.add_argument("--worker-heartbeat", help="Exact new worker pulse log within a retained runtime resume directory")
-    parser.add_argument("--revision", choices=("0018", "0022"), default="0018", help="Explicit additive local migrate target; default is unchanged")
+    parser.add_argument("--revision", choices=("0018", "0022", "0023", "0024"), default="0018", help="Explicit additive local migrate target; default is unchanged")
     args = parser.parse_args()
+    if args.learning_rehearsal and args.command != "serve":
+        parser.error("--learning-rehearsal is only valid with serve")
     if args.command == "inventory":
         inventory()
     elif args.command == "bootstrap-local":
@@ -561,7 +666,8 @@ def main():
     elif args.command in {"worker", "worker-once"}:
         asyncio.run(work(args.command == "worker-once", rehearsal=args.rehearsal, heartbeat_file=args.worker_heartbeat))
     else:
-        asyncio.run(serve(args.port, args.generation, args.frontend_port, rehearsal=args.rehearsal))
+        asyncio.run(serve(args.port, args.generation, args.frontend_port, rehearsal=args.rehearsal,
+            learning_rehearsal=args.learning_rehearsal))
 
 
 if __name__ == "__main__":
