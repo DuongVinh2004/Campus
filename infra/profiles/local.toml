@@ -3,9 +3,9 @@
 name = "local"
 
 [api]
-# Consumed by the launcher from step 1.1. The launcher refuses any value its code cannot honour yet (see
-# SUPPORTED_API_WORKERS in scripts/knowledge_platform_runtime.py). Step 1.8 raises local to 2, then 3 when RAM allows.
-workers = 1
+# API processes sharing port 8015 (the launcher accepts 1 to MAX_API_WORKERS in scripts/knowledge_platform_runtime.py).
+# More workers need more RAM: the launcher checks the memory estimate before starting any.
+workers = 2
 # Per-worker turns in flight (admission control, step 1.2; measured: 24 gave 27 s turns, 12 keeps them under 18 s)
 # and concurrent provider calls (declared now, consumed from step 1.7).
 max_in_flight_per_worker = 12

@@ -35,9 +35,8 @@ from knowledge_platform import (
 from runtime_profile import ProfileError, check_memory, load_profile
 
 FRONTEND = None
-# The launcher starts exactly one API process today. Profiles may declare more (cloud does); step 1.8 adds the app
-# factory that makes N workers possible, and raises this together with local.toml.
-SUPPORTED_API_WORKERS = 1
+# API processes sharing port 8015 (uvicorn workers started from an app factory, rollout step 1.8).
+MAX_API_WORKERS = 4
 HIDDEN = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 RAG_V2_INDEX = "data/rag_v2_index/embedded2"
 GATEWAY_TOKEN = ROOT / "infra/local/public-rag-20261013/gateway-sidecar.token"
@@ -286,9 +285,9 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
     if engine not in {"v1", "v2"}:
         raise ValueError("Explicit RAG engine v1 or v2 required")
     profile = load_profile(profile)
-    if profile.api_workers != SUPPORTED_API_WORKERS:
+    if not 1 <= profile.api_workers <= MAX_API_WORKERS:
         raise RuntimeError(f"Profile '{profile.name}' asks for {profile.api_workers} API workers; this launcher "
-                           f"supports {SUPPORTED_API_WORKERS} until step 1.8")
+                           f"supports 1 to {MAX_API_WORKERS}")
     index = Path(rag_v2_index)
     index = checked_path(index if index.is_absolute() else ROOT / index, ROOT)
     if engine == "v2" and not index.is_dir():
@@ -307,7 +306,8 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
         "gateway": ["scripts/gateway_sidecar.py", "serve", "--port", str(profile.gateway_port),
                     "--concurrency", str(profile.provider_concurrency), "--daily-usd-cap", profile.daily_usd_cap,
                     "--daily-call-cap", str(profile.daily_call_cap)],
-        "api": ["scripts/knowledge_platform.py", "serve", "--generation", "--port", "8015", "--frontend-port", "3015"],
+        "api": ["scripts/knowledge_platform.py", "serve", "--generation", "--port", "8015", "--frontend-port", "3015",
+                *(["--workers", str(profile.api_workers)] if profile.api_workers > 1 else [])],
         "worker": ["scripts/knowledge_platform.py", "worker", "--worker-heartbeat", None],
     }
     if defer_worker:

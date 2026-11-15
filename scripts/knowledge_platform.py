@@ -14,6 +14,7 @@ import secrets
 import socket
 import subprocess
 import sys
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -30,6 +31,25 @@ PGROOT = checked_path(ROOT / ".tooling/knowledge-postgres-20261023/pgsql", ROOT)
 CLUSTER = checked_path(ROOT / ".tooling/knowledge-postgres-20261023/cluster", ROOT)
 CONNECTION = checked_path(STATE / "local-connection.json", ROOT)
 DB_NAME, DB_PORT, TENANT = "campus247_knowledge_local_20261023", 55437, "huce-local-public"
+
+
+def shared_secret(name):
+    """A secret every API process of this runtime shares (a random value per process could not be verified by the
+    others): created once with exclusive create, then read by all. Lives in the runtime state directory."""
+    path = checked_path(STATE / name, ROOT)
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        for _ in range(100):  # another process is still writing it
+            value = path.read_text(encoding="ascii").strip()
+            if len(value) == 64:
+                return value
+            time.sleep(0.05)
+        raise RuntimeError("shared secret file is incomplete")
+    value = secrets.token_hex(32)
+    with os.fdopen(descriptor, "w", encoding="ascii") as stream:
+        stream.write(value)
+    return value
 
 
 def retain(path, value):
@@ -272,13 +292,19 @@ async def components(*, rehearsal=None, learning_rehearsal=None):
         OPENAI_API_KEY=None, GEMINI_API_KEY=None, DEEPSEEK_API_KEY=None,
         DATABASE_URL=__import__("sqlalchemy").engine.URL.create("postgresql+asyncpg", username=value["user"],
             password=value["password"], host=value["host"], port=value["port"], database=value["database"]).render_as_string(hide_password=False),
-        **scoped_settings)
+        # Every API process of the runtime must verify the confirmation tokens any other minted, so the key is one
+        # persistent random secret in the runtime state directory (the built-in default is a fixed public string).
+        **{"CONFIRMATION_SIGNING_KEY": shared_secret("confirmation-signing.key"), **scoped_settings})
     repository = KnowledgeRepository(pool, TENANT)
     bundle = ({"artifacts": learning_rehearsal.directory / "artifacts"} if learning_rehearsal
               else rehearsal_bundle_paths(rehearsal))
     storage = (FileKnowledgeStorage(ROOT, bundle["artifacts"]) if bundle else
         ReadThroughKnowledgeStorage(ROOT, STATE / "rehearsals" / value["database"] / "artifacts", STATE / "artifacts") if rehearsal else FileKnowledgeStorage(ROOT, STATE / "artifacts"))
     platform = KnowledgePlatform(repository, storage, ConfirmationTokenService(settings.CONFIRMATION_SIGNING_KEY))
+    # Several API processes: share the agent write-flow's signing key (derived for that purpose only) and its previews.
+    from campus247.agent.tools.write_flow import configure_shared_state
+    configure_shared_state(checked_path(STATE / "write-previews.sqlite3", ROOT), hashlib.sha256(
+        b"write-flow:" + bytes.fromhex(settings.CONFIRMATION_SIGNING_KEY)).digest())
     platform.operational = True
     platform.runtime_environment = "rehearsal" if rehearsal or learning_rehearsal else "operational"
     platform.model_budget = model_budget
@@ -637,15 +663,53 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     return app
 
 
-async def serve(port, generation=False, frontend_port=None, *, rehearsal=None, learning_rehearsal=None):
+def _log_config():
     from copy import deepcopy
 
     import uvicorn
-    app = await make_app(generation=generation, frontend_port=frontend_port, rehearsal=rehearsal,
-        learning_rehearsal=learning_rehearsal, api_port=port)
     logs = deepcopy(uvicorn.config.LOGGING_CONFIG)
     logs["loggers"]["campus247.learning.metrics"] = {"handlers": ["default"], "level": "INFO", "propagate": False}
-    await uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, access_log=False, log_config=logs)).serve()
+    return logs
+
+
+async def serve(port, generation=False, frontend_port=None, *, rehearsal=None, learning_rehearsal=None):
+    import uvicorn
+    app = await make_app(generation=generation, frontend_port=frontend_port, rehearsal=rehearsal,
+        learning_rehearsal=learning_rehearsal, api_port=port)
+    await uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, access_log=False, log_config=_log_config())).serve()
+
+
+class DeferredApp:
+    """ASGI app that builds the real application inside the worker's own event loop at lifespan startup.
+
+    make_app is a coroutine (it opens the database pool), but uvicorn starts several workers from an import string and a
+    synchronous factory. The first ASGI scope of a worker is its lifespan, so the real app is built there and then
+    handles every scope, including that lifespan, exactly as when served by a single process.
+    """
+
+    def __init__(self, build):
+        self._build, self._app = build, None
+
+    async def __call__(self, scope, receive, send):
+        if self._app is None:
+            if scope["type"] != "lifespan":
+                raise RuntimeError("application not started")
+            self._app = await self._build()
+        await self._app(scope, receive, send)
+
+
+def worker_app():
+    """Import-string factory for `uvicorn ... --workers N`; settings arrive as JSON in the environment."""
+    config = json.loads(os.environ["CAMPUS247_SERVE_CONFIG"])
+    return DeferredApp(lambda: make_app(**config))
+
+
+def serve_workers(port, workers, generation=False, frontend_port=None):
+    """Several API processes on one port. Not for rehearsals (they run a single process)."""
+    import uvicorn
+    os.environ["CAMPUS247_SERVE_CONFIG"] = json.dumps({"generation": generation, "frontend_port": frontend_port, "api_port": port})
+    uvicorn.run("knowledge_platform:worker_app", factory=True, host="127.0.0.1", port=port, workers=workers,
+                access_log=False, log_config=_log_config())
 
 
 def main():
@@ -654,6 +718,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["inventory", "bootstrap-local", "migrate", "worker", "worker-once", "serve"])
     parser.add_argument("--port", type=int, default=8015)
+    parser.add_argument("--workers", type=int, default=1, help="API processes sharing the port (serve only)")
     parser.add_argument("--frontend-port", type=int)
     parser.add_argument("--generation", action="store_true", help="Use the existing paid gateway only if its retained guards accept")
     parser.add_argument("--rehearsal", help="Exact successful new local test DB manifest; serving DB remains unchanged")
@@ -671,6 +736,10 @@ def main():
         migrate(args.revision)
     elif args.command in {"worker", "worker-once"}:
         asyncio.run(work(args.command == "worker-once", rehearsal=args.rehearsal, heartbeat_file=args.worker_heartbeat))
+    elif args.workers > 1:
+        if args.rehearsal or args.learning_rehearsal:
+            parser.error("--workers above 1 is only for the retained runtime, not rehearsals")
+        serve_workers(args.port, args.workers, args.generation, args.frontend_port)
     else:
         asyncio.run(serve(args.port, args.generation, args.frontend_port, rehearsal=args.rehearsal,
             learning_rehearsal=args.learning_rehearsal))

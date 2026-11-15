@@ -118,9 +118,13 @@ PS_SAMPLE = (
 
 def api_pids(port: int) -> list[int]:
     import subprocess
+    # The serving process and, with several API workers, the worker processes it started.
     out = subprocess.run(["powershell", "-NoProfile", "-Command",
-        "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'knowledge_platform.py serve' -and "
-        f"$_.CommandLine -match '--port {port}' }} | ForEach-Object {{ $_.ProcessId }}"], capture_output=True, text=True).stdout
+        "$all = Get-CimInstance Win32_Process; "
+        "$parents = @($all | Where-Object { $_.CommandLine -match 'knowledge_platform.py serve' -and "
+        f"$_.CommandLine -match '--port {port}' }} | ForEach-Object {{ $_.ProcessId }}); "
+        "$all | Where-Object { $parents -contains $_.ProcessId -or $parents -contains $_.ParentProcessId } | "
+        "ForEach-Object { $_.ProcessId }"], capture_output=True, text=True).stdout
     return [int(x) for x in out.split() if x.isdigit()]
 
 
@@ -137,7 +141,7 @@ async def sample_resources(stop: asyncio.Event, out: list, port: int):
                                                                  capture_output=True, text=True).stdout)
         rows = [tuple(map(int, line.split(","))) for line in result.split() if line.count(",") == 1]
         if rows:
-            out.append({"cpu": max(r[0] for r in rows), "rss_mb": max(r[1] for r in rows)})
+            out.append({"cpu": sum(r[0] for r in rows), "rss_mb": max(r[1] for r in rows)})
 
 
 async def run_stage(users: int, turns: int, base_url: str, abort_rate: float, seed: int, think: tuple[float, float] = (0.0, 2.0),

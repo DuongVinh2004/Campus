@@ -42,7 +42,8 @@ def write(tmp_path, text, name="t"):
 
 def test_local_profile_keeps_the_values_the_launcher_used_before_profiles():
     local = rp.load_profile("local")
-    assert (local.pg_shared_buffers, local.pg_max_connections, local.api_workers) == ("128MB", 20, 1)
+    assert (local.pg_shared_buffers, local.pg_max_connections) == ("128MB", 20)
+    assert local.api_workers == 2  # raised from 1 by rollout step 1.8
 
 
 def test_local_gateway_is_uncapped_as_today_and_cloud_is_never_uncapped():
@@ -112,9 +113,12 @@ def test_available_memory_reads_the_os():
     assert rp.available_memory_mb() > 0
 
 
-def test_launcher_refuses_a_profile_with_more_workers_than_it_supports():
-    with pytest.raises(RuntimeError, match="until step 1.8"):
-        runtime.start(profile="cloud")
+def test_launcher_refuses_a_profile_with_more_workers_than_it_supports(monkeypatch):
+    from dataclasses import replace
+    too_many = replace(rp.load_profile("local"), api_workers=runtime.MAX_API_WORKERS + 1)
+    monkeypatch.setattr(runtime, "load_profile", lambda name: too_many)
+    with pytest.raises(RuntimeError, match="supports 1 to"):
+        runtime.start(profile="local")
 
 
 class _Anything:

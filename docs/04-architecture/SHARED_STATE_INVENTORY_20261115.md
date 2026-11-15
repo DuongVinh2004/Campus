@@ -31,7 +31,11 @@ WAL tự lưu trong file nên chỉ cần đặt một lần; các lần mở sa
 | Tiêu đề đã fold, nhóm hàng xóm | `rag_v2/retrieval/hybrid._FOLDED_TITLES`, `neighbors._GROUPS` | Cache thuần | Như trên | An toàn |
 | Khóa phòng khi đặt phòng | `infrastructure/repositories/bookings._room_locks` | Khóa luồng | Chỉ khóa trong 1 tiến trình | Cần xem: chỉ an toàn nếu việc đặt phòng chống trùng ở mức DB. `campus_ops` có `BEGIN IMMEDIATE` nên đường 8015 an toàn; `bookings.py` chưa kiểm |
 | Thu hồi phiên | `app.py` → `auxiliary_repositories(actor_state_store)` | Kho bền (SQLite actor-state) ở đường 8015 | Dùng chung qua file | An toàn ở 8015. Cần kiểm: `LogoutService(revocation_store=InMemoryRevocationStore())` (`app.py:354`) vẫn là kho trong bộ nhớ |
-| Xem trước và xác nhận hành động ghi | `agent/tools/write_flow`: `_PREVIEW_BINDINGS`, `_PREVIEW_METADATA`, `_CONSUMED_PREVIEWS`, **`_CONFIRMATION_SIGNING_KEY = secrets.token_bytes(32)` sinh lại mỗi tiến trình** | Trạng thái bảo mật | Nếu bước xem trước ở tiến trình A mà xác nhận rơi vào tiến trình B thì chữ ký và dấu xem trước không khớp. Hệ thống **từ chối (an toàn)**, không bỏ qua kiểm tra; hậu quả là xác nhận hợp lệ bị từ chối, và tập "đã dùng" không chung nên không có bảo đảm dùng một lần giữa các tiến trình | **Phải dùng chung trước khi bật nhiều tiến trình cho luồng ghi** (khóa ký đọc từ bí mật chung, preview và đã-dùng lưu trong kho bền). Ghi vào điều kiện của bước 1.8 |
+| Xem trước và xác nhận hành động ghi (agent) | `agent/tools/write_flow` | Trạng thái bảo mật | **Đã làm ở bước 1.8**: preview, siêu dữ liệu và dấu "đã dùng" nằm trong `write-previews.sqlite3` (WAL) dùng chung, khóa ký dẫn xuất từ một bí mật chung; `INSERT OR IGNORE` bảo đảm đúng một tiến trình thắng khi xác nhận. Khóa sai, preview lạ, preview bị sửa, dùng lần hai đều vẫn bị từ chối | Đã dùng chung |
+| Khóa ký token xác nhận của nền tảng tri thức | `Settings.CONFIRMATION_SIGNING_KEY` | Bí mật | Trước đây là chuỗi mặc định cố định (dùng chung được nhưng công khai). **Đã làm ở 1.8**: một bí mật ngẫu nhiên bền trong thư mục trạng thái runtime, mọi tiến trình đọc cùng một giá trị | Đã dùng chung, mạnh hơn trước |
+| Thu hồi phiên qua `LogoutService` | `app.py:354` | Kho trong bộ nhớ | **Đã kiểm ở 1.8**: route `/logout` luôn dùng `session_service` (kho bền) khi có; `LogoutService` chỉ chạy khi không có `session_service`, điều không xảy ra trong app | Không ảnh hưởng 8015 |
+| Khóa phòng `bookings._room_locks` | `infrastructure/repositories/bookings.py` | Khóa luồng | **Đã kiểm ở 1.8**: chỉ có test `test_booking_concurrency` dùng; đường 8015 đặt phòng qua `campus_ops` (`BEGIN IMMEDIATE`) | Không ảnh hưởng 8015 |
+| Giới hạn đăng nhập theo tên tài khoản | `local_student.LocalStudentIdentityAdapter._attempts` | Bộ đếm trong bộ nhớ | 5 lần/phút mỗi tiến trình, nên N tiến trình cho tối đa 5N lần. Còn lại: chưa chuyển sang kho dùng chung (đăng nhập vẫn bị rate limit chung 30/phút ở middleware cho `/v1/conversations`, không cho đường đăng nhập) | **Còn lại**, rủi ro thấp (tài khoản local, mật khẩu scrypt) |
 
 ## 3. Việc đã làm và việc còn lại
 
@@ -39,5 +43,5 @@ WAL tự lưu trong file nên chỉ cần đặt một lần; các lần mở sa
 
 Còn lại, đã đưa vào điều kiện các bước sau:
 - 1.5: rate limit dùng chung (Postgres).
-- 1.8 (điều kiện để bật >1 tiến trình): luồng xem trước/xác nhận hành động ghi dùng chung (khóa ký và dấu "đã dùng"); kiểm `LogoutService` và `bookings._room_locks`.
+- 1.8: đã làm (xem các dòng "Đã làm ở bước 1.8" ở trên). Còn lại: giới hạn đăng nhập theo tên tài khoản vẫn đếm riêng từng tiến trình.
 - Trước khi dùng ở runtime nào: test đồng thời cho học liệu và các kho chỉ có ở đường fixture.

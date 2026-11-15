@@ -11,7 +11,7 @@ infra/local/rag-fixture/.venv/Scripts/python.exe -B scripts/knowledge_platform_r
 - Before starting anything the launcher estimates the memory of the components it would start (already running
   components are reused and not counted) and refuses if the OS reports less available memory. Nothing is started
   or stopped when it refuses.
-- Used now: `[postgres]` options, `[memory]`, and `[api] workers` (the launcher refuses a value it cannot honour;
-  `cloud.toml` asks for 2 and is refused until step 1.8).
+- Used now: `[postgres]` options, `[memory]`, and `[api] workers` (the launcher accepts 1 to MAX_API_WORKERS;
+  workers share the port through uvicorn's multi-process mode).
 - Declared, consumed in later steps: `max_in_flight_per_worker` (1.2) and `provider_concurrency` (1.7).
 - Memory figures are estimates; re-measure them on the real VM (rollout step 2.3).
