@@ -87,6 +87,44 @@ async def verified_attachment(platform, conn, row, release_id):
     return result
 
 
+_version_cache: dict = {}
+_acquisition_cache: dict = {}
+
+
+def _acquisition_results(path, expected_sha256):
+    """The linked-result list of one pinned acquisition file, or None when its hash is not the pinned one.
+
+    Parsing a multi-megabyte JSON per cited chunk was the largest per-turn cost of the attestation. The key carries
+    the file's size and modification time, so any change to the file is read and hashed again at once.
+    """
+    info = path.stat()
+    key = (str(path), info.st_mtime_ns, info.st_size, expected_sha256)
+    if key not in _acquisition_cache:
+        raw = path.read_bytes()
+        _acquisition_cache[key] = json.loads(raw)["results"] if digest(raw) == expected_sha256 else None
+        if len(_acquisition_cache) > 32:
+            _acquisition_cache.pop(next(iter(_acquisition_cache)))
+    return _acquisition_cache[key]
+
+
+async def _verified_version(platform, conn, row, release_id):
+    """Everything that depends on the document version, not on the chunk: acquisition record, official publisher
+    page, original PDF and rendition hashes. Returns (record, texts of the rendition's pages) or None. Kept for
+    the same 30 s as the per-chunk attestation; a failure is kept too, as before."""
+    key = (id(platform), str(platform.storage.workspace.resolve()), platform.repo.tenant,
+           row["document_version_id"], row["canonical_uri"], row["source_id"], release_id)
+    started = monotonic()
+    cached = _version_cache.get(key)
+    if cached is not None and started - cached[0] < ATTACHMENT_CACHE_TTL_SECONDS:
+        return cached[1]
+    result = await _verify_version(platform, conn, row)
+    _version_cache.pop(key, None)
+    if len(_version_cache) >= ATTACHMENT_CACHE_MAX_ENTRIES:
+        _version_cache.pop(next(iter(_version_cache)))
+    _version_cache[key] = (started, result, platform)
+    return result
+
+
 async def _verify_attachment(platform, conn, row, release_id):
     """Unknown/missing acquisition stays unverified; ordinary evidence still works.
 
@@ -95,6 +133,17 @@ async def _verify_attachment(platform, conn, row, release_id):
     Hashes bind the retained official HTML, its exact link and the original PDF.
     No network lookup, arbitrary local path or domain-wide Drive exception.
     """
+    verified = await _verified_version(platform, conn, row, release_id)
+    if verified is None:
+        return None
+    item, page_texts = verified
+    if digest(row["content_text"].encode()) != row["content_checksum"] or row["content_text"] not in page_texts:
+        return None
+    return VerifiedPublication(item["publisher_url"], item["linked_url"], str(row["source_id"]),
+        str(row["document_version_id"]), row["content_checksum"], item["source_sha256"], release_id)
+
+
+async def _verify_version(platform, conn, row):
     root = platform.storage.workspace
     matches = []
     for name, expected_sha256 in ((_ACQUISITION, _ACQUISITION_SHA256),
@@ -104,9 +153,9 @@ async def _verify_attachment(platform, conn, row, release_id):
         acquisition = checked_path(root / name, root)
         if not acquisition.is_file():
             continue
-        raw = acquisition.read_bytes()
-        if digest(raw) == expected_sha256:
-            matches.extend(item for item in json.loads(raw)["results"] if item["linked_url"] == row["canonical_uri"])
+        results = _acquisition_results(acquisition, expected_sha256)
+        if results is not None:
+            matches.extend(item for item in results if item["linked_url"] == row["canonical_uri"])
     if len(matches) != 1:
         return None
     item = matches[0]
@@ -131,8 +180,7 @@ async def _verify_attachment(platform, conn, row, release_id):
     artifact = await conn.fetchrow("SELECT * FROM knowledge_artifact WHERE id=$1 AND tenant_id=$2",
                                    version["original_id"], platform.repo.tenant)
     original = platform.storage.read(artifact)
-    if (digest(original) != item["source_sha256"] or version["original_sha256"] != item["source_sha256"]
-            or digest(row["content_text"].encode()) != row["content_checksum"]):
+    if digest(original) != item["source_sha256"] or version["original_sha256"] != item["source_sha256"]:
         return None
     rendition_artifact = await conn.fetchrow("SELECT * FROM knowledge_artifact WHERE id=$1 AND tenant_id=$2",
         version["rendition_id"], platform.repo.tenant)
@@ -140,8 +188,6 @@ async def _verify_attachment(platform, conn, row, release_id):
     if digest(rendition_raw) != version["rendition_sha256"]:
         return None
     rendition = json.loads(rendition_raw)
-    if (rendition.get("original_sha256") != item["source_sha256"]
-            or not any(page["text"] == row["content_text"] for page in rendition.get("pages", []))):
+    if rendition.get("original_sha256") != item["source_sha256"]:
         return None
-    return VerifiedPublication(item["publisher_url"], item["linked_url"], str(row["source_id"]),
-        str(row["document_version_id"]), row["content_checksum"], item["source_sha256"], release_id)
+    return item, frozenset(page["text"] for page in rendition.get("pages", []))

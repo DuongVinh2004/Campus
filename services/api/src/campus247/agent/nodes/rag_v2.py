@@ -104,6 +104,21 @@ def _binding_failure(unit, rows):
     return None
 
 
+def _rows_fingerprint(rows) -> str:
+    """Everything the binding checks read from the authorized rows, hashed. Equal fingerprints, equal checks."""
+    digest = sha256()
+    for chunk in sorted(rows):
+        row = rows[chunk]
+        digest.update("\x1f".join(str(row.get(field)) for field in (
+            "chunk_id", "evidence_sha256", "source_id", "document_version_id", "title", "section_path",
+            "effective_from", "effective_until")).encode())
+        digest.update(b"\x1e" + str(chunk).encode() + b"\x1e")
+        # The text itself too (a few ms per turn): a row whose text no longer matches its declared hash must still
+        # reach the full checks and fail there, exactly as before.
+        digest.update(str(row.get("content_text") or "").encode() + b"\x1d")
+    return digest.hexdigest()
+
+
 class RagV2Node:
     def __init__(self, *, service, index, reranker, embed, gateway, authorize_sources, revalidate=None):
         self.service, self.index, self.reranker = service, index, reranker
@@ -137,6 +152,29 @@ class RagV2Node:
         self._injection_thread.start()
 
     def _prepare_index(self, rows):
+        """The authorized view of the index for this turn's authorized rows.
+
+        The binding checks and the injection scan are a pure function of the index (fixed for the process) and of
+        the authorized rows, whose content is bound by its evidence hash. Turns with the same authorized row set
+        (same release, scope and validity) therefore share one result; any change to a row's identifiers, title,
+        path, evidence hash or validity changes the fingerprint and runs every check again. Rebuilding it on every
+        turn was 3/4 of the API's CPU under load.
+        """
+        key = _rows_fingerprint(rows)
+        cache = self.__dict__.setdefault("_prepared", {})
+        lock = self.__dict__.setdefault("_prepared_lock", Lock())
+        with lock:
+            hit = cache.get(key)
+        if hit is not None:
+            return hit
+        result = self._build_index(rows)
+        with lock:
+            if len(cache) >= 16:  # a handful of scope variants per release; old releases fall out
+                cache.pop(next(iter(cache)))
+            cache[key] = result
+        return result
+
+    def _build_index(self, rows):
         detector = PromptInjectionDetector()
         units, drops = {}, {}
         for uid in self.index.all_ids():

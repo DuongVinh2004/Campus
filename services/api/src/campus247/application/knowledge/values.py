@@ -8,6 +8,7 @@ import hashlib
 import json
 import unicodedata
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
@@ -57,7 +58,9 @@ def public_document_url(value: str) -> str:
     return value
 
 
+@lru_cache(maxsize=2048)
 def normalized(text: str) -> str:
+    # Pure; the same source rows are normalized again on every read of a turn (≈150,000 characters per turn).
     return " ".join("".join(c for c in unicodedata.normalize("NFD", text.lower())
                             if unicodedata.category(c) != "Mn").replace("đ", "d").split())
 

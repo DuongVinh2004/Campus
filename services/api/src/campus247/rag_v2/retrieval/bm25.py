@@ -1,6 +1,7 @@
 """Small BM25 index with accented/folded word and adjacent-word features."""
 from __future__ import annotations
 
+import heapq
 import math
 import re
 import unicodedata
@@ -48,9 +49,10 @@ class BM25:
                     continue
                 denominator = tf + self.k1 * (1 - self.b + self.b * self.lengths[uid] / self.average_length)
                 scores[uid] += idf * tf * (self.k1 + 1) / denominator
-        # Scores equal up to float noise tie-break by unit id.
-        return sorted(((uid, round(score, 9)) for uid, score in scores.items()),
-                      key=lambda item: (-item[1], item[0]))[:limit]
+        # Scores equal up to float noise tie-break by unit id. nsmallest on the same key returns exactly the first
+        # `limit` items of the full sort, without sorting tens of thousands of scored units on every query.
+        return heapq.nsmallest(limit, ((uid, round(score, 9)) for uid, score in scores.items()),
+                               key=lambda item: (-item[1], item[0]))
 
     def anchored(self, query: str, limit: int, *, allowed: set[str] | None = None,
                  max_document_frequency: int = 200) -> list[tuple[str, float]]:
