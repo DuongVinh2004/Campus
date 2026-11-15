@@ -1,0 +1,25 @@
+# Caddy: HTTPS in front of the internal frontend (3015). install.sh substitutes the domain.
+# Only 22 and 443 are open to the world; the API (8015), gateway (8025), models (18081/18082) and Postgres (55437)
+# listen on loopback only. The frontend proxies /v1 and /health to the API itself.
+{
+	# Certificates are obtained over port 443 (TLS-ALPN), so port 80 stays closed.
+	auto_https disable_redirects
+}
+
+{$CAMPUS247_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3015 {
+		flush_interval -1
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+	log {
+		output file /var/log/caddy/campus247.log {
+			roll_size 20MiB
+			roll_keep 10
+		}
+	}
+}

@@ -100,7 +100,7 @@ def worker(state: Path, predecessor: Path | None = None, resource_authorization:
         if event == "socket.getaddrinfo" and args[0] != "127.0.0.1":
             raise RuntimeError("DNS denied")
     sys.addaudithook(protect)
-    from m1_spin_policy_20261011_51 import CPU
+    from m1_platform_20261115 import CPU
     from m2_inference_20261012_74 import Session
     from onnx_capi_20261011_30 import digest
     from onnx_graph_20261011_30 import DEST
@@ -264,7 +264,10 @@ def main():
     if state.exists():
         raise ValueError("fresh owned model namespace required")
     state.mkdir(parents=True)
-    from bounded_physical_process_20261011_30 import BoundedProcess
+    if os.name == "nt":
+        from bounded_physical_process_20261011_30 import BoundedProcess
+    else:
+        from bounded_posix_process_20261115 import BoundedProcess
     env = {k: v for k, v in os.environ.items() if not any(part in k.upper() for part in ("TOKEN", "SECRET", "PASSWORD", "API_KEY"))}
     env.update(PYTHONDONTWRITEBYTECODE="1", PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8", TEMP=str(state), TMP=str(state))
     command = [sys.executable, "-B", str(Path(__file__).resolve()), "--worker", "--state", str(state)]

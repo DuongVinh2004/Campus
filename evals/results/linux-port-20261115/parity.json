@@ -1,0 +1,10 @@
+{
+ "compared": 200,
+ "min_cosine": 0.9999999999999998,
+ "mean_cosine": 1.0,
+ "max_abs_difference": 0.0,
+ "threshold": 0.9999,
+ "a": "Windows-11-10.0.26200-SP0",
+ "b": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+ "passed": true
+}

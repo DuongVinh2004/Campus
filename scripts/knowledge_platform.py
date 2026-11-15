@@ -695,7 +695,13 @@ class DeferredApp:
         if self._app is None:
             if scope["type"] != "lifespan":
                 raise RuntimeError("application not started")
-            self._app = await self._build()
+            try:
+                self._app = await self._build()
+            except BaseException:
+                # Without this the cause stays hidden (uvicorn reports only "lifespan unsupported" in its default mode).
+                import logging
+                logging.getLogger("campus247.worker").exception("application failed to start")
+                raise
         await self._app(scope, receive, send)
 
 
@@ -709,8 +715,9 @@ def serve_workers(port, workers, generation=False, frontend_port=None):
     """Several API processes on one port. Not for rehearsals (they run a single process)."""
     import uvicorn
     os.environ["CAMPUS247_SERVE_CONFIG"] = json.dumps({"generation": generation, "frontend_port": frontend_port, "api_port": port})
+    # lifespan="on": a worker whose application cannot start exits (the supervisor restarts it) instead of serving errors.
     uvicorn.run("knowledge_platform:worker_app", factory=True, host="127.0.0.1", port=port, workers=workers,
-                access_log=False, log_config=_log_config())
+                access_log=False, log_config=_log_config(), lifespan="on")
 
 
 def main():

@@ -1,0 +1,10 @@
+[Unit]
+Description=Campus 24/7 daily backup
+
+[Timer]
+OnCalendar=*-*-* 03:10:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

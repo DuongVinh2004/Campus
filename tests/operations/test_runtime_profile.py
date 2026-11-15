@@ -1,5 +1,6 @@
 """Runtime profiles: strict loading, memory check before any start, and the launcher's refusals."""
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
@@ -113,6 +114,7 @@ def test_available_memory_reads_the_os():
     assert rp.available_memory_mb() > 0
 
 
+@pytest.mark.skipif(os.name != "nt", reason="the launcher runs the Windows runtime; on Linux systemd starts the units")
 def test_launcher_refuses_a_profile_with_more_workers_than_it_supports(monkeypatch):
     from dataclasses import replace
     too_many = replace(rp.load_profile("local"), api_workers=runtime.MAX_API_WORKERS + 1)
@@ -135,6 +137,7 @@ class _Anything:
         return "stub"
 
 
+@pytest.mark.skipif(os.name != "nt", reason="the launcher runs the Windows runtime; on Linux systemd starts the units")
 def test_launcher_refuses_before_starting_anything_when_memory_is_short(monkeypatch):
     stub = _Anything()
     monkeypatch.setattr(runtime, "checked_path", lambda path, root: stub)
@@ -154,6 +157,7 @@ def test_launcher_refuses_before_starting_anything_when_memory_is_short(monkeypa
     assert launched == []
 
 
+@pytest.mark.skipif(os.name != "nt", reason="the launcher runs the Windows runtime; on Linux systemd starts the units")
 def test_launcher_skips_the_memory_check_when_every_component_is_running(monkeypatch):
     stub = _Anything()
     seen = []

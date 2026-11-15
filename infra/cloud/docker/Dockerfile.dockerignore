@@ -1,0 +1,16 @@
+# Keep the build context to the code the image copies (the repository root holds many gigabytes of local state).
+*
+!pyproject.toml
+!uv.lock
+!scripts
+!services
+!packages
+!contracts
+!infra/profiles
+!infra/cloud
+!evals/load
+!evals/runners
+!evals/datasets/rag-v2
+**/__pycache__
+**/.pytest_cache
+**/node_modules

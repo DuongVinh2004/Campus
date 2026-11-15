@@ -191,7 +191,7 @@ class PublicKnowledgeStore:
             items = regulation_sections(manifest["chunks"]) if name.startswith("regulations-") else manifest["chunks"]
             for item in items:
                 if reviewed_release:
-                    snapshot = (directory.parent / item["source_file"]).resolve()
+                    snapshot = (directory.parent / item["source_file"].replace("\\", "/")).resolve()  # manifests written on Windows use backslashes
                     if (not snapshot.is_relative_to(directory.parent.resolve())
                             or hashlib.sha256(snapshot.read_bytes()).hexdigest() != item["source_sha256"]
                             or hashlib.sha256(item["text"].encode()).hexdigest() != item["text_sha256"]):
