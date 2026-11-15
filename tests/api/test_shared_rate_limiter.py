@@ -22,13 +22,14 @@ from campus247.presentation.middleware.abuse_limits import AbuseLimiterMiddlewar
 
 
 async def open_pool():
+    """A small pool (the local server allows 20 connections in total and the running runtime already holds some)."""
     import asyncpg
     try:
         import knowledge_platform as platform
         value = platform.connection()
-        pool = await asyncpg.create_pool(**value, min_size=1, max_size=4, command_timeout=10)
+        pool = await asyncpg.create_pool(**value, min_size=1, max_size=2, command_timeout=10)
     except Exception as error:  # noqa: BLE001
-        pytest.skip(f"retained local Postgres not available: {type(error).__name__}")
+        pytest.skip(f"retained local Postgres not available or out of free connections: {type(error).__name__}")
     return pool
 
 

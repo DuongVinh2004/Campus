@@ -55,6 +55,10 @@ only 22 and 443. It starts nothing that calls the paid provider.
    `systemctl start campus247-gateway campus247-api campus247-frontend`.
 5. Check: `curl -s http://127.0.0.1:8015/health/ready` shows `"status":"ready"`; `curl -s http://127.0.0.1:8025/health` shows `ok`;
    `journalctl -u campus247-api | grep leader_acquired` shows exactly one leader; open `https://<domain>/chat` and ask one question.
+6. Warm up before opening to users: in the 4-CPU simulation the first 100-user burst right after a cold start lost the vector branch on
+   about 10 % of retrievals (89 % success), while the same burst on a warm stack reached 99.5 %. After any restart of the models or API,
+   ask 5 to 10 different questions (several at once) and wait until `journalctl -u campus247-api | grep rag_v2_vector_stats` reports `failed=0`
+   for a full interval before announcing that the service is open.
 
 ## Backup and restore
 

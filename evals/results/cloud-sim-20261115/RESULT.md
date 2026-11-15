@@ -35,3 +35,25 @@ SQLite chế độ WAL trong thư mục chỉ-đọc, đường dẫn tuyệt đ
 ## Chưa kiểm
 Caddy và HTTPS thật (cần tên miền), systemd thật (container không có systemd; đơn vị chỉ được sinh ra và kiểm bằng test chứ chưa khởi động), frontend Linux, tải với provider thật, giám sát và cảnh báo.
 Phần sao lưu ngoài máy chủ (off-site) và diễn tập khôi phục trên VPS thật nằm ở giai đoạn 2.
+
+## Đo lại trên mã cuối (sau khi tái dùng kết nối SQLite) — 2026-11-16
+
+Dựng lại ảnh Docker từ mã cuối, cùng giới hạn `--cpus=4 --memory=7500m`, provider giả, câu hỏi không lặp. Tệp: `sim-b-50-final.json`, `sim-a-100-final.json`, `sim-a-100-final-warm.json`, `cg-*-final*.json`.
+
+| | B: 50 × 3 | A: 100 × 2, ngay sau khi khởi động (nguội) | A: 100 × 2, đã chạy nóng |
+|---|---|---|---|
+| Thành công | **100 %** | 89 % (22 lượt hết thử vì bận) | **99,5 %** (1 lượt) |
+| p50 / p95 / lâu nhất | 5,9 / **8,3** / 9,8 s | 19,1 / 24,2 / 27,8 s | 9,8 / **12,9** / 15,5 s |
+| 503 lâu nhất | không có | 5,4 s | **5,0 s** |
+| RAM anon đỉnh | 4,91 GB = 67 % | 66 % | 69 % |
+| OOM, swap | 0, 0 | 0, 0 | 0, 0 |
+
+Kịch bản B đạt rõ (p95 8,3 s so với 13,0 s trước khi tái dùng kết nối). Kịch bản A khi đã chạy nóng đạt 99,5 %, p95 12,9 s, 503 trong 5,0 s.
+**Hạn chế ghi nhận:** lần chạy A đầu tiên ngay sau khi khởi động chỉ đạt 89 % vì nhánh vector hết thời gian ở các truy vấn đầu (7 đến 10 lần mất nhánh vector trên 75 lượt tìm kiếm, toàn bộ nằm trong lần chạy nguội này; lần chạy nóng không thêm lần nào). Nghĩa là mô hình embedding cần được làm nóng trước khi nhận tải đỉnh; khi mở cho người dùng nên chạy vài câu hỏi khởi động trước.
+Một lần chạy A khác chỉ đạt 69 % không phải do hiệu năng: **trần gọi trong ngày của gateway (2.000 lời gọi, giá trị tạm của hồ sơ cloud) đã chạm** và gateway từ chối đúng thiết kế (`reason=daily_cap`). Lần chạy được loại khỏi số đo; trần được đặt lại chỉ trong container mô phỏng rồi chạy lại ra kết quả nóng ở trên. Điều này cũng nghĩa là trần 2.000 lời gọi/ngày không đủ cho tải 100 người, chủ dự án cần chọn trần thật.
+Giết cả hai worker API: `/health/ready` trở lại 200 sau chưa tới 30 s, supervisor dựng lại hai worker, `leader_acquired` từ 1 lên 2.
+
+## Kiểm bổ sung trong container (2026-11-16)
+- `caddy validate` với `Caddyfile.example` (đặt `CAMPUS247_DOMAIN`): **Valid configuration**.
+- `systemd-analyze verify` các đơn vị `campus247-api/frontend/gateway/models.service` đã sinh ra: không báo lỗi; đơn vị backup chỉ cảnh báo bit thực thi (sinh ra từ việc sao chép từ Windows, không ảnh hưởng).
+- Vẫn chưa kiểm: khởi động thật dưới systemd (container không có init), HTTPS thật với tên miền, frontend Linux, tốc độ CPU của VPS thật.

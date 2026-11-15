@@ -20,7 +20,7 @@ Giai đoạn 2 (deploy lên VPS) **chưa bắt đầu**, chờ lệnh của ch�
 | 1.10 Gate chất lượng | Đạt (sau khi sửa máy khách đo). safety 20/20, stop 35/35, core 80 %, sai 0 | `evals/results/gate-20261115/` |
 | 1.11 Port Linux | Đạt cho phần máy chủ chạy. Vector Windows và Linux giống hệt từng bit | `evals/results/linux-port-20261115/` |
 | 1.12 Bộ triển khai cloud | Đạt. Cài trọn trên Ubuntu 24.04 sạch; sinh đơn vị systemd từ hồ sơ | `infra/cloud/` |
-| 1.13 Giả lập 4 CPU / 8 GB | Đạt kịch bản B (100 % thành công, p95 13,0 s, RAM 65 %, không OOM); kịch bản A không sập nhưng 503 lâu nhất 5,4 s | `evals/results/cloud-sim-20261115/` |
+| 1.13 Giả lập 4 CPU / 8 GB | Đo lại trên mã cuối: B 100 %, p95 8,3 s, RAM 67 %, không OOM; A khi đã nóng 99,5 %, p95 12,9 s, 503 trong 5,0 s; A ngay sau khởi động nguội 89 % (cần làm nóng mô hình trước khi mở) | `evals/results/cloud-sim-20261115/` |
 | 1.14 Diễn tập khôi phục | Đạt. Postgres 55 bảng và 20.403 dòng giống hệt; SQLite giống backup | như trên |
 | 1.15 Giảm lời gọi (tùy chọn) | **Không làm.** Các đòn bẩy L1, L2, L4 đổi cách kiểm chứng hoặc cần cổng chất lượng đầy đủ; chỉ làm khi chủ dự án muốn giảm chi phí | |
 
@@ -29,7 +29,7 @@ Giai đoạn 2 (deploy lên VPS) **chưa bắt đầu**, chờ lệnh của ch�
 - [x] Hồ sơ `local`, tải giả kịch bản A: thành công trung bình 99,8 % trên 3 lần chạy API mới (mục tiêu 99 %), p95 khoảng 11,8 s, `vector_failed` 0, 503 trong 4,5 s.
 - [x] Test: Windows không có lỗi mới so với mốc; Linux chạy các nhóm phần máy chủ, các test chỉ Windows được bỏ qua kèm lý do trong `tests/conftest.py`.
 - [x] Gate chất lượng PASSED trên kiến trúc mới.
-- [x] Hồ sơ `cloud` giả lập đạt tiêu chí kịch bản B; kịch bản A chỉ lệch ở thời gian trả 503 (5,4 s so với 5 s).
+- [x] Hồ sơ `cloud` giả lập (mã cuối) đạt kịch bản B (100 %, p95 8,3 s) và kịch bản A khi nóng (99,5 %, p95 12,9 s, 503 trong 5,0 s); lần chạy nguội ngay sau khởi động chỉ 89 %, nên cần bước làm nóng.
 - [x] `infra/cloud/install.sh` dựng được hệ thống từ Ubuntu sạch (đã chạy trong container).
 - [x] Sao lưu và khôi phục đã diễn tập.
 - [x] Không có bí mật hay credential trong repo và `infra/cloud/` (đã quét).
@@ -38,12 +38,12 @@ Giai đoạn 2 (deploy lên VPS) **chưa bắt đầu**, chờ lệnh của ch�
 ## Việc cần chủ dự án quyết định trước giai đoạn 2
 
 1. **Kịch bản A đã đạt trên máy này** (không cần INT8 hay VPS lớn hơn để đạt mục tiêu của kế hoạch). Vẫn nên đo lại trên VPS thật ở bước 2.3 vì tốc độ CPU khác.
-2. **Trần chi tiêu thật của gateway** (cloud đang có giá trị tạm 5 USD và 2.000 lời gọi mỗi ngày).
+2. **Trần chi tiêu thật của gateway** (cloud đang có giá trị tạm 5 USD và 2.000 lời gọi mỗi ngày; trần này đã chạm ngay trong ba lần chạy tải 100 người, nên chắc chắn phải nâng).
 3. **Dữ liệu nào lên cloud**: chỉ kiến thức công khai hay cả tài khoản và hội thoại thật. Bản backup mặc định không chứa mật khẩu dạng chữ.
 4. **Module học liệu** cần ClamAV bản Linux; hiện cloud chạy với module này tắt.
 5. **VPS, tên miền, nơi lưu backup ngoài máy chủ.**
 
 ## Chưa kiểm chứng (nói rõ)
 
-Tốc độ thật của CPU VPS, Caddy và HTTPS thật, systemd thật (đơn vị chỉ được sinh và kiểm bằng test), frontend trên Linux, tải với provider thật, giám sát và cảnh báo, hành vi người dùng thật.
+Tốc độ thật của CPU VPS, HTTPS thật với tên miền (cấu hình Caddy đã qua `caddy validate`), khởi động thật dưới systemd (đơn vị đã qua `systemd-analyze verify`), frontend trên Linux, tải với provider thật, giám sát và cảnh báo, hành vi người dùng thật.
 Các số đo tải dùng provider giả có độ trễ lấy từ ledger thật; gate dùng câu hỏi có đáp án đã kiểm bằng code.

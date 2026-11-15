@@ -22,7 +22,7 @@ async def open_pool():
     import asyncpg
     try:
         import knowledge_platform as platform
-        return await asyncpg.create_pool(**platform.connection(), min_size=1, max_size=3, command_timeout=10)
+        return await asyncpg.create_pool(**platform.connection(), min_size=1, max_size=2, command_timeout=10)
     except Exception as error:  # noqa: BLE001
         pytest.skip(f"retained local Postgres not available: {type(error).__name__}")
 
