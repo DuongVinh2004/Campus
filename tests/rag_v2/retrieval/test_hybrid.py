@@ -231,7 +231,8 @@ async def test_stalled_vector_preserves_lexical_fallback():
     async def stalled(*args, **kwargs):
         await asyncio.sleep(30)
     index.vector = stalled
-    result = await asyncio.wait_for(retrieve(U, index, Reranker()), timeout=1.5)
+    from campus247.rag_v2.retrieval.hybrid import VECTOR_TIMEOUT_S
+    result = await asyncio.wait_for(retrieve(U, index, Reranker()), timeout=VECTOR_TIMEOUT_S + 0.5)
     assert result.trace["vector_failed"] and len(result.candidates) == 1
 
 

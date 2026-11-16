@@ -1,0 +1,38 @@
+{
+  "after_ordinal": 122245,
+  "calls": 1103,
+  "failed_calls": 0,
+  "calls_by_route": {
+    "grounded_faq": 388,
+    "sensitive_classifier": 249,
+    "route_intent": 243,
+    "grounded_semantic_verification": 223
+  },
+  "input_tokens": 2846909,
+  "cached_input_tokens": 2457435,
+  "cached_share": 0.8632,
+  "tokens_by_route": {
+    "route_intent": {
+      "input": 258692,
+      "cached": 217174,
+      "output": 9929
+    },
+    "sensitive_classifier": {
+      "input": 170342,
+      "cached": 127338,
+      "output": 4482
+    },
+    "grounded_faq": {
+      "input": 1970467,
+      "cached": 1791172,
+      "output": 59466
+    },
+    "grounded_semantic_verification": {
+      "input": 447408,
+      "cached": 321751,
+      "output": 5761
+    }
+  },
+  "turns": 250,
+  "calls_per_turn": 4.412
+}

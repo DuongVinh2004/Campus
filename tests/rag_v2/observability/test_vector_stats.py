@@ -54,11 +54,12 @@ async def test_retrieval_counts_a_stalled_vector_branch_as_timeout(fresh):
         await asyncio.sleep(30)
 
     index.vector = stalled
-    result = await asyncio.wait_for(retrieve(U, index, Reranker()), timeout=2)
+    from campus247.rag_v2.retrieval.hybrid import VECTOR_TIMEOUT_S
+    result = await asyncio.wait_for(retrieve(U, index, Reranker()), timeout=VECTOR_TIMEOUT_S + 1)
     assert result.trace["vector_failed"]
     snap = fresh.snapshot()
     assert (snap["retrievals"], snap["failed"], snap["timeouts"]) == (1, 1, 1)
-    assert snap["vector_ms_max"] >= 900
+    assert snap["vector_ms_max"] >= VECTOR_TIMEOUT_S * 900
 
 
 @pytest.mark.asyncio

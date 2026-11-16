@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import math
+import os
 import re
 import time
 from collections.abc import Mapping
@@ -138,6 +139,12 @@ def _programme_titled(u: Understanding, index: UnitIndex, allowed: set[str], lim
     return index.lexical(u.search_query, limit, allowed=titled)
 
 
+# How long the vector branch may take before retrieval goes on with lexical results only. A real-provider load test with
+# 100 users measured 20 % of retrievals losing the branch at 1.0 s (the embedding server shares the machine's CPU with the
+# API); a longer wait costs a slower turn instead of worse retrieval, and the turn budget is 22 s.
+VECTOR_TIMEOUT_S = float(os.environ.get("CAMPUS247_VECTOR_TIMEOUT_S", "2.5"))
+
+
 async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
                    lexical_k: int = 40, vector_k: int = 40, preselect: int = 10,
                    rerank_deadline_s: float = 4.5, min_rerank_logit: float = -1.0,
@@ -154,7 +161,7 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
     lexical = index.lexical(u.search_query, lexical_k, allowed=allowed)
     vector_failed, vector_timeout, vector_started = False, False, time.perf_counter()
     try:
-        async with asyncio.timeout(1.0):
+        async with asyncio.timeout(VECTOR_TIMEOUT_S):
             vector = await index.vector(u.search_query, vector_k, allowed=allowed)
     except Exception as error:  # noqa: BLE001 -- a vector adapter outage must preserve lexical retrieval
         vector, vector_failed, vector_timeout = [], True, isinstance(error, TimeoutError)
