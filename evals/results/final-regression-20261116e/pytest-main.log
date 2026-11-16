@@ -1,0 +1,154 @@
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+.................................................................sF..... [ 20%]
+...s............s....................................................... [ 22%]
+..........................s...................sFs....................... [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+.................................................................sssssss [ 31%]
+ss........ssssssss.........s.............ss..................ssss....... [ 32%]
+.....ssssss................................s....ssss.................... [ 33%]
+........................................................................ [ 35%]
+................ss.s.......................................ss........... [ 36%]
+........................................................s.............s. [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+...................................................F.................F............................................................ [ 73%]
+...................................................................... [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+............x.....................x...x...x...x......................... [ 98%]
+...............................................................          [100%]
+================================== FAILURES ===================================
+_ FixtureGuardTests.test_reviewed_addition_preserves_historical_baseline_and_ancestry _
+
+self = <tests.integration.rag_fixture.test_guard.FixtureGuardTests testMethod=test_reviewed_addition_preserves_historical_baseline_and_ancestry>
+
+    def test_reviewed_addition_preserves_historical_baseline_and_ancestry(self):
+>       _, script, head, tables = fixture.chain()
+                                  ^^^^^^^^^^^^^^^
+
+tests\integration\rag_fixture\test_guard.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+infra\local\rag-fixture\fixture.py:219: in chain
+    directory = reviewed_sources()
+                ^^^^^^^^^^^^^^^^^^
+infra\local\rag-fixture\fixture.py:213: in reviewed_sources
+    require(actual == REVIEWED | REVIEWED_ADDITIONS,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False
+message = 'migration source changed or unreviewed; stop before DB mutation'
+
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise FixtureError(message)
+E           rag_fixture_tool.FixtureError: migration source changed or unreviewed; stop before DB mutation
+
+infra\local\rag-fixture\fixture.py:83: FixtureError
+______________ test_reviewed_ancestry_and_forward_only_recovery _______________
+
+    def test_reviewed_ancestry_and_forward_only_recovery():
+        f = load("filter_fixture", HERE / "fixture.py")
+>       _, script, head, _ = f.chain()
+                             ^^^^^^^^^
+
+tests\integration\test_retrieval_scope_migration.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+infra\local\rag-fixture\fixture.py:219: in chain
+    directory = reviewed_sources()
+                ^^^^^^^^^^^^^^^^^^
+infra\local\rag-fixture\fixture.py:213: in reviewed_sources
+    require(actual == REVIEWED | REVIEWED_ADDITIONS,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False
+message = 'migration source changed or unreviewed; stop before DB mutation'
+
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise FixtureError(message)
+E           filter_fixture.FixtureError: migration source changed or unreviewed; stop before DB mutation
+
+infra\local\rag-fixture\fixture.py:83: FixtureError
+_ DependencyGateTests.test_candidate_count_mismatch_does_not_enable_prerelease_exception _
+
+self = <tests.unit.dependency_resolution.test_verifier.DependencyGateTests testMethod=test_candidate_count_mismatch_does_not_enable_prerelease_exception>
+
+    def test_candidate_count_mismatch_does_not_enable_prerelease_exception(self):
+        with patch.object(gate, "APPROVED_ADDITIONAL_PACKAGE_COUNT", 131):
+            valid, errors = gate.verify_dependencies(ROOT)
+        self.assertFalse(valid)
+>       self.assertIn("approved candidate package count differs", errors)
+E       AssertionError: 'approved candidate package count differs' not found in ['human approval reference or candidate checksum mismatch', 'dependency must use an exact stable == pin; URL/VCS/range/wildcard denied', 'immutable stable version required: opentelemetry-exporter-http-transport', 'immutable stable version required: opentelemetry-exporter-otlp-common', 'immutable stable version required: opentelemetry-instrumentation', 'immutable stable version required: opentelemetry-instrumentation-asgi', 'immutable stable version required: opentelemetry-instrumentation-fastapi', 'immutable stable version required: opentelemetry-instrumentation-httpx', 'immutable stable version required: opentelemetry-instrumentation-redis', 'immutable stable version required: opentelemetry-instrumentation-sqlalchemy', 'immutable stable version required: opentelemetry-semantic-conventions', 'immutable stable version required: opentelemetry-util-http', 'lock drift: production requirement metadata differs', 'lock drift: root dependency references differ', 'unapproved declared dependency: cryptography', 'unapproved declared dependency: langchain-core', 'unapproved declared dependency: langfuse', 'unapproved declared dependency: locust', 'unapproved declared dependency: mypy', 'unapproved declared dependency: numpy', 'unapproved declared dependency: openai', 'unapproved declared dependency: opentelemetry-api', 'unapproved declared dependency: opentelemetry-exporter-otlp', 'unapproved declared dependency: opentelemetry-sdk', 'unapproved declared dependency: pdfplumber', 'unapproved declared dependency: prometheus-client', 'unapproved declared dependency: pyjwt', 'unapproved declared dependency: pypdf', 'unapproved declared dependency: pytest-benchmark', 'unapproved declared dependency: pytest-mock', 'unapproved declared dependency: python-multipart', 'unapproved declared dependency: ruff', 'unapproved declared dependency: scikit-learn', 'unapproved declared dependency: structlog', 'unapproved declared dependency: tiktoken', 'unapproved declared dependency: tzdata', 'unapproved resolved dependency: annotated-doc', 'unapproved resolved dependency: annotated-types', 'unapproved resolved dependency: anyio', 'unapproved resolved dependency: asgiref', 'unapproved resolved dependency: ast-serialize', 'unapproved resolved dependency: attrs', 'unapproved resolved dependency: backoff', 'unapproved resolved dependency: bidict', 'unapproved resolved dependency: blinker', 'unapproved resolved dependency: brotli', 'unapproved resolved dependency: certifi', 'unapproved resolved dependency: cffi', 'unapproved resolved dependency: charset-normalizer', 'unapproved resolved dependency: click', 'unapproved resolved dependency: cloudpickle', 'unapproved resolved dependency: colorama', 'unapproved resolved dependency: configargparse', 'unapproved resolved dependency: cryptography', 'unapproved resolved dependency: distro', 'unapproved resolved dependency: flask', 'unapproved resolved dependency: flask-cors', 'unapproved resolved dependency: flask-login', 'unapproved resolved dependency: gevent', 'unapproved resolved dependency: geventhttpclient', 'unapproved resolved dependency: googleapis-common-protos', 'unapproved resolved dependency: greenlet', 'unapproved resolved dependency: grpcio', 'unapproved resolved dependency: h11', 'unapproved resolved dependency: httpcore', 'unapproved resolved dependency: httpcore2', 'unapproved resolved dependency: httptools', 'unapproved resolved dependency: httpx2', 'unapproved resolved dependency: httpx2-jsfetch', 'unapproved resolved dependency: idna', 'unapproved resolved dependency: iniconfig', 'unapproved resolved dependency: itsdangerous', 'unapproved resolved dependency: jinja2', 'unapproved resolved dependency: jiter', 'unapproved resolved dependency: joblib', 'unapproved resolved dependency: jsonpatch', 'unapproved resolved dependency: jsonpointer', 'unapproved resolved dependency: jsonschema-specifications', 'unapproved resolved dependency: langchain-core', 'unapproved resolved dependency: langchain-protocol', 'unapproved resolved dependency: langfuse', 'unapproved resolved dependency: langgraph-checkpoint', 'unapproved resolved dependency: langgraph-prebuilt', 'unapproved resolved dependency: langgraph-sdk', 'unapproved resolved dependency: langsmith', 'unapproved resolved dependency: librt', 'unapproved resolved dependency: locust', 'unapproved resolved dependency: mako', 'unapproved resolved dependency: markupsafe', 'unapproved resolved dependency: msgpack', 'unapproved resolved dependency: mypy', 'unapproved resolved dependency: mypy-extensions', 'unapproved resolved dependency: narwhals', 'unapproved resolved dependency: numpy', 'unapproved resolved dependency: openai', 'unapproved resolved dependency: opentelemetry-api', 'unapproved resolved dependency: opentelemetry-exporter-http-transport', 'unapproved resolved dependency: opentelemetry-exporter-otlp', 'unapproved resolved dependency: opentelemetry-exporter-otlp-common', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-common', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-grpc', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-http', 'unapproved resolved dependency: opentelemetry-instrumentation', 'unapproved resolved dependency: opentelemetry-instrumentation-asgi', 'unapproved resolved dependency: opentelemetry-instrumentation-fastapi', 'unapproved resolved dependency: opentelemetry-instrumentation-httpx', 'unapproved resolved dependency: opentelemetry-instrumentation-redis', 'unapproved resolved dependency: opentelemetry-instrumentation-sqlalchemy', 'unapproved resolved dependency: opentelemetry-proto', 'unapproved resolved dependency: opentelemetry-sdk', 'unapproved resolved dependency: opentelemetry-semantic-conventions', 'unapproved resolved dependency: opentelemetry-util-http', 'unapproved resolved dependency: orjson', 'unapproved resolved dependency: ormsgpack', 'unapproved resolved dependency: packaging', 'unapproved resolved dependency: pathspec', 'unapproved resolved dependency: pdfminer-six', 'unapproved resolved dependency: pdfplumber', 'unapproved resolved dependency: pillow', 'unapproved resolved dependency: pluggy', 'unapproved resolved dependency: prometheus-client', 'unapproved resolved dependency: protobuf', 'unapproved resolved dependency: psutil', 'unapproved resolved dependency: py-cpuinfo2', 'unapproved resolved dependency: pycparser', 'unapproved resolved dependency: pydantic-core', 'unapproved resolved dependency: pygments', 'unapproved resolved dependency: pyjwt', 'unapproved resolved dependency: pypdf', 'unapproved resolved dependency: pypdfium2', 'unapproved resolved dependency: pytest-benchmark', 'unapproved resolved dependency: pytest-mock', 'unapproved resolved dependency: python-dotenv', 'unapproved resolved dependency: python-engineio', 'unapproved resolved dependency: python-multipart', 'unapproved resolved dependency: python-socketio', 'unapproved resolved dependency: pywin32', 'unapproved resolved dependency: pyzmq', 'unapproved resolved dependency: referencing', 'unapproved resolved dependency: regex', 'unapproved resolved dependency: requests', 'unapproved resolved dependency: requests-toolbelt', 'unapproved resolved dependency: rpds-py', 'unapproved resolved dependency: ruff', 'unapproved resolved dependency: scikit-learn', 'unapproved resolved dependency: scipy', 'unapproved resolved dependency: simple-websocket', 'unapproved resolved dependency: sniffio', 'unapproved resolved dependency: starlette', 'unapproved resolved dependency: structlog', 'unapproved resolved dependency: tenacity', 'unapproved resolved dependency: threadpoolctl', 'unapproved resolved dependency: tiktoken', 'unapproved resolved dependency: truststore', 'unapproved resolved dependency: typing-extensions', 'unapproved resolved dependency: typing-inspection', 'unapproved resolved dependency: tzdata', 'unapproved resolved dependency: urllib3', 'unapproved resolved dependency: uuid-utils', 'unapproved resolved dependency: uvloop', 'unapproved resolved dependency: watchfiles', 'unapproved resolved dependency: websocket-client', 'unapproved resolved dependency: websockets', 'unapproved resolved dependency: werkzeug', 'unapproved resolved dependency: wrapt', 'unapproved resolved dependency: wsproto', 'unapproved resolved dependency: xxhash', 'unapproved resolved dependency: zope-event', 'unapproved resolved dependency: zope-interface', 'unapproved resolved dependency: zstandard']
+
+tests\unit\dependency_resolution\test_verifier.py:213: AssertionError
+_ DependencyGateTests.test_repository_candidate_matches_exact_human_approval __
+
+self = <tests.unit.dependency_resolution.test_verifier.DependencyGateTests testMethod=test_repository_candidate_matches_exact_human_approval>
+
+    def test_repository_candidate_matches_exact_human_approval(self):
+        valid, errors = gate.verify_dependencies(ROOT)
+>       self.assertTrue(valid, errors)
+E       AssertionError: False is not true : ['human approval reference or candidate checksum mismatch', 'dependency must use an exact stable == pin; URL/VCS/range/wildcard denied', 'immutable stable version required: opentelemetry-exporter-http-transport', 'immutable stable version required: opentelemetry-exporter-otlp-common', 'immutable stable version required: opentelemetry-instrumentation', 'immutable stable version required: opentelemetry-instrumentation-asgi', 'immutable stable version required: opentelemetry-instrumentation-fastapi', 'immutable stable version required: opentelemetry-instrumentation-httpx', 'immutable stable version required: opentelemetry-instrumentation-redis', 'immutable stable version required: opentelemetry-instrumentation-sqlalchemy', 'immutable stable version required: opentelemetry-semantic-conventions', 'immutable stable version required: opentelemetry-util-http', 'lock drift: production requirement metadata differs', 'lock drift: root dependency references differ', 'unapproved declared dependency: cryptography', 'unapproved declared dependency: langchain-core', 'unapproved declared dependency: langfuse', 'unapproved declared dependency: locust', 'unapproved declared dependency: mypy', 'unapproved declared dependency: numpy', 'unapproved declared dependency: openai', 'unapproved declared dependency: opentelemetry-api', 'unapproved declared dependency: opentelemetry-exporter-otlp', 'unapproved declared dependency: opentelemetry-sdk', 'unapproved declared dependency: pdfplumber', 'unapproved declared dependency: prometheus-client', 'unapproved declared dependency: pyjwt', 'unapproved declared dependency: pypdf', 'unapproved declared dependency: pytest-benchmark', 'unapproved declared dependency: pytest-mock', 'unapproved declared dependency: python-multipart', 'unapproved declared dependency: ruff', 'unapproved declared dependency: scikit-learn', 'unapproved declared dependency: structlog', 'unapproved declared dependency: tiktoken', 'unapproved declared dependency: tzdata', 'unapproved resolved dependency: annotated-doc', 'unapproved resolved dependency: annotated-types', 'unapproved resolved dependency: anyio', 'unapproved resolved dependency: asgiref', 'unapproved resolved dependency: ast-serialize', 'unapproved resolved dependency: attrs', 'unapproved resolved dependency: backoff', 'unapproved resolved dependency: bidict', 'unapproved resolved dependency: blinker', 'unapproved resolved dependency: brotli', 'unapproved resolved dependency: certifi', 'unapproved resolved dependency: cffi', 'unapproved resolved dependency: charset-normalizer', 'unapproved resolved dependency: click', 'unapproved resolved dependency: cloudpickle', 'unapproved resolved dependency: colorama', 'unapproved resolved dependency: configargparse', 'unapproved resolved dependency: cryptography', 'unapproved resolved dependency: distro', 'unapproved resolved dependency: flask', 'unapproved resolved dependency: flask-cors', 'unapproved resolved dependency: flask-login', 'unapproved resolved dependency: gevent', 'unapproved resolved dependency: geventhttpclient', 'unapproved resolved dependency: googleapis-common-protos', 'unapproved resolved dependency: greenlet', 'unapproved resolved dependency: grpcio', 'unapproved resolved dependency: h11', 'unapproved resolved dependency: httpcore', 'unapproved resolved dependency: httpcore2', 'unapproved resolved dependency: httptools', 'unapproved resolved dependency: httpx2', 'unapproved resolved dependency: httpx2-jsfetch', 'unapproved resolved dependency: idna', 'unapproved resolved dependency: iniconfig', 'unapproved resolved dependency: itsdangerous', 'unapproved resolved dependency: jinja2', 'unapproved resolved dependency: jiter', 'unapproved resolved dependency: joblib', 'unapproved resolved dependency: jsonpatch', 'unapproved resolved dependency: jsonpointer', 'unapproved resolved dependency: jsonschema-specifications', 'unapproved resolved dependency: langchain-core', 'unapproved resolved dependency: langchain-protocol', 'unapproved resolved dependency: langfuse', 'unapproved resolved dependency: langgraph-checkpoint', 'unapproved resolved dependency: langgraph-prebuilt', 'unapproved resolved dependency: langgraph-sdk', 'unapproved resolved dependency: langsmith', 'unapproved resolved dependency: librt', 'unapproved resolved dependency: locust', 'unapproved resolved dependency: mako', 'unapproved resolved dependency: markupsafe', 'unapproved resolved dependency: msgpack', 'unapproved resolved dependency: mypy', 'unapproved resolved dependency: mypy-extensions', 'unapproved resolved dependency: narwhals', 'unapproved resolved dependency: numpy', 'unapproved resolved dependency: openai', 'unapproved resolved dependency: opentelemetry-api', 'unapproved resolved dependency: opentelemetry-exporter-http-transport', 'unapproved resolved dependency: opentelemetry-exporter-otlp', 'unapproved resolved dependency: opentelemetry-exporter-otlp-common', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-common', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-grpc', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-http', 'unapproved resolved dependency: opentelemetry-instrumentation', 'unapproved resolved dependency: opentelemetry-instrumentation-asgi', 'unapproved resolved dependency: opentelemetry-instrumentation-fastapi', 'unapproved resolved dependency: opentelemetry-instrumentation-httpx', 'unapproved resolved dependency: opentelemetry-instrumentation-redis', 'unapproved resolved dependency: opentelemetry-instrumentation-sqlalchemy', 'unapproved resolved dependency: opentelemetry-proto', 'unapproved resolved dependency: opentelemetry-sdk', 'unapproved resolved dependency: opentelemetry-semantic-conventions', 'unapproved resolved dependency: opentelemetry-util-http', 'unapproved resolved dependency: orjson', 'unapproved resolved dependency: ormsgpack', 'unapproved resolved dependency: packaging', 'unapproved resolved dependency: pathspec', 'unapproved resolved dependency: pdfminer-six', 'unapproved resolved dependency: pdfplumber', 'unapproved resolved dependency: pillow', 'unapproved resolved dependency: pluggy', 'unapproved resolved dependency: prometheus-client', 'unapproved resolved dependency: protobuf', 'unapproved resolved dependency: psutil', 'unapproved resolved dependency: py-cpuinfo2', 'unapproved resolved dependency: pycparser', 'unapproved resolved dependency: pydantic-core', 'unapproved resolved dependency: pygments', 'unapproved resolved dependency: pyjwt', 'unapproved resolved dependency: pypdf', 'unapproved resolved dependency: pypdfium2', 'unapproved resolved dependency: pytest-benchmark', 'unapproved resolved dependency: pytest-mock', 'unapproved resolved dependency: python-dotenv', 'unapproved resolved dependency: python-engineio', 'unapproved resolved dependency: python-multipart', 'unapproved resolved dependency: python-socketio', 'unapproved resolved dependency: pywin32', 'unapproved resolved dependency: pyzmq', 'unapproved resolved dependency: referencing', 'unapproved resolved dependency: regex', 'unapproved resolved dependency: requests', 'unapproved resolved dependency: requests-toolbelt', 'unapproved resolved dependency: rpds-py', 'unapproved resolved dependency: ruff', 'unapproved resolved dependency: scikit-learn', 'unapproved resolved dependency: scipy', 'unapproved resolved dependency: simple-websocket', 'unapproved resolved dependency: sniffio', 'unapproved resolved dependency: starlette', 'unapproved resolved dependency: structlog', 'unapproved resolved dependency: tenacity', 'unapproved resolved dependency: threadpoolctl', 'unapproved resolved dependency: tiktoken', 'unapproved resolved dependency: truststore', 'unapproved resolved dependency: typing-extensions', 'unapproved resolved dependency: typing-inspection', 'unapproved resolved dependency: tzdata', 'unapproved resolved dependency: urllib3', 'unapproved resolved dependency: uuid-utils', 'unapproved resolved dependency: uvloop', 'unapproved resolved dependency: watchfiles', 'unapproved resolved dependency: websocket-client', 'unapproved resolved dependency: websockets', 'unapproved resolved dependency: werkzeug', 'unapproved resolved dependency: wrapt', 'unapproved resolved dependency: wsproto', 'unapproved resolved dependency: xxhash', 'unapproved resolved dependency: zope-event', 'unapproved resolved dependency: zope-interface', 'unapproved resolved dependency: zstandard']
+
+tests\unit\dependency_resolution\test_verifier.py:159: AssertionError
+============================== warnings summary ===============================
+scripts\rag_v2_build_index.py:43
+scripts\rag_v2_build_index.py:43
+  C:\Users\Duong Vinh\Vinh\scripts\rag_v2_build_index.py:43: UserWarning: LEGACY_EMBED_CACHE_IGNORED
+    warnings.warn("LEGACY_EMBED_CACHE_IGNORED", stacklevel=1)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/rag_fixture/test_guard.py::FixtureGuardTests::test_reviewed_addition_preserves_historical_baseline_and_ancestry
+FAILED tests/integration/test_retrieval_scope_migration.py::test_reviewed_ancestry_and_forward_only_recovery
+FAILED tests/unit/dependency_resolution/test_verifier.py::DependencyGateTests::test_candidate_count_mismatch_does_not_enable_prerelease_exception
+FAILED tests/unit/dependency_resolution/test_verifier.py::DependencyGateTests::test_repository_candidate_matches_exact_human_approval
+4 failed, 4814 passed, 48 skipped, 5 xfailed, 2 warnings, 16 subtests passed in 990.42s (0:16:30)
