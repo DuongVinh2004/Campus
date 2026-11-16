@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "expected_version": {
+      "minimum": 1,
+      "title": "Expected Version",
+      "type": "integer"
+    },
+    "locale": {
+      "anyOf": [
+        {
+          "enum": [
+            "vi",
+            "en"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Locale"
+    },
+    "reply_style": {
+      "anyOf": [
+        {
+          "enum": [
+            "concise",
+            "steps",
+            "detailed"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reply Style"
+    },
+    "format": {
+      "anyOf": [
+        {
+          "enum": [
+            "text",
+            "markdown"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Format"
+    },
+    "custom_instructions": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Custom Instructions"
+    }
+  },
+  "required": [
+    "expected_version"
+  ],
+  "title": "PreferencesPatch",
+  "type": "object"
+}

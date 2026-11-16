@@ -1,0 +1,729 @@
+{
+  "$defs": {
+    "AppliedSource": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "version_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Version Id",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "rendition_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Rendition Sha256",
+          "type": "string"
+        },
+        "locator": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "effective_from": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective From"
+        },
+        "effective_until": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective Until"
+        },
+        "classification": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "public_snapshot"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "effective_status": {
+          "default": "demo_interval",
+          "enum": [
+            "demo_interval",
+            "unknown"
+          ],
+          "title": "Effective Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "version_id",
+        "source_sha256",
+        "rendition_sha256",
+        "locator"
+      ],
+      "title": "AppliedSource",
+      "type": "object"
+    },
+    "AssistanceResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "unified-assistance.v1",
+          "default": "unified-assistance.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "source_changed",
+            "missing_source"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "resource": {
+          "$ref": "#/$defs/ResourceState"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 6,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "guidance": {
+          "maxLength": 20000,
+          "title": "Guidance",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Limitations",
+          "type": "array"
+        },
+        "open_path": {
+          "pattern": "^/(services|tickets)\\?request=[0-9a-f-]{36}$",
+          "title": "Open Path",
+          "type": "string"
+        },
+        "action_authority": {
+          "const": "none",
+          "default": "none",
+          "title": "Action Authority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "resource",
+        "guidance",
+        "limitations",
+        "open_path"
+      ],
+      "title": "AssistanceResponse",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "version_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Version Id",
+          "type": "string"
+        },
+        "locator": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "synthetic",
+            "public_snapshot"
+          ],
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "version_id",
+        "locator",
+        "sha256",
+        "classification"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "MandatoryReview": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z_]{1,100}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "reviewer": {
+          "const": "SUPPORT_OFFICER",
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "required": {
+          "const": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "status": {
+          "const": "required",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "reviewer",
+        "required",
+        "status"
+      ],
+      "title": "MandatoryReview",
+      "type": "object"
+    },
+    "ResourceRunMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "state": {
+          "enum": [
+            "partial",
+            "interrupted"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "receipt_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Receipt Id",
+          "type": "string"
+        },
+        "is_replay": {
+          "title": "Is Replay",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "state",
+        "receipt_id",
+        "is_replay"
+      ],
+      "title": "ResourceRunMetadata",
+      "type": "object"
+    },
+    "ResourceState": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "DRAFT",
+            "PENDING_CONFIRMATION",
+            "SUBMITTED",
+            "VALIDATING",
+            "PROCESSING",
+            "WAITING_STUDENT",
+            "READY",
+            "REJECTED",
+            "FULFILLED",
+            "CANCELLED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "workflow": {
+          "enum": [
+            "GRADE_APPEAL",
+            "GENERAL_SUPPORT",
+            "STUDENT_CERTIFICATE"
+          ],
+          "title": "Workflow",
+          "type": "string"
+        },
+        "view": {
+          "enum": [
+            "student",
+            "staff"
+          ],
+          "title": "View",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "version",
+        "status",
+        "workflow",
+        "view"
+      ],
+      "title": "ResourceState",
+      "type": "object"
+    },
+    "SupplementApplicability": {
+      "additionalProperties": false,
+      "properties": {
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "at": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At"
+        },
+        "binding_status": {
+          "enum": [
+            "bound",
+            "unresolved"
+          ],
+          "title": "Binding Status",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AppliedSource"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_changed_from_submission": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Changed From Submission"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Reasons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sequence",
+        "binding_status",
+        "source",
+        "source_changed_from_submission",
+        "reasons"
+      ],
+      "title": "SupplementApplicability",
+      "type": "object"
+    },
+    "TemplateDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "required_fields": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Required Fields",
+          "type": "array"
+        },
+        "outcomes": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Outcomes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "version",
+        "title",
+        "required_fields",
+        "outcomes"
+      ],
+      "title": "TemplateDefinition",
+      "type": "object"
+    },
+    "WorkflowBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "workflow_version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Workflow Version",
+          "type": "string"
+        },
+        "template_version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Template Version",
+          "type": "string"
+        },
+        "milestone": {
+          "const": "submitted_at_or_created_at",
+          "title": "Milestone",
+          "type": "string"
+        },
+        "as_of": {
+          "maxLength": 64,
+          "title": "As Of",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/AppliedSource"
+        },
+        "supporting_sources": {
+          "items": {
+            "$ref": "#/$defs/AppliedSource"
+          },
+          "maxItems": 5,
+          "title": "Supporting Sources",
+          "type": "array"
+        },
+        "source_capture_at": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Capture At"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workflow_version",
+        "template_version",
+        "milestone",
+        "as_of",
+        "source",
+        "sha256"
+      ],
+      "title": "WorkflowBinding",
+      "type": "object"
+    },
+    "WorkflowResolveResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "unified-workflow.v1",
+          "default": "unified-workflow.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "resource": {
+          "$ref": "#/$defs/ResourceState"
+        },
+        "definition_version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Definition Version",
+          "type": "string"
+        },
+        "classification": {
+          "const": "synthetic",
+          "title": "Classification",
+          "type": "string"
+        },
+        "binding_status": {
+          "enum": [
+            "bound",
+            "unresolved"
+          ],
+          "title": "Binding Status",
+          "type": "string"
+        },
+        "binding": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkflowBinding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "current_source_differs": {
+          "title": "Current Source Differs",
+          "type": "boolean"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "required_form_fields": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Required Form Fields",
+          "type": "array"
+        },
+        "mandatory_reviews": {
+          "items": {
+            "$ref": "#/$defs/MandatoryReview"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Mandatory Reviews",
+          "type": "array"
+        },
+        "template": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TemplateDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "readiness": {
+          "enum": [
+            "requires_officer_review",
+            "undetermined"
+          ],
+          "title": "Readiness",
+          "type": "string"
+        },
+        "action_authority": {
+          "const": "none",
+          "default": "none",
+          "title": "Action Authority",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 6,
+          "title": "Limitations",
+          "type": "array"
+        },
+        "supplements": {
+          "items": {
+            "$ref": "#/$defs/SupplementApplicability"
+          },
+          "maxItems": 50,
+          "title": "Supplements",
+          "type": "array"
+        },
+        "institutional_rules_verified": {
+          "const": false,
+          "default": false,
+          "title": "Institutional Rules Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "resource",
+        "definition_version",
+        "classification",
+        "binding_status",
+        "binding",
+        "current_source_differs",
+        "reasons",
+        "required_form_fields",
+        "mandatory_reviews",
+        "template",
+        "readiness",
+        "limitations"
+      ],
+      "title": "WorkflowResolveResponse",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "resource-specialist.v1",
+      "default": "resource-specialist.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "observed",
+        "partial",
+        "abstained"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "context": {
+      "$ref": "#/$defs/AssistanceResponse"
+    },
+    "workflow": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WorkflowResolveResponse"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "blockers": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 16,
+      "title": "Blockers",
+      "type": "array"
+    },
+    "next_action": {
+      "enum": [
+        "review_resource",
+        "read_sources"
+      ],
+      "title": "Next Action",
+      "type": "string"
+    },
+    "action_authority": {
+      "const": "none",
+      "default": "none",
+      "title": "Action Authority",
+      "type": "string"
+    },
+    "run": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ResourceRunMetadata"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "status",
+    "context",
+    "next_action"
+  ],
+  "title": "ResourceSpecialistResult",
+  "type": "object"
+}

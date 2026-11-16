@@ -1,0 +1,115 @@
+{
+  "$defs": {
+    "ItemResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Item Id",
+          "type": "string"
+        },
+        "field": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Field",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "item_id",
+        "field",
+        "value"
+      ],
+      "title": "ItemResponse",
+      "type": "object"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "resource": {
+      "$ref": "#/$defs/ResourceRef"
+    },
+    "request_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "request_version": {
+      "minimum": 1,
+      "title": "Request Version",
+      "type": "integer"
+    },
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "responses": {
+      "items": {
+        "$ref": "#/$defs/ItemResponse"
+      },
+      "maxItems": 12,
+      "minItems": 1,
+      "title": "Responses",
+      "type": "array"
+    },
+    "note": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Note",
+      "type": "string"
+    }
+  },
+  "required": [
+    "resource",
+    "request_id",
+    "request_version",
+    "client_id",
+    "responses",
+    "note"
+  ],
+  "title": "SupplementResponse",
+  "type": "object"
+}

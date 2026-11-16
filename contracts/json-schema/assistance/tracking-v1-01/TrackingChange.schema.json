@@ -1,0 +1,153 @@
+{
+  "$defs": {
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    },
+    "SubscriptionSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "resource": {
+          "$ref": "#/$defs/ResourceRef"
+        },
+        "trigger": {
+          "enum": [
+            "feedback",
+            "supplement",
+            "status",
+            "deadline"
+          ],
+          "title": "Trigger",
+          "type": "string"
+        },
+        "channel": {
+          "const": "in_app",
+          "default": "in_app",
+          "title": "Channel",
+          "type": "string"
+        },
+        "expires_at": {
+          "title": "Expires At",
+          "type": "string"
+        },
+        "permission_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Permission Id",
+          "type": "string"
+        },
+        "permission_version": {
+          "minimum": 1,
+          "title": "Permission Version",
+          "type": "integer"
+        },
+        "quiet_start_hour": {
+          "default": 22,
+          "maximum": 23,
+          "minimum": 0,
+          "title": "Quiet Start Hour",
+          "type": "integer"
+        },
+        "quiet_end_hour": {
+          "default": 7,
+          "maximum": 23,
+          "minimum": 0,
+          "title": "Quiet End Hour",
+          "type": "integer"
+        },
+        "utc_offset_minutes": {
+          "default": 420,
+          "maximum": 840,
+          "minimum": -720,
+          "title": "Utc Offset Minutes",
+          "type": "integer"
+        },
+        "purpose": {
+          "const": "selected_resource_tracking",
+          "default": "selected_resource_tracking",
+          "title": "Purpose",
+          "type": "string"
+        }
+      },
+      "required": [
+        "resource",
+        "trigger",
+        "expires_at",
+        "permission_id",
+        "permission_version"
+      ],
+      "title": "SubscriptionSpec",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "operation": {
+      "enum": [
+        "subscribe",
+        "stop"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "subscription_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Subscription Id",
+      "type": "string"
+    },
+    "expected_version": {
+      "minimum": 0,
+      "title": "Expected Version",
+      "type": "integer"
+    },
+    "spec": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SubscriptionSpec"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "operation",
+    "client_id",
+    "subscription_id",
+    "expected_version"
+  ],
+  "title": "TrackingChange",
+  "type": "object"
+}

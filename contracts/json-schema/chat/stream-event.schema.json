@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://campus247.example/schemas/chat/stream-event.schema.json",
+  "title": "ChatStreamEvent",
+  "x-multi-agent-extension": {"version": "1.1.0", "date": "2026-10-13", "basis": "Direct human integrated multi-agent implementation request", "additions": ["agent.status", "partial_answer", "system_error", "optional run_id"]},
+  "x-document-control": {
+    "document_id": "API-SCHEMA-CHAT-STREAM-001", "version": "1.0.0", "status": "approved",
+    "owner": "API Architect", "approvers": ["Direct human P-CONTRACT-STREAM-001 approval"],
+    "last_updated": "2026-10-04"
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "event", "data"],
+  "properties": {
+    "id": {"$ref": "#/$defs/uuid"},
+    "event": {"enum": ["message.started", "agent.status", "message.delta", "citation.added", "message.completed", "message.failed"]},
+    "data": {"type": "object"}
+  },
+  "oneOf": [
+    {"properties": {"event": {"const": "message.started"}, "data": {"$ref": "#/$defs/started"}}},
+    {"properties": {"event": {"const": "agent.status"}, "data": {"$ref": "#/$defs/agentStatus"}}},
+    {"properties": {"event": {"const": "message.delta"}, "data": {"$ref": "#/$defs/delta"}}},
+    {"properties": {"event": {"const": "citation.added"}, "data": {"$ref": "#/$defs/citationAdded"}}},
+    {"properties": {"event": {"const": "message.completed"}, "data": {"$ref": "#/$defs/completed"}}},
+    {"properties": {"event": {"const": "message.failed"}, "data": {"$ref": "../common/error.schema.json"}}}
+  ],
+  "$defs": {
+    "agentStatus": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "run_id", "phase", "tasks", "source_count"],
+      "properties": {
+        "version": {"const": 1}, "run_id": {"$ref": "#/$defs/uuid"},
+        "phase": {"enum": ["planning", "researching", "verifying", "reviewing", "synthesizing", "waiting_user", "failed", "completed", "cancelled", "partial"]},
+        "source_count": {"type": "integer", "minimum": 0, "maximum": 6},
+        "tasks": {"type": "array", "maxItems": 8, "items": {
+          "type": "object", "additionalProperties": false, "required": ["id", "role", "status"],
+          "properties": {"id": {"type": "string", "pattern": "^T[1-8]$"},
+            "role": {"enum": ["research", "verifier"]},
+            "status": {"enum": ["pending", "running", "succeeded", "partial", "failed", "cancelled"]}}
+        }}
+      }
+    },
+    "uuid": {
+      "type": "string", "format": "uuid",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "started": {
+      "type": "object", "additionalProperties": false,
+      "required": ["conversation_id", "message_id"],
+      "properties": {"conversation_id": {"$ref": "#/$defs/uuid"}, "message_id": {"$ref": "#/$defs/uuid"}}
+    },
+    "delta": {
+      "type": "object", "additionalProperties": false, "required": ["seq", "delta"],
+      "properties": {"seq": {"type": "integer", "minimum": 1}, "delta": {"type": "string", "maxLength": 20000}}
+    },
+    "streamCitation": {
+      "type": "object", "additionalProperties": false, "required": ["turn_citation_id", "citation"],
+      "properties": {
+        "turn_citation_id": {"type": "string", "pattern": "^CIT-[0-9]{3,}$"},
+        "citation": {"$ref": "../citations/citation.schema.json"}
+      }
+    },
+    "citationAdded": {
+      "type": "object", "additionalProperties": false, "required": ["message_id", "citation"],
+      "properties": {"message_id": {"$ref": "#/$defs/uuid"}, "citation": {"$ref": "#/$defs/streamCitation"}}
+    },
+    "completed": {
+      "type": "object", "additionalProperties": false,
+      "required": ["conversation_id", "message_id", "status", "response_class", "content", "citations"],
+      "properties": {
+        "conversation_id": {"$ref": "#/$defs/uuid"}, "message_id": {"$ref": "#/$defs/uuid"},
+        "run_id": {"$ref": "#/$defs/uuid"},
+        "status": {"enum": ["answered", "abstained", "completed", "cancelled", "handed_over"]},
+        "response_class": {"enum": ["grounded_answer", "partial_answer", "system_error", "tool_result", "action_preview", "action_result", "handover_notice", "clarification_request", "safe_refusal"]},
+        "content": {"type": "string", "minLength": 1, "maxLength": 20000},
+        "citations": {"type": "array", "maxItems": 20, "items": {"$ref": "#/$defs/streamCitation"}}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "answered"}}}, "then": {"properties": {"response_class": {"enum": ["grounded_answer", "partial_answer", "tool_result"]}}}},
+        {"if": {"properties": {"status": {"const": "abstained"}}}, "then": {"properties": {"response_class": {"enum": ["safe_refusal", "clarification_request", "system_error"]}, "citations": {"maxItems": 0}}}},
+        {"if": {"properties": {"status": {"const": "completed"}}}, "then": {"properties": {"response_class": {"enum": ["tool_result", "action_preview", "action_result"]}}}},
+        {"if": {"properties": {"status": {"const": "cancelled"}}}, "then": {"properties": {"response_class": {"const": "safe_refusal"}, "citations": {"maxItems": 0}}}},
+        {"if": {"properties": {"status": {"const": "handed_over"}}}, "then": {"properties": {"response_class": {"const": "handover_notice"}}}},
+        {"if": {"properties": {"response_class": {"enum": ["grounded_answer", "partial_answer"]}}}, "then": {"properties": {"citations": {"minItems": 1}}}}
+      ]
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "version_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Version Id",
+          "type": "string"
+        },
+        "locator": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "synthetic",
+            "public_snapshot"
+          ],
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "version_id",
+        "locator",
+        "sha256",
+        "classification"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "ResourceState": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "DRAFT",
+            "PENDING_CONFIRMATION",
+            "SUBMITTED",
+            "VALIDATING",
+            "PROCESSING",
+            "WAITING_STUDENT",
+            "READY",
+            "REJECTED",
+            "FULFILLED",
+            "CANCELLED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "workflow": {
+          "enum": [
+            "GRADE_APPEAL",
+            "GENERAL_SUPPORT",
+            "STUDENT_CERTIFICATE"
+          ],
+          "title": "Workflow",
+          "type": "string"
+        },
+        "view": {
+          "enum": [
+            "student",
+            "staff"
+          ],
+          "title": "View",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "version",
+        "status",
+        "workflow",
+        "view"
+      ],
+      "title": "ResourceState",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "unified-assistance.v1",
+      "default": "unified-assistance.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "observed",
+        "source_changed",
+        "missing_source"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "resource": {
+      "$ref": "#/$defs/ResourceState"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "maxItems": 6,
+      "title": "Evidence",
+      "type": "array"
+    },
+    "guidance": {
+      "maxLength": 20000,
+      "title": "Guidance",
+      "type": "string"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 8,
+      "title": "Limitations",
+      "type": "array"
+    },
+    "open_path": {
+      "pattern": "^/(services|tickets)\\?request=[0-9a-f-]{36}$",
+      "title": "Open Path",
+      "type": "string"
+    },
+    "action_authority": {
+      "const": "none",
+      "default": "none",
+      "title": "Action Authority",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "resource",
+    "guidance",
+    "limitations",
+    "open_path"
+  ],
+  "title": "AssistanceResponse",
+  "type": "object"
+}

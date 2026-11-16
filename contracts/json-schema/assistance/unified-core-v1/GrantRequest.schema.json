@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "purpose": {
+      "enum": [
+        "source_assistance",
+        "personalization",
+        "notifications"
+      ],
+      "title": "Purpose",
+      "type": "string"
+    },
+    "capability": {
+      "enum": [
+        "read_source",
+        "read_own_resource",
+        "prepare_draft",
+        "remember_preference",
+        "notify_resource"
+      ],
+      "title": "Capability",
+      "type": "string"
+    },
+    "resource": {
+      "$ref": "#/$defs/ResourceRef"
+    },
+    "requested_lifetime_seconds": {
+      "maximum": 86400,
+      "minimum": 1,
+      "title": "Requested Lifetime Seconds",
+      "type": "integer"
+    },
+    "state": {
+      "const": "requested",
+      "default": "requested",
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "purpose",
+    "capability",
+    "resource",
+    "requested_lifetime_seconds"
+  ],
+  "title": "GrantRequest",
+  "type": "object"
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "client_id": {
+      "pattern": "^baseline:[0-9a-f]{8}-[0-9a-f]{4}-[47][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "case_id": {
+      "pattern": "^UB-(0[1-9]|1[0-4])$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "operator_kind": {
+      "enum": [
+        "human_declared",
+        "automation"
+      ],
+      "title": "Operator Kind",
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "case_id",
+    "operator_kind"
+  ],
+  "title": "BaselineStart",
+  "type": "object"
+}

@@ -1,0 +1,66 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "done": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Done",
+      "type": "array"
+    },
+    "open": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "minItems": 1,
+      "title": "Open",
+      "type": "array"
+    },
+    "evidence_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "next_action": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Next Action",
+      "type": "string"
+    },
+    "visibility": {
+      "enum": [
+        "internal",
+        "public"
+      ],
+      "title": "Visibility",
+      "type": "string"
+    },
+    "target_queue": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Target Queue",
+      "type": "string"
+    },
+    "target_actor": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Target Actor",
+      "type": "string"
+    }
+  },
+  "required": [
+    "done",
+    "open",
+    "evidence_ids",
+    "next_action",
+    "visibility",
+    "target_queue",
+    "target_actor"
+  ],
+  "title": "HandoverSummary",
+  "type": "object"
+}

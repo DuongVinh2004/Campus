@@ -1,0 +1,111 @@
+{
+  "$defs": {
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "recipient_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Recipient Id",
+      "type": "string"
+    },
+    "audience": {
+      "enum": [
+        "student",
+        "staff"
+      ],
+      "title": "Audience",
+      "type": "string"
+    },
+    "resource": {
+      "$ref": "#/$defs/ResourceRef"
+    },
+    "reason": {
+      "maxLength": 240,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "source_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Source Id",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+    },
+    "next_action": {
+      "enum": [
+        "open_resource",
+        "review_supplement",
+        "read_feedback",
+        "review_status"
+      ],
+      "title": "Next Action",
+      "type": "string"
+    },
+    "classification": {
+      "enum": [
+        "public_student",
+        "internal_staff"
+      ],
+      "title": "Classification",
+      "type": "string"
+    },
+    "action_authority": {
+      "const": "none",
+      "default": "none",
+      "title": "Action Authority",
+      "type": "string"
+    }
+  },
+  "required": [
+    "recipient_id",
+    "audience",
+    "resource",
+    "reason",
+    "source_id",
+    "source_sha256",
+    "updated_at",
+    "next_action",
+    "classification"
+  ],
+  "title": "NotificationProjection",
+  "type": "object"
+}

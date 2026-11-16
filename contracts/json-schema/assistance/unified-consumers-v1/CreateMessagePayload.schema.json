@@ -1,0 +1,29 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "content": {
+      "maxLength": 10000,
+      "minLength": 1,
+      "title": "Content",
+      "type": "string"
+    },
+    "client_id": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Client Id"
+    }
+  },
+  "required": [
+    "content"
+  ],
+  "title": "CreateMessagePayload",
+  "type": "object"
+}

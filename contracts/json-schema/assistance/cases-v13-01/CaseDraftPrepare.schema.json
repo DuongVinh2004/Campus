@@ -1,0 +1,287 @@
+{
+  "$defs": {
+    "HandoverSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "done": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Done",
+          "type": "array"
+        },
+        "open": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Open",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "next_action": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Next Action",
+          "type": "string"
+        },
+        "visibility": {
+          "enum": [
+            "internal",
+            "public"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "target_queue": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Target Queue",
+          "type": "string"
+        },
+        "target_actor": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Target Actor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "done",
+        "open",
+        "evidence_ids",
+        "next_action",
+        "visibility",
+        "target_queue",
+        "target_actor"
+      ],
+      "title": "HandoverSummary",
+      "type": "object"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    },
+    "SupplementItem": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9_-]{1,80}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "criterion_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Criterion Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "field": {
+          "enum": [
+            "reason",
+            "purpose",
+            "recipient",
+            "attachments",
+            "course_record_id",
+            "quantity",
+            "delivery_method",
+            "contact_preference"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "public_reason": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Public Reason",
+          "type": "string"
+        },
+        "accepted_format": {
+          "enum": [
+            "text",
+            "text/plain",
+            "course_reference",
+            "integer",
+            "delivery_method",
+            "contact_preference"
+          ],
+          "title": "Accepted Format",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "criterion_id",
+        "source_ids",
+        "field",
+        "public_reason",
+        "accepted_format"
+      ],
+      "title": "SupplementItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "resource": {
+      "$ref": "#/$defs/ResourceRef"
+    },
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "expected_draft_version": {
+      "minimum": 0,
+      "title": "Expected Draft Version",
+      "type": "integer"
+    },
+    "student_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Student Id",
+      "type": "string"
+    },
+    "recipient_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Recipient Id",
+      "type": "string"
+    },
+    "operation": {
+      "enum": [
+        "respond",
+        "resolve",
+        "reject",
+        "approve",
+        "request_supplement",
+        "transfer"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "outcome": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Outcome",
+      "type": "string"
+    },
+    "fact_source_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "minItems": 1,
+      "title": "Fact Source Ids",
+      "type": "array"
+    },
+    "public_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Public Reasons",
+      "type": "array"
+    },
+    "internal_note": {
+      "default": "",
+      "maxLength": 2000,
+      "title": "Internal Note",
+      "type": "string"
+    },
+    "workflow_version": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Workflow Version",
+      "type": "string"
+    },
+    "template_version": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Template Version",
+      "type": "string"
+    },
+    "binding_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Binding Hash",
+      "type": "string"
+    },
+    "supplement_items": {
+      "items": {
+        "$ref": "#/$defs/SupplementItem"
+      },
+      "maxItems": 12,
+      "title": "Supplement Items",
+      "type": "array"
+    },
+    "handover": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/HandoverSummary"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "resource",
+    "client_id",
+    "expected_draft_version",
+    "student_id",
+    "recipient_id",
+    "operation",
+    "outcome",
+    "fact_source_ids",
+    "public_reasons",
+    "workflow_version",
+    "template_version",
+    "binding_hash"
+  ],
+  "title": "CaseDraftPrepare",
+  "type": "object"
+}

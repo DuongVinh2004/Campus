@@ -1,0 +1,184 @@
+{
+  "$defs": {
+    "ControllerCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "pattern": "^Q[1-4]$",
+          "title": "Item Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "supported",
+            "missing_user_fact",
+            "missing_source",
+            "conflicting",
+            "out_of_scope"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "supports": {
+          "items": {
+            "$ref": "#/$defs/Support"
+          },
+          "maxItems": 16,
+          "title": "Supports",
+          "type": "array"
+        },
+        "verification": {
+          "anyOf": [
+            {
+              "const": "quoted_source_checked_pending_claim_verification",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verification"
+        }
+      },
+      "required": [
+        "item_id",
+        "status",
+        "supports"
+      ],
+      "title": "ControllerCoverage",
+      "type": "object"
+    },
+    "CoverageItem": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^Q[1-4]$",
+          "title": "Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 700,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "requirements": {
+          "items": {
+            "$ref": "#/$defs/Requirement"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Requirements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "question",
+        "requirements"
+      ],
+      "title": "CoverageItem",
+      "type": "object"
+    },
+    "Requirement": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 3,
+          "pattern": "^R[1-9][0-9]?$",
+          "title": "Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "question"
+      ],
+      "title": "Requirement",
+      "type": "object"
+    },
+    "Support": {
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "pattern": "^R[1-9][0-9]?$",
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "quote": {
+          "maxLength": 700,
+          "minLength": 8,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "evidence_id",
+        "quote"
+      ],
+      "title": "Support",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/CoverageItem"
+      },
+      "maxItems": 4,
+      "title": "Items",
+      "type": "array"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/ControllerCoverage"
+      },
+      "maxItems": 4,
+      "title": "Coverage",
+      "type": "array"
+    },
+    "queries": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 8,
+      "title": "Queries",
+      "type": "array"
+    },
+    "no_progress": {
+      "default": 0,
+      "maximum": 8,
+      "minimum": 0,
+      "title": "No Progress",
+      "type": "integer"
+    },
+    "evidence_refs": {
+      "items": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "maxItems": 6,
+      "title": "Evidence Refs",
+      "type": "array"
+    }
+  },
+  "title": "ControllerCheckpoint",
+  "type": "object"
+}

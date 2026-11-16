@@ -1,0 +1,34 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "preview_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Preview Id",
+      "type": "string"
+    },
+    "confirmation_token": {
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Confirmation Token",
+      "type": "string"
+    },
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "confirmed": {
+      "const": true,
+      "title": "Confirmed",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "preview_id",
+    "confirmation_token",
+    "client_id",
+    "confirmed"
+  ],
+  "title": "CaseConfirm",
+  "type": "object"
+}

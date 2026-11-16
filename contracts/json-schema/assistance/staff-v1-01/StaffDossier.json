@@ -1,0 +1,358 @@
+{
+  "$defs": {
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    },
+    "StaffFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "layer": {
+          "enum": [
+            "deterministic",
+            "officer_review"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "unchecked",
+            "checked",
+            "missing_source",
+            "error",
+            "conflicting"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "dependency_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dependency Hash",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        },
+        "reviewed_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed At"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "layer",
+        "state",
+        "reason",
+        "dependency_hash",
+        "source_ids"
+      ],
+      "title": "StaffFinding",
+      "type": "object"
+    },
+    "StaffSource": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "record",
+            "workflow"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "synthetic",
+            "public_snapshot"
+          ],
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "version",
+        "locator",
+        "sha256",
+        "classification"
+      ],
+      "title": "StaffSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "staff-workspace.v1",
+      "default": "staff-workspace.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "resource": {
+      "$ref": "#/$defs/ResourceRef"
+    },
+    "student_id": {
+      "title": "Student Id",
+      "type": "string"
+    },
+    "tenant": {
+      "title": "Tenant",
+      "type": "string"
+    },
+    "queue": {
+      "title": "Queue",
+      "type": "string"
+    },
+    "assigned_actor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Assigned Actor"
+    },
+    "classification": {
+      "const": "synthetic",
+      "default": "synthetic",
+      "title": "Classification",
+      "type": "string"
+    },
+    "purpose": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Purpose"
+    },
+    "facts": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Facts",
+      "type": "array"
+    },
+    "timeline": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Timeline",
+      "type": "array"
+    },
+    "documents": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Documents",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/StaffSource"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/StaffFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "ai_proposals": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Ai Proposals",
+      "type": "array"
+    },
+    "ai_state": {
+      "const": "unavailable",
+      "default": "unavailable",
+      "title": "Ai State",
+      "type": "string"
+    },
+    "readiness": {
+      "enum": [
+        "ready",
+        "needs_verification",
+        "missing",
+        "waiting",
+        "blocked"
+      ],
+      "title": "Readiness",
+      "type": "string"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    },
+    "next_action": {
+      "title": "Next Action",
+      "type": "string"
+    },
+    "binding_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Binding Hash",
+      "type": "string"
+    },
+    "workflow_version": {
+      "title": "Workflow Version",
+      "type": "string"
+    },
+    "criteria_version": {
+      "const": "staff-criteria.v1",
+      "default": "staff-criteria.v1",
+      "title": "Criteria Version",
+      "type": "string"
+    },
+    "delta": {
+      "additionalProperties": true,
+      "title": "Delta",
+      "type": "object"
+    },
+    "capabilities": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Capabilities",
+      "type": "object"
+    },
+    "action_authority": {
+      "const": "none",
+      "default": "none",
+      "title": "Action Authority",
+      "type": "string"
+    }
+  },
+  "required": [
+    "resource",
+    "student_id",
+    "tenant",
+    "queue",
+    "assigned_actor",
+    "purpose",
+    "facts",
+    "timeline",
+    "documents",
+    "sources",
+    "findings",
+    "readiness",
+    "reasons",
+    "next_action",
+    "binding_hash",
+    "workflow_version",
+    "delta",
+    "capabilities"
+  ],
+  "title": "StaffDossier",
+  "type": "object"
+}

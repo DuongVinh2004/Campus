@@ -1,0 +1,259 @@
+{
+  "$defs": {
+    "DisplayChange": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "maxLength": 4000,
+          "title": "Field",
+          "type": "string"
+        },
+        "before": {
+          "maxLength": 4000,
+          "title": "Before",
+          "type": "string"
+        },
+        "after": {
+          "maxLength": 4000,
+          "title": "After",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "before",
+        "after"
+      ],
+      "title": "DisplayChange",
+      "type": "object"
+    },
+    "NavigationBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "navigation",
+          "title": "Type",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 4000,
+          "title": "Label",
+          "type": "string"
+        },
+        "path": {
+          "enum": [
+            "/services",
+            "/my-requests",
+            "/privacy",
+            "/student/certificate",
+            "/student/complaint",
+            "/staff"
+          ],
+          "title": "Path",
+          "type": "string"
+        },
+        "audience": {
+          "enum": [
+            "student",
+            "staff"
+          ],
+          "title": "Audience",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "label",
+        "path",
+        "audience"
+      ],
+      "title": "NavigationBlock",
+      "type": "object"
+    },
+    "ProposalBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "proposal",
+          "title": "Type",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 4000,
+          "title": "Title",
+          "type": "string"
+        },
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/DisplayChange"
+          },
+          "maxItems": 30,
+          "title": "Changes",
+          "type": "array"
+        },
+        "action_authority": {
+          "const": "none",
+          "default": "none",
+          "title": "Action Authority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "changes"
+      ],
+      "title": "ProposalBlock",
+      "type": "object"
+    },
+    "StatusBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "status",
+          "title": "Type",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "completed",
+            "interrupted",
+            "error"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 4000,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "state",
+        "text"
+      ],
+      "title": "StatusBlock",
+      "type": "object"
+    },
+    "StepsBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "steps",
+          "title": "Type",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "maxLength": 4000,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "items"
+      ],
+      "title": "StepsBlock",
+      "type": "object"
+    },
+    "TableBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "table",
+          "title": "Type",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "maxLength": 4000,
+            "type": "string"
+          },
+          "maxItems": 12,
+          "minItems": 1,
+          "title": "Columns",
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "items": {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "maxItems": 100,
+          "title": "Rows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "columns",
+        "rows"
+      ],
+      "title": "TableBlock",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "assistant-content.v1",
+      "default": "assistant-content.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "content": {
+      "maxLength": 20000,
+      "title": "Content",
+      "type": "string"
+    },
+    "blocks": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "navigation": "#/$defs/NavigationBlock",
+            "proposal": "#/$defs/ProposalBlock",
+            "status": "#/$defs/StatusBlock",
+            "steps": "#/$defs/StepsBlock",
+            "table": "#/$defs/TableBlock"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/StepsBlock"
+          },
+          {
+            "$ref": "#/$defs/TableBlock"
+          },
+          {
+            "$ref": "#/$defs/StatusBlock"
+          },
+          {
+            "$ref": "#/$defs/ProposalBlock"
+          },
+          {
+            "$ref": "#/$defs/NavigationBlock"
+          }
+        ]
+      },
+      "maxItems": 12,
+      "title": "Blocks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "content"
+  ],
+  "title": "AssistantDisplayContent",
+  "type": "object"
+}

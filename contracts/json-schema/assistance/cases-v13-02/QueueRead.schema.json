@@ -1,0 +1,25 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "enum": [
+        "service_request",
+        "certificate_request"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "limit": {
+      "default": 100,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Limit",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "kind"
+  ],
+  "title": "QueueRead",
+  "type": "object"
+}
