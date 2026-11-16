@@ -19,9 +19,11 @@ RUNTIME = ">=3.12,<3.14"
 # Owner approval on 2026-11-03 covers these exact candidate bytes and the
 # reviewed 133 unlisted package/version additions. New names/versions still
 # require new approval.
-APPROVAL_REFERENCE = "DIRECT-HUMAN-2026-11-03-STACK-002"
-APPROVED_CANDIDATE_SHA256 = "251e0a8fbd1f5910abd30105a3a0e6b63f6ab9a51244d209cfc29848b2dbce46"
-APPROVED_ADDITIONAL_PACKAGE_COUNT = 133
+# Owner approval in chat on 2026-11-16: the 2026-11-03 candidate plus tzdata==2026.6 (pure data package, needed for time-zone
+# aware tests on Windows). Earlier reference: DIRECT-HUMAN-2026-11-03-STACK-002 (sha256 251e0a8f...ce46, 133 packages).
+APPROVAL_REFERENCE = "DIRECT-HUMAN-2026-11-16-TZDATA-001"
+APPROVED_CANDIDATE_SHA256 = "edd5ac6ca92357cc9938e219a108cca24858aa7e3d4fc86e47adcf3265dad452"
+APPROVED_ADDITIONAL_PACKAGE_COUNT = 134
 # Explicit human approval on 2026-10-05 for only these prereleases within the
 # hash-bound candidate. A name allowlist alone never enables this exception.
 APPROVED_OTEL_PRERELEASES = frozenset((name, "0.66b0") for name in (
