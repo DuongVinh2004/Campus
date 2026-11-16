@@ -51,7 +51,9 @@ def test_one_worker_profile_does_not_pass_workers_flag():
 
 def test_caddy_exposes_only_https_and_install_opens_only_22_and_443():
     caddy = (ROOT / "infra/cloud/Caddyfile.example").read_text(encoding="utf-8")
-    assert "reverse_proxy 127.0.0.1:3015" in caddy and "auto_https disable_redirects" in caddy
+    # The API is the single browser origin (it serves /v1 and /health and proxies the pages); 3015 would 404 on both.
+    assert "reverse_proxy 127.0.0.1:8015" in caddy and "reverse_proxy 127.0.0.1:3015" not in caddy
+    assert "auto_https disable_redirects" in caddy
     install = (ROOT / "infra/cloud/install.sh").read_text(encoding="utf-8")
     assert "ufw allow 22/tcp" in install and "ufw allow 443/tcp" in install and "ufw allow 80" not in install
     assert "set -euo pipefail" in install

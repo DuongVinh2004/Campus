@@ -20,6 +20,7 @@ import argparse
 import codecs
 import importlib.util
 import json
+import os
 import sys
 import threading
 import time
@@ -87,7 +88,8 @@ class Runner:
 
     def client(self):
         cred = json.loads(CRED.read_text(encoding="utf-8"))
-        client = httpx.Client(base_url=self.base, trust_env=False, timeout=120)
+        # EVAL_CA_BUNDLE: trust this CA file (for a TLS-terminating proxy with a private CA, such as the cloud kit rehearsal).
+        client = httpx.Client(base_url=self.base, trust_env=False, timeout=120, verify=os.environ.get("EVAL_CA_BUNDLE") or True)
         r = client.post("/v1/knowledge/platform/session", json={"username": cred["username"], "password": cred["password"]})
         r.raise_for_status()
         return client

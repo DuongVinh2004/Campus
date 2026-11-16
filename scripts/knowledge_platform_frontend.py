@@ -1,6 +1,7 @@
 """Snapshot/build the current UI without changing any source/build already present."""
 import argparse
 import json
+import os
 import subprocess
 import sys
 
@@ -36,7 +37,7 @@ def prepare():
                     frontend.write(scope / relative, source.read_bytes())
     for name in ("package.json", "postcss.config.mjs"):
         frontend.write(scope / name, (frontend.SOURCE / name).read_bytes())
-    portable = not frontend.PRIOR.exists()
+    portable = os.name != "nt" or not frontend.PRIOR.exists()   # the retained templates hold Windows paths: never use them on Linux
     for name in ("tsconfig.json", "next.config.js", "font-responses.cjs"):
         data = ((CLOUD_TEMPLATES if portable else frontend.PRIOR) / name).read_bytes()
         if portable and name == "tsconfig.json":
@@ -44,7 +45,7 @@ def prepare():
         frontend.write(scope / name, data)
     frontend.write(scope / "next-env.d.ts", b'/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n')
     template_path = ROOT / "infra/local/public-rag-20261013/frontend11/preserve-build.mjs"
-    template = (template_path if template_path.exists() else CLOUD_TEMPLATES / "preserve-build.mjs").read_text(encoding="utf-8")
+    template = (template_path if os.name == "nt" and template_path.exists() else CLOUD_TEMPLATES / "preserve-build.mjs").read_text(encoding="utf-8")
     # Bind a new copy to exactly this new artifact; never edit an existing protection.
     template = template.replace('["frontend11"]', json.dumps([scope.name]))
     frontend.write(scope / "preserve-build.mjs", template.encode())

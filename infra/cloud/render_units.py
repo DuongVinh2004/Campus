@@ -42,8 +42,10 @@ Description=Campus 24/7 embedding and reranker model server
 After=network.target
 {common}
 # State directory is created by install.sh; the predecessor is the retained models state it continues.
-ExecStart={python_cmd} scripts/serve_rag_models.py --state ${{CAMPUS247_MODELS_STATE}} --predecessor ${{CAMPUS247_MODELS_PREDECESSOR}} --accounting-only
+ExecStart={root}/infra/cloud/start_models.sh {python} {root}
 TimeoutStartSec=300
+# Active only when the server really answers, so units ordered after it never start against a model server still loading.
+ExecStartPost=/bin/bash -c 'for i in $$(seq 1 280); do (echo > /dev/tcp/127.0.0.1/18082) 2>/dev/null && exit 0; sleep 1; done; exit 1'
 
 [Install]
 WantedBy=multi-user.target
@@ -54,6 +56,8 @@ After=network.target
 {common}
 ExecStart={python_cmd} scripts/gateway_sidecar.py serve --port {profile.gateway_port} --concurrency {profile.provider_concurrency} --daily-usd-cap {profile.daily_usd_cap} --daily-call-cap {profile.daily_call_cap}
 TimeoutStartSec=300
+# The API reads the sidecar's token file at start: wait until the sidecar has written it and answers.
+ExecStartPost=/bin/bash -c 'for i in $$(seq 1 120); do curl -sf http://127.0.0.1:{profile.gateway_port}/health >/dev/null && exit 0; sleep 1; done; exit 1'
 
 [Install]
 WantedBy=multi-user.target
