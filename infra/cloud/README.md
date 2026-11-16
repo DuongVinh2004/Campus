@@ -54,8 +54,10 @@ only 22 and 443. It starts nothing that calls the paid provider.
 3b. Build the web frontend on the server: `sudo infra/cloud/build_frontend.sh` (pnpm 9.12.0 with the locked dependencies, then a Next.js build;
    about 1 minute, needs the npm registry). It sets `CAMPUS247_FRONTEND_NAME` in `/etc/campus247/campus247.env` to the new snapshot. Verified on Ubuntu 24.04:
    the build succeeds, `/chat /login /knowledge/sources /rooms /tickets` return 200 and the 796 web unit tests pass.
-4. `systemctl start campus247-models` and wait until ports 18081/18082 answer (about a minute), then
-   `systemctl start campus247-gateway campus247-api campus247-frontend`.
+4. `systemctl start campus247-api campus247-frontend caddy`. The units are ordered and become active only when they really answer
+   (models open 18082 after about 1.5 minutes, the gateway answers `/health`), so one command is enough; `systemctl restart` of any of
+   them is safe (the model unit uses a fresh state directory each time through `start_models.sh`). Caddy proxies to the API on 8015.
+   Verified under real systemd in a container (`evals/results/systemd-caddy-20261116/RESULT.md`).
 5. Check: `curl -s http://127.0.0.1:8015/health/ready` shows `"status":"ready"`; `curl -s http://127.0.0.1:8025/health` shows `ok`;
    `journalctl -u campus247-api | grep leader_acquired` shows exactly one leader; open `https://<domain>/chat` and ask one question.
 6. Warm up before opening to users: in the 4-CPU simulation the first 100-user burst right after a cold start lost the vector branch on
