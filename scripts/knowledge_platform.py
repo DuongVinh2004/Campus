@@ -532,7 +532,12 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                         application.state.learning_worker_status = "standby"
 
                 leader_task = asyncio.create_task(leader.run(start_jobs, standby))
-                yield
+                from campus247.infrastructure.loop_watchdog import LoopWatchdog
+                watchdog = LoopWatchdog(asyncio.get_running_loop()).start()
+                try:
+                    yield
+                finally:
+                    watchdog.stop()
         finally:
             if leader_task is not None:
                 leader_task.cancel()  # its own cleanup cancels the jobs and releases the lock
@@ -705,8 +710,57 @@ class DeferredApp:
         await self._app(scope, receive, send)
 
 
+def _serialize_accepts_between_workers():
+    """Windows only. Worker processes share one listening socket whose operating-system mode is blocking, and asyncio keeps
+    calling accept() until it is told "would block". The worker that lost the race for a connection (or asked for a second
+    one) therefore sat inside accept() with its whole event loop parked until the next client connected: measured stalls of
+    5 to 8 s, enough for a turn on that worker to run into its 30 s budget. Here the workers take turns (an exclusive lock
+    file), accept only when the socket is readable and only one connection per call, so accept() can never wait."""
+    if os.name != "nt":
+        return
+    import asyncio.selector_events as selector_events
+    import msvcrt
+    import select
+    original = selector_events.BaseSelectorEventLoop._accept_connection
+    if getattr(original, "_campus247_serialized", False):
+        return
+    descriptor = os.open(str(STATE / "api-accept.lock"), os.O_RDWR | os.O_CREAT)
+
+    class OneConnection:
+        """The listening socket, but a second accept() in the same call reports "would block"."""
+        def __init__(self, sock):
+            self._sock, self._used = sock, False
+
+        def __getattr__(self, name):
+            return getattr(self._sock, name)
+
+        def accept(self):
+            if self._used:
+                raise BlockingIOError
+            self._used = True
+            return self._sock.accept()
+
+    def accept_connection(self, protocol_factory, sock, *args, **kwargs):
+        try:
+            msvcrt.locking(descriptor, msvcrt.LK_NBLCK, 1)
+        except OSError:
+            return None          # another worker is accepting right now; the loop asks again at its next turn
+        try:
+            if select.select([sock], [], [], 0)[0]:
+                return original(self, protocol_factory, OneConnection(sock), *args, **kwargs)
+        finally:
+            try:
+                msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+            except OSError:
+                pass
+        return None
+    accept_connection._campus247_serialized = True
+    selector_events.BaseSelectorEventLoop._accept_connection = accept_connection
+
+
 def worker_app():
     """Import-string factory for `uvicorn ... --workers N`; settings arrive as JSON in the environment."""
+    _serialize_accepts_between_workers()
     config = json.loads(os.environ["CAMPUS247_SERVE_CONFIG"])
     return DeferredApp(lambda: make_app(**config))
 

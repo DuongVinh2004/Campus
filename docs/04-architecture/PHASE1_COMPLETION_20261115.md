@@ -22,7 +22,7 @@ Giai đoạn 2 (deploy lên VPS) **chưa bắt đầu**, chờ lệnh của ch�
 | 1.12 Bộ triển khai cloud | Đạt. Cài trọn trên Ubuntu 24.04 sạch; sinh đơn vị systemd từ hồ sơ | `infra/cloud/` |
 | 1.13 Giả lập 4 CPU / 8 GB | Đo lại trên mã cuối: B 100 %, p95 8,3 s, RAM 67 %, không OOM; A khi đã nóng 99,5 %, p95 12,9 s, 503 trong 5,0 s; A ngay sau khởi động nguội 89 % (cần làm nóng mô hình trước khi mở) | `evals/results/cloud-sim-20261115/` |
 | 1.14 Diễn tập khôi phục | Đạt. Postgres 55 bảng và 20.403 dòng giống hệt; SQLite giống backup | như trên |
-| 1.15 Giảm lời gọi | Đã làm và đo bằng provider thật. L4: 89,8 % token vào đã từ cache. L1: chỉ tiết kiệm tối đa 1,7 % và bật cùng L2 thì 2/4 lần gate có câu sai, **để tắt**. L2: giảm 8,6 % khi câu hỏi lặp, gate lần nguội PASSED, **để tắt mặc định** chờ chủ dự án. Gặp lỗi chập chờn ~1 % lượt (hết ngân sách 30 s) chưa tìm ra gốc | `evals/results/l115-20261116/` |
+| 1.15 Giảm lời gọi | Đã làm và đo bằng provider thật. L4: 89,8 % token vào đã từ cache. L1: chỉ tiết kiệm tối đa 1,7 % và bật cùng L2 thì 2/4 lần gate có câu sai, **để tắt**. L2: giảm 8,6 % khi câu hỏi lặp, gate lần nguội PASSED, **để tắt mặc định** chờ chủ dự án. Lỗi chập chờn ~1 % lượt (hết ngân sách 30 s) đã tìm ra gốc (accept chặn) và sửa | `evals/results/l115-20261116/` |
 
 ## Định nghĩa "sẵn sàng deploy" (mục 1.3 của kế hoạch)
 
@@ -50,6 +50,6 @@ Các số đo tải dùng provider giả có độ trễ lấy từ ledger thậ
 
 ## Việc phát hiện thêm khi làm nốt (cần chủ dự án biết)
 
-- **Lỗi chập chờn khoảng 1 % lượt** (hết ngân sách 30 s, trả `AI_WORKFLOW_UNAVAILABLE`) với provider thật; có từ trước các thay đổi này, chưa tìm ra gốc; làm gate dễ trượt oan (chi tiết `evals/results/l115-20261116/RESULT.md`).
+- **Lỗi chập chờn khoảng 1 % lượt (hết ngân sách 30 s) đã tìm ra gốc và sửa**: vòng lặp của worker API bị chặn trong `accept()` do socket lắng nghe dùng chung ở chế độ chặn trên Windows; các worker nay lần lượt accept bằng khóa tệp. Sau sửa: 0 lần chặn, 0 lỗi, gate nhanh PASSED 2/2 (chi tiết `evals/results/l115-20261116/RESULT.md`).
 - **Nhiều file nguồn chưa được git theo dõi** (ví dụ `scripts/run_public_rag.py`, `application/conversation/stream_result.py`; chỉ 29 trên 397 file trong `scripts/` được theo dõi). Triển khai cloud bằng `git clone` sẽ thiếu chúng; cần commit hoặc đóng gói từ cây làm việc ở bước 2.1.
 - L1 và L2 đã làm nhưng tắt; bật L2 là một dòng cấu hình `CAMPUS247_RAG_ANSWER_CACHE=on` khi chủ dự án đồng ý.

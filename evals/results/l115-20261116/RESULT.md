@@ -28,3 +28,12 @@ Bổ sung quan sát (giữ lại): log `graph_failure kind=...`, `graph_stalled 
 | L4 | 89,8 % token vào đã từ cache; sổ cái ghi `cached_input_tokens` | xong (không cần đổi hành vi) |
 | L1 | tiết kiệm tối đa 1,7 % lời gọi; bật cùng L2 thì 2/4 lần gate có câu sai | làm xong, tắt |
 | L2 | −8,6 % lời gọi khi câu hỏi lặp; gate lần nguội PASSED | làm xong, tắt mặc định |
+
+## Cập nhật cuối ngày: gốc của lỗi timeout chập chờn đã tìm ra và sửa
+
+Bộ dò mới `infrastructure/loop_watchdog.py` (chạy trong mỗi worker API, ghi `loop_blocked ... at <hàm>`) cho thấy vòng lặp sự kiện của một worker **bị chặn 3–8 s liên tục trong `socket.accept()`** (hàng chục lần mỗi lần chạy gate: 481 báo cáo trong 6 lần chạy core). Hai worker dùng chung một socket lắng nghe mà ở mức hệ điều hành trên Windows nó ở chế độ chặn, còn asyncio gọi `accept()` lặp lại cho tới khi nhận "would block": worker thua cuộc (hoặc xin kết nối thứ hai) đứng yên cả vòng lặp tới khi có khách kế tiếp. Vòng lặp chết thì timeout của lượt cũng không chạy được, nên lượt trên worker đó chạm trần 30 s và trả `AI_WORKFLOW_UNAVAILABLE`. Tải mô phỏng không thấy vì khi có nhiều kết nối liên tục, khách kế tiếp đến ngay.
+Một lần thử "ép non-blocking" không đủ (vẫn 287 báo cáo). Sửa đúng: `scripts/knowledge_platform.py::_serialize_accepts_between_workers` (chỉ Windows; Linux dùng chung cờ O_NONBLOCK nên không bị): các worker lần lượt accept qua khóa tệp, chỉ accept khi socket sẵn sàng đọc và chỉ một kết nối mỗi lần.
+Kết quả: **0 báo cáo `loop_blocked`, 0 `graph_failure`**, gate nhanh **PASSED 2/2** (kể cả không lỗi nào ở safety/stop), kiểm tra tải 600 kết nối đồng thời không lỗi liên quan (các 503 đó là kiểm tra sẵn sàng hết pool Postgres, không phải accept).
+Hệ quả: các số "gate trượt vì 1 lỗi" ở trên đều do lỗi này, không do L1/L2. Câu sai B+ khi bật L1 vẫn là quan sát riêng nên L1 vẫn để tắt.
+Sửa kèm: `BackgroundLeader` đợi `1,5 × check_s` sau khi lấy khóa rồi mới chạy việc nền, để leader cũ chắc chắn đã dừng (bài test chuyển leader chập chờn 2/4 lần vì hai leader chạy chồng ngắn; nay 6/6 đạt).
+Regression Windows toàn bộ trên mã cuối: `evals/results/final-regression-20261116b/` (113 mục = 112 mục mốc + 1 test leader chập chờn, nay đã sửa và đạt khi chạy riêng và cùng nhóm).

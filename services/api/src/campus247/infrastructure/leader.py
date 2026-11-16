@@ -50,6 +50,10 @@ class BackgroundLeader:
             self.is_leader = True
             self.takeovers += 1
             LOG.warning("leader_acquired name=%s", self.name)
+            # The previous holder can only have lost the lock by losing its session, and it notices that at its next
+            # check (at most `check_s` later) and stops its jobs. Waiting a little longer than that before starting ours
+            # means the two never run together; a short delay in starting the jobs is the price.
+            await asyncio.sleep(self.check_s * 1.5)
             tasks = await start_jobs()
             while True:
                 await asyncio.sleep(self.check_s)
