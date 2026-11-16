@@ -19,7 +19,7 @@ Giai đoạn 2 (deploy lên VPS) **chưa bắt đầu**, chờ lệnh của ch�
 | 1.9 Giảm CPU, gỡ nghẽn embedding | Đạt. Sau khi tái dùng kết nối SQLite: 3 lần chạy API mới cho thành công 100 %, 99,5 %, 100 %, p95 khoảng 11,8 s, `vector_failed` 0, 503 trong 4,5 s | `evals/results/cpu-20261115/` |
 | 1.10 Gate chất lượng | Đạt (sau khi sửa máy khách đo). safety 20/20, stop 35/35, core 80 %, sai 0 | `evals/results/gate-20261115/` |
 | 1.11 Port Linux | Đạt cho phần máy chủ chạy và **frontend**: build từ lockfile bằng `infra/cloud/build_frontend.sh` trên Ubuntu 24.04, 5 trang chính trả 200, 796 test web đạt. Vector Windows và Linux giống hệt từng bit | `evals/results/linux-port-20261115/` |
-| 1.12 Bộ triển khai cloud | Đạt. Cài trọn trên Ubuntu 24.04 sạch; sinh đơn vị systemd từ hồ sơ | `infra/cloud/` |
+| 1.12 Bộ triển khai cloud | Đạt. Cài trọn trên Ubuntu 24.04 sạch; đơn vị systemd chạy thật cùng Caddy HTTPS trong container systemd (lộ ra và sửa 3 lỗi) | `infra/cloud/` |
 | 1.13 Giả lập 4 CPU / 8 GB | Đo lại trên mã cuối: B 100 %, p95 8,3 s, RAM 67 %, không OOM; A khi đã nóng 99,5 %, p95 12,9 s, 503 trong 5,0 s; A ngay sau khởi động nguội 89 % (cần làm nóng mô hình trước khi mở) | `evals/results/cloud-sim-20261115/` |
 | 1.14 Diễn tập khôi phục | Đạt. Postgres 55 bảng và 20.403 dòng giống hệt; SQLite giống backup | như trên |
 | 1.15 Giảm lời gọi | Đã làm và đo bằng provider thật. L4: 89,8 % token vào đã từ cache. L1: chỉ tiết kiệm tối đa 1,7 % và bật cùng L2 thì 2/4 lần gate có câu sai, **để tắt**. L2: giảm 8,6 % khi câu hỏi lặp, gate lần nguội PASSED, **để tắt mặc định** chờ chủ dự án. Lỗi chập chờn ~1 % lượt (hết ngân sách 30 s) đã tìm ra gốc (accept chặn) và sửa | `evals/results/l115-20261116/` |
@@ -43,10 +43,16 @@ Giai đoạn 2 (deploy lên VPS) **chưa bắt đầu**, chờ lệnh của ch�
 4. **Module học liệu** cần ClamAV bản Linux; hiện cloud chạy với module này tắt.
 5. **VPS, tên miền, nơi lưu backup ngoài máy chủ.**
 
+## Đã chạy thật ở giai đoạn local (cập nhật 2026-11-16)
+
+- **systemd và Caddy HTTPS thật**: container Ubuntu 24.04 với systemd là PID 1 chạy đúng các đơn vị `campus247-*.service` sinh từ hồ sơ `cloud`, Caddy phía trước với chứng chỉ CA nội bộ; chat thật qua HTTPS, `kill -9` API/worker, restart gateway đều hồi phục, 0 vi phạm sandbox. Lộ ra và đã sửa 3 lỗi của bộ triển khai (Caddy trỏ nhầm cổng, đơn vị models không restart được, API khởi động trước gateway). `evals/results/systemd-caddy-20261116/`.
+- **100 người với provider thật** (2.400 lời gọi): thành công 99,5 %, p95 13,1 s, 503 trong 4,3 s, 0 lời gọi hỏng, 0 lần mất nhánh vector sau khi nâng thời gian chờ vector từ 1,0 s lên 2,5 s (trước đó mất 20 %); gate chất lượng PASSED. `evals/results/real-load-20261116/`.
+- **Test Windows**: từ 112 mục lỗi của mốc còn **4**, đều là chốt chặn chờ con người duyệt (2 danh sách băm migration, 2 phê duyệt dependency) và được giữ nguyên có chủ ý; chạy bằng `evals/runners/run_full_regression.py` (môi trường đúng cho từng nhóm). `evals/results/final-regression-20261116d/`.
+
 ## Chưa kiểm chứng (nói rõ)
 
-Tốc độ thật của CPU VPS, HTTPS thật với tên miền (cấu hình Caddy đã qua `caddy validate`), khởi động thật dưới systemd (đơn vị đã qua `systemd-analyze verify`), tải 100 người với provider thật, giám sát và cảnh báo, hành vi người dùng thật.
-Các số đo tải dùng provider giả có độ trễ lấy từ ledger thật; gate dùng câu hỏi có đáp án đã kiểm bằng code.
+Tốc độ thật của CPU VPS (máy này mạnh hơn vCPU cloud), chứng chỉ Let's Encrypt thật với tên miền thật, khởi động lại cả máy (reboot), tải thật từ người dùng thật, giám sát và cảnh báo.
+Các số đo tải giả dùng provider giả có độ trễ lấy từ ledger thật; gate dùng câu hỏi có đáp án đã kiểm bằng code.
 
 ## Việc phát hiện thêm khi làm nốt (cần chủ dự án biết)
 
