@@ -51,7 +51,7 @@ Giai đoạn 2 (deploy lên VPS) **chưa bắt đầu**, chờ lệnh của ch�
 
 ## Chưa kiểm chứng (nói rõ)
 
-Tốc độ thật của CPU VPS (máy này mạnh hơn vCPU cloud), chứng chỉ Let's Encrypt thật với tên miền thật, khởi động lại cả máy (reboot), tải thật từ người dùng thật, giám sát và cảnh báo.
+Tốc độ thật của CPU VPS (máy này mạnh hơn vCPU cloud), chứng chỉ Let's Encrypt thật với tên miền thật, tải thật từ người dùng thật, giám sát và cảnh báo. (Khởi động lại cả máy đã kiểm trong container systemd: 6 đơn vị tự lên.)
 Các số đo tải giả dùng provider giả có độ trễ lấy từ ledger thật; gate dùng câu hỏi có đáp án đã kiểm bằng code.
 
 ## Việc phát hiện thêm khi làm nốt (cần chủ dự án biết)
