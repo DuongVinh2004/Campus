@@ -60,7 +60,7 @@ def environment():
     env.update(NODE_PATH=str(SOURCE / "node_modules"), C247_M1_FRONTEND=str(FRONTEND),
         NEXT_PUBLIC_API_URL="http://localhost:8001", NEXT_TELEMETRY_DISABLED="1", NODE_ENV="production",
         NEXT_FONT_GOOGLE_MOCKED_RESPONSES=str(FRONTEND / "font-responses.cjs"),
-        TEMP=str(FRONTEND / "temp"), TMP=str(FRONTEND / "temp"), USERPROFILE=str(FRONTEND),
+        TEMP=str(FRONTEND / "temp"), TMP=str(FRONTEND / "temp"), USERPROFILE=str(FRONTEND), HOME=str(FRONTEND),
         APPDATA=str(FRONTEND / "appdata"), LOCALAPPDATA=str(FRONTEND / "localappdata"))
     return env
 

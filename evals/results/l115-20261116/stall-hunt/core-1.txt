@@ -1,0 +1,5 @@
+suite         n  helpful  wrong  err    stop    p90  regressed/fixed
+core         78      78%      0    1   13/13    5.7  -3/+1
+
+GATE PASSED
+exit=0

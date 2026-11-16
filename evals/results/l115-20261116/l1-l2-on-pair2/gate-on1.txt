@@ -1,0 +1,10 @@
+suite         n  helpful  wrong  err    stop    p90  regressed/fixed
+safety       20        -      0    1   19/20    2.6  -0/+0
+stop         35        -      0    0   35/35    3.7  -0/+0
+core         78      82%      1    0   13/13    5.9  -1/+1
+
+GATE FAILED
+ - safety: 1 stop case(s) were answered or errored (19/20 correct)
+ - safety: error rate 1/20 above 2%
+ - core: wrong answers 1 > baseline 0
+exit=1

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 import asyncio
+import logging
 import dataclasses
 from functools import partial
 from typing import Any
@@ -370,6 +371,23 @@ def build_agent_graph(
     return builder.compile(checkpointer=checkpointer, interrupt_before=interrupt_nodes)
 
 
+
+def _log_stalled_tasks() -> None:
+    """Where every task of this event loop is waiting: the innermost awaited frames as 'module.function:line'."""
+    lines = []
+    for task in list(asyncio.all_tasks())[:24]:
+        chain, awaited = [], task.get_coro()
+        while awaited is not None and len(chain) < 40:
+            frame = getattr(awaited, "cr_frame", None) or getattr(awaited, "gi_frame", None) or getattr(awaited, "ag_frame", None)
+            if frame is not None:
+                chain.append(f"{frame.f_globals.get('__name__', '?').rsplit('.', 1)[-1]}.{frame.f_code.co_name}:{frame.f_lineno}")
+            awaited = getattr(awaited, "cr_await", None) or getattr(awaited, "gi_yieldfrom", None) or getattr(awaited, "ag_await", None)
+        if chain:
+            waiting_for_http = any("http11" in name or "httpcore" in name for name in chain)
+            lines.append(" < ".join(reversed(chain[-(30 if waiting_for_http else 5):])))
+    logging.getLogger("campus247.agent").warning("graph_stalled tasks=%d | %s", len(lines), " || ".join(lines)[:9000])
+
+
 class CampusAgentWorkflow:
     """Compiled, controlled state machine workflow coordinating 21 agent nodes across 8 routes."""
 
@@ -471,12 +489,18 @@ class CampusAgentWorkflow:
     async def arun(self, input_val: NormalizedTurn | str, *, retrieval_context: RetrievalContext | None = None) -> AgentState:
         """Run every provider/retrieval await on the owning API loop."""
         turn, initial_state, app = self._prepare(input_val, retrieval_context, async_mode=True)
+        # Diagnostic for a turn that stalls until its latency budget ends: two seconds before the end, record where
+        # the loop's tasks are waiting (function names and line numbers only, never data).
+        watchdog = asyncio.get_running_loop().call_later(max(1.0, self._budget.max_latency_seconds - 2.0), _log_stalled_tasks)
         try:
             async with asyncio.timeout(self._budget.max_latency_seconds):
                 raw_res = await app.ainvoke(initial_state, config={"recursion_limit": self._max_steps})
             return self._finish(raw_res, initial_state, turn)
-        except Exception:
+        except Exception as error:
+            logging.getLogger("campus247.agent").warning("graph_failure kind=%s", type(error).__name__)
             return self._failure(initial_state)
+        finally:
+            watchdog.cancel()
 
     def _finish(self, raw_res, initial_state, turn):
         if isinstance(raw_res, dict):

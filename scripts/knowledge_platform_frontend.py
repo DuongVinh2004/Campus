@@ -7,6 +7,9 @@ import sys
 import advanced_rag_frontend as frontend
 from knowledge_platform import ROOT, STATE, checked_path, retain
 
+# Portable templates for a server that does not have the development machine's retained frontend files.
+CLOUD_TEMPLATES = ROOT / "infra/cloud/frontend"
+
 
 def prepare():
     scope = frontend.FRONTEND
@@ -33,10 +36,15 @@ def prepare():
                     frontend.write(scope / relative, source.read_bytes())
     for name in ("package.json", "postcss.config.mjs"):
         frontend.write(scope / name, (frontend.SOURCE / name).read_bytes())
+    portable = not frontend.PRIOR.exists()
     for name in ("tsconfig.json", "next.config.js", "font-responses.cjs"):
-        frontend.write(scope / name, (frontend.PRIOR / name).read_bytes())
+        data = ((CLOUD_TEMPLATES if portable else frontend.PRIOR) / name).read_bytes()
+        if portable and name == "tsconfig.json":
+            data = data.replace(b"__ROOT__", ROOT.as_posix().encode())
+        frontend.write(scope / name, data)
     frontend.write(scope / "next-env.d.ts", b'/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n')
-    template = (ROOT / "infra/local/public-rag-20261013/frontend11/preserve-build.mjs").read_text(encoding="utf-8")
+    template_path = ROOT / "infra/local/public-rag-20261013/frontend11/preserve-build.mjs"
+    template = (template_path if template_path.exists() else CLOUD_TEMPLATES / "preserve-build.mjs").read_text(encoding="utf-8")
     # Bind a new copy to exactly this new artifact; never edit an existing protection.
     template = template.replace('["frontend11"]', json.dumps([scope.name]))
     frontend.write(scope / "preserve-build.mjs", template.encode())

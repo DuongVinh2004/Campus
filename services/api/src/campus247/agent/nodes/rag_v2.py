@@ -160,12 +160,16 @@ def _rows_fingerprint(rows) -> str:
 
 
 class RagV2Node:
+    _answers = None   # AnswerCache when CAMPUS247_RAG_ANSWER_CACHE is on (lever L2)
+
     def __init__(self, *, service, index, reranker, embed, gateway, authorize_sources, revalidate=None):
         self.service, self.index, self.reranker = service, index, reranker
         self.embed, self.gateway = embed, gateway
         self.authorize_sources, self.revalidate = authorize_sources, revalidate
         self._injection: dict[str | tuple, bool] = {}
         self._injection_lock = Lock()
+        from campus247.rag_v2.answer_cache import AnswerCache, enabled
+        self._answers = AnswerCache() if enabled() else None
 
     def _scan(self, key, text, detector):
         with self._injection_lock:
@@ -329,9 +333,18 @@ class RagV2Node:
                         ((f"{kind}:{reason}", count) for (kind, reason), count in drops.items()), key=lambda item: -item[1])[:8])
                 import logging
                 logging.getLogger("campus247.rag_v2").warning("rag_v2_node_stage auth_ms=%d units_ms=%d units=%d", t_auth, t_units, unit_count)
-                outcome = await self.service.answer(resolved.resolved, history, gateway=guarded_gateway,
-                    index=index, reranker=self.reranker, embed=self.embed,
-                    deadline_s=TURN_BUDGET_S - (monotonic() - started), revalidate=revalidate)
+                cache_key = (self._answers.key(_rows_fingerprint(rows), resolved.resolved)
+                             if self._answers is not None and not history else None)
+                outcome = self._answers.get(cache_key) if cache_key else None
+                if outcome is not None:
+                    import logging
+                    logging.getLogger("campus247.rag_v2").warning("rag_v2_answer_cache hit=1")
+                else:
+                    outcome = await self.service.answer(resolved.resolved, history, gateway=guarded_gateway,
+                        index=index, reranker=self.reranker, embed=self.embed,
+                        deadline_s=TURN_BUDGET_S - (monotonic() - started), revalidate=revalidate)
+                    if cache_key:
+                        self._answers.put(cache_key, outcome)
                 guard()  # Recheck after all model awaits.
                 cited_chunks = tuple(dict.fromkeys(chunk for c in outcome.citations for chunk in c.chunk_ids))
                 live = await revalidate(cited_chunks)

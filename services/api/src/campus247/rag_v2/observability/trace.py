@@ -20,6 +20,7 @@ class TurnTrace:
     statement_rejections: dict[int, tuple[str, ...]] = field(default_factory=dict)
     outcome_kind: str | None = None
     latency_ms: dict[str, float] = field(default_factory=dict)
+    semantic_skipped: bool = False   # lever L1 (not part of the public payload)
 
     def payload(self) -> dict:
         return {

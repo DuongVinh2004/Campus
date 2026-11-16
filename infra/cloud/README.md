@@ -51,6 +51,9 @@ only 22 and 443. It starts nothing that calls the paid provider.
 2. Put the provider key in `/opt/campus247/.env` (`DEEPSEEK_API_KEY=...`, mode 0600, owner `campus247`). Only the gateway reads it.
 3. Decide the daily cap and edit `[gateway]` in `infra/profiles/cloud.toml` (the shipped 5 USD and 2000 calls a day are placeholders),
    then re-run `render_units.py` (install.sh does it) and `systemctl daemon-reload`.
+3b. Build the web frontend on the server: `sudo infra/cloud/build_frontend.sh` (pnpm 9.12.0 with the locked dependencies, then a Next.js build;
+   about 1 minute, needs the npm registry). It sets `CAMPUS247_FRONTEND_NAME` in `/etc/campus247/campus247.env` to the new snapshot. Verified on Ubuntu 24.04:
+   the build succeeds, `/chat /login /knowledge/sources /rooms /tickets` return 200 and the 796 web unit tests pass.
 4. `systemctl start campus247-models` and wait until ports 18081/18082 answer (about a minute), then
    `systemctl start campus247-gateway campus247-api campus247-frontend`.
 5. Check: `curl -s http://127.0.0.1:8015/health/ready` shows `"status":"ready"`; `curl -s http://127.0.0.1:8025/health` shows `ok`;
