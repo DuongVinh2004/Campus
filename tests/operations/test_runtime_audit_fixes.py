@@ -44,7 +44,7 @@ def operational(monkeypatch, tmp_path):
     actors = {"first": first, "second": second,
         "owner": replace(first, roles=(IdentityRole.KNOWLEDGE_ADMIN,))}
     class Adapter:
-        def __init__(self, *args):
+        def __init__(self, *args, **kwargs):   # the real adapters also take learning=...; the stub ignores it
             pass
         def directory(self):
             return {}
@@ -66,6 +66,7 @@ def operational(monkeypatch, tmp_path):
         return (SimpleNamespace(close=noop), Settings(_env_file=None),
             SimpleNamespace(schedules=SimpleNamespace(serve=noop)), SimpleNamespace())
     monkeypatch.delenv("CAMPUS247_RAG_ENGINE", raising=False)
+    monkeypatch.setenv("CAMPUS_LEARNING_ENABLED", "false")   # the stub pool has no database for the learning module
     monkeypatch.setenv("CAMPUS247_IDEMPOTENCY_DB", str(tmp_path / "action-idempotency.sqlite3"))
     monkeypatch.setattr(platform_script, "components", components)
     monkeypatch.setattr(platform_script, "rehearsal_bundle_paths", lambda _: {
@@ -106,7 +107,7 @@ def test_operational_schema_routes_are_not_public(operational, path):
 
 
 @pytest.mark.parametrize("path", ["fonts/inter-vietnamese.woff2", "fonts/inter-latin.woff2",
-    "fonts/inter-latin-ext.woff2", "images/home-banner-1-2.918477da.webp", "_next/static/test.js"])
+    "fonts/inter-latin-ext.woff2", "images/home-banner-1-2.918477da.webp", "_next/static/test.js", "admin", "staff"])
 def test_proxy_allows_build_assets(operational, monkeypatch, path):
     calls = []
     class Client:
@@ -128,7 +129,8 @@ def test_proxy_allows_build_assets(operational, monkeypatch, path):
     assert calls == ["http://127.0.0.1:3015/"+path]
 
 
-@pytest.mark.parametrize("path", ["fonts/%2e%2e/secret", "fonts/a..woff2", "fonts/a%5Cb.woff2", "admin", "staff", "memory"])
+# "admin" and "staff" are real pages now (they are in the proxy allow-list); only unknown pages stay blocked.
+@pytest.mark.parametrize("path", ["fonts/%2e%2e/secret", "fonts/a..woff2", "fonts/a%5Cb.woff2", "memory"])
 def test_proxy_rejects_traversal_and_additional_pages(operational, monkeypatch, path):
     monkeypatch.setattr(httpx, "AsyncClient", lambda **k: pytest.fail("Blocked path was forwarded"))
     with TestClient(operational[0]) as client:
