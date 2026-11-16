@@ -1,0 +1,1 @@
+l1_skipped=16 cache_hits=29 blocked=0 graph_failure=0

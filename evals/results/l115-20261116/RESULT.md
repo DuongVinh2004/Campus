@@ -37,3 +37,7 @@ Kết quả: **0 báo cáo `loop_blocked`, 0 `graph_failure`**, gate nhanh **PAS
 Hệ quả: các số "gate trượt vì 1 lỗi" ở trên đều do lỗi này, không do L1/L2. Câu sai B+ khi bật L1 vẫn là quan sát riêng nên L1 vẫn để tắt.
 Sửa kèm: `BackgroundLeader` đợi `1,5 × check_s` sau khi lấy khóa rồi mới chạy việc nền, để leader cũ chắc chắn đã dừng (bài test chuyển leader chập chờn 2/4 lần vì hai leader chạy chồng ngắn; nay 6/6 đạt).
 Regression Windows toàn bộ trên mã cuối: `evals/results/final-regression-20261116b/` (113 mục = 112 mục mốc + 1 test leader chập chờn, nay đã sửa và đạt khi chạy riêng và cùng nhóm).
+
+## Đo lại L1 + L2 sau khi sửa hạ tầng (`l1l2-on-fixed/`)
+Cùng cấu hình bật L1 và L2, gate nhanh chạy 2 lần liên tiếp (nguội rồi nóng): **cả hai PASSED**, không câu sai, không lỗi, 0 `loop_blocked`, 0 `graph_failure`. Lời gọi: 454 (nguội, cơ sở 463, −1,9 %, chủ yếu từ L1: kiểm ngữ nghĩa 60 → 51) và 402 (nóng, −13 %: grounded_faq 149 → 122, kiểm ngữ nghĩa 26; 29 lượt trúng cache, 16 lần L1 bỏ qua).
+Tổng cộng với L1 bật: 6 lần gate, 4 đạt và 2 có câu B+ sai (cả hai trước khi sửa hạ tầng). Với L1 tắt hoặc shadow: 0 câu sai trên 9+ lần. Mẫu còn nhỏ nên **kết luận giữ nguyên: L1 để tắt (lợi ích ≤ 2 % lời gọi), L2 để tắt mặc định cho chủ dự án quyết định**; cả hai bật được bằng một biến môi trường và đã có đường đo (`ledger_window.py`).
