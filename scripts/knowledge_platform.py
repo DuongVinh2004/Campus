@@ -483,6 +483,22 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.include_router(create_learning_router(learning_service))
     app.state.learning_service = learning_service
 
+    # Operations page: numbers from every API worker (snapshot files), probes of the services around the API.
+    from campus247.observability.ops_status import OpsConfig
+    from campus247.infrastructure.llm.remote_gateway import read_token
+    from campus247.presentation.admin_ops import create_admin_ops_router
+    gateway_url = os.environ.get("CAMPUS247_GATEWAY_URL")
+    gateway_token_file = os.environ.get("CAMPUS247_GATEWAY_TOKEN_FILE")
+    backup_dir = os.environ.get("CAMPUS247_BACKUP_DIR")
+    ops_config = OpsConfig(
+        metrics_dir=STATE / "ops-metrics", data_dir=ROOT, backup_dir=Path(backup_dir) if backup_dir else None,
+        model_urls={"embedding": "http://127.0.0.1:18081/info", "reranker": "http://127.0.0.1:18082/info"},
+        gateway_url=gateway_url,
+        gateway_token=read_token(gateway_token_file) if gateway_url and gateway_token_file else None,
+        background=lambda: {"leader": bool(getattr(getattr(app.state, "background_leader", None), "is_leader", False)),
+                            "learning_worker": getattr(app.state, "learning_worker_status", "disabled")})
+    app.include_router(create_admin_ops_router(ops_config))
+
     @app.get("/health/entry", include_in_schema=False)
     def entry_health():
         return {"entry_url": f"http://127.0.0.1:{api_port}", "api_same_origin": True,
@@ -534,10 +550,14 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 leader_task = asyncio.create_task(leader.run(start_jobs, standby))
                 from campus247.infrastructure.loop_watchdog import LoopWatchdog
                 watchdog = LoopWatchdog(asyncio.get_running_loop()).start()
+                from campus247.observability.ops_metrics import OPS, run_writer
+                from campus247.rag_v2.observability.vector_stats import VECTOR_STATS
+                ops_writer = asyncio.create_task(run_writer(OPS, ops_config.metrics_dir, retrieval=VECTOR_STATS.snapshot))
                 try:
                     yield
                 finally:
                     watchdog.stop()
+                    ops_writer.cancel()
         finally:
             if leader_task is not None:
                 leader_task.cancel()  # its own cleanup cancels the jobs and releases the lock
