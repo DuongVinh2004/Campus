@@ -506,6 +506,13 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     freshness_service = FreshnessService(pool, SourceReviewStore(STATE / "source-reviews.sqlite3"), tenant=TENANT)
     app.include_router(create_freshness_router(freshness_service))
 
+    # Which sources are behind answers people mark "not helpful": counts per source only, no question and no person.
+    from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_quality_recording
+    from campus247.presentation.knowledge_quality import create_quality_router
+    quality_store = AnswerQualityStore(STATE / "answer-quality.sqlite3")
+    attach_quality_recording(app.state.feedback_service, quality_store)
+    app.include_router(create_quality_router(quality_store, freshness_service))
+
     # Sign in with the university account: only when the owner supplied a provider configuration (CAMPUS247_OIDC_CONFIG).
     if os.environ.get("CAMPUS247_OIDC_CONFIG"):
         import httpx as oidc_httpx
