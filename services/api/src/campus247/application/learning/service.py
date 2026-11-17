@@ -101,6 +101,26 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
         require(actor.is_active and actor.tenant_id == self.tenant_id, 403, "FORBIDDEN", "Tài khoản không thuộc phạm vi học liệu.")
         require(actor.expires_at > datetime.now(UTC) and bool(actor.session_id), 401, "AUTHENTICATION_REQUIRED", "Phiên đăng nhập không còn hiệu lực.")
 
+    def recheck(self, actor, still_valid):
+        """Re-read the caller's identity inside a storage transaction.
+
+        The router checks the session once, before the request may wait for the storage lock. A session revoked during
+        that wait must not write, so the same session is read again after the lock is held and the fresh identity
+        (current roles) is used from here on.
+        """
+        if still_valid is None:
+            return actor
+        try:
+            fresh = still_valid()
+        except LearningError:
+            raise
+        except Exception:  # noqa: BLE001 -- any failed revalidation denies the write
+            raise LearningError(401, "AUTHENTICATION_REQUIRED", "Phiên đăng nhập không còn hiệu lực.") from None
+        require(fresh.subject_id == actor.subject_id and fresh.session_id == actor.session_id,
+                401, "READER_SESSION_CHANGED", "Phiên đăng nhập đã thay đổi.")
+        self.identity(fresh)
+        return fresh
+
     def admin(self, actor):
         self.identity(actor)
         require(actor.has_role("SYSTEM_ADMIN"), 403, "FORBIDDEN", "Cần quyền quản trị lớp.")
@@ -385,7 +405,7 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
             return {"preview_id": pid, "confirmation_token": token, "payload": {k: v for k, v in payload.items() if k not in {"_idea_guard", "_ocr_guard"}},
                     "action": action, "target_id": target, "expires_at": record["expires_at"]} | details
 
-    async def command(self, actor, action, target, payload, *, key=None):
+    async def command(self, actor, action, target, payload, *, key=None, still_valid=None):
         self.identity(actor)
         supplied = {k: payload[k] for k in ("preview_id", "confirmation_token") if k in payload}
         payload = {k: v for k, v in payload.items() if k not in supplied}
@@ -395,6 +415,7 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
         else:
             transaction = self.repository.transaction()
         async with transaction as s:
+            actor = self.recheck(actor, still_valid)
             request_payload = {k: v for k, v in payload.items() if k != "_idea_source"}
             stamp = fingerprint({"target": target, "payload": request_payload})
             if key:
@@ -759,9 +780,10 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
         require(not expired, 409, "UPLOAD_EXPIRED", "Lượt tải đã hết hạn. Hãy tạo lượt tải mới.")
         return {"id": upload_id, "state": "RECEIVED", "byte_size": blob["byte_size"]}
 
-    async def complete(self, actor, upload_id, key=None):
+    async def complete(self, actor, upload_id, key=None, still_valid=None):
         self.identity(actor)
         async with self.repository.transaction() as s:
+            actor = self.recheck(actor, still_valid)
             upload = s["uploads"].get(upload_id)
             require(upload is not None and upload["actor_id"] == actor.subject_id)
             material, _, _ = self.material(s, actor, upload["material_id"], write=True)
@@ -884,9 +906,10 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
                 await self.blobs.verify(view_info['storage_key'], view_info['sha256'], view_info['byte_size'])
             return info, view_info
 
-    async def abort(self, actor, upload_id):
+    async def abort(self, actor, upload_id, still_valid=None):
         self.identity(actor)
         async with self.repository.transaction() as s:
+            actor = self.recheck(actor, still_valid)
             upload = s["uploads"].get(upload_id)
             require(upload is not None and upload["actor_id"] == actor.subject_id)
             self.material(s, actor, upload["material_id"], write=True)

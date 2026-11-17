@@ -396,7 +396,8 @@ def create_learning_router(service):
                         401, "READER_SESSION_CHANGED", "Phiên đọc đã thay đổi.")
                 current = refreshed
             target = request.path_params.get(target_field) if target_field else payload.get("version_id")
-            result = await service.command(current, action, target, payload, key=key)
+            result = await service.command(current, action, target, payload, key=key,
+                                           still_valid=lambda: actor(request, write=True))
             return JSONResponse(result, headers={"Cache-Control": "no-store"}) if private_write else result
         return write
 
@@ -458,12 +459,12 @@ def create_learning_router(service):
         key = request.headers.get("Idempotency-Key")
         require(bool(key), 422, "IDEMPOTENCY_REQUIRED", "Cần khóa chống ghi trùng.")
         current = actor(request, write=True)
-        return await service.complete(current, upload_id, key=key)
+        return await service.complete(current, upload_id, key=key, still_valid=lambda: actor(request, write=True))
 
     @router.post("/upload-intents/{upload_id}/abort")
     async def upload_abort(upload_id: str, request: Request):
         current = actor(request, write=True)
-        return await service.abort(current, upload_id)
+        return await service.abort(current, upload_id, still_valid=lambda: actor(request, write=True))
 
     async def content(version_id, request, download=False):
         current = actor(request)
@@ -471,6 +472,8 @@ def create_learning_router(service):
         path = service.blobs.path(row["storage_key"])
         require(path.is_file() and path.stat().st_size == row["byte_size"], 503, "BLOB_UNAVAILABLE", "Tệp học liệu không đầy đủ.")
         await service.blobs.verify(row["storage_key"], row["sha256"], row["byte_size"])
+        # The checksum is awaited; a session revoked meanwhile must not receive the first byte.
+        service.recheck(current, lambda: actor(request))
         etag = '"' + row["sha256"] + '"'
         selection = select_bytes(row["byte_size"], request.headers.get("Range"), method=request.method, if_range=request.headers.get("If-Range"), etag=etag)
         media_type = row.get('content_type', 'application/pdf')
