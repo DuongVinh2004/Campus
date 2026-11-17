@@ -169,5 +169,67 @@ class TestWindowSummary:
         assert summary["turns"] == 0 and summary["p95_s_le"] is None and summary["error_rate"] == 0.0
 
 
+def sse(name, data):
+    return f"id: 018f\nevent: {name}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+class TestTurnObserver:
+    def observer(self):
+        clock = Clock(100.0)
+        target = metrics()
+        return clock, target, om.TurnObserver(target, clock=clock)
+
+    def test_a_grounded_answer_is_ok_with_first_token_and_total_time(self):
+        clock, target, watch = self.observer()
+        watch.feed(sse("message.started", {"message_id": "m"}))
+        clock.now += 1.2
+        watch.feed(sse("message.delta", {"seq": 1, "delta": "Xin chào"}))
+        clock.now += 3.0
+        watch.feed(sse("message.delta", {"seq": 2, "delta": " bạn"}))
+        watch.feed(sse("message.completed", {"status": "answered", "content": "Câu hỏi riêng tư của sinh viên"}))
+        watch.finish()
+        minute = target.snapshot()["minutes"][0]
+        assert (minute["turns"], minute["ok"], minute["abstained"]) == (1, 1, 0)
+        edges = list(LATENCY_BUCKETS_S)
+        assert minute["first_token"][edges.index(2.0)] == 1 and minute["total"][edges.index(5.0)] == 1
+        assert "riêng tư" not in json.dumps(target.snapshot())
+
+    def test_an_abstained_answer_is_counted_apart(self):
+        _, target, watch = self.observer()
+        watch.feed(sse("message.completed", {"status": "abstained"}))
+        watch.finish()
+        assert target.snapshot()["minutes"][0]["abstained"] == 1
+
+    def test_a_failed_turn_records_its_error_code(self):
+        _, target, watch = self.observer()
+        watch.feed(sse("message.failed", {"code": "AI_WORKFLOW_UNAVAILABLE", "detail": "chi tiết"}))
+        watch.finish()
+        assert target.snapshot()["minutes"][0]["errors"] == {"AI_WORKFLOW_UNAVAILABLE": 1}
+
+    def test_events_split_across_bytes_chunks_and_extra_events_are_handled(self):
+        _, target, watch = self.observer()
+        watch.feed(sse("agent.status", {"stage": "retrieve"}).encode())
+        watch.feed(sse("citation.added", {"citation": {}}).encode())
+        watch.feed(sse("message.completed", {"status": "answered"}).encode())
+        watch.finish()
+        assert target.snapshot()["minutes"][0]["ok"] == 1
+
+    def test_an_abandoned_turn_is_not_recorded_and_finish_is_idempotent(self):
+        _, target, watch = self.observer()
+        watch.feed(sse("message.delta", {"seq": 1, "delta": "x"}))
+        watch.finish()
+        assert target.snapshot()["minutes"] == []
+        watch.feed(sse("message.completed", {"status": "answered"}))
+        watch.finish()
+        watch.finish()
+        assert target.snapshot()["minutes"][0]["turns"] == 1
+
+    def test_garbage_in_a_terminal_event_does_not_raise(self):
+        _, target, watch = self.observer()
+        watch.feed("event: message.completed\ndata: {broken\n\n")
+        watch.finish()
+        assert target.snapshot()["minutes"][0]["ok"] == 1
+
+
 def test_module_constants_are_consistent():
     assert list(LATENCY_BUCKETS_S) == sorted(LATENCY_BUCKETS_S) and om.FRESH_FOR_S > om.WRITE_EVERY_S

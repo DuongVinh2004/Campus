@@ -30,6 +30,20 @@ ROUTE_GROUPS = ("chat", "auth", "knowledge", "learning", "other")
 _ERROR_CODE = re.compile(r"^[A-Z][A-Z0-9_]{0,63}$")
 
 
+def route_group(path_prefix: str) -> str:
+    """Map a rate-limit rule's path prefix to one of the fixed groups, so no path text becomes a label."""
+    prefix = path_prefix.lower()
+    if prefix.startswith(("/v1/conversations", "/v1/chat", "/v1/assistant")):
+        return "chat"
+    if prefix.startswith(("/v1/auth", "/v1/knowledge/platform/session")):
+        return "auth"
+    if prefix.startswith("/v1/knowledge"):
+        return "knowledge"
+    if prefix.startswith("/v1/learning"):
+        return "learning"
+    return "other"
+
+
 def _bucket_index(seconds: float) -> int:
     for index, bound in enumerate(LATENCY_BUCKETS_S):
         if seconds <= bound:
@@ -218,3 +232,51 @@ def summarize_window(aggregated: dict[str, Any], *, minutes: int) -> dict[str, A
             "admission_rejected_rate": total["admission_rejected"] / (turns + total["admission_rejected"]) if turns + total["admission_rejected"] else 0.0,
             "rate_limited": dict(total["rate_limited"]), "loop_blocked": total["loop_blocked"],
             "loop_blocked_max_ms": total["loop_blocked_max_ms"]}
+
+
+# ----------------------------------------------------------------------------------------- the process-wide instance
+
+OPS = OpsMetrics()
+
+_SSE_EVENT = re.compile(r"event: ([A-Za-z0-9_.]+)\ndata: (.*)", re.DOTALL)
+
+
+class TurnObserver:
+    """Watches the server-sent events of one chat turn and records its outcome once, without touching the stream.
+
+    It reads only the event name and, for the two terminal events, the `status` / `code` field. A turn the client abandons
+    before a terminal event is not recorded: that is a disconnect, not a failure of the service.
+    """
+
+    def __init__(self, metrics: OpsMetrics = OPS, clock: Callable[[], float] = time.monotonic) -> None:
+        self._metrics, self._clock = metrics, clock
+        self._started = clock()
+        self._first_token: float | None = None
+        self._outcome: tuple[str, str | None] | None = None
+        self._finished = False
+
+    def feed(self, chunk: str | bytes) -> None:
+        text = chunk.decode("utf-8", "replace") if isinstance(chunk, bytes) else chunk
+        for found in _SSE_EVENT.finditer(text):
+            name, raw = found.group(1), found.group(2)
+            if name == "message.delta" and self._first_token is None:
+                self._first_token = self._clock() - self._started
+            elif name in {"message.completed", "message.failed"}:
+                try:
+                    data = json.loads(raw.split("\n\n", 1)[0])
+                except ValueError:
+                    data = {}
+                if name == "message.failed":
+                    code = data.get("code") if isinstance(data, dict) else None
+                    self._outcome = ("error", code if isinstance(code, str) else None)
+                else:
+                    status = data.get("status") if isinstance(data, dict) else None
+                    self._outcome = ("abstained" if status == "abstained" else "ok", None)
+
+    def finish(self) -> None:
+        if self._finished or self._outcome is None:
+            return
+        self._finished = True
+        outcome, code = self._outcome
+        self._metrics.record_turn(outcome=outcome, error_code=code, first_token_s=self._first_token,
+                                  total_s=self._clock() - self._started)

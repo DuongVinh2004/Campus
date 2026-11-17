@@ -13,6 +13,8 @@ import threading
 import time
 import traceback
 
+from campus247.observability.ops_metrics import OPS
+
 LOG = logging.getLogger("campus247.loop")
 
 
@@ -65,4 +67,5 @@ class LoopWatchdog:
                 total = time.monotonic() - blocked_since
                 self.longest_s = max(self.longest_s, total)
                 LOG.warning("loop_unblocked name=%s total_ms=%d", self.name, total * 1000)
+                OPS.record_loop_blocked(int(total * 1000))
                 blocked_since = None

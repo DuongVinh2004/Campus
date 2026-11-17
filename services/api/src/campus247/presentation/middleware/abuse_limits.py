@@ -9,6 +9,8 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import JSONResponse, Response
 
+from campus247.observability.ops_metrics import OPS, route_group
+
 
 @dataclass(frozen=True)
 class RateLimitRule:
@@ -118,6 +120,7 @@ class AbuseLimiterMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         if not allowed:
+            OPS.record_rate_limited(route_group(rule.path_prefix))
             # AC-TASK-API-ABUSE-001-01: Excess requests rejected before expensive work
             return JSONResponse(
                 status_code=429,
