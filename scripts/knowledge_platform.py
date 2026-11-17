@@ -502,7 +502,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     # Freshness of the sources in the current release, for knowledge managers (reads the release pointer, writes only its own file).
     from campus247.application.knowledge.freshness_service import FreshnessService, SourceReviewStore
     from campus247.presentation.knowledge_freshness import create_freshness_router
-    app.include_router(create_freshness_router(FreshnessService(pool, SourceReviewStore(STATE / "source-reviews.sqlite3"), tenant=TENANT)))
+    freshness_service = FreshnessService(pool, SourceReviewStore(STATE / "source-reviews.sqlite3"), tenant=TENANT)
+    app.include_router(create_freshness_router(freshness_service))
 
     # Sign in with the university account: only when the owner supplied a provider configuration (CAMPUS247_OIDC_CONFIG).
     if os.environ.get("CAMPUS247_OIDC_CONFIG"):
@@ -565,6 +566,9 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 async def start_jobs():
                     jobs = [asyncio.create_task(platform.schedules.serve())]
                     jobs.append(asyncio.create_task(run_reminders(ops_service.store, student_subjects)))
+                    from campus247.application.knowledge.freshness_reminders import run_freshness_reminders
+                    jobs.append(asyncio.create_task(run_freshness_reminders(
+                        freshness_service, ops_service.store, lambda: [owner_adapter.directory()["owner_id"]])))
                     from campus247.observability.alert_job import run_alerts
                     from campus247.observability.alert_notifiers import build_notifier
                     from campus247.observability.alerts import AlertManager
