@@ -6,9 +6,9 @@
 
 ## Đã xong (đã commit, chưa push)
 
-Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/schedule-ics-feed`
+Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/alert-engine`
 chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-and-timezone` → `fix/learning-session-revocation-boundary` →
-`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed`.
+`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed` → `feat/alert-engine`.
 
 | Task | Commit | Kết quả đo được |
 |---|---|---|
@@ -34,6 +34,10 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 | B1.4 (engine) | `20c9f46` | `application/campus_ops/reminders.py` (nhắc 24 giờ và 2 giờ trước giờ thi, một lần, không nhắc sau hạn, restart không lặp); 25 test đạt cùng `ics.py` |
 | B1.3 | `ae81b67` | `GET /v1/students/me/schedule.ics`; 35 test campus_ops đạt |
 | B1.4 (nối runtime) | `3f2b073` | vòng nhắc 5 phút trong leader jobs; 3 test đạt. **Chưa chạy trên runtime thật** |
+| A3 (động cơ) | `98d7568` | `alert_rules.py` (13 luật), `alerts.py` (máy trạng thái: bắn sau `for_s`, nhắc lại 30 phút, giải quyết sau 2 lần tốt, thử lại khi gửi lỗi, lưu trạng thái); 25 test đạt, gồm test ngưỡng khớp `ops-assess.ts` |
+| A3 (kênh) | `3b4169f` | `alert_notifiers.py`: Telegram, e-mail (TLS bắt buộc), allowlist host, không lộ token; 13 test đạt với giao vận giả. **Chưa gửi tin thật** |
+| A3 (job + runtime) | `c256e8e` | vòng 60 giây trong leader; 3 test đạt |
+| A3 (watchdog ngoài) | `fdb42aa` | `infra/cloud/watchdog.py` + timer 1 phút + `OnFailure` + `alerts.env.example` + dòng trong `install.sh`; 8 test đạt. **Chưa chạy systemd thật, chưa thử mất dịch vụ thật** |
 
 ## Việc dở và việc bị chặn
 
@@ -42,6 +46,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
   vì hai file có thay đổi dở khác của chủ dự án; chủ dự án tự commit cùng thay đổi của mình.
 - **Hiện panel vận hành trên `/admin`**: đã thêm 2 dòng vào `apps/web/src/app/admin/page.tsx` trong working tree (không commit, file có thay đổi dở của chủ dự án). Cần dựng lại frontend snapshot mới thấy trên 8015.
 - Trang lịch (`schedule/page.tsx`) nên dùng `item.kind === "EXAM"` do API đã trả `kind` thay vì đoán theo tên môn (B1.1); chưa sửa vì file có thay đổi dở.
+- **Ổ đĩa của máy này chỉ còn 4,3 % trống (17,7 GB / 414 GB)** lúc 23:5x ngày 17/11: watchdog sẽ báo mức nghiêm trọng. `.pytest-tmp-aud1/` của lượt này chỉ 141 MB; phần còn lại là dữ liệu khác (117 thư mục `.pytest-tmp-*` cũ, model, bằng chứng). Không tự xóa gì.
 - **A5.5** (chạy workflow trong Linux): Docker không chạy; WSL Ubuntu có nhưng đang tắt, và `uv sync --frozen` phải tải gói. Chờ cho phép tải.
 - **A5.7** (chạy CI trên GitHub): chờ duyệt push.
 - Test `test_session_revocation_boundary.py` và `test_environments.py` đạt trên working tree, nhưng **không** đạt trên bản checkout sạch của HEAD,
@@ -49,7 +54,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 
 ## Làm tiếp theo thứ tự (mỗi mục là một đơn vị commit được)
 
-1. **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
+1. **A1.1–A1.8 (OIDC)**, **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
 
 ## Quy tắc đã dùng (giữ nguyên khi làm tiếp)
 
