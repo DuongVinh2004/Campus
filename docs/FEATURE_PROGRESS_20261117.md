@@ -6,9 +6,9 @@
 
 ## Đã xong (đã commit, chưa push)
 
-Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/source-freshness-api`
+Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/schedule-ics-feed`
 chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-and-timezone` → `fix/learning-session-revocation-boundary` →
-`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api`.
+`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed`.
 
 | Task | Commit | Kết quả đo được |
 |---|---|---|
@@ -30,6 +30,10 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 | A4.2/A4.3 | `624da45` | `rehearse_restore.py` + `rehearse.sh` + timer tháng; 12 test đạt (bước giả). **Chưa chạy trên Postgres thật hay systemd thật** |
 | A4.4 | `c3cf551` | `offsite.py` bọc restic; 11 test đạt với restic giả (1 bỏ qua trên Windows). Chưa chạy restic thật |
 | C3.2 | `24b2d20`, `47a7ab7` | `freshness_service.py`, `knowledge_freshness.py` (GET /v1/knowledge/freshness, POST .../reviewed), đã nối runtime; 17 test đạt với DB giả. **SQL chưa chạy trên Postgres thật** (cụm local không chạy lúc làm) |
+| C3.3 | `872b2c8` | `/knowledge/freshness` + `FreshnessPanel`: 6 test vitest đạt, `tsc` sạch. Chưa có mục menu (cần sửa `AppShell.tsx`, file có thay đổi dở) |
+| B1.4 (engine) | `20c9f46` | `application/campus_ops/reminders.py` (nhắc 24 giờ và 2 giờ trước giờ thi, một lần, không nhắc sau hạn, restart không lặp); 25 test đạt cùng `ics.py` |
+| B1.3 | `ae81b67` | `GET /v1/students/me/schedule.ics`; 35 test campus_ops đạt |
+| B1.4 (nối runtime) | `3f2b073` | vòng nhắc 5 phút trong leader jobs; 3 test đạt. **Chưa chạy trên runtime thật** |
 
 ## Việc dở và việc bị chặn
 
@@ -37,6 +41,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
   `apps/web/src/features/schedule/ScheduleView.tsx` (+ test mới `ScheduleView.ics.test.tsx`), vitest 14 đạt, `tsc` sạch. **Không commit**
   vì hai file có thay đổi dở khác của chủ dự án; chủ dự án tự commit cùng thay đổi của mình.
 - **Hiện panel vận hành trên `/admin`**: đã thêm 2 dòng vào `apps/web/src/app/admin/page.tsx` trong working tree (không commit, file có thay đổi dở của chủ dự án). Cần dựng lại frontend snapshot mới thấy trên 8015.
+- Trang lịch (`schedule/page.tsx`) nên dùng `item.kind === "EXAM"` do API đã trả `kind` thay vì đoán theo tên môn (B1.1); chưa sửa vì file có thay đổi dở.
 - **A5.5** (chạy workflow trong Linux): Docker không chạy; WSL Ubuntu có nhưng đang tắt, và `uv sync --frozen` phải tải gói. Chờ cho phép tải.
 - **A5.7** (chạy CI trên GitHub): chờ duyệt push.
 - Test `test_session_revocation_boundary.py` và `test_environments.py` đạt trên working tree, nhưng **không** đạt trên bản checkout sạch của HEAD,
@@ -44,7 +49,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 
 ## Làm tiếp theo thứ tự (mỗi mục là một đơn vị commit được)
 
-1. **C3.3–C3.5** (trang UI hiệu lực nguồn, nhắc hạn, nhãn trong CitationDrawer), **B1.3–B1.6**, **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
+1. **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
 
 ## Quy tắc đã dùng (giữ nguyên khi làm tiếp)
 
