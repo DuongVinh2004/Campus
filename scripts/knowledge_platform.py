@@ -504,6 +504,21 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     from campus247.presentation.knowledge_freshness import create_freshness_router
     app.include_router(create_freshness_router(FreshnessService(pool, SourceReviewStore(STATE / "source-reviews.sqlite3"), tenant=TENANT)))
 
+    # Sign in with the university account: only when the owner supplied a provider configuration (CAMPUS247_OIDC_CONFIG).
+    if os.environ.get("CAMPUS247_OIDC_CONFIG"):
+        import httpx as oidc_httpx
+        from campus247.infrastructure.identity.oidc import OidcClient, OidcConfig
+        from campus247.infrastructure.identity.oidc_accounts import OidcAccountStore, validate_config as validate_oidc_config
+        from campus247.infrastructure.identity.oidc_session import OidcSessionAdapter, load_or_create_key
+        from campus247.presentation.oidc import create_oidc_router
+        oidc_config = OidcConfig.from_dict(json.loads(Path(os.environ["CAMPUS247_OIDC_CONFIG"]).read_text(encoding="utf-8")),
+                                           secret_reader=lambda name: Path(name).read_text(encoding="utf-8").strip())
+        validate_oidc_config(oidc_config)  # refuses a configuration that would let the provider grant an administrator role
+        oidc_sessions = OidcSessionAdapter(load_or_create_key(STATE / "oidc-session.key"), TENANT)
+        campus_adapter.oidc = oidc_sessions
+        app.include_router(create_oidc_router(oidc_config, OidcClient(oidc_config, oidc_httpx.AsyncClient(trust_env=False)),
+                                              OidcAccountStore(STATE / "oidc.sqlite3"), oidc_sessions))
+
     @app.get("/health/entry", include_in_schema=False)
     def entry_health():
         return {"entry_url": f"http://127.0.0.1:{api_port}", "api_same_origin": True,

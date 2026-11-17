@@ -91,4 +91,9 @@ class LocalCampusIdentityAdapter:
             return self.owner.resolve_token(token)
         if claims.get("iss") == ISSUER and self.student.path.is_file():
             return self.student.resolve_token(token)
+        oidc = getattr(self, "oidc", None)  # set by the runtime when sign-in with the university account is configured
+        if oidc is not None:
+            from campus247.infrastructure.identity.oidc_session import ISSUER as OIDC_ISSUER
+            if claims.get("iss") == OIDC_ISSUER:
+                return oidc.resolve_token(token)
         raise ValueError("Unrecognized local issuer")
