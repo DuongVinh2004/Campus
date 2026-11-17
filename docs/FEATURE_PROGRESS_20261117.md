@@ -6,9 +6,9 @@
 
 ## Đã xong (đã commit, chưa push)
 
-Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/nightly-retrieval`
+Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/answer-quality` (48 commit sau `docs/feature-design-plan`, chưa push)
 chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-and-timezone` → `fix/learning-session-revocation-boundary` →
-`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed` → `feat/alert-engine` → `feat/oidc-client` → `feat/oidc-runtime` → `feat/source-freshness-reminders` → `feat/reminder-preferences` → `feat/nightly-retrieval`.
+`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed` → `feat/alert-engine` → `feat/oidc-client` → `feat/oidc-runtime` → `feat/source-freshness-reminders` → `feat/reminder-preferences` → `feat/nightly-retrieval` → `feat/pwa` → `feat/ci-more-tests` → `feat/answer-quality`.
 
 | Task | Commit | Kết quả đo được |
 |---|---|---|
@@ -48,6 +48,15 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 | B1.6 | `5245e5d`, `2fc9a8f` | `GET/PUT /v1/notifications/preferences` (bật/tắt nhắc thi, nhắc nguồn; boolean thật; audit), `ReminderPreferences.tsx` (6 test đạt); đã thêm vào `app/notifications/page.tsx` trong working tree (thư mục untracked, không commit). Công tắc "nguồn" chưa gắn vào trang (cần biết vai trò) |
 | C2.1-C2.2 | `6aadc02` | `evals/runners/nightly_retrieval.py` (+ timer 02:30): chạy probe truy hồi sẵn có, lưu thư mục mới theo ngày, trend.jsonl, so với baseline (giảm >3 điểm top-8 hoặc >5 điểm sau rerank); 16 test đạt với probe giả. **Chưa chạy probe thật** (cần model server + chỉ mục) |
 | C2.3 | `3a36b54` | trạng thái vận hành có `quality`, tile trên trang, luật `quality_regression`; 93 test Python + 26 test web đạt |
+| B2.1-B2.3 | `a6d1451` | `app/manifest.ts`, 3 icon PNG (`scripts/make_pwa_icons.py`, biểu tượng riêng không dùng logo trường), `public/sw.js` (chỉ trang offline + file tĩnh có hash; không bao giờ lưu API, trang, phản hồi no-store/private/set-cookie), `PwaRegister`, `InstallPrompt`; 27 test đạt. **Chưa thử trên trình duyệt thật hay cài lên điện thoại**; đã thêm `<PwaRegister />` vào `app/layout.tsx` trong working tree (không commit); chưa gắn `clearPwaCaches` vào luồng đăng xuất |
+| CI | `182ea4e`, `0c32864` | tập `--ci` thêm tests/campus_ops, các test operations/api/evals mới: 216 đạt + 17 đạt (answer quality); test hợp đồng CI vẫn đạt |
+| C1 (phần làm được) | `37a1403` | `answer_quality.py` + `GET /v1/knowledge/answer-quality`: đếm đánh giá theo nguồn được trích (không lưu người, hội thoại, câu hỏi, câu trả lời, bình luận), tối thiểu 3 lượt, giữ 180 ngày; 17 test đạt; đã nối vào feedback service của runtime và vào backup. **Chưa có giao diện**; câu bị từ chối không biết thiếu nguồn nào nếu không lưu chữ câu hỏi (cần quyết định C-D1) |
+
+## Kiểm chứng cuối lượt (đêm 17→18/11)
+
+- Tập CI cục bộ (`run_full_regression.py --ci`, trước khi thêm vài test mới): **2449 đạt, 5 xfail, 0 lỗi** (10 phút 44 giây).
+- Toàn bộ vitest của web (gồm thay đổi dở của chủ dự án): **140 file, 908 test đạt**; `tsc --noEmit` sạch.
+- Chưa chạy: Postgres thật (cụm local không chạy), systemd/Docker, restic thật, model server (probe truy hồi), trình duyệt thật, nhà cung cấp OIDC thật.
 
 ## Việc dở và việc bị chặn
 
@@ -65,7 +74,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 
 ## Làm tiếp theo thứ tự (mỗi mục là một đơn vị commit được)
 
-1. **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3** (PWA; cần tạo icon PNG), **C1.1–C1.4** (chỉ làm được phần đếm theo nguồn của đánh giá không hữu ích; câu bị từ chối không có thông tin nguồn nếu không lưu chữ câu hỏi), **C2.4** (chạy khi kích hoạt release), **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
+1. **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.4** (web push, chờ quyết định), **C1 giao diện** (tab "chất lượng câu trả lời" gọi `/v1/knowledge/answer-quality`) và phần câu bị từ chối (cần quyết định C-D1), **C2.4** (chạy khi kích hoạt release), **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
 
 ## Quy tắc đã dùng (giữ nguyên khi làm tiếp)
 
