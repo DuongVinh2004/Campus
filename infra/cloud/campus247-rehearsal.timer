@@ -1,0 +1,11 @@
+[Unit]
+Description=Campus 24/7 monthly restore drill
+
+[Timer]
+# Early on the first day of the month, after the 03:10 backup has finished.
+OnCalendar=*-*-01 04:30:00
+Persistent=true
+RandomizedDelaySec=900
+
+[Install]
+WantedBy=timers.target

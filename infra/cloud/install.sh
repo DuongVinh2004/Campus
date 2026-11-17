@@ -123,12 +123,16 @@ log "systemd units from profile $PROFILE"
 install -m 0644 "$ROOT/infra/cloud/logrotate.conf" /etc/logrotate.d/campus247
 install -m 0755 "$ROOT/infra/cloud/backup.sh" /usr/local/sbin/campus247-backup
 install -m 0755 "$ROOT/infra/cloud/restore.sh" /usr/local/sbin/campus247-restore
+install -m 0755 "$ROOT/infra/cloud/rehearse.sh" /usr/local/sbin/campus247-rehearse
 if [ "$SKIP_SERVICES" != 1 ]; then
   systemctl daemon-reload
   systemctl enable campus247-models campus247-gateway campus247-api campus247-frontend >/dev/null
   install -m 0644 "$ROOT/infra/cloud/campus247-backup.service" /etc/systemd/system/
   install -m 0644 "$ROOT/infra/cloud/campus247-backup.timer" /etc/systemd/system/
   systemctl enable --now campus247-backup.timer >/dev/null
+  install -m 0644 "$ROOT/infra/cloud/campus247-rehearsal.service" /etc/systemd/system/
+  install -m 0644 "$ROOT/infra/cloud/campus247-rehearsal.timer" /etc/systemd/system/
+  systemctl enable --now campus247-rehearsal.timer >/dev/null
 fi
 
 log "HTTPS proxy and firewall (only 22 and 443 are reachable)"
