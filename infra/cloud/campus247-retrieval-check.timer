@@ -1,0 +1,11 @@
+[Unit]
+Description=Campus 24/7 nightly retrieval check
+
+[Timer]
+# 02:30, before the 03:10 backup; the run is skipped by the script itself when the model servers do not answer.
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target
