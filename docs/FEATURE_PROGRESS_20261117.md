@@ -6,9 +6,9 @@
 
 ## Đã xong (đã commit, chưa push)
 
-Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/ops-web-panel`
+Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/source-freshness-api`
 chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-and-timezone` → `fix/learning-session-revocation-boundary` →
-`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel`.
+`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api`.
 
 | Task | Commit | Kết quả đo được |
 |---|---|---|
@@ -26,6 +26,10 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 | A2.6 | `f02fd11` | `presentation/admin_ops.py` (`/v1/admin/operations/status`, `/metrics` chỉ loopback, từ chối mọi header proxy); 13 test đạt |
 | A2.5b (nối runtime) | `7f1d34e` | 20 dòng trong `scripts/knowledge_platform.py` (chỉ phần của mình); **chưa chạy trên runtime thật**, cần khởi động lại 8015 (chủ dự án quyết định) |
 | A2.7 | `4e4988c` | `features/admin/OperationsPanel.tsx`, `lib/ops-assess.ts`, `lib/ops-status-api.ts`: 19 test vitest đạt, `tsc` sạch |
+| A4.1 | `6a10dee` | `backup.py` ghi `LAST_BACKUP.json` (kể cả khi lỗi), lệnh `status`; 8 test đạt |
+| A4.2/A4.3 | `624da45` | `rehearse_restore.py` + `rehearse.sh` + timer tháng; 12 test đạt (bước giả). **Chưa chạy trên Postgres thật hay systemd thật** |
+| A4.4 | `c3cf551` | `offsite.py` bọc restic; 11 test đạt với restic giả (1 bỏ qua trên Windows). Chưa chạy restic thật |
+| C3.2 | `24b2d20`, `47a7ab7` | `freshness_service.py`, `knowledge_freshness.py` (GET /v1/knowledge/freshness, POST .../reviewed), đã nối runtime; 17 test đạt với DB giả. **SQL chưa chạy trên Postgres thật** (cụm local không chạy lúc làm) |
 
 ## Việc dở và việc bị chặn
 
@@ -40,8 +44,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 
 ## Làm tiếp theo thứ tự (mỗi mục là một đơn vị commit được)
 
-1. **A4.1–A4.4**: `LAST_BACKUP.json` trong `infra/cloud/backup.py`, `rehearse_restore.py`, timer, `offsite.py` với restic giả.
-2. **C3.2–C3.5**, **B1.3–B1.6**, **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
+1. **C3.3–C3.5** (trang UI hiệu lực nguồn, nhắc hạn, nhãn trong CitationDrawer), **B1.3–B1.6**, **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
 
 ## Quy tắc đã dùng (giữ nguyên khi làm tiếp)
 
