@@ -10,7 +10,7 @@ from typing import Any
 from identities import generate_identities
 from campus247.ports.identity import AccountState, IdentityContext, IdentityRole
 
-ALLOWED_ENVIRONMENTS = {"local", "development", "test", "demo-synthetic"}
+ALLOWED_ENVIRONMENTS = {"local", "development", "test", "testing", "demo-synthetic"}
 
 
 class SyntheticIdentityAdapter:

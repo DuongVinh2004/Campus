@@ -35,6 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
+      # Settings reads ENVIRONMENT; the audit writer reads CAMPUS247_ENV. Both name the local test environment.
+      ENVIRONMENT: "testing"
       CAMPUS247_ENV: "test"
       OFFLINE_MODE: "true"
     steps:
