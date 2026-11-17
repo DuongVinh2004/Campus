@@ -6,9 +6,9 @@
 
 ## Đã xong (đã commit, chưa push)
 
-Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/alert-engine`
+Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/oidc-runtime`
 chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-and-timezone` → `fix/learning-session-revocation-boundary` →
-`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed` → `feat/alert-engine`.
+`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed` → `feat/alert-engine` → `feat/oidc-client` → `feat/oidc-runtime`.
 
 | Task | Commit | Kết quả đo được |
 |---|---|---|
@@ -38,6 +38,12 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 | A3 (kênh) | `3b4169f` | `alert_notifiers.py`: Telegram, e-mail (TLS bắt buộc), allowlist host, không lộ token; 13 test đạt với giao vận giả. **Chưa gửi tin thật** |
 | A3 (job + runtime) | `c256e8e` | vòng 60 giây trong leader; 3 test đạt |
 | A3 (watchdog ngoài) | `fdb42aa` | `infra/cloud/watchdog.py` + timer 1 phút + `OnFailure` + `alerts.env.example` + dòng trong `install.sh`; 8 test đạt. **Chưa chạy systemd thật, chưa thử mất dịch vụ thật** |
+| A1.1-A1.2 | `3d61c09` | `identity/oidc.py`: OIDC + PKCE, xác minh ID token chặt (RS256/ES256, issuer/aud chính xác, nonce, azp, key rotation tối đa 1 lần/phút); 27 test đạt gồm các cuộc tấn công (alg=none, HMAC với khóa công khai, sai khóa, payload bị sửa) |
+| A1.3 | `7938acd` | `identity/oidc_accounts.py`: ánh xạ claim → tài khoản; vai trò quản trị không bao giờ lấy từ nhà cung cấp; lượt đăng nhập dùng một lần; 31 test đạt |
+| A1.4-A1.5 | `41893d4` | `presentation/oidc.py` + `identity/oidc_session.py`: start/callback/providers, phiên 1 giờ do server ký, cookie Secure đúng chỗ; 20 test luồng đầy đủ + 9 test phiên đạt với nhà cung cấp giả |
+| A1 (runtime) | `34f141e` | bật khi có `CAMPUS247_OIDC_CONFIG`; thêm `oidc.sqlite3` vào backup; **chưa chạy trên runtime thật** |
+| A1.8 | `66eef78` | `scripts/oidc_preflight.py` + `docs/OIDC_SIGN_IN_SETUP_20261117.md` (danh sách thông tin HUCE phải cấp); 7 test đạt |
+| A1.7 | `f53c1d0` | `features/auth/UniversitySignIn.tsx` (13 test đạt, `tsc` sạch); đã thêm 2 dòng vào `app/login/page.tsx` trong working tree (thư mục untracked, không commit) |
 
 ## Việc dở và việc bị chặn
 
@@ -47,6 +53,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 - **Hiện panel vận hành trên `/admin`**: đã thêm 2 dòng vào `apps/web/src/app/admin/page.tsx` trong working tree (không commit, file có thay đổi dở của chủ dự án). Cần dựng lại frontend snapshot mới thấy trên 8015.
 - Trang lịch (`schedule/page.tsx`) nên dùng `item.kind === "EXAM"` do API đã trả `kind` thay vì đoán theo tên môn (B1.1); chưa sửa vì file có thay đổi dở.
 - **Ổ đĩa của máy này chỉ còn 4,3 % trống (17,7 GB / 414 GB)** lúc 23:5x ngày 17/11: watchdog sẽ báo mức nghiêm trọng. `.pytest-tmp-aud1/` của lượt này chỉ 141 MB; phần còn lại là dữ liệu khác (117 thư mục `.pytest-tmp-*` cũ, model, bằng chứng). Không tự xóa gì.
+- **A1 chờ HUCE**: issuer, client đã đăng ký, redirect URI được duyệt, tên claim mã sinh viên/nhóm (danh sách đầy đủ trong `docs/OIDC_SIGN_IN_SETUP_20261117.md`). A1.9 (Keycloak thật) chờ duyệt tải image.
 - **A5.5** (chạy workflow trong Linux): Docker không chạy; WSL Ubuntu có nhưng đang tắt, và `uv sync --frozen` phải tải gói. Chờ cho phép tải.
 - **A5.7** (chạy CI trên GitHub): chờ duyệt push.
 - Test `test_session_revocation_boundary.py` và `test_environments.py` đạt trên working tree, nhưng **không** đạt trên bản checkout sạch của HEAD,
@@ -54,7 +61,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 
 ## Làm tiếp theo thứ tự (mỗi mục là một đơn vị commit được)
 
-1. **A1.1–A1.8 (OIDC)**, **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
+1. **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
 
 ## Quy tắc đã dùng (giữ nguyên khi làm tiếp)
 
