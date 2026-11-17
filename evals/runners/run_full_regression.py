@@ -30,7 +30,14 @@ PY = [sys.executable, "-B", "-m", "pytest", "-q", "-p", "no:cacheprovider", "-rf
 # --ci runs one pytest over the tests that need nothing outside the repository: no registered fixture directories under
 # infra/local, no model server, no database server, no paid provider. Every other tests/ directory is listed as not run,
 # so a green CI run is never read as "everything passed".
-CI_PATHS = ["tests/unit", "tests/integration/retention", "tests/evals/test_audit_remediation_gate.py", "tests/delivery"]
+CI_PATHS = [
+    "tests/unit", "tests/integration/retention", "tests/evals/test_audit_remediation_gate.py", "tests/delivery", "tests/campus_ops",
+    # Operations, alerts, backup, sign-in and nightly-check tests: they use temporary files, fake HTTP and fake clocks only.
+    "tests/operations/test_backup_status.py", "tests/operations/test_rehearse_restore.py", "tests/operations/test_rehearsal_units.py",
+    "tests/operations/test_offsite.py", "tests/operations/test_watchdog.py", "tests/evals/test_nightly_retrieval.py",
+    "tests/api/test_admin_ops.py", "tests/api/test_knowledge_freshness.py", "tests/api/test_oidc_login.py", "tests/api/test_ops_metrics_hooks.py",
+    "tests/api/test_gateway_sidecar.py", "tests/api/test_chat_admission.py", "tests/api/test_abuse_limits.py",
+]
 
 # (name, test paths, base temp directory relative to infra/local, extra pytest args)
 GROUPS = [
