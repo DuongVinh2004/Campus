@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, FastAPI, Header, Query, Request
 from pydantic import BaseModel, ConfigDict, Field
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from campus247.application.campus_ops.service import CampusOpsService
 from campus247.ports.campus_ops import OpsError
@@ -111,6 +111,12 @@ def create_campus_ops_router(service: CampusOpsService) -> APIRouter:
     @r.get("/v1/students/me/schedule")
     def my_schedule(request: Request, from_time: str = Query(..., alias="from", max_length=40), to_time: str = Query(..., alias="to", max_length=40)):
         return _json(service.list_schedule(get_current_identity(request), from_time, to_time))
+
+    @r.get("/v1/students/me/schedule.ics")
+    def my_schedule_ics(request: Request, from_time: str = Query(..., alias="from", max_length=40), to_time: str = Query(..., alias="to", max_length=40)):
+        text = service.schedule_ics(get_current_identity(request), from_time, to_time)
+        return Response(content=text, media_type="text/calendar; charset=utf-8",
+                        headers={**NO_STORE, "Content-Disposition": 'attachment; filename="lich-hoc-campus247.ics"', "X-Content-Type-Options": "nosniff"})
 
     @r.post("/v1/students/me/schedule/events")
     def create_event(body: EventBody, request: Request):

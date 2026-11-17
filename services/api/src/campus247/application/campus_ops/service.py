@@ -275,6 +275,26 @@ class CampusOpsService:
         return {"items": [self._event_view(r) for r in rows], "page": {"next_cursor": None, "has_more": False, "limit": 2000},
                 "sources": sorted({r["source"] for r in rows})}
 
+    def schedule_ics(self, identity: IdentityContext, frm: str, to: str) -> str:
+        """The caller's own timetable for a range as an iCalendar file. Same access and range rules as list_schedule."""
+        from campus247.application.campus_ops.ics import IcsEvent, build_ics
+
+        def moment(text: str) -> datetime:
+            value = datetime.fromisoformat(text.replace("Z", "+00:00"))
+            return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+
+        events = []
+        for item in self.list_schedule(identity, frm, to)["items"]:
+            exam = item["kind"] == "EXAM"
+            details = [f"Giảng viên: {item['instructor_display_name']}"] if item["instructor_display_name"] else []
+            if item["note"]:
+                details.append(item["note"])
+            details.append(f"Nguồn: {item['source_system']} (không phải lịch chính thức của trường nếu là dữ liệu tổng hợp)")
+            events.append(IcsEvent(id=item["id"], title=("[Thi] " if exam else "") + f"{item['course_name']} ({item['course_code']})",
+                                   starts_at=moment(item["starts_at"]), ends_at=moment(item["ends_at"]), location=item["location_label"] or "",
+                                   description="\n".join(details)))
+        return build_ics(events, now=datetime.now(timezone.utc))[0]
+
     @staticmethod
     def _event_view(r: dict[str, Any]) -> dict[str, Any]:
         return {"id": r["id"], "kind": r["kind"], "course_code": r["course_code"], "course_name": r["course_name"],
