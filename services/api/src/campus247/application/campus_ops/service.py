@@ -353,6 +353,29 @@ class CampusOpsService:
         return {"id": event_id, "deleted": True}
 
     # ---------------------------------------------------------- notifications
+    REMINDER_KINDS = ("exam", "sources")
+
+    def reminder_preferences(self, identity: IdentityContext) -> dict[str, bool]:
+        """Which kinds of reminders the caller receives. Everything is on until the person switches it off."""
+        from campus247.application.campus_ops.reminders import PREFS_SCHEMA
+        with self.store.tx() as c:
+            c.execute(PREFS_SCHEMA)
+            stored = {row[0]: bool(row[1]) for row in c.execute("SELECT kind, enabled FROM ops_reminder_prefs WHERE subject_id = ?", (identity.subject_id,))}
+        return {kind: stored.get(kind, True) for kind in self.REMINDER_KINDS}
+
+    def set_reminder_preferences(self, identity: IdentityContext, body: dict[str, Any]) -> dict[str, bool]:
+        from campus247.application.campus_ops.reminders import PREFS_SCHEMA
+        if not body or set(body) - set(self.REMINDER_KINDS) or any(type(value) is not bool for value in body.values()):
+            raise OpsError(422, "INVALID_PREFERENCE", "Chỉ được bật hoặc tắt các loại nhắc: " + ", ".join(self.REMINDER_KINDS) + ".")
+        with self.store.tx() as c:
+            c.execute(PREFS_SCHEMA)
+            for kind, enabled in body.items():
+                c.execute("""INSERT INTO ops_reminder_prefs(subject_id, kind, enabled, updated_at) VALUES (?,?,?,?)
+                             ON CONFLICT(subject_id, kind) DO UPDATE SET enabled = excluded.enabled, updated_at = excluded.updated_at""",
+                          (identity.subject_id, kind, int(enabled), now_iso()))
+            self.store.audit(c, identity.subject_id, "reminders.preferences", identity.subject_id, {kind: enabled for kind, enabled in body.items()})
+        return self.reminder_preferences(identity)
+
     def list_notifications(self, identity: IdentityContext, unread_only: bool, limit: int) -> dict[str, Any]:
         where = "recipient_subject_id=?" + (" AND read_at IS NULL" if unread_only else "")
         rows = self.store.query(f"SELECT * FROM ops_notifications WHERE {where} ORDER BY created_at DESC LIMIT ?",

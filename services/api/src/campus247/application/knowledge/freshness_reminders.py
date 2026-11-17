@@ -42,7 +42,7 @@ def source_candidates(items: list[dict[str, Any]], managers: list[str], *, now: 
                 return (f"Nguồn {what}: {item['title']}", f"Còn {_days_text(left)} (ngày {due.astimezone(VN):%d/%m/%Y}). {action}")
 
             candidates.append(Candidate(item_key=f"source:{item['version_id']}:{due.date().isoformat()}", recipient=manager, kind="REMINDER",
-                                        deadline=due, describe=describe, link=LINK, offsets=OFFSETS))
+                                        deadline=due, describe=describe, link=LINK, offsets=OFFSETS, pref_kind="sources"))
         if overdue:
             local = now.astimezone(VN)
             monday = (local - timedelta(days=local.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -50,7 +50,7 @@ def source_candidates(items: list[dict[str, Any]], managers: list[str], *, now: 
             count = len(overdue)
             candidates.append(Candidate(item_key=f"overdue-summary:{monday.date().isoformat()}", recipient=manager, kind="REMINDER", deadline=week_end,
                                         describe=lambda left, count=count: (f"{count} nguồn quá hạn rà soát", "Mở trang Hiệu lực của nguồn để xem và ghi nhận việc rà soát."),
-                                        link=LINK, offsets=(timedelta(days=7),)))
+                                        link=LINK, offsets=(timedelta(days=7),), pref_kind="sources"))
     return candidates
 
 

@@ -5,7 +5,7 @@ No ``from __future__ import annotations`` here: FastAPI resolves the request mod
 from typing import Any, Optional
 
 from fastapi import APIRouter, FastAPI, Header, Query, Request
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictBool
 from starlette.responses import JSONResponse, Response
 
 from campus247.application.campus_ops.service import CampusOpsService
@@ -142,6 +142,14 @@ def create_campus_ops_router(service: CampusOpsService) -> APIRouter:
     @r.post("/v1/notifications/{notification_id}/read")
     def read_one(notification_id: str, request: Request):
         return _json(service.mark_read(get_current_identity(request), notification_id))
+
+    @r.get("/v1/notifications/preferences")
+    def reminder_preferences(request: Request):
+        return _json(service.reminder_preferences(get_current_identity(request)))
+
+    @r.put("/v1/notifications/preferences")
+    def set_reminder_preferences(body: dict[str, StrictBool], request: Request):
+        return _json(service.set_reminder_preferences(get_current_identity(request), body))
 
     # ---------------------------------------------------------------- tickets
     @r.get("/v1/tickets")

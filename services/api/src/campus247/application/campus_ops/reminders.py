@@ -17,6 +17,8 @@ from zoneinfo import ZoneInfo
 DEFAULT_OFFSETS = (timedelta(hours=24), timedelta(hours=2))
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
 SCHEMA = "CREATE TABLE IF NOT EXISTS ops_reminders_sent(key TEXT PRIMARY KEY, sent_at TEXT NOT NULL)"
+PREFS_SCHEMA = """CREATE TABLE IF NOT EXISTS ops_reminder_prefs(subject_id TEXT NOT NULL, kind TEXT NOT NULL, enabled INTEGER NOT NULL,
+                  updated_at TEXT NOT NULL, PRIMARY KEY(subject_id, kind))"""
 
 
 @dataclass(frozen=True)
@@ -28,10 +30,17 @@ class Candidate:
     describe: Callable[[timedelta], tuple[str, str]]  # time left -> (title, body)
     link: str = ""
     offsets: tuple[timedelta, ...] = DEFAULT_OFFSETS
+    pref_kind: str | None = None  # the person can switch this kind of reminder off (see reminder_prefs.py)
 
 
 def _offset_label(offset: timedelta) -> str:
     return f"{int(offset.total_seconds() // 60)}m"
+
+
+def _enabled(c, subject_id: str, kind: str) -> bool:
+    """On unless the person switched it off."""
+    row = c.execute("SELECT enabled FROM ops_reminder_prefs WHERE subject_id = ? AND kind = ?", (subject_id, kind)).fetchone()
+    return True if row is None else bool(row[0])
 
 
 def applicable_offsets(deadline: datetime, now: datetime, offsets: tuple[timedelta, ...]) -> list[timedelta]:
@@ -56,10 +65,13 @@ def deliver(store, candidates: list[Candidate], *, now: datetime) -> int:
     sent = 0
     with store.tx() as c:
         c.execute(SCHEMA)
+        c.execute(PREFS_SCHEMA)
         for candidate in candidates:
             due = applicable_offsets(candidate.deadline, now, candidate.offsets)
             if not due:
                 continue
+            if candidate.pref_kind and not _enabled(c, candidate.recipient, candidate.pref_kind):
+                continue  # switched off: nothing is sent and nothing is marked, so switching it back on inside the window still works
             fresh = []
             for offset in due:
                 key = f"{candidate.item_key}|{candidate.recipient}|{_offset_label(offset)}"
@@ -96,5 +108,5 @@ def exam_candidates(store, resolve_recipient: Callable[[str], str | None], *, no
                     f"Còn {time_left_text(left)}. Thi lúc {local:%H:%M} ngày {local:%d/%m/%Y}, phòng {row['location'] or 'chưa rõ'}.")
 
         candidates.append(Candidate(item_key=f"exam:{row['id']}", recipient=recipient, kind="REMINDER", deadline=start,
-                                    describe=describe, link="/schedule"))
+                                    describe=describe, link="/schedule", pref_kind="exam"))
     return candidates
