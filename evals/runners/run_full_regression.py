@@ -1,6 +1,7 @@
 """Full Windows regression with the environment each test group is written for.
 
   .venv/Scripts/python.exe -B evals/runners/run_full_regression.py [--out DIR]
+  python -B evals/runners/run_full_regression.py --ci [--out DIR]     # portable subset for a clean Linux checkout (CI)
 
 Some groups only run inside a registered fixture directory (their helper scripts refuse any other temp directory) or need an
 evidence directory, so one plain `pytest tests` leaves them failing for environmental reasons. This runner starts pytest once
@@ -26,6 +27,11 @@ LOCAL = ROOT / "infra/local"
 STAMP = time.strftime("%Y%m%d%H%M%S")
 PY = [sys.executable, "-B", "-m", "pytest", "-q", "-p", "no:cacheprovider", "-rfE"]
 
+# --ci runs one pytest over the tests that need nothing outside the repository: no registered fixture directories under
+# infra/local, no model server, no database server, no paid provider. Every other tests/ directory is listed as not run,
+# so a green CI run is never read as "everything passed".
+CI_PATHS = ["tests/unit", "tests/integration/retention", "tests/evals/test_audit_remediation_gate.py", "tests/delivery"]
+
 # (name, test paths, base temp directory relative to infra/local, extra pytest args)
 GROUPS = [
     ("stream-c", ["tests/unified_final", "tests/integration/test_unified_storage_completion.py"],
@@ -34,6 +40,49 @@ GROUPS = [
     ("stream-a", ["tests/unified_workflow13a"], "unified-ai-parallel-20261015-01/stream-a/reg-" + STAMP, []),
     ("stream-b", ["tests/unified_personal13b"], "unified-ai-parallel-20261015-01/stream-b/reg-" + STAMP, []),
 ]
+
+
+def ci_not_run(paths: list[str] | None = None) -> list[str]:
+    """Test directories and files the CI subset does not cover. A directory that is only partly covered is opened up."""
+    covered = list(CI_PATHS if paths is None else paths)
+
+    def walk(directory: Path) -> list[str]:
+        missing = []
+        for entry in sorted(directory.iterdir()):
+            rel = entry.relative_to(ROOT).as_posix()
+            if entry.name.startswith((".", "__")) or not (entry.is_dir() or entry.name.startswith("test_")):
+                continue
+            if rel in covered:
+                continue
+            if entry.is_dir() and any(path.startswith(rel + "/") for path in covered):
+                missing += walk(entry)
+            else:
+                missing.append(rel)
+        return missing
+
+    return walk(ROOT / "tests")
+
+
+def run_ci(out: Path) -> int:
+    out.mkdir(parents=True, exist_ok=True)
+    evidence = out / "learning-evidence"  # LEARNING_TEST_ROOT must exist and is never reused between runs
+    evidence.mkdir(exist_ok=True)
+    env = dict(os.environ, LEARNING_TEST_ROOT=str(evidence), PYTHONPATH=os.pathsep.join(
+        [str(ROOT / "services/worker/src"), str(ROOT / "scripts"), os.environ.get("PYTHONPATH", "")]))
+    command = [*PY, f"--basetemp={out / 'basetemp'}", *CI_PATHS]
+    started = time.time()
+    code, text = run(command, env, out / "pytest-ci.log")
+    final = [line for line in text.splitlines() if re.search(r"\d+ (passed|failed|error)", line)][-1:]
+    failures = sorted({re.sub(r" - .*", "", line) for line in text.splitlines() if line.startswith(("FAILED ", "ERROR "))})
+    not_run = ci_not_run()
+    summary = [f"ci: exit {code}, {final[0].strip() if final else 'no summary'} ({time.time() - started:.0f} s)",
+               "ran: " + ", ".join(CI_PATHS),
+               f"NOT RUN in --ci ({len(not_run)}): " + ", ".join(not_run)]
+    (out / "failures.txt").write_text("\n".join(failures) + ("\n" if failures else ""), encoding="utf-8")
+    (out / "summary.txt").write_text("\n".join(summary) + "\n", encoding="utf-8")
+    print("\n".join(summary))
+    print(f"{len(failures)} failing items -> {out / 'failures.txt'}")
+    return 1 if code != 0 or failures else 0
 
 
 def free_backend() -> str:
@@ -55,8 +104,13 @@ def run(args: list[str], env: dict, log: Path) -> tuple[int, str]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=str(ROOT / f"evals/results/final-regression-{STAMP}"))
+    parser.add_argument("--ci", action="store_true", help="portable subset for a clean Linux checkout")
     args = parser.parse_args()
+    if args.ci and args.out == str(ROOT / f"evals/results/final-regression-{STAMP}"):
+        args.out = str(ROOT / f".ci-evidence/regression-{STAMP}")
     out = Path(args.out)
+    if args.ci:
+        return run_ci(out)
     out.mkdir(parents=True, exist_ok=True)
     evidence = LOCAL / "learning-test-evidence-20261116"
     evidence.mkdir(exist_ok=True)

@@ -4,11 +4,18 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+# Settings reads ENVIRONMENT; the audit writer reads CAMPUS247_ENV. Both name the local test environment.
+env:
+  ENVIRONMENT: "testing"
+  CAMPUS247_ENV: "test"
+  OFFLINE_MODE: "true"
+  OFFLINE_EVAL_MODE: "true"
 
 jobs:
   catalog-validation:
@@ -33,67 +40,73 @@ jobs:
   backend-tests:
     name: "Backend Unit & Integration Gates"
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      # Settings reads ENVIRONMENT; the audit writer reads CAMPUS247_ENV. Both name the local test environment.
-      ENVIRONMENT: "testing"
-      CAMPUS247_ENV: "test"
-      OFFLINE_MODE: "true"
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install dependencies
+      # Same as infra/cloud/install.sh: the environment comes from uv.lock, nothing is resolved at CI time.
+      - name: Install from uv.lock
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install --no-cache-dir pytest pytest-asyncio pydantic jsonschema pyyaml httpx
-      - name: Run backend tests
+          python -m pip install --upgrade pip uv
+          uv sync --frozen
+      - name: Verify the dependency closure and hashes
+        run: uv run --frozen python -B scripts/verify_dependencies.py
+      - name: Run the portable regression subset
+        # --ci prints the test directories it does not run; they need fixtures, model servers or databases CI does not have.
         run: |
           echo "Commit: ${{ github.sha }}"
-          python -B -m pytest -q tests/unit tests/integration/retention
+          uv run --frozen python -B evals/runners/run_full_regression.py --ci --out .ci-evidence/regression
+      - name: Keep the logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-regression-${{ github.run_id }}
+          path: .ci-evidence/regression
+          retention-days: 14
 
   web-tests:
     name: "Web Unit & A11y Gates"
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-      - name: Install dependencies
+          node-version: "22.11.0"
+      - name: Install the locked dependencies
+        # Node and pnpm versions match infra/cloud/install.sh and build_frontend.sh.
         run: |
-          npm --prefix apps/web install
+          npm install -g pnpm@9.12.0 --no-audit --no-fund
+          pnpm install --frozen-lockfile --filter 'web...' --ignore-scripts
+      - name: Type check
+        run: pnpm --filter web exec tsc --noEmit
       - name: Run vitest suite
         run: |
           echo "Commit: ${{ github.sha }}"
-          npm --prefix apps/web test -- --run
+          pnpm --filter web test
 
   ai-eval-gates:
     name: "AI Safety & Release Gates"
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      OFFLINE_EVAL_MODE: "true"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install dependencies
+      - name: Install from uv.lock
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install --no-cache-dir pytest pyyaml
+          python -m pip install --upgrade pip uv
+          uv sync --frozen
       - name: Run AI adversarial gates
         run: |
           echo "Commit: ${{ github.sha }}"
-          python -B -m pytest -q tests/evals/test_audit_remediation_gate.py
+          uv run --frozen python -B -m pytest -q tests/evals/test_audit_remediation_gate.py
 
   release-manifest-gate:
     name: "Release Manifest Verification Gate"
@@ -105,14 +118,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install dependencies
+      - name: Install from uv.lock
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install --no-cache-dir pytest jsonschema pyyaml
+          python -m pip install --upgrade pip uv
+          uv sync --frozen
       - name: Run release manifest verifier tests
         run: |
           echo "Commit: ${{ github.sha }}"
-          python -B -m pytest -q tests/delivery/test_release_manifest.py
-
-
+          uv run --frozen python -B -m pytest -q tests/delivery/test_release_manifest.py
