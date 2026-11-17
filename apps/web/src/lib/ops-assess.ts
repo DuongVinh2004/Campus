@@ -92,6 +92,19 @@ export function assessStatus(status: OpsStatus): Finding[] {
   }
   findings.push({ id: "gateway", label: "Chi phí hôm nay", value: gatewayValue, level: gatewayLevel, detail: gatewayDetail });
 
+  const quality = status.quality;
+  if (quality?.configured) {
+    const metrics = quality.metrics;
+    const regressions = quality.regressions ?? [];
+    findings.push({
+      id: "quality",
+      label: "Chất lượng truy hồi (đêm qua)",
+      value: !quality.ran ? "chưa chạy lần nào" : quality.skipped ? "bị bỏ qua" : metrics ? `top 8: ${pct(metrics.fused_top8)}` : "—",
+      level: !quality.ran || quality.skipped || !quality.ok ? "unknown" : regressions.length ? "warn" : "ok",
+      detail: regressions[0] ?? (quality.skipped === "models_down" ? "Model embedding/rerank không chạy nên không kiểm được." : quality.ran && !quality.has_baseline ? "Chưa có mốc so sánh." : undefined),
+    });
+  }
+
   const data = status.storage.data_free_pct;
   findings.push({ id: "disk", label: "Dung lượng trống", value: data === null ? "—" : `${String(data).replace(".", ",")}%`,
     level: data === null ? "unknown" : data < THRESHOLDS.diskCritPct ? "crit" : data < THRESHOLDS.diskWarnPct ? "warn" : "ok" });

@@ -5,7 +5,7 @@ from pathlib import Path
 import httpx
 import pytest
 from campus247.observability.ops_metrics import OpsMetrics, write_snapshot
-from campus247.observability.ops_status import OpsConfig, ProbeCache, backup_state, build_status
+from campus247.observability.ops_status import OpsConfig, ProbeCache, backup_state, build_status, quality_state
 
 NOW = datetime(2026, 11, 17, 3, 0, 20, tzinfo=UTC)
 
@@ -140,3 +140,35 @@ class TestBackupState:
     def test_an_unreadable_timestamp_keeps_the_record_without_an_age(self, tmp_path):
         self.write(tmp_path, "LAST_BACKUP.json", {"finished_at": "yesterday", "verified": True})
         assert backup_state(tmp_path, now=NOW)["last"]["age_hours"] is None
+
+
+class TestQualityState:
+    def latest(self, directory: Path, **over):
+        directory.mkdir(parents=True, exist_ok=True)
+        record = {"at": (NOW - timedelta(hours=3)).isoformat(), "ok": True, "baseline": True, "regressions": [],
+                  "metrics": {"cases": 120, "any": 0.95, "fused_top8": 0.9, "survive": 0.85, "rerank": "http", "embedding": "http"}} | over
+        (directory / "LATEST.json").write_text(json.dumps(record), encoding="utf-8")
+
+    def test_reports_the_newest_check_with_only_the_numbers_the_page_needs(self, tmp_path):
+        self.latest(tmp_path, regressions=["fused_top8 fell 4.0 points"])
+        state = quality_state(tmp_path, now=NOW)
+        assert state["ok"] and state["age_hours"] == 3.0 and state["regressions"] == ["fused_top8 fell 4.0 points"] and state["has_baseline"]
+        assert state["metrics"] == {"cases": 120, "any": 0.95, "fused_top8": 0.9, "survive": 0.85}
+
+    def test_a_skipped_check_is_reported_as_skipped_with_no_numbers(self, tmp_path):
+        self.latest(tmp_path, ok=False, skipped="models_down", metrics=None, baseline=False)
+        state = quality_state(tmp_path, now=NOW)
+        assert state["skipped"] == "models_down" and state["ok"] is False and state["metrics"] is None
+
+    def test_not_configured_and_never_ran(self, tmp_path):
+        assert quality_state(None, now=NOW) == {"configured": False}
+        assert quality_state(tmp_path, now=NOW) == {"configured": True, "ran": False}
+
+    @pytest.mark.asyncio
+    async def test_the_status_document_carries_it(self, tmp_path):
+        self.latest(tmp_path / "q")
+        handler, _ = transport()
+        async with httpx.AsyncClient(transport=handler) as client:
+            status = await build_status(config(tmp_path, quality_dir=tmp_path / "q"), client=client, cache=ProbeCache(), now=NOW)
+        assert status["quality"]["metrics"]["fused_top8"] == 0.9
+        json.dumps(status)

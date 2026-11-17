@@ -110,6 +110,16 @@ def test_learning_worker_only_judged_when_it_should_be_running():
     assert not reading("learning_worker_down", status(background={"learning_worker": "ready"})).breached
 
 
+def test_quality_regression_speaks_only_about_a_check_that_ran():
+    ran = {"configured": True, "ran": True, "ok": True, "regressions": []}
+    assert not reading("quality_regression", status(quality=ran)).breached
+    got = reading("quality_regression", status(quality=ran | {"regressions": ["fused_top8 fell 4.0 points (baseline 90.0%, now 86.0%, allowed 3)"]}))
+    assert got.breached and got.severity == Severity.WARNING and "fused_top8" in got.value
+    for quiet in ({"configured": False}, {"configured": True, "ran": False}, {"configured": True, "ran": True, "ok": False, "skipped": "models_down"}):
+        assert reading("quality_regression", status(quality=quiet)) is None
+    assert reading("quality_regression", status()) is None  # a status without the section
+
+
 def test_rule_ids_are_unique_and_every_message_value_is_plain_text():
     assert len({rule.id for rule in RULES}) == len(RULES)
     for rule in RULES:

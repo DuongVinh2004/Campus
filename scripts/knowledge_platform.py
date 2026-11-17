@@ -492,6 +492,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     backup_dir = os.environ.get("CAMPUS247_BACKUP_DIR")
     ops_config = OpsConfig(
         metrics_dir=STATE / "ops-metrics", data_dir=ROOT, backup_dir=Path(backup_dir) if backup_dir else None,
+        quality_dir=ROOT / "evals/results/nightly",
         model_urls={"embedding": "http://127.0.0.1:18081/info", "reranker": "http://127.0.0.1:18082/info"},
         gateway_url=gateway_url,
         gateway_token=read_token(gateway_token_file) if gateway_url and gateway_token_file else None,

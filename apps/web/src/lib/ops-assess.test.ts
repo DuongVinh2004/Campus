@@ -99,6 +99,21 @@ describe("assessStatus", () => {
     expect(level({ configured: true, last: { at: "x", ok: true, age_hours: 2 } }).detail).toContain("ngoài máy");
   });
 
+  it("judges the nightly retrieval check: regression warns, skipped and never-ran are unknown, absent shows no tile", () => {
+    const quality = (over: object) => find(assessStatus(status({ quality: { configured: true, ran: true, ok: true, has_baseline: true, regressions: [], metrics: { cases: 120, any: 0.95, fused_top8: 0.9, survive: 0.85 }, ...over } })), "quality");
+    expect(quality({}).level).toBe("ok");
+    expect(quality({}).value).toBe("top 8: 90,0%");
+    expect(quality({ regressions: ["fused_top8 fell 4.0 points"] }).level).toBe("warn");
+    expect(quality({ regressions: ["fused_top8 fell 4.0 points"] }).detail).toBe("fused_top8 fell 4.0 points");
+    expect(quality({ ran: false, metrics: null }).level).toBe("unknown");
+    const skipped = quality({ ok: false, skipped: "models_down", metrics: null });
+    expect(skipped.level).toBe("unknown");
+    expect(skipped.detail).toContain("Model embedding/rerank không chạy");
+    expect(quality({ has_baseline: false }).detail).toBe("Chưa có mốc so sánh.");
+    expect(assessStatus(status()).some((f) => f.id === "quality")).toBe(false);
+    expect(assessStatus(status({ quality: { configured: false } })).some((f) => f.id === "quality")).toBe(false);
+  });
+
   it("overall level is the worst finding, unknown only when nothing is known", () => {
     expect(overallLevel([])).toBe("unknown");
     expect(overallLevel([{ id: "a", label: "", value: "", level: "unknown" }, { id: "b", label: "", value: "", level: "warn" }])).toBe("warn");

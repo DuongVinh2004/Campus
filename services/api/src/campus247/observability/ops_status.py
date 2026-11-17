@@ -33,6 +33,7 @@ class OpsConfig:
     gateway_url: str | None = None
     gateway_token: str | None = None
     background: Callable[[], dict[str, Any]] | None = None  # {"leader": bool, "learning_worker": str}
+    quality_dir: Path | None = None  # where evals/runners/nightly_retrieval.py writes LATEST.json
 
 
 class ProbeCache:
@@ -86,6 +87,24 @@ def backup_state(directory: Path | None, *, now: datetime) -> dict[str, Any]:
             pass
         state[name] = {"at": at, "ok": bool(record.get("ok", record.get("verified", False))), "age_hours": age}
     return state
+
+
+def quality_state(directory: Path | None, *, now: datetime) -> dict[str, Any]:
+    """The newest nightly retrieval check: its numbers, how old it is, and what fell against the baseline. Read only."""
+    if directory is None:
+        return {"configured": False}
+    record = _read_json(directory / "LATEST.json")
+    if record is None:
+        return {"configured": True, "ran": False}
+    age = None
+    try:
+        age = round((now - datetime.fromisoformat(str(record.get("at")).replace("Z", "+00:00"))).total_seconds() / 3600, 1)
+    except (TypeError, ValueError):
+        pass
+    metrics = record.get("metrics") if isinstance(record.get("metrics"), dict) else None
+    return {"configured": True, "ran": True, "at": record.get("at"), "age_hours": age, "ok": bool(record.get("ok")), "skipped": record.get("skipped"),
+            "regressions": list(record.get("regressions") or []), "has_baseline": bool(record.get("baseline")),
+            "metrics": {key: metrics[key] for key in ("cases", "any", "fused_top8", "survive") if key in metrics} if metrics else None}
 
 
 async def _probe_model(client: httpx.AsyncClient, url: str) -> str:
@@ -155,5 +174,6 @@ async def build_status(config: OpsConfig, *, client: httpx.AsyncClient, cache: P
         "background": config.background() if config.background else {},
         "storage": {"data_free_pct": _free_pct(config.data_dir), "backup_free_pct": _free_pct(config.backup_dir)},
         "backup": backup_state(config.backup_dir, now=now),
+        "quality": quality_state(config.quality_dir, now=now),
         "series": _series(aggregated),
     }

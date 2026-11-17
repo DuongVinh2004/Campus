@@ -35,6 +35,18 @@ export interface OpsBackupRecord {
   age_hours: number | null;
 }
 
+export interface OpsQuality {
+  configured: boolean;
+  ran?: boolean;
+  at?: string | null;
+  age_hours?: number | null;
+  ok?: boolean;
+  skipped?: string | null;
+  regressions?: string[];
+  has_baseline?: boolean;
+  metrics?: { cases: number; any: number; fused_top8: number; survive: number } | null;
+}
+
 export interface OpsStatus {
   generated_at: string;
   workers_reporting: number;
@@ -47,6 +59,7 @@ export interface OpsStatus {
   background: { leader?: boolean; learning_worker?: string };
   storage: { data_free_pct: number | null; backup_free_pct: number | null };
   backup: { configured: boolean; last?: OpsBackupRecord | null; offsite?: OpsBackupRecord | null; rehearsal?: OpsBackupRecord | null };
+  quality?: OpsQuality;
   series: { minute: number[]; turns: number[]; errors: number[]; p95_s_le: Array<number | null> };
 }
 

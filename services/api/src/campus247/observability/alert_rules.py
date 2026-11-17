@@ -177,6 +177,14 @@ def learning_worker_down(status):
     return Reading(worker == "unavailable", f"tiến trình học liệu: {worker}")
 
 
+def quality_regression(status):
+    quality = status.get("quality") or {}
+    if not quality.get("configured") or not quality.get("ran") or not quality.get("ok"):
+        return None  # no check yet, or the last one could not run (models down): the other rules cover that
+    regressions = quality.get("regressions") or []
+    return Reading(bool(regressions), regressions[0] if regressions else "truy hồi không giảm so với mốc")
+
+
 def no_worker_reporting(status):
     return Reading(status["workers_reporting"] == 0, f"{status['workers_reporting']} tiến trình API báo số liệu", Severity.CRITICAL)
 
@@ -196,5 +204,6 @@ RULES: tuple[Rule, ...] = (
     Rule("backup_stale", "Sao lưu cũ hoặc lỗi", backup_stale),
     Rule("rehearsal_failed", "Diễn tập khôi phục lỗi hoặc quá cũ", rehearsal_failed),
     Rule("learning_worker_down", "Tiến trình học liệu ngừng", learning_worker_down, for_s=600),
+    Rule("quality_regression", "Chất lượng truy hồi giảm so với mốc", quality_regression),
 )
 RULES_BY_ID = {rule.id: rule for rule in RULES}
