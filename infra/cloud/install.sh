@@ -133,6 +133,17 @@ if [ "$SKIP_SERVICES" != 1 ]; then
   install -m 0644 "$ROOT/infra/cloud/campus247-rehearsal.service" /etc/systemd/system/
   install -m 0644 "$ROOT/infra/cloud/campus247-rehearsal.timer" /etc/systemd/system/
   systemctl enable --now campus247-rehearsal.timer >/dev/null
+  # Watchdog outside the application, and an alert when a long-running unit fails for good.
+  install -m 0644 "$ROOT/infra/cloud/campus247-watchdog.service" /etc/systemd/system/
+  install -m 0644 "$ROOT/infra/cloud/campus247-watchdog.timer" /etc/systemd/system/
+  install -m 0644 "$ROOT/infra/cloud/campus247-alert@.service" /etc/systemd/system/
+  for unit in campus247-api campus247-gateway campus247-models campus247-frontend; do
+    install -d "/etc/systemd/system/$unit.service.d"
+    install -m 0644 "$ROOT/infra/cloud/campus247-onfailure.conf" "/etc/systemd/system/$unit.service.d/onfailure.conf"
+  done
+  [ -f /etc/campus247/alerts.env ] || install -m 0640 -g "$RUN_USER" "$ROOT/infra/cloud/alerts.env.example" /etc/campus247/alerts.env
+  systemctl daemon-reload
+  systemctl enable --now campus247-watchdog.timer >/dev/null
 fi
 
 log "HTTPS proxy and firewall (only 22 and 443 are reachable)"

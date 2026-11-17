@@ -1,0 +1,12 @@
+[Unit]
+Description=Campus 24/7 watchdog (probes the services and sends alerts, independent of the API)
+
+[Service]
+Type=oneshot
+User=campus247
+ExecStart=/opt/campus247/.venv/bin/python /opt/campus247/infra/cloud/watchdog.py check
+# Channel settings (variable names are listed in services/api/src/campus247/observability/alert_notifiers.py); systemd reads the file as root.
+EnvironmentFile=-/etc/campus247/alerts.env
+StateDirectory=campus247/watchdog
+Nice=10
+TimeoutStartSec=60

@@ -1,0 +1,8 @@
+[Unit]
+Description=Campus 24/7 alert: unit %i entered the failed state
+
+[Service]
+Type=oneshot
+User=campus247
+ExecStart=/opt/campus247/.venv/bin/python /opt/campus247/infra/cloud/watchdog.py unit-failed %i
+EnvironmentFile=-/etc/campus247/alerts.env
