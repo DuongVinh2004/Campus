@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "pattern": "^event:[0-9a-f]{8}-[0-9a-f]{4}-[47][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "expected_version": {
+      "minimum": 1,
+      "title": "Expected Version",
+      "type": "integer"
+    },
+    "kind": {
+      "enum": [
+        "pause",
+        "resume",
+        "wait",
+        "finish",
+        "field_edit",
+        "correction",
+        "manual_action",
+        "check_source",
+        "assistant_request",
+        "preview",
+        "receipt_observed"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "field": {
+      "anyOf": [
+        {
+          "enum": [
+            "reason",
+            "course_record_id",
+            "purpose",
+            "recipient",
+            "staff_note",
+            "target",
+            "outcome",
+            "contact_preference"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Field"
+    }
+  },
+  "required": [
+    "event_id",
+    "expected_version",
+    "kind"
+  ],
+  "title": "BaselineEvent",
+  "type": "object"
+}

@@ -1,0 +1,99 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793634801.6122925,
+ "wall_seconds": 10.780005931854248,
+ "paid_calls": 4,
+ "ledger_before": 74342,
+ "ledger_after": 74346,
+ "records": [
+  {
+   "case_id": "L12-V1",
+   "question": "Ai là người ký quyết định kỷ luật sinh viên?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04232899995986372,
+   "first_content_seconds": 9.642,
+   "started_at": 1793634801.61979,
+   "conversation_id": "01a19cf7-17d8-7f2e-bb24-0bd04728f6fe",
+   "timeline": [
+    [
+     "message.started",
+     0.042
+    ],
+    [
+     "message.delta",
+     9.642
+    ],
+    [
+     "message.delta",
+     9.642
+    ],
+    [
+     "message.delta",
+     9.643
+    ],
+    [
+     "message.delta",
+     9.644
+    ],
+    [
+     "message.delta",
+     9.644
+    ],
+    [
+     "message.delta",
+     9.645
+    ],
+    [
+     "message.delta",
+     9.645
+    ],
+    [
+     "citation.added",
+     10.052
+    ],
+    [
+     "message.completed",
+     10.181
+    ]
+   ],
+   "final": {
+    "message_id": "01a19cf7-17f9-7c11-9dda-f5bd82a8a67f",
+    "conversation_id": "01a19cf7-17d8-7f2e-bb24-0bd04728f6fe",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Hiệu trưởng ký quyết định kỷ luật sinh viên. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19cf7-3d76-7c47-bba0-47d475ff6778",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-5ec6-7a35-9897-04926c0d1259",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 45 · chars 0:1899",
+        "page_start": 45,
+        "page_end": 45
+       },
+       "quote": "Trang 45\nTRÁCH NHIỆM TRÌNH TỰ CÔNG VIỆC DIỄN GIẢI\n- Tùy thuộc tính chất, mức độ, hậu quả của hành \nvi vi phạm của sinh viên, các đơn vị gửi đề đề \nxuất kỷ luật về Khoa/Ban quản lý sinh viên.\nĐƠN VỊ\nPHÒNG\nCTCT&QLSV\nCHUYÊN VIÊN\nPHỤ TRÁCH\nKHOA/BAN\nLỚP SINH VIÊN\nĐỀ XUẤT KỶ LUẬT SINH \nHĐKT & KLSV CẤP TRƯỜNG \nQUYẾT ĐỊNH\nSINH VIÊN\nHĐ KHEN THƯỞNG\n& KỶ LUẬT SINH VIÊN\nCẤP TRƯỜNG\nLÃNH ĐẠO PHÒNG\nCTCT&QLSV\nHĐ KHEN THƯỞNG\nVÀ KỶ LUẬT\nSINH VIÊN\nCẤP TRƯỜNG\nHIỆU TRƯỞNG\nLÃNH ĐẠO PHÒNG\nCTCT&QLSV\nCHUYÊN VIÊN\nPHỤ",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "2546565b1ce685151887480b12829567e834bd5230584df104c2ab487df999d6",
+       "unit_id": "39d5d633e5093252"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Hiệu trưởng ký quyết định kỷ luật sinh viên. [CIT-001]",
+   "seconds": 10.181599399948027,
+   "user": 0
+  }
+ ]
+}

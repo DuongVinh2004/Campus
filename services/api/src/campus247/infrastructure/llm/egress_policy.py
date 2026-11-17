@@ -8,11 +8,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 
-class EgressViolationError(Exception):
-    def __init__(self, safe_reason: str, message: str | None = None) -> None:
-        self.safe_reason = safe_reason
-        # Never use caller-supplied message: it may contain the rejected value.
-        super().__init__(safe_reason)
+from campus247.ports.llm import EgressViolationError  # noqa: E402 -- re-exported for existing callers
 
 
 class DataSensitivityClassification(StrEnum):
@@ -37,10 +33,12 @@ SECRET_PATTERNS = (
     re.compile(r"\b(sk-[a-zA-Z0-9_\-]{16,}|ghp_[a-zA-Z0-9]{20,}|eyJ[a-zA-Z0-9_\-]{20,})\b"),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
 )
-EMAIL_PATTERN = re.compile(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b")
-PHONE_PATTERN = re.compile(r"(?<!\w)(?:\+?[1-9]\d{9,14}|0\d{9,10})(?!\w)")
-IP_PATTERN = re.compile(r"(?<!\w)(?:\d{1,3}\.){3}\d{1,3}(?!\w)")
-STUDENT_ID_PATTERN = re.compile(r"\b(?:SV|MSV|STU)[-_]?\d{4,}\b", re.IGNORECASE)
+from campus247.domain.contact_values import (  # noqa: E402  (shared with evidence minimization)
+    EMAIL_PATTERN,
+    IP_PATTERN,
+    PHONE_PATTERN,
+    STUDENT_ID_PATTERN,
+)
 
 APPROVED_PURPOSES = frozenset({"FAQ_ANSWERING", "SUMMARIZATION", "EMBEDDING"})
 ALLOWED_EGRESS_FIELDS = frozenset(
@@ -53,10 +51,12 @@ ALLOWED_EGRESS_FIELDS = frozenset(
         "top_p",
         "dimensions",
         "encoding_format",
+        "thinking",
+        "response_format",
     }
 )
 PURPOSE_FIELDS = {
-    "FAQ_ANSWERING": frozenset({"messages", "temperature", "max_tokens", "model", "top_p"}),
+    "FAQ_ANSWERING": frozenset({"messages", "temperature", "max_tokens", "model", "top_p", "thinking", "response_format"}),
     "SUMMARIZATION": frozenset({"messages", "temperature", "max_tokens", "model", "top_p"}),
     "EMBEDDING": frozenset({"input", "model", "dimensions", "encoding_format"}),
 }
@@ -276,6 +276,8 @@ class EgressPolicy:
             "top_p",
             "dimensions",
             "encoding_format",
+            "thinking",
+            "response_format",
         ):
             if field_name not in payload or field_name not in allowed:
                 continue
@@ -285,6 +287,14 @@ class EgressPolicy:
                 minimized[field_name] = self._sanitize_messages(value)
             elif field_name == "input":
                 minimized[field_name] = self._sanitize_embedding_input(value)
+            elif field_name == "thinking":
+                if payload.get("model") != "deepseek-flash" or not isinstance(value, dict) or value != {"type": "disabled"}:
+                    self._deny(REASON_INVALID)
+                minimized[field_name] = {"type": "disabled"}
+            elif field_name == "response_format":
+                if payload.get("model") != "deepseek-flash" or not isinstance(value, dict) or value != {"type": "json_object"}:
+                    self._deny(REASON_INVALID)
+                minimized[field_name] = {"type": "json_object"}
             else:
                 minimized[field_name] = self._sanitize_scalar(field_name, value)
 

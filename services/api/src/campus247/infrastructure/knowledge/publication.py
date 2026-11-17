@@ -1,0 +1,193 @@
+"""Validate retained acquisition evidence before attesting external attachments."""
+import json
+import re
+from html.parser import HTMLParser
+from time import monotonic
+from urllib.parse import urlsplit
+
+from campus247.application.knowledge.platform_models import digest
+from campus247.domain.publication import VerifiedPublication, official_huce_uri
+from campus247.infrastructure.knowledge.storage import checked_path
+
+_ACQUISITION = "data/huce-document-pipeline/it-english-acquisition-20261022T145232183582Z.json"
+_ACQUISITION_SHA256 = "f0d868939aa8604540c3fc757cff24a84f19bed55a13ba378d1692c427a53d54"
+_REGULATION_ACQUISITION = "infra/local/huce-completion-20261025-02/regulation-publication-acquisition-01.json"
+_REGULATION_ACQUISITION_SHA256 = "4065e765eedf739f4e580fab6163dacb60c25909aa93bce6080a6394c9cf27e1"
+_STEM_ACQUISITION = "infra/local/huce-completion-20261025-02/stem-publication-acquisition-01.json"
+_STEM_ACQUISITION_SHA256 = "5e987a7c79c488bce2c0e610fde964593e2abad903f55b31b6ce0124b4359bbf"
+_HANDBOOK_ACQUISITION = "infra/local/huce-completion-20261102-01/handbook-publication-acquisition-01.json"
+_HANDBOOK_ACQUISITION_SHA256 = "8cfa1cc2ebfdac86f1355d07e163a6fc42f8249ad0b8f1b0de7ff4966288788c"
+
+ATTACHMENT_CACHE_TTL_SECONDS = 30
+ATTACHMENT_CACHE_MAX_ENTRIES = 512
+_attachment_cache = {}
+
+
+def clear_attachment_cache():
+    """Discard memoized attestations, including negative results."""
+    _attachment_cache.clear()
+
+
+def same_flipbook_pdf(published, canonical, viewer):
+    """A flipbook link maps to its PDF only when the retained viewer page names that exact file.
+
+    The flipbook id must prefix the PDF's content hash, the PDF must sit on the flipbook host's CDN
+    under its upload path, and the pinned viewer HTML must contain the exact PDF URL.
+    """
+    flip = re.fullmatch(r"https://heyzine\.com/flip-book/([a-z0-9]{6,})\.html\?#page/\d+", published or "")
+    pdf = re.fullmatch(r"https://cdn[a-z]?\.heyzine\.com/files/uploaded/(?:v3/)?([a-f0-9]{40})\.pdf", canonical or "")
+    return bool(flip and pdf and pdf[1].startswith(flip[1]) and canonical in viewer)
+
+
+def same_published_attachment(published, canonical):
+    """Only an explicit pinned receipt can map a preview to its own file view."""
+    if published == canonical:
+        return True
+    identities = []
+    for value in (published, canonical):
+        try:
+            uri = urlsplit(value)
+        except ValueError:
+            return False
+        match = re.fullmatch(r"/file/d/([A-Za-z0-9_-]+)/(?:view|preview)", uri.path)
+        if uri.scheme != "https" or uri.netloc != "drive.google.com" or uri.query or uri.fragment or not match:
+            return False
+        identities.append(match[1])
+    return identities[0] == identities[1]
+
+
+class _Links(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.urls = set()
+
+    def handle_starttag(self, tag, attrs):
+        for name, value in attrs:
+            if value and (tag == "iframe" and name == "src" or tag == "a" and name == "href"):
+                self.urls.add(value)
+
+
+async def verified_attachment(platform, conn, row, release_id):
+    """Reuse an identical platform-scoped attestation for at most 30 seconds."""
+    key = (id(platform), str(platform.storage.workspace.resolve()), platform.repo.tenant,
+           row.get("id"), row["content_checksum"], row["document_version_id"], release_id,
+           row["canonical_uri"], row["source_id"], row["content_text"])
+    started = monotonic()
+    cached = _attachment_cache.get(key)
+    if cached is not None and started - cached[0] < ATTACHMENT_CACHE_TTL_SECONDS:
+        return cached[1]
+    _attachment_cache.pop(key, None)
+    result = await _verify_attachment(platform, conn, row, release_id)
+    # Keep the platform alive with its entry so its identity cannot be reused.
+    # Insert only after successful completion: exceptions are never memoized.
+    _attachment_cache.pop(key, None)
+    if len(_attachment_cache) >= ATTACHMENT_CACHE_MAX_ENTRIES:
+        _attachment_cache.pop(next(iter(_attachment_cache)))
+    _attachment_cache[key] = (started, result, platform)
+    return result
+
+
+_version_cache: dict = {}
+_acquisition_cache: dict = {}
+
+
+def _acquisition_results(path, expected_sha256):
+    """The linked-result list of one pinned acquisition file, or None when its hash is not the pinned one.
+
+    Parsing a multi-megabyte JSON per cited chunk was the largest per-turn cost of the attestation. The key carries
+    the file's size and modification time, so any change to the file is read and hashed again at once.
+    """
+    info = path.stat()
+    key = (str(path), info.st_mtime_ns, info.st_size, expected_sha256)
+    if key not in _acquisition_cache:
+        raw = path.read_bytes()
+        _acquisition_cache[key] = json.loads(raw)["results"] if digest(raw) == expected_sha256 else None
+        if len(_acquisition_cache) > 32:
+            _acquisition_cache.pop(next(iter(_acquisition_cache)))
+    return _acquisition_cache[key]
+
+
+async def _verified_version(platform, conn, row, release_id):
+    """Everything that depends on the document version, not on the chunk: acquisition record, official publisher
+    page, original PDF and rendition hashes. Returns (record, texts of the rendition's pages) or None. Kept for
+    the same 30 s as the per-chunk attestation; a failure is kept too, as before."""
+    key = (id(platform), str(platform.storage.workspace.resolve()), platform.repo.tenant,
+           row["document_version_id"], row["canonical_uri"], row["source_id"], release_id)
+    started = monotonic()
+    cached = _version_cache.get(key)
+    if cached is not None and started - cached[0] < ATTACHMENT_CACHE_TTL_SECONDS:
+        return cached[1]
+    result = await _verify_version(platform, conn, row)
+    _version_cache.pop(key, None)
+    if len(_version_cache) >= ATTACHMENT_CACHE_MAX_ENTRIES:
+        _version_cache.pop(next(iter(_version_cache)))
+    _version_cache[key] = (started, result, platform)
+    return result
+
+
+async def _verify_attachment(platform, conn, row, release_id):
+    """Unknown/missing acquisition stays unverified; ordinary evidence still works.
+
+    Publication is additional provenance, never publication approval. Caller has
+    already applied the release, independent review, scope and metadata gates.
+    Hashes bind the retained official HTML, its exact link and the original PDF.
+    No network lookup, arbitrary local path or domain-wide Drive exception.
+    """
+    verified = await _verified_version(platform, conn, row, release_id)
+    if verified is None:
+        return None
+    item, page_texts = verified
+    if digest(row["content_text"].encode()) != row["content_checksum"] or row["content_text"] not in page_texts:
+        return None
+    return VerifiedPublication(item["publisher_url"], item["linked_url"], str(row["source_id"]),
+        str(row["document_version_id"]), row["content_checksum"], item["source_sha256"], release_id)
+
+
+async def _verify_version(platform, conn, row):
+    root = platform.storage.workspace
+    matches = []
+    for name, expected_sha256 in ((_ACQUISITION, _ACQUISITION_SHA256),
+            (_REGULATION_ACQUISITION, _REGULATION_ACQUISITION_SHA256),
+            (_STEM_ACQUISITION, _STEM_ACQUISITION_SHA256),
+            (_HANDBOOK_ACQUISITION, _HANDBOOK_ACQUISITION_SHA256)):
+        acquisition = checked_path(root / name, root)
+        if not acquisition.is_file():
+            continue
+        results = _acquisition_results(acquisition, expected_sha256)
+        if results is not None:
+            matches.extend(item for item in results if item["linked_url"] == row["canonical_uri"])
+    if len(matches) != 1:
+        return None
+    item = matches[0]
+    if not official_huce_uri(item["publisher_url"]):
+        return None
+    html = checked_path(root / item["publisher_file"], root).read_bytes()
+    if digest(html) != item["publisher_sha256"]:
+        return None
+    links = _Links()
+    links.feed(html.decode("utf-8"))
+    published_link = item.get("publisher_link", item["linked_url"])
+    if published_link not in links.urls:
+        return None
+    if not same_published_attachment(published_link, item["linked_url"]):
+        if not item.get("viewer_file"):
+            return None
+        viewer = checked_path(root / item["viewer_file"], root).read_bytes()
+        if (digest(viewer) != item.get("viewer_sha256")
+                or not same_flipbook_pdf(published_link, item["linked_url"], viewer.decode("utf-8", "ignore"))):
+            return None
+    version = await platform.repo.version(conn, row["document_version_id"])
+    artifact = await conn.fetchrow("SELECT * FROM knowledge_artifact WHERE id=$1 AND tenant_id=$2",
+                                   version["original_id"], platform.repo.tenant)
+    original = platform.storage.read(artifact)
+    if digest(original) != item["source_sha256"] or version["original_sha256"] != item["source_sha256"]:
+        return None
+    rendition_artifact = await conn.fetchrow("SELECT * FROM knowledge_artifact WHERE id=$1 AND tenant_id=$2",
+        version["rendition_id"], platform.repo.tenant)
+    rendition_raw = platform.storage.read(rendition_artifact)
+    if digest(rendition_raw) != version["rendition_sha256"]:
+        return None
+    rendition = json.loads(rendition_raw)
+    if rendition.get("original_sha256") != item["source_sha256"]:
+        return None
+    return item, frozenset(page["text"] for page in rendition.get("pages", []))

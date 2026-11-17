@@ -1,0 +1,179 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793628139.7447743,
+ "wall_seconds": 5.460009574890137,
+ "paid_calls": 4,
+ "ledger_before": 74315,
+ "ledger_after": 74319,
+ "records": [
+  {
+   "case_id": "AU-A23",
+   "question": "Ngành Logistics đô thị do khoa nào quản lý, bằng gì?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.037651199992978945,
+   "first_content_seconds": 4.903,
+   "started_at": 1793628139.7489538,
+   "conversation_id": "01a19c91-70e8-7dbd-a72c-9982c8258b4d",
+   "timeline": [
+    [
+     "message.started",
+     0.038
+    ],
+    [
+     "message.delta",
+     4.903
+    ],
+    [
+     "message.delta",
+     4.904
+    ],
+    [
+     "message.delta",
+     4.904
+    ],
+    [
+     "message.delta",
+     4.906
+    ],
+    [
+     "message.delta",
+     4.906
+    ],
+    [
+     "message.delta",
+     4.907
+    ],
+    [
+     "message.delta",
+     4.908
+    ],
+    [
+     "message.delta",
+     4.908
+    ],
+    [
+     "message.delta",
+     4.909
+    ],
+    [
+     "message.delta",
+     4.91
+    ],
+    [
+     "message.delta",
+     4.91
+    ],
+    [
+     "message.delta",
+     4.911
+    ],
+    [
+     "message.delta",
+     4.911
+    ],
+    [
+     "message.delta",
+     4.912
+    ],
+    [
+     "message.delta",
+     4.913
+    ],
+    [
+     "message.delta",
+     4.913
+    ],
+    [
+     "message.delta",
+     4.914
+    ],
+    [
+     "message.delta",
+     4.914
+    ],
+    [
+     "message.delta",
+     4.915
+    ],
+    [
+     "message.delta",
+     4.916
+    ],
+    [
+     "message.delta",
+     4.916
+    ],
+    [
+     "message.delta",
+     4.917
+    ],
+    [
+     "message.delta",
+     4.917
+    ],
+    [
+     "message.delta",
+     4.918
+    ],
+    [
+     "message.delta",
+     4.919
+    ],
+    [
+     "message.delta",
+     4.919
+    ],
+    [
+     "message.delta",
+     4.92
+    ],
+    [
+     "citation.added",
+     4.983
+    ],
+    [
+     "message.completed",
+     4.997
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c91-7105-7311-941b-74a9ff126391",
+    "conversation_id": "01a19c91-70e8-7dbd-a72c-9982c8258b4d",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Chuyên ngành Logistics đô thị (K71LGTDT) thuộc ngành Logistics và quản lý chuỗi cung ứng, trình độ cử nhân. [CIT-001]\nKế hoạch giảng dạy ghi người lập là Trưởng khoa Cầu đường và Trưởng phòng Quản lý Đào tạo. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c91-840a-7ddc-9a4a-72d6af90ae01",
+       "source_id": "f8399bc0-568a-7732-8929-9625dd3299da",
+       "document_version_id": "01a16d41-d70a-79f2-ac7c-747fc26a1307",
+       "chunk_id": "01a16d41-d718-76e3-95f7-90b0009ba0f0",
+       "source_title": "Kế hoạch giảng dạy chương trình đào tạo trình độ cử nhân — Ngành Logistics và quản lý chuỗi cung ứng — Chuyên ngành Logistics đô thị (K71LGTDT)",
+       "canonical_uri": "https://drive.google.com/file/d/1Q3HpEfkj4idg1_SSZWYivbSK5qLOdWYU/view?usp=sharing",
+       "version_label": "public-snapshot-01a16d41-d70a-79f2-ac7c-747fc26a1307",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Kế hoạch giảng dạy chương trình đào tạo trình độ cử nhân — Ngành Logistics và quản lý chuỗi cung ứng — Chuyên ngành Logistics đô thị (K71LGTDT) · trang 1 · chars 0:2596",
+        "page_start": 1,
+        "page_end": 1
+       },
+       "quote": "BỘ GIÁO DỤC VÀ ĐÀO TẠO\nTRƯỜNG ĐH XÂY DỰNG HN\nKẾ HOẠCH GIẢNG DẠY CHƯƠNG TRÌNH ĐÀO TẠO TRÌNH ĐỘ CỬ NHÂN \nNGÀNH LOGISTICS VÀ QUẢN LÝ CHUỖI CUNG ỨNG/CHUYÊN NGÀNH LOGISTICS ĐÔ THỊ\n(K71LGTDT)\nHọc kỳ 1 Học kỳ 2 Học kỳ 3 Học kỳ 4 Học kỳ 5 Học kỳ 6 Học kỳ 7\n4288011 – 3\nTriết học Mác-Lênin\n428802 – 2\nKinh tế chính trị Mác\u0002Lênin\n428803 – 2\nChủ nghĩa xã hội \nkhoa học\n418801 – 2\nLịch sử Đảng cộng sản \nVN\n418802 – 2\nTư tưởng \nHồ Chí Minh\n370407 – 3\nTài chính kế toán và \nTMĐT\n160479 – 3\nThực tập\ntốt nghiệp",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "acdb22c0609011b05b5ebd1ed5a70a8a3cf39f05341a974065dc6b77b2506172",
+       "unit_id": "2d628a9440a5fe35"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Chuyên ngành Logistics đô thị (K71LGTDT) thuộc ngành Logistics và quản lý chuỗi cung ứng, trình độ cử nhân. [CIT-001]\nKế hoạch giảng dạy ghi người lập là Trưởng khoa Cầu đường và Trưởng phòng Quản lý Đào tạo. [CIT-001]",
+   "seconds": 4.996792199992342,
+   "user": 0
+  }
+ ]
+}

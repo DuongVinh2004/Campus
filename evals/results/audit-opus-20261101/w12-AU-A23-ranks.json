@@ -1,0 +1,17 @@
+{
+  "case_id": "AU-A23",
+  "search_query": "ngành logistics đô thị do khoa nào quản lý, bằng gì?",
+  "top_k": 80,
+  "indexes": {
+    "embedded2": {
+      "gold_logistics_units": 1,
+      "lexical": [],
+      "vector": []
+    },
+    "embedded3": {
+      "gold_logistics_units": 1,
+      "lexical": [],
+      "vector": []
+    }
+  }
+}

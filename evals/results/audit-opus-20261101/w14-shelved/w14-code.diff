@@ -1,0 +1,143 @@
+diff --git a/services/api/src/campus247/rag_v2/ingest/tables.py b/services/api/src/campus247/rag_v2/ingest/tables.py
+index d74f1c893c..4e7c91bf49 100644
+--- a/services/api/src/campus247/rag_v2/ingest/tables.py
++++ b/services/api/src/campus247/rag_v2/ingest/tables.py
+@@ -7,6 +7,34 @@ import re
+ TABLE_MARKER = "⟦RAG_V2_TABLE⟧"
+ 
+ 
++def flat_list_rows(text):
++    """Offsets of strict runs of >=8 consecutive numbered, non-pipe lines.
++
++    Validate the entire uninterrupted block: a repeated/skipped ordinal must
++    not leave a qualifying prefix. Context is at most two preceding lines;
++    source bodies retain their original line endings and exact boundaries.
++    """
++    lines = text.splitlines(keepends=True)
++    result, block, offset = {}, [], 0
++
++    def flush():
++        if len(block) >= 8 and all(b[2] == a[2] + 1 for a, b in zip(block, block[1:])):
++            context = "\n".join(line.strip() for line in lines[max(0, block[0][3] - 2):block[0][3]])
++            for start, end, _, _ in block:
++                result[start] = (end, context)
++        block.clear()
++
++    for i, line in enumerate(lines):
++        match = re.match(r"^(\d{1,3})\s+\S", line) if "|" not in line else None
++        if match:
++            block.append((offset, offset + len(line), int(match[1]), i))
++        else:
++            flush()
++        offset += len(line)
++    flush()
++    return result
++
++
+ def cells(line):
+     values = line.strip().split("|")
+     if line.strip().startswith("|") and line.strip().endswith("|"):
+diff --git a/services/api/src/campus247/rag_v2/ingest/units.py b/services/api/src/campus247/rag_v2/ingest/units.py
+index 278c8973af..01424b4120 100644
+--- a/services/api/src/campus247/rag_v2/ingest/units.py
++++ b/services/api/src/campus247/rag_v2/ingest/units.py
+@@ -7,11 +7,11 @@ from dataclasses import replace
+ from hashlib import sha256
+ 
+ from campus247.rag_v2.types import Scope, Unit
+-from campus247.rag_v2.ingest.tables import encode_inheritance, table_contexts
++from campus247.rag_v2.ingest.tables import encode_inheritance, flat_list_rows, table_contexts
+ 
+ CONTEXT_START = "⟦RAG_V2_CONTEXT⟧\n"
+ SOURCE_SEPARATOR = "\n⟦RAG_V2_SOURCE⟧\n"
+-SPLITTER_VERSION = "structural-spans-v2"
++SPLITTER_VERSION = "structural-spans-v3"
+ SPAN = re.compile(r"⟦RAG_V2_SPAN:(\d+):(\d+)⟧")
+ _ARTICLE = re.compile(r"^\s*Điều\s+(\d+)\s*[.:]?\s*", re.IGNORECASE)
+ _CLAUSE = re.compile(r"^\s*(\d+)[.)]\s+")
+@@ -80,11 +80,21 @@ def _segments(chunk: dict):
+     start = 0
+     offset = 0
+     tables = table_contexts(text)
++    flat_rows = flat_list_rows(text)
++    flat_end = None
+     for line in text.splitlines(keepends=True):
++        if offset == flat_end:
++            if offset > start:
++                yield start, text[start:offset], current
++            start, current = offset, None
++            flat_end = None
+         stripped = line.strip()
+         a, c, p = _ARTICLE.match(line), _CLAUSE.match(line), _POINT.match(line)
+         new = None
+-        if re.match(r"\s*STT\s+\S", line, re.IGNORECASE) and "|" not in line:
++        if offset in flat_rows:
++            flat_end, context = flat_rows[offset]
++            new = ("table_row", f"{section} > Dòng {offset}", context)
++        elif re.match(r"\s*STT\s+\S", line, re.IGNORECASE) and "|" not in line:
+             header = stripped
+             new = ("table_row", f"{section} > Tiêu đề bảng", header)
+         elif a:
+diff --git a/services/api/src/campus247/rag_v2/retrieval/hybrid.py b/services/api/src/campus247/rag_v2/retrieval/hybrid.py
+index c72cf7009e..5fde8d5b11 100644
+--- a/services/api/src/campus247/rag_v2/retrieval/hybrid.py
++++ b/services/api/src/campus247/rag_v2/retrieval/hybrid.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ import asyncio
+ import math
+ import re
++import unicodedata
+ from collections.abc import Mapping
+ from dataclasses import dataclass, replace
+ 
+@@ -14,11 +15,22 @@ from campus247.rag_v2.understanding.normalize import fold, normalize_query
+ 
+ 
+ RRF_K = 60
++FOCUSED_LEXICAL = True
++# Exact (accented) forms only: folding would merge "do" with "đô" and "thi" with "thị".
++_FOCUSED_FILLER = set("do nào gì là thì vậy nhé sao thế em mình tôi hỏi xin bao nhiêu".split())
+ # Without a reranker, lexical hits at this rank or better stay inside the packed rows (0 disables).
+ LEXICAL_PIN = 4
+ PACK_WINDOW = 6
+ 
+ 
++def focused_query(query: str) -> str:
++    """Drop only whole filler tokens; preserve numbers, codes and other words."""
++    tokens = query.split()
++    kept = [token for token in tokens
++            if re.sub(r"^\W+|\W+$", "", unicodedata.normalize("NFC", token.lower())) not in _FOCUSED_FILLER]
++    return " ".join(kept) if len(kept) != len(tokens) else query
++
++
+ @dataclass(frozen=True)
+ class RetrievalResult:
+     candidates: tuple[Candidate, ...]
+@@ -120,6 +132,11 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
+     if not allowed:
+         return RetrievalResult((), False, {"status": "EMPTY", "eligible": 0, "preselected": 0, "returned": 0})
+     lexical = index.lexical(u.search_query, lexical_k, allowed=allowed)
++    focused = []
++    if FOCUSED_LEXICAL:
++        query = focused_query(u.search_query)
++        if query != u.search_query and len(query.split()) >= 2:
++            focused = index.lexical(query, lexical_k, allowed=allowed)
+     vector_failed = False
+     try:
+         async with asyncio.timeout(1.0):
+@@ -128,13 +145,13 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
+         vector, vector_failed = [], True
+     ranks = {}
+     anchored = index.anchored(u.search_query, lexical_k, allowed=allowed) if hasattr(index, "anchored") else []
+-    for branch, rows in enumerate((lexical, vector, anchored)):
++    for branch, rows in enumerate((lexical, vector, anchored, focused)):
+         seen = set()
+         for rank, (uid, _) in enumerate(rows, 1):
+             if uid not in allowed or uid in seen:
+                 continue
+             seen.add(uid)
+-            ranks.setdefault(uid, [None, None, None])[branch] = rank
++            ranks.setdefault(uid, [None, None, None, None])[branch] = rank
+     k = RRF_K
+     ranked = [Candidate(uid, pair[0], pair[1], sum(1 / (k + rank) for rank in pair if rank is not None))
+               for uid, pair in ranks.items()]

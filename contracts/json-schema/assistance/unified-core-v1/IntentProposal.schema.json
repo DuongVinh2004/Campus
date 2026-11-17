@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CandidateFact": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "pattern": "^[a-z][a-z0-9_]{0,63}$",
+          "title": "Key",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "origin": {
+          "enum": [
+            "user_statement",
+            "profile_reference",
+            "document_candidate",
+            "inference"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "status": {
+          "const": "candidate",
+          "default": "candidate",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "value",
+        "origin"
+      ],
+      "title": "CandidateFact",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "version_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Version Id",
+          "type": "string"
+        },
+        "locator": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "synthetic",
+            "public_snapshot"
+          ],
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "version_id",
+        "locator",
+        "sha256",
+        "classification"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "unified-intent.v1",
+      "default": "unified-intent.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "goal": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Goal",
+      "type": "string"
+    },
+    "workflow": {
+      "anyOf": [
+        {
+          "enum": [
+            "STUDENT_CERTIFICATE",
+            "GRADE_APPEAL",
+            "GENERAL_SUPPORT"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Workflow"
+    },
+    "purpose": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Purpose"
+    },
+    "resource": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ResourceRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "constraints": {
+      "items": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 8,
+      "title": "Constraints",
+      "type": "array"
+    },
+    "facts": {
+      "items": {
+        "$ref": "#/$defs/CandidateFact"
+      },
+      "maxItems": 24,
+      "title": "Facts",
+      "type": "array"
+    },
+    "missing_fields": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 24,
+      "title": "Missing Fields",
+      "type": "array"
+    },
+    "clarification": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Clarification"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "needs_clarification",
+        "out_of_scope"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "action_authority": {
+      "const": "none",
+      "default": "none",
+      "title": "Action Authority",
+      "type": "string"
+    }
+  },
+  "required": [
+    "goal",
+    "status"
+  ],
+  "title": "IntentProposal",
+  "type": "object"
+}

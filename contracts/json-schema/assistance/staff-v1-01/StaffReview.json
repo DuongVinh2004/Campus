@@ -1,0 +1,87 @@
+{
+  "$defs": {
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "resource": {
+      "$ref": "#/$defs/ResourceRef"
+    },
+    "criterion_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Criterion Id",
+      "type": "string"
+    },
+    "binding_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Binding Hash",
+      "type": "string"
+    },
+    "dependency_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Dependency Hash",
+      "type": "string"
+    },
+    "verdict": {
+      "enum": [
+        "checked",
+        "missing_source",
+        "conflicting"
+      ],
+      "title": "Verdict",
+      "type": "string"
+    },
+    "note": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Note",
+      "type": "string"
+    },
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "resource",
+    "criterion_id",
+    "binding_hash",
+    "dependency_hash",
+    "verdict",
+    "note",
+    "client_id"
+  ],
+  "title": "StaffReview",
+  "type": "object"
+}

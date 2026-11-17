@@ -1,0 +1,1767 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793623264.281713,
+ "wall_seconds": 130.5767743587494,
+ "paid_calls": 50,
+ "ledger_before": 73590,
+ "ledger_after": 73640,
+ "records": [
+  {
+   "case_id": "R2-A1-0047",
+   "question": "K71CD B1 GT thông minh mã",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.037583099998300895,
+   "first_content_seconds": 5.158,
+   "started_at": 1793623264.2860267,
+   "conversation_id": "01a19c47-0c21-7db4-8113-4aea26500202",
+   "timeline": [
+    [
+     "message.started",
+     0.038
+    ],
+    [
+     "message.delta",
+     5.158
+    ],
+    [
+     "message.delta",
+     5.159
+    ],
+    [
+     "message.delta",
+     5.16
+    ],
+    [
+     "message.delta",
+     5.161
+    ],
+    [
+     "message.delta",
+     5.161
+    ],
+    [
+     "message.delta",
+     5.162
+    ],
+    [
+     "message.delta",
+     5.162
+    ],
+    [
+     "message.delta",
+     5.163
+    ],
+    [
+     "message.delta",
+     5.164
+    ],
+    [
+     "message.delta",
+     5.164
+    ],
+    [
+     "message.delta",
+     5.165
+    ],
+    [
+     "message.delta",
+     5.166
+    ],
+    [
+     "message.delta",
+     5.166
+    ],
+    [
+     "message.delta",
+     5.167
+    ],
+    [
+     "message.delta",
+     5.167
+    ],
+    [
+     "message.delta",
+     5.168
+    ],
+    [
+     "message.delta",
+     5.169
+    ],
+    [
+     "message.delta",
+     5.169
+    ],
+    [
+     "message.delta",
+     5.17
+    ],
+    [
+     "message.delta",
+     5.171
+    ],
+    [
+     "message.delta",
+     5.171
+    ],
+    [
+     "message.delta",
+     5.172
+    ],
+    [
+     "message.delta",
+     5.173
+    ],
+    [
+     "message.delta",
+     5.173
+    ],
+    [
+     "message.delta",
+     5.174
+    ],
+    [
+     "message.delta",
+     5.174
+    ],
+    [
+     "message.delta",
+     5.175
+    ],
+    [
+     "message.delta",
+     5.175
+    ],
+    [
+     "message.delta",
+     5.176
+    ],
+    [
+     "message.delta",
+     5.177
+    ],
+    [
+     "citation.added",
+     5.367
+    ],
+    [
+     "message.completed",
+     5.426
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c47-0c3f-7d01-a3d9-2a8b42513210",
+    "conversation_id": "01a19c47-0c21-7db4-8113-4aea26500202",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Trong Kế hoạch giảng dạy chương trình đào tạo trình độ kỹ sư ngành Kỹ thuật xây dựng công trình giao thông, chuyên ngành Xây dựng cầu đường (K71CD), học kỳ 8 có học phần \"Hệ thống GT thông minh\" mã 160470 - 2. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c47-2042-701f-8506-1063966918de",
+       "source_id": "eb96738f-ec1f-76cf-82a7-63b7f2399fd9",
+       "document_version_id": "01a16d41-d646-7774-9357-d7203785c37c",
+       "chunk_id": "01a16d41-d665-7f6c-ab6e-28919c64c748",
+       "source_title": "Kế hoạch giảng dạy chương trình đào tạo trình độ kỹ sư — Ngành Kỹ thuật xây dựng công trình giao thông — Chuyên ngành Xây dựng cầu đường (K71CD)",
+       "canonical_uri": "https://drive.google.com/file/d/1vjo0v_-3ZbqRyen3F7hH67t2GhCKHvpI/view?usp=drive_link",
+       "version_label": "public-snapshot-01a16d41-d646-7774-9357-d7203785c37c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Kế hoạch giảng dạy chương trình đào tạo trình độ kỹ sư — Ngành Kỹ thuật xây dựng công trình giao thông — Chuyên ngành Xây dựng cầu đường (K71CD) · trang 2 · chars 0:762",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "160316 - 3\nKỹ thuật giao thông\n120311 - 2\nPM PTKC trong TK cầu\nvà CTN\n160470 - 2\nHệ thống GT thông minh\n120332 - 3\nTK và XD cầu nâng cao\n160317 - 2\nVật liệu công trình đường\n120315 - 2\nTK và xây dựng công\ntrình ngầm Metro\n160449 - 2\nKinh tế GT và QLDA\n120317 - 3\nCầu đường sắt tốc độ\ncao\n160314 - 3\nQuản lý tài sản đường bộ\n120333 - 2\nQuản lý dự án và giám\nsát xây dựng CTGT\n160315 – 2\nThí nghiệm, kiểm định và\nĐGCL công trình đường\n120310 - 2\nMóng sâu cho công trình\ncầu\n160455 - 2\nChuyển đề đường",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "dd88a218b318eaa0de7cbf88ebc8216f2dd9583365e34c5d2e79954a6420e7de",
+       "unit_id": "08b1cd3eb46b0656"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Trong Kế hoạch giảng dạy chương trình đào tạo trình độ kỹ sư ngành Kỹ thuật xây dựng công trình giao thông, chuyên ngành Xây dựng cầu đường (K71CD), học kỳ 8 có học phần \"Hệ thống GT thông minh\" mã 160470 - 2. [CIT-001]",
+   "seconds": 5.426058399985777,
+   "user": 0
+  },
+  {
+   "case_id": "R2-A1-0086",
+   "question": "Trong danh muc tu chon tu do cua Ky thuat co khi K69ME, Nhap mon ve robot co ma gi va bao nhieu tin chi?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03310490000876598,
+   "first_content_seconds": 8.358,
+   "started_at": 1793623273.7126324,
+   "conversation_id": "01a19c47-30f4-7975-b42d-0d152d4dbaf4",
+   "timeline": [
+    [
+     "message.started",
+     0.033
+    ],
+    [
+     "message.delta",
+     8.358
+    ],
+    [
+     "message.delta",
+     8.358
+    ],
+    [
+     "message.delta",
+     8.359
+    ],
+    [
+     "message.delta",
+     8.36
+    ],
+    [
+     "message.delta",
+     8.36
+    ],
+    [
+     "message.delta",
+     8.361
+    ],
+    [
+     "message.delta",
+     8.361
+    ],
+    [
+     "message.delta",
+     8.362
+    ],
+    [
+     "message.delta",
+     8.363
+    ],
+    [
+     "message.delta",
+     8.363
+    ],
+    [
+     "message.delta",
+     8.364
+    ],
+    [
+     "message.delta",
+     8.365
+    ],
+    [
+     "message.delta",
+     8.366
+    ],
+    [
+     "message.delta",
+     8.366
+    ],
+    [
+     "message.delta",
+     8.367
+    ],
+    [
+     "message.delta",
+     8.368
+    ],
+    [
+     "message.delta",
+     8.368
+    ],
+    [
+     "message.delta",
+     8.369
+    ],
+    [
+     "message.delta",
+     8.369
+    ],
+    [
+     "message.delta",
+     8.37
+    ],
+    [
+     "message.delta",
+     8.371
+    ],
+    [
+     "message.delta",
+     8.371
+    ],
+    [
+     "message.delta",
+     8.372
+    ],
+    [
+     "citation.added",
+     8.886
+    ],
+    [
+     "message.completed",
+     9.049
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c47-310d-7c7b-ae39-d1405fc8e598",
+    "conversation_id": "01a19c47-30f4-7975-b42d-0d152d4dbaf4",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Trong danh mục học phần tự chọn tự do (3/9TC) của chuyên ngành Kỹ thuật Cơ khí (K69ME), học phần Nhập môn về robot có mã 288809 và khối lượng 3 tín chỉ. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c47-5194-7fb7-bb08-58d6fd32de21",
+       "source_id": "8665ae61-305c-7121-83ee-f433a340cf18",
+       "document_version_id": "01a16d41-c8f6-75ea-81e7-91c241856998",
+       "chunk_id": "01a16d41-c92c-755a-bb0d-c1206924ea6d",
+       "source_title": "K70_and_earlier_verify_individual_row — Kỹ thuật cơ khí",
+       "canonical_uri": "https://drive.google.com/file/d/1TdDRa74x8LZLE-bhkFfTKE9vOihIobJN/view?usp=drive_link",
+       "version_label": "public-snapshot-01a16d41-c8f6-75ea-81e7-91c241856998",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "K70_and_earlier_verify_individual_row — Kỹ thuật cơ khí · trang 2 · chars 0:348",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "BỘ GIÁO DỤC VÀ ĐÀO TẠO\n TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI\nKẾ HOẠCH GIẢNG DẠY CHƯƠNG TRÌNH ĐÀO TẠO TRÌNH ĐỘ KỸ SƯ \nNGÀNH KỸ THUẬT CƠ KHÍ\nCHUYÊN NGÀNH KỸ THUẬT CƠ KHÍ (K69ME)\nCác học phần tự chọn tự do (3/9TC)\n288808 – 3\nNhập môn cơ điện tử\n288809 – 3\nNhập môn về robot\n498804 – 3\nPhương pháp số\nNgười lập Trưởng khoa Cơ khí Trưởng phòng Quản lý đào tạo",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "4d1622ad8c52087a4c6b1f46cde8d2d03ee1c736ddbeb394147098df14234f65",
+       "unit_id": "5263f9cc36dbb71c"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Trong danh mục học phần tự chọn tự do (3/9TC) của chuyên ngành Kỹ thuật Cơ khí (K69ME), học phần Nhập môn về robot có mã 288809 và khối lượng 3 tín chỉ. [CIT-001]",
+   "seconds": 9.049238100007642,
+   "user": 0
+  },
+  {
+   "case_id": "R2-A1-0088",
+   "question": "K69ME chọn môn nhập môn robot thì mã gì, mấy tc ạ?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.0362326999893412,
+   "first_content_seconds": 5.351,
+   "started_at": 1793623286.7622375,
+   "conversation_id": "01a19c47-63ee-7e32-8443-6d5c7d474c80",
+   "timeline": [
+    [
+     "message.started",
+     0.036
+    ],
+    [
+     "message.delta",
+     5.351
+    ],
+    [
+     "message.delta",
+     5.352
+    ],
+    [
+     "message.delta",
+     5.352
+    ],
+    [
+     "message.delta",
+     5.353
+    ],
+    [
+     "message.delta",
+     5.354
+    ],
+    [
+     "message.delta",
+     5.354
+    ],
+    [
+     "message.delta",
+     5.355
+    ],
+    [
+     "message.delta",
+     5.356
+    ],
+    [
+     "message.delta",
+     5.356
+    ],
+    [
+     "message.delta",
+     5.357
+    ],
+    [
+     "message.delta",
+     5.358
+    ],
+    [
+     "message.delta",
+     5.358
+    ],
+    [
+     "message.delta",
+     5.359
+    ],
+    [
+     "citation.added",
+     5.552
+    ],
+    [
+     "message.completed",
+     5.611
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c47-6408-763d-a9f6-016e974b3691",
+    "conversation_id": "01a19c47-63ee-7e32-8443-6d5c7d474c80",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Học phần tự chọn tự do \"Nhập môn về robot\" có mã 288809 và khối lượng 3 tín chỉ. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c47-78ce-70f8-bdb6-1a0ddcb5d2bf",
+       "source_id": "8665ae61-305c-7121-83ee-f433a340cf18",
+       "document_version_id": "01a16d41-c8f6-75ea-81e7-91c241856998",
+       "chunk_id": "01a16d41-c92c-755a-bb0d-c1206924ea6d",
+       "source_title": "K70_and_earlier_verify_individual_row — Kỹ thuật cơ khí",
+       "canonical_uri": "https://drive.google.com/file/d/1TdDRa74x8LZLE-bhkFfTKE9vOihIobJN/view?usp=drive_link",
+       "version_label": "public-snapshot-01a16d41-c8f6-75ea-81e7-91c241856998",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "K70_and_earlier_verify_individual_row — Kỹ thuật cơ khí · trang 2 · chars 0:348",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "BỘ GIÁO DỤC VÀ ĐÀO TẠO\n TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI\nKẾ HOẠCH GIẢNG DẠY CHƯƠNG TRÌNH ĐÀO TẠO TRÌNH ĐỘ KỸ SƯ \nNGÀNH KỸ THUẬT CƠ KHÍ\nCHUYÊN NGÀNH KỸ THUẬT CƠ KHÍ (K69ME)\nCác học phần tự chọn tự do (3/9TC)\n288808 – 3\nNhập môn cơ điện tử\n288809 – 3\nNhập môn về robot\n498804 – 3\nPhương pháp số\nNgười lập Trưởng khoa Cơ khí Trưởng phòng Quản lý đào tạo",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "4d1622ad8c52087a4c6b1f46cde8d2d03ee1c736ddbeb394147098df14234f65",
+       "unit_id": "5263f9cc36dbb71c"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Học phần tự chọn tự do \"Nhập môn về robot\" có mã 288809 và khối lượng 3 tín chỉ. [CIT-001]",
+   "seconds": 5.610796900000423,
+   "user": 0
+  },
+  {
+   "case_id": "R2-A1-0125",
+   "question": "Theo khung Kiến trúc phiên bản 2025, Năng lực số cơ bản mang mã gì, có mấy tín chỉ và thuộc khối kiến thức nào?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.05416619998868555,
+   "first_content_seconds": 4.589,
+   "started_at": 1793623296.373423,
+   "conversation_id": "01a19c47-8987-7a71-8cd5-30b4057c7d86",
+   "timeline": [
+    [
+     "message.started",
+     0.054
+    ],
+    [
+     "message.delta",
+     4.589
+    ],
+    [
+     "message.delta",
+     4.589
+    ],
+    [
+     "message.delta",
+     4.59
+    ],
+    [
+     "message.delta",
+     4.591
+    ],
+    [
+     "message.delta",
+     4.591
+    ],
+    [
+     "message.delta",
+     4.592
+    ],
+    [
+     "message.delta",
+     4.592
+    ],
+    [
+     "message.delta",
+     4.593
+    ],
+    [
+     "message.delta",
+     4.594
+    ],
+    [
+     "message.delta",
+     4.594
+    ],
+    [
+     "message.delta",
+     4.595
+    ],
+    [
+     "message.delta",
+     4.595
+    ],
+    [
+     "message.delta",
+     4.596
+    ],
+    [
+     "message.delta",
+     4.597
+    ],
+    [
+     "message.delta",
+     4.597
+    ],
+    [
+     "message.delta",
+     4.598
+    ],
+    [
+     "message.delta",
+     4.598
+    ],
+    [
+     "message.delta",
+     4.599
+    ],
+    [
+     "message.delta",
+     4.6
+    ],
+    [
+     "message.delta",
+     4.6
+    ],
+    [
+     "message.delta",
+     4.601
+    ],
+    [
+     "citation.added",
+     4.68
+    ],
+    [
+     "message.completed",
+     4.699
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c47-89a6-76f1-9a82-76077ec87110",
+    "conversation_id": "01a19c47-8987-7a71-8cd5-30b4057c7d86",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Trong Khung chương trình ngành Kiến trúc phiên bản 2025, học phần Năng lực số cơ bản có mã 458804, 2 tín chỉ và thuộc khối Kiến thức bổ trợ. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c47-9b60-73b7-9c4f-8cda718aea13",
+       "source_id": "8da40ef9-1850-7fa5-878d-86a2eb357674",
+       "document_version_id": "01a16eec-220b-74d9-82a3-94d5c36a8c4e",
+       "chunk_id": "01a16eec-221e-7a24-a7ad-7768321fdced",
+       "source_title": "Khung chương trình ngành Kiến trúc — phiên bản 2025",
+       "canonical_uri": "https://drive.google.com/file/d/1CoFsdOzqixs2B5srF8bFE8mvg3lw1llE/view",
+       "version_label": "public-snapshot-01a16eec-220b-74d9-82a3-94d5c36a8c4e",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Khung chương trình ngành Kiến trúc — phiên bản 2025 · phạm vi đối chiếu đã ghi",
+        "page_start": 1,
+        "page_end": 1
+       },
+       "quote": "KHUNG CHƯƠNG TRÌNH ĐÀO TẠO \nNGÀNH KIẾN TRÚC \nPhiên bản 2025 \nSTT Mã HP Tên học phần Số TC Khối kiến thức\n Học kỳ 1 \n1 651601 Giới thiệu ngành kiến trúc 1 Kiến thức bổ trợ \n2 428801 Triết học Mác - Lênin 3 Giáo dục đại cương\n3 518801 Pháp luật đại cương 2 Giáo dục đại cương\n4 291647 Cơ sở mỹ thuật 1 2 Giáo dục đại cương\n5 390111 Đại số tuyến tính 3 Giáo dục đại cương\n6 301619 Hình họa trong kiến trúc 3 Cơ sở ngành \n7 351640 Diễn họa kiến trúc 1 2 Cơ sở ngành \n8 358841 Cơ sở thiết kế 1 2 Cơ sở",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "2df78432e190a2c85f7fbb077ed6651747fd11fa6fe66b336a5040198a6bf344",
+       "unit_id": "2e8a23b8f6fed8dc"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Trong Khung chương trình ngành Kiến trúc phiên bản 2025, học phần Năng lực số cơ bản có mã 458804, 2 tín chỉ và thuộc khối Kiến thức bổ trợ. [CIT-001]",
+   "seconds": 4.699161099997582,
+   "user": 0
+  },
+  {
+   "case_id": "R2-A1-0126",
+   "question": "Theo khung Kien truc phien ban 2025, Nang luc so co ban mang ma gi, co may tin chi va thuoc khoi kien thuc nao?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04084090000833385,
+   "first_content_seconds": 4.487,
+   "started_at": 1793623305.0730107,
+   "conversation_id": "01a19c47-ab76-78a1-a391-cbee17bf9814",
+   "timeline": [
+    [
+     "message.started",
+     0.041
+    ],
+    [
+     "message.delta",
+     4.487
+    ],
+    [
+     "message.delta",
+     4.487
+    ],
+    [
+     "message.delta",
+     4.488
+    ],
+    [
+     "message.delta",
+     4.489
+    ],
+    [
+     "message.delta",
+     4.489
+    ],
+    [
+     "message.delta",
+     4.49
+    ],
+    [
+     "message.delta",
+     4.491
+    ],
+    [
+     "message.delta",
+     4.491
+    ],
+    [
+     "message.delta",
+     4.492
+    ],
+    [
+     "message.delta",
+     4.492
+    ],
+    [
+     "message.delta",
+     4.493
+    ],
+    [
+     "message.delta",
+     4.494
+    ],
+    [
+     "message.delta",
+     4.494
+    ],
+    [
+     "message.delta",
+     4.495
+    ],
+    [
+     "message.delta",
+     4.495
+    ],
+    [
+     "message.delta",
+     4.496
+    ],
+    [
+     "message.delta",
+     4.497
+    ],
+    [
+     "message.delta",
+     4.497
+    ],
+    [
+     "message.delta",
+     4.498
+    ],
+    [
+     "message.delta",
+     4.498
+    ],
+    [
+     "message.delta",
+     4.499
+    ],
+    [
+     "citation.added",
+     4.607
+    ],
+    [
+     "message.completed",
+     4.635
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c47-ab94-74f5-9fa0-d872bb4d61c7",
+    "conversation_id": "01a19c47-ab76-78a1-a391-cbee17bf9814",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Trong Khung chương trình ngành Kiến trúc phiên bản 2025, học phần Năng lực số cơ bản có mã 458804, 2 tín chỉ và thuộc khối Kiến thức bổ trợ. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c47-bcf6-79d8-aa5b-483d97c4a18a",
+       "source_id": "8da40ef9-1850-7fa5-878d-86a2eb357674",
+       "document_version_id": "01a16eec-220b-74d9-82a3-94d5c36a8c4e",
+       "chunk_id": "01a16eec-221e-7a24-a7ad-7768321fdced",
+       "source_title": "Khung chương trình ngành Kiến trúc — phiên bản 2025",
+       "canonical_uri": "https://drive.google.com/file/d/1CoFsdOzqixs2B5srF8bFE8mvg3lw1llE/view",
+       "version_label": "public-snapshot-01a16eec-220b-74d9-82a3-94d5c36a8c4e",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Khung chương trình ngành Kiến trúc — phiên bản 2025 · phạm vi đối chiếu đã ghi",
+        "page_start": 1,
+        "page_end": 1
+       },
+       "quote": "KHUNG CHƯƠNG TRÌNH ĐÀO TẠO \nNGÀNH KIẾN TRÚC \nPhiên bản 2025 \nSTT Mã HP Tên học phần Số TC Khối kiến thức\n Học kỳ 1 \n1 651601 Giới thiệu ngành kiến trúc 1 Kiến thức bổ trợ \n2 428801 Triết học Mác - Lênin 3 Giáo dục đại cương\n3 518801 Pháp luật đại cương 2 Giáo dục đại cương\n4 291647 Cơ sở mỹ thuật 1 2 Giáo dục đại cương\n5 390111 Đại số tuyến tính 3 Giáo dục đại cương\n6 301619 Hình họa trong kiến trúc 3 Cơ sở ngành \n7 351640 Diễn họa kiến trúc 1 2 Cơ sở ngành \n8 358841 Cơ sở thiết kế 1 2 Cơ sở",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "2df78432e190a2c85f7fbb077ed6651747fd11fa6fe66b336a5040198a6bf344",
+       "unit_id": "2e8a23b8f6fed8dc"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Trong Khung chương trình ngành Kiến trúc phiên bản 2025, học phần Năng lực số cơ bản có mã 458804, 2 tín chỉ và thuộc khối Kiến thức bổ trợ. [CIT-001]",
+   "seconds": 4.634657500020694,
+   "user": 0
+  },
+  {
+   "case_id": "R2-A2-0013",
+   "question": "Ở Kinh tế xây dựng Anh ngữ K71KTE, đồ án tốt nghiệp có mã gì và bao nhiêu tín chỉ?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04025469999760389,
+   "first_content_seconds": 4.527,
+   "started_at": 1793623313.7079718,
+   "conversation_id": "01a19c47-cd31-75da-b7c0-a96afac9a5b5",
+   "timeline": [
+    [
+     "message.started",
+     0.04
+    ],
+    [
+     "message.delta",
+     4.527
+    ],
+    [
+     "message.delta",
+     4.528
+    ],
+    [
+     "message.delta",
+     4.528
+    ],
+    [
+     "message.delta",
+     4.53
+    ],
+    [
+     "message.delta",
+     4.53
+    ],
+    [
+     "message.delta",
+     4.531
+    ],
+    [
+     "message.delta",
+     4.531
+    ],
+    [
+     "message.delta",
+     4.532
+    ],
+    [
+     "citation.added",
+     4.595
+    ],
+    [
+     "message.completed",
+     4.608
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c47-cd4e-7449-aca2-86a2d08e138b",
+    "conversation_id": "01a19c47-cd31-75da-b7c0-a96afac9a5b5",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Đồ án tốt nghiệp có mã 361883 và 10 tín chỉ. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c47-ded9-7646-be72-180b52840454",
+       "source_id": "878730a5-2e55-75f3-8395-16c8da02b5ab",
+       "document_version_id": "01a16d41-ca46-7863-8620-217c945182ec",
+       "chunk_id": "01a16d41-ca53-7503-b856-0942b8f662cf",
+       "source_title": "Kế hoạch giảng dạy CTĐT trình độ kỹ sư — Ngành Kinh tế xây dựng Anh ngữ (K71KTE)",
+       "canonical_uri": "https://drive.google.com/file/d/1Aec4GHt4PYT8fLTQm80EgjN87_3qS8IG/view?usp=sharing",
+       "version_label": "public-snapshot-01a16d41-ca46-7863-8620-217c945182ec",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Kế hoạch giảng dạy CTĐT trình độ kỹ sư — Ngành Kinh tế xây dựng Anh ngữ (K71KTE) · trang 1 · chars 0:3477",
+        "page_start": 1,
+        "page_end": 1
+       },
+       "quote": "\nSXKD \n511801 – 3 \nCông nghệ số và Mô \nhình thông tin công \ntrình\n091801 – 2 \nĐánh giá tác động môi \ntrường – xã hội của dự \nán đầu tư XD\n361882 – 8 \nThực tập tốt \nnghiệp\n250103 – 1 \nThực hành Vật lý 396602 – 2 \nGiải tích 2\n060223– 2 \nSức bền VL1 \n(học block 1)\n310702– 3 \nKiến trúc dân dụng \nvà công nghiệp\n410113 – 2 \nLịch sử Đảng \nCSVN\n361456 –2 \nKinh tế XD 2 & \nngh.vụ đấu thầu\n361801 – 3 \nKhoa học quản lý, \nquản trị\n381801 –2 \nTiêu chuẩn và định \nmức XD\n361883 – 10 \nĐồ án tốt nghiệp\n4801xx – 8",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "3a23048ecae53b2cb0b5d835c6d2f1e253a1bfc7ec576ab4ac10fcfe0ca80cd5",
+       "unit_id": "4c822148e463ef33"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Đồ án tốt nghiệp có mã 361883 và 10 tín chỉ. [CIT-001]",
+   "seconds": 4.6084793000190984,
+   "user": 0
+  },
+  {
+   "case_id": "R2-A2-0016",
+   "question": "K71KTE ĐA tốt nghiệp mã j, mấy tc z mn?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.053360699996119365,
+   "first_content_seconds": 5.891,
+   "started_at": 1793623322.3168733,
+   "conversation_id": "01a19c47-eedb-7c00-9f1b-1e86e612c218",
+   "timeline": [
+    [
+     "message.started",
+     0.053
+    ],
+    [
+     "message.delta",
+     5.891
+    ],
+    [
+     "message.delta",
+     5.891
+    ],
+    [
+     "message.delta",
+     5.892
+    ],
+    [
+     "message.delta",
+     5.893
+    ],
+    [
+     "message.delta",
+     5.893
+    ],
+    [
+     "message.delta",
+     5.894
+    ],
+    [
+     "message.delta",
+     5.894
+    ],
+    [
+     "message.delta",
+     5.895
+    ],
+    [
+     "message.delta",
+     5.896
+    ],
+    [
+     "message.delta",
+     5.896
+    ],
+    [
+     "message.delta",
+     5.897
+    ],
+    [
+     "message.delta",
+     5.898
+    ],
+    [
+     "message.delta",
+     5.898
+    ],
+    [
+     "message.delta",
+     5.899
+    ],
+    [
+     "message.delta",
+     5.9
+    ],
+    [
+     "message.delta",
+     5.9
+    ],
+    [
+     "message.delta",
+     5.901
+    ],
+    [
+     "message.delta",
+     5.901
+    ],
+    [
+     "message.delta",
+     5.902
+    ],
+    [
+     "message.delta",
+     5.903
+    ],
+    [
+     "message.delta",
+     5.903
+    ],
+    [
+     "message.delta",
+     5.904
+    ],
+    [
+     "message.delta",
+     5.904
+    ],
+    [
+     "message.delta",
+     5.905
+    ],
+    [
+     "message.delta",
+     5.906
+    ],
+    [
+     "message.delta",
+     5.906
+    ],
+    [
+     "message.delta",
+     5.907
+    ],
+    [
+     "message.delta",
+     5.907
+    ],
+    [
+     "message.delta",
+     5.908
+    ],
+    [
+     "message.delta",
+     5.909
+    ],
+    [
+     "message.delta",
+     5.909
+    ],
+    [
+     "message.delta",
+     5.91
+    ],
+    [
+     "message.delta",
+     5.911
+    ],
+    [
+     "citation.added",
+     6.131
+    ],
+    [
+     "message.completed",
+     6.199
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c47-eefb-770e-b070-a2040cc952a8",
+    "conversation_id": "01a19c47-eedb-7c00-9f1b-1e86e612c218",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Chương trình Kinh tế xây dựng Anh ngữ (K71KTE) có học phần Đồ án tốt nghiệp mã 361883 – 10 tín chỉ. [CIT-001]\nTổng số tín chỉ của chương trình K71KTE là 190TC (không tính học phần Giáo dục thể chất, Giáo dục quốc phòng và An ninh). [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c48-05ce-7d3b-b32b-cbf5c6350a35",
+       "source_id": "878730a5-2e55-75f3-8395-16c8da02b5ab",
+       "document_version_id": "01a16d41-ca46-7863-8620-217c945182ec",
+       "chunk_id": "01a16d41-ca53-7503-b856-0942b8f662cf",
+       "source_title": "Kế hoạch giảng dạy CTĐT trình độ kỹ sư — Ngành Kinh tế xây dựng Anh ngữ (K71KTE)",
+       "canonical_uri": "https://drive.google.com/file/d/1Aec4GHt4PYT8fLTQm80EgjN87_3qS8IG/view?usp=sharing",
+       "version_label": "public-snapshot-01a16d41-ca46-7863-8620-217c945182ec",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Kế hoạch giảng dạy CTĐT trình độ kỹ sư — Ngành Kinh tế xây dựng Anh ngữ (K71KTE) · trang 1 · chars 0:3477",
+        "page_start": 1,
+        "page_end": 1
+       },
+       "quote": "Anh 6\n580108 –2 \nTiếng Anh 8\n580109 –2 \nTiếng Anh 9\n \n \n100203– 2 \nCấp thoát nước và \nHTKT trong công \ntrình\n \n \n \n430101 – 1 \nGiáo dục thể chất 1\n430102 – 1 \nGiáo dục thể chất 2\n430103 – 1 \nGiáo dục thể chất 3 \n \n15 20 23 24 24 23 22 21 18 \nTổng: 190TC (Không tính HP giáo dục thể chất, Giáo dục quốc phòng và An ninh) \nGhi chú và kí hiệu: Học phần tiên quyết Học phần; Học phần song hành; \nNgười lập Trưởng khoa Kinh tế & QLXD Trưởng phòng Quản lý đào tạo \nNGÀNH KINH TẾ XÂY DỰNG ANH NGỮ (K71KTE)",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "3a23048ecae53b2cb0b5d835c6d2f1e253a1bfc7ec576ab4ac10fcfe0ca80cd5",
+       "unit_id": "4c822148e463ef33"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Chương trình Kinh tế xây dựng Anh ngữ (K71KTE) có học phần Đồ án tốt nghiệp mã 361883 – 10 tín chỉ. [CIT-001]\nTổng số tín chỉ của chương trình K71KTE là 190TC (không tính học phần Giáo dục thể chất, Giáo dục quốc phòng và An ninh). [CIT-001]",
+   "seconds": 6.199007099989103,
+   "user": 0
+  },
+  {
+   "case_id": "R2-A2-0041",
+   "question": "Chuyên ngành Đường sắt tốc độ cao và đường sắt đô thị K71CDS có môn Quy hoạch theo mô hình TOD mã gì, mấy tín chỉ?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03519100000266917,
+   "first_content_seconds": 4.103,
+   "started_at": 1793623332.516146,
+   "conversation_id": "01a19c48-16a7-7baa-b2d1-45850023c84d",
+   "timeline": [
+    [
+     "message.started",
+     0.035
+    ],
+    [
+     "message.delta",
+     4.103
+    ],
+    [
+     "message.delta",
+     4.104
+    ],
+    [
+     "message.delta",
+     4.104
+    ],
+    [
+     "message.delta",
+     4.105
+    ],
+    [
+     "message.delta",
+     4.106
+    ],
+    [
+     "message.delta",
+     4.106
+    ],
+    [
+     "message.delta",
+     4.107
+    ],
+    [
+     "message.delta",
+     4.107
+    ],
+    [
+     "message.delta",
+     4.108
+    ],
+    [
+     "message.delta",
+     4.108
+    ],
+    [
+     "message.delta",
+     4.109
+    ],
+    [
+     "message.delta",
+     4.109
+    ],
+    [
+     "message.delta",
+     4.11
+    ],
+    [
+     "citation.added",
+     4.172
+    ],
+    [
+     "message.completed",
+     4.185
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-16c2-7b97-81e6-64b973e10f8d",
+    "conversation_id": "01a19c48-16a7-7baa-b2d1-45850023c84d",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Môn Quy hoạch theo mô hình TOD trong chương trình K71CDS có mã 320701 – 2 tín chỉ. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c48-26a9-7fa5-a6bb-d6e36f672309",
+       "source_id": "8f0036ec-e1e2-7795-8596-0ca7a7207c15",
+       "document_version_id": "01a16d41-cbd5-7c31-9712-e98ab7739571",
+       "chunk_id": "01a16d41-cbdf-7f8e-97b4-ef61c2606bcf",
+       "source_title": "Kế hoạch giảng dạy chương trình đào tạo trình độ kỹ sư — Ngành Kỹ thuật xây dựng công trình giao thông — Chuyên ngành Đường sắt tốc độ cao và đường sắt đô thị (K71CDS)",
+       "canonical_uri": "https://drive.google.com/file/d/1U-93xUeullMrtymml2QoGxu0lgnCckcj/view?usp=drive_link",
+       "version_label": "public-snapshot-01a16d41-cbd5-7c31-9712-e98ab7739571",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Kế hoạch giảng dạy chương trình đào tạo trình độ kỹ sư — Ngành Kỹ thuật xây dựng công trình giao thông — Chuyên ngành Đường sắt tốc độ cao và đường sắt đô thị (K71CDS) · trang 1 · chars 0:3248",
+        "page_start": 1,
+        "page_end": 1
+       },
+       "quote": "Xác suất thống kê\n040212 – 3\nKết cấu bê tông cốt \nthép \n050211 – 2\nKết cấu thép 1\n160703 – 1\nĐồ án Thiết kế tuyến \nđường sắt\n320701 – 2\nQuy hoạch theo mô \nhình TOD\n160712 – 2\nXây dựng đường \nsắt\n250101 – 3\nVật lí 1\n250102 – 2\nVật lí 2\nGiáo dục TC3 -\n1TC\n040213 – 1\nĐồ án Kết cấu bê \ntông cốt thép\n418802 – 2\nTư tưởng \nHồ Chí Minh\n160704 – 3\nCông trình nền đường \nvà KC thượng tầng \nđường sắt \n160471 – 2\nQuy hoạch và PT hệ\nthống giao thông VT\n120303 – 2\nPP phần tử HH \ntrong PTKC và \nCT ngầm\n510211 –",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "351091762df97a8a11ab196c6e0aa381b37940e8a3b15f2948bdff94f6837911",
+       "unit_id": "1ff04553e8667426"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Môn Quy hoạch theo mô hình TOD trong chương trình K71CDS có mã 320701 – 2 tín chỉ. [CIT-001]",
+   "seconds": 4.185358799993992,
+   "user": 0
+  },
+  {
+   "case_id": "R2-N-0003",
+   "question": "Đại học Thủy lợi chuyển ngành",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03870120001374744,
+   "first_content_seconds": 1.43,
+   "started_at": 1793623340.7017915,
+   "conversation_id": "01a19c48-36a2-720d-aee7-fe8602650558",
+   "timeline": [
+    [
+     "message.started",
+     0.039
+    ],
+    [
+     "message.delta",
+     1.43
+    ],
+    [
+     "message.delta",
+     1.431
+    ],
+    [
+     "message.delta",
+     1.432
+    ],
+    [
+     "message.delta",
+     1.433
+    ],
+    [
+     "message.delta",
+     1.434
+    ],
+    [
+     "message.delta",
+     1.434
+    ],
+    [
+     "message.delta",
+     1.435
+    ],
+    [
+     "message.delta",
+     1.436
+    ],
+    [
+     "message.completed",
+     1.465
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-36c0-75c5-9d0c-15f004c326b8",
+    "conversation_id": "01a19c48-36a2-720d-aee7-fe8602650558",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Câu hỏi này nằm ngoài phạm vi thông tin mình hỗ trợ.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Câu hỏi này nằm ngoài phạm vi thông tin mình hỗ trợ.",
+   "seconds": 1.4650860000110697,
+   "user": 0
+  },
+  {
+   "case_id": "R2-N-0018",
+   "question": "Chi cach trong lan ho diep de cay ra hoa dung Tet.",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04244050002307631,
+   "first_content_seconds": 1.933,
+   "started_at": 1793623346.1674292,
+   "conversation_id": "01a19c48-4c01-71bd-94c0-650653649a5f",
+   "timeline": [
+    [
+     "message.started",
+     0.042
+    ],
+    [
+     "message.delta",
+     1.933
+    ],
+    [
+     "message.delta",
+     1.934
+    ],
+    [
+     "message.delta",
+     1.936
+    ],
+    [
+     "message.delta",
+     1.937
+    ],
+    [
+     "message.delta",
+     1.937
+    ],
+    [
+     "message.delta",
+     1.938
+    ],
+    [
+     "message.delta",
+     1.939
+    ],
+    [
+     "message.delta",
+     1.94
+    ],
+    [
+     "message.delta",
+     1.94
+    ],
+    [
+     "message.delta",
+     1.941
+    ],
+    [
+     "message.delta",
+     1.942
+    ],
+    [
+     "message.delta",
+     1.942
+    ],
+    [
+     "message.completed",
+     1.967
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-4c1c-7f86-91cc-51ae7c1b8b3e",
+    "conversation_id": "01a19c48-4c01-71bd-94c0-650653649a5f",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Hiện tại hệ thống chưa hỗ trợ nội dung này hoặc chưa tìm thấy tài liệu liên quan.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Hiện tại hệ thống chưa hỗ trợ nội dung này hoặc chưa tìm thấy tài liệu liên quan.",
+   "seconds": 1.9674966000020504,
+   "user": 0
+  },
+  {
+   "case_id": "R2-N-0030",
+   "question": "Gan HUCE co dich vu cham soc nguoi cao tuoi tai nha khong?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04414479999104515,
+   "first_content_seconds": 4.924,
+   "started_at": 1793623352.1353674,
+   "conversation_id": "01a19c48-6351-7c24-b3d7-7cfd68bd5d51",
+   "timeline": [
+    [
+     "message.started",
+     0.044
+    ],
+    [
+     "message.delta",
+     4.924
+    ],
+    [
+     "message.delta",
+     4.924
+    ],
+    [
+     "message.delta",
+     4.925
+    ],
+    [
+     "message.delta",
+     4.925
+    ],
+    [
+     "message.delta",
+     4.926
+    ],
+    [
+     "message.delta",
+     4.927
+    ],
+    [
+     "message.delta",
+     4.927
+    ],
+    [
+     "message.delta",
+     4.928
+    ],
+    [
+     "message.delta",
+     4.929
+    ],
+    [
+     "message.completed",
+     5.319
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-636e-721f-9f80-312b51b833b3",
+    "conversation_id": "01a19c48-6351-7c24-b3d7-7cfd68bd5d51",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "seconds": 5.319094199978281,
+   "user": 0
+  },
+  {
+   "case_id": "R2-N-0042",
+   "question": "em thiếu cái đó thì ntn ạ?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03152140000020154,
+   "first_content_seconds": 1.776,
+   "started_at": 1793623361.4549167,
+   "conversation_id": "01a19c48-87b2-74b9-a5b3-2eba29dc1192",
+   "timeline": [
+    [
+     "message.started",
+     0.032
+    ],
+    [
+     "message.delta",
+     1.776
+    ],
+    [
+     "message.delta",
+     1.776
+    ],
+    [
+     "message.delta",
+     1.777
+    ],
+    [
+     "message.delta",
+     1.778
+    ],
+    [
+     "message.delta",
+     1.779
+    ],
+    [
+     "message.delta",
+     1.779
+    ],
+    [
+     "message.delta",
+     1.78
+    ],
+    [
+     "message.delta",
+     1.78
+    ],
+    [
+     "message.delta",
+     1.781
+    ],
+    [
+     "message.delta",
+     1.782
+    ],
+    [
+     "message.delta",
+     1.783
+    ],
+    [
+     "message.delta",
+     1.783
+    ],
+    [
+     "message.delta",
+     1.784
+    ],
+    [
+     "message.delta",
+     1.784
+    ],
+    [
+     "message.delta",
+     1.785
+    ],
+    [
+     "message.delta",
+     1.786
+    ],
+    [
+     "message.delta",
+     1.786
+    ],
+    [
+     "message.completed",
+     1.825
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-87c9-7905-8164-db48dab3e69f",
+    "conversation_id": "01a19c48-87b2-74b9-a5b3-2eba29dc1192",
+    "status": "abstained",
+    "response_class": "clarification_request",
+    "content": "Câu hỏi chưa rõ nội dung. Bạn muốn hỏi về học phí, học bổng, đăng ký học phần, bảo lưu, tốt nghiệp hay ký túc xá?",
+    "citations": []
+   },
+   "outcome_class": "clarify",
+   "answer_text": "Câu hỏi chưa rõ nội dung. Bạn muốn hỏi về học phí, học bổng, đăng ký học phần, bảo lưu, tốt nghiệp hay ký túc xá?",
+   "seconds": 1.825109600002179,
+   "user": 0
+  },
+  {
+   "case_id": "R2-N-0053",
+   "question": "Hồ sơ việc kia",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.036423099983949214,
+   "first_content_seconds": 1.838,
+   "started_at": 1793623367.2806182,
+   "conversation_id": "01a19c48-9e75-7ab3-95a6-41f90f6ab4c2",
+   "timeline": [
+    [
+     "message.started",
+     0.036
+    ],
+    [
+     "message.delta",
+     1.838
+    ],
+    [
+     "message.delta",
+     1.838
+    ],
+    [
+     "message.delta",
+     1.84
+    ],
+    [
+     "message.delta",
+     1.841
+    ],
+    [
+     "message.delta",
+     1.841
+    ],
+    [
+     "message.delta",
+     1.842
+    ],
+    [
+     "message.delta",
+     1.842
+    ],
+    [
+     "message.delta",
+     1.843
+    ],
+    [
+     "message.delta",
+     1.844
+    ],
+    [
+     "message.delta",
+     1.844
+    ],
+    [
+     "message.delta",
+     1.845
+    ],
+    [
+     "message.delta",
+     1.845
+    ],
+    [
+     "message.completed",
+     1.869
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-9e8f-7d0d-8607-c806ee64f950",
+    "conversation_id": "01a19c48-9e75-7ab3-95a6-41f90f6ab4c2",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Hiện tại hệ thống chưa hỗ trợ nội dung này hoặc chưa tìm thấy tài liệu liên quan.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Hiện tại hệ thống chưa hỗ trợ nội dung này hoặc chưa tìm thấy tài liệu liên quan.",
+   "seconds": 1.8689761999994516,
+   "user": 0
+  },
+  {
+   "case_id": "R2-N-0068",
+   "question": "em có Unity Certified User thì HUCE miễn môn đồ họa đc ko?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.0417250000173226,
+   "first_content_seconds": 1.597,
+   "started_at": 1793623373.149882,
+   "conversation_id": "01a19c48-b561-7cd5-8a35-82201b45ddf3",
+   "timeline": [
+    [
+     "message.started",
+     0.042
+    ],
+    [
+     "message.delta",
+     1.597
+    ],
+    [
+     "message.delta",
+     1.598
+    ],
+    [
+     "message.delta",
+     1.599
+    ],
+    [
+     "message.delta",
+     1.599
+    ],
+    [
+     "message.delta",
+     1.6
+    ],
+    [
+     "message.delta",
+     1.6
+    ],
+    [
+     "message.delta",
+     1.601
+    ],
+    [
+     "message.delta",
+     1.602
+    ],
+    [
+     "message.delta",
+     1.602
+    ],
+    [
+     "message.delta",
+     1.603
+    ],
+    [
+     "message.delta",
+     1.603
+    ],
+    [
+     "message.delta",
+     1.604
+    ],
+    [
+     "message.delta",
+     1.605
+    ],
+    [
+     "message.completed",
+     1.634
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-b582-74ae-a24d-3697611ff279",
+    "conversation_id": "01a19c48-b561-7cd5-8a35-82201b45ddf3",
+    "status": "abstained",
+    "response_class": "clarification_request",
+    "content": "Bạn muốn hỏi điều kiện miễn học phí, miễn thi, miễn học phần, ngoại ngữ hay giáo dục thể chất?",
+    "citations": []
+   },
+   "outcome_class": "clarify",
+   "answer_text": "Bạn muốn hỏi điều kiện miễn học phí, miễn thi, miễn học phần, ngoại ngữ hay giáo dục thể chất?",
+   "seconds": 1.6337003000080585,
+   "user": 0
+  },
+  {
+   "case_id": "R2-N-0072",
+   "question": "em nộp TOEFL Essentials thì HUCE xét miễn tiếng Anh ntn ạ?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04156159999547526,
+   "first_content_seconds": 1.334,
+   "started_at": 1793623378.7842433,
+   "conversation_id": "01a19c48-cb69-70c5-99c9-cfef031d3742",
+   "timeline": [
+    [
+     "message.started",
+     0.042
+    ],
+    [
+     "message.delta",
+     1.334
+    ],
+    [
+     "message.delta",
+     1.335
+    ],
+    [
+     "message.delta",
+     1.335
+    ],
+    [
+     "message.delta",
+     1.336
+    ],
+    [
+     "message.delta",
+     1.337
+    ],
+    [
+     "message.delta",
+     1.337
+    ],
+    [
+     "message.delta",
+     1.338
+    ],
+    [
+     "message.delta",
+     1.339
+    ],
+    [
+     "message.delta",
+     1.34
+    ],
+    [
+     "message.delta",
+     1.34
+    ],
+    [
+     "message.delta",
+     1.341
+    ],
+    [
+     "message.delta",
+     1.342
+    ],
+    [
+     "message.delta",
+     1.342
+    ],
+    [
+     "message.completed",
+     1.373
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-cb83-741a-86ef-8173b8639ae4",
+    "conversation_id": "01a19c48-cb69-70c5-99c9-cfef031d3742",
+    "status": "abstained",
+    "response_class": "clarification_request",
+    "content": "Bạn muốn hỏi điều kiện miễn học phí, miễn thi, miễn học phần, ngoại ngữ hay giáo dục thể chất?",
+    "citations": []
+   },
+   "outcome_class": "clarify",
+   "answer_text": "Bạn muốn hỏi điều kiện miễn học phí, miễn thi, miễn học phần, ngoại ngữ hay giáo dục thể chất?",
+   "seconds": 1.3735464999917895,
+   "user": 0
+  },
+  {
+   "case_id": "R2-N-0101",
+   "question": "Tỷ lệ tốt nghiệp đúng hạn của ngành Kiến trúc HUCE trong năm 2025 là bao nhiêu phần trăm?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.053212800004985183,
+   "first_content_seconds": 5.822,
+   "started_at": 1793623384.1582332,
+   "conversation_id": "01a19c48-e06e-7caf-9546-afb563ac217e",
+   "timeline": [
+    [
+     "message.started",
+     0.053
+    ],
+    [
+     "message.delta",
+     5.822
+    ],
+    [
+     "message.delta",
+     5.823
+    ],
+    [
+     "message.delta",
+     5.823
+    ],
+    [
+     "message.delta",
+     5.824
+    ],
+    [
+     "message.delta",
+     5.825
+    ],
+    [
+     "message.delta",
+     5.825
+    ],
+    [
+     "message.delta",
+     5.826
+    ],
+    [
+     "message.delta",
+     5.826
+    ],
+    [
+     "message.delta",
+     5.827
+    ],
+    [
+     "message.completed",
+     6.241
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c48-e08d-7454-bf1a-dd28970f1c2e",
+    "conversation_id": "01a19c48-e06e-7caf-9546-afb563ac217e",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "seconds": 6.240943200013135,
+   "user": 0
+  }
+ ]
+}

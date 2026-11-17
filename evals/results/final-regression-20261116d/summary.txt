@@ -1,0 +1,6 @@
+main: exit 1, 4 failed, 4814 passed, 48 skipped, 5 xfailed, 2 warnings, 16 subtests passed in 1023.21s (0:17:03) (1030 s)
+stream-c: exit 0, 109 passed in 42.20s (46 s)
+staff-12: exit 0, 38 passed in 20.94s (25 s)
+stream-a: exit 0, 42 passed in 34.67s (38 s)
+stream-b: exit 0, 57 passed in 20.98s (24 s)
+completion: exit 0, 18 passed in 4.89s (8 s)

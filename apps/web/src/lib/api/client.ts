@@ -20,7 +20,9 @@ export class ApiClientError extends Error {
   readonly problem: ProblemDetails;
 
   constructor(problem: ProblemDetails) {
-    super(problem.detail || problem.title || "API Error");
+    super(problem.status === 401 || problem.code === "AUTHENTICATION_REQUIRED"
+      ? "Phiên đăng nhập đã hết hạn hoặc chưa hợp lệ. Vui lòng đăng nhập lại."
+      : problem.detail || problem.title || "API Error");
     this.name = "ApiClientError";
     this.problem = problem;
     Object.setPrototypeOf(this, ApiClientError.prototype);
@@ -38,17 +40,8 @@ export class ApiClient {
 
   constructor(config: ApiClientConfig = {}) {
     this.baseUrl = (config.baseUrl || "").replace(/\/$/, "");
-    let token: string | null = null;
-    try {
-      if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
-        token = window.localStorage.getItem("campus247_token");
-      }
-    } catch {
-      // ignore
-    }
     this.defaultHeaders = {
       Accept: "application/json, application/problem+json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...config.defaultHeaders,
     };
   }
@@ -115,12 +108,14 @@ export class ApiClient {
           type: json.type || "https://campus247.example/problems/unknown",
           title: json.title || "Lỗi máy chủ",
           status: json.status || response.status,
-          detail: json.detail || "Đã xảy ra lỗi khi xử lý yêu cầu.",
+          detail: typeof json.detail === "string" ? json.detail : "Máy chủ yêu cầu kiểm tra các trường trong biểu mẫu.",
           code: json.code || "INTERNAL_ERROR",
           instance: json.instance,
           request_id: json.request_id || requestId,
           retryable: json.retryable ?? false,
-          errors: json.errors,
+          errors: json.errors || (Array.isArray(json.detail) ? json.detail.map((e: { loc?: Array<string | number>; msg?: string; type?: string }) => ({
+            pointer: "/" + (e.loc || []).join("/"), detail: e.msg || "Trường không hợp lệ", code: e.type || "VALIDATION_ERROR",
+          })) : undefined),
         };
       } catch {
         problem = {

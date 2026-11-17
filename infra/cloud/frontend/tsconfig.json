@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "downlevelIteration": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": false,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./src/*"],
+      "react": ["__ROOT__/apps/web/node_modules/@types/react/index.d.ts"],
+      "react/*": ["__ROOT__/apps/web/node_modules/@types/react/*"],
+      "react-dom": ["__ROOT__/apps/web/node_modules/@types/react-dom/index.d.ts"],
+      "react-dom/*": ["__ROOT__/apps/web/node_modules/@types/react-dom/*"],
+      "*": ["__ROOT__/apps/web/node_modules/*"]
+    },
+    "typeRoots": ["__ROOT__/apps/web/node_modules/@types"]
+  },
+  "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
+}

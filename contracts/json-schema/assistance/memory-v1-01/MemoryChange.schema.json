@@ -1,0 +1,207 @@
+{
+  "$defs": {
+    "MemoryValue": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "assistant-memory.v1",
+          "default": "assistant-memory.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "preference",
+            "goal",
+            "confirmed_fact"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "topic": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "purpose": {
+          "const": "personal_assistance",
+          "default": "personal_assistance",
+          "title": "Purpose",
+          "type": "string"
+        },
+        "scope": {
+          "default": "actor",
+          "enum": [
+            "actor",
+            "resource"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "resource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResourceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "grant_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grant Id"
+        },
+        "valid_until": {
+          "title": "Valid Until",
+          "type": "string"
+        },
+        "origin": {
+          "const": "explicit_actor_declaration",
+          "default": "explicit_actor_declaration",
+          "title": "Origin",
+          "type": "string"
+        },
+        "action_authority": {
+          "const": "none",
+          "default": "none",
+          "title": "Action Authority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "topic",
+        "text",
+        "valid_until"
+      ],
+      "title": "MemoryValue",
+      "type": "object"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "operation": {
+      "enum": [
+        "save",
+        "forget",
+        "control"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "expected_version": {
+      "minimum": 0,
+      "title": "Expected Version",
+      "type": "integer"
+    },
+    "conversation_id": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Conversation Id"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MemoryValue"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "key": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Key"
+    },
+    "enabled": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Enabled"
+    }
+  },
+  "required": [
+    "operation",
+    "client_id",
+    "expected_version"
+  ],
+  "title": "MemoryChange",
+  "type": "object"
+}

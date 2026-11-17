@@ -7,6 +7,7 @@ describe("StaffTicketQueue Enhanced Checklist & AI Support", () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    localStorage.clear();
   });
 
   const mockItems: StaffQueueItem[] = [
@@ -77,6 +78,13 @@ describe("StaffTicketQueue Enhanced Checklist & AI Support", () => {
     expect(screen.getByText(/Đề xuất câu trả lời nhanh/i)).toBeDefined();
   });
 
+  it("does not assert duplicate checks or processing deadlines without source evidence", () => {
+    render(<StaffTicketQueue items={mockItems} currentStaffId="staff-huce-01" />);
+    fireEvent.click(screen.getByRole("button", { name: /Chi tiết TCK-2026-0101/i }));
+    expect(screen.queryByText(/Không phát hiện hồ sơ trùng lặp trong hệ thống/)).toBeNull();
+    expect(screen.queryByText(/cần xử lý trong 24h/)).toBeNull();
+  });
+
   it("supports transferring case to another department with reason", () => {
     const handleTransfer = vi.fn();
     render(
@@ -84,6 +92,7 @@ describe("StaffTicketQueue Enhanced Checklist & AI Support", () => {
         items={mockItems}
         currentStaffId="staff-huce-01"
         onTransferTicket={handleTransfer}
+        businessActionsAvailable
       />
     );
 
@@ -119,12 +128,14 @@ describe("StaffTicketQueue Enhanced Checklist & AI Support", () => {
 
     // AI Draft Modal should be rendered
     expect(screen.getByRole("heading", { name: /Trợ lý AI Soạn Thảo Phản Hồi Cho Sinh Viên/i })).toBeDefined();
-    expect(screen.getByDisplayValue(/Kính gửi sinh viên Trần Văn B/i)).toBeDefined();
+    expect(screen.getByDisplayValue(/Bản nháp cần cán bộ kiểm tra\.[\s\S]*Chào bạn Trần Văn B/i)).toBeDefined();
+    expect(screen.queryByDisplayValue(/đã tiếp nhận|24 giờ|48 giờ/i)).toBeNull();
 
     // Switch template to supplement request
     const supplementTab = screen.getByRole("button", { name: /Yêu cầu bổ sung hồ sơ/i });
     fireEvent.click(supplementTab);
-    expect(screen.getByDisplayValue(/còn thiếu minh chứng/i)).toBeDefined();
+    expect(screen.getByDisplayValue(/Cán bộ ghi rõ thông tin cần bổ sung/)).toBeDefined();
+    expect(screen.queryByDisplayValue(/còn thiếu minh chứng/)).toBeNull();
 
     // Close dialog
     const closeBtn = screen.getByRole("button", { name: /Đóng hộp thoại/i });
@@ -143,7 +154,7 @@ describe("StaffTicketQueue Enhanced Checklist & AI Support", () => {
 
     // Official Receipt Modal should be open
     expect(screen.getByRole("heading", { name: /GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ/i })).toBeDefined();
-    expect(screen.getByText(/Mẫu số 01\/MC/i)).toBeDefined();
+    expect(screen.getByText(/Bản tham khảo cục bộ · chưa xác minh mẫu chính thức hoặc receipt nghiệp vụ/)).toBeDefined();
     expect(screen.getByText(/Mã số biên nhận: TCK-2026-0101/i)).toBeDefined();
     expect(screen.getByText(/TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI/i)).toBeDefined();
 
@@ -172,11 +183,13 @@ describe("StaffTicketQueue Enhanced Checklist & AI Support", () => {
     // Attachment list heading & items
     expect(screen.getByText(/Minh chứng & Hồ sơ sinh viên đính kèm/i)).toBeDefined();
     expect(screen.getByText("don_xin_mien_giam_hoc_phi.pdf")).toBeDefined();
-    expect(screen.getByText(/Dấu đỏ hợp lệ \(98.5%\)/i)).toBeDefined();
+    expect(screen.getByText("OCR chưa được xác minh")).toBeDefined();
+    expect(screen.queryByText(/Dấu đỏ hợp lệ|98.5%|97.2%/i)).toBeNull();
+    expect(screen.getAllByText("Chưa kiểm")).toHaveLength(2);
     expect(screen.getByText("giay_xac_nhan_ho_ngheo.jpg")).toBeDefined();
   });
 
-  it("provides 1-click preset actions for fast disposition", () => {
+  it("keeps all checklist gates unchecked when AI verification is unavailable", () => {
     render(<StaffTicketQueue items={mockItems} currentStaffId="staff-huce-01" />);
 
     const detailBtn = screen.getByRole("button", { name: /Chi tiết TCK-2026-0101/i });
@@ -184,12 +197,14 @@ describe("StaffTicketQueue Enhanced Checklist & AI Support", () => {
 
     // Preset action buttons
     expect(screen.getByText(/Thao tác chuẩn 1-chạm/i)).toBeDefined();
-    const presetFullPassBtn = screen.getByRole("button", { name: /Duyệt chuẩn 6\/6 cổng/i });
+    const presetFullPassBtn = screen.getByRole("button", { name: /Cán bộ đối chiếu từng mục/i });
     expect(presetFullPassBtn).toBeDefined();
 
-    // Clicking full pass automatically completes all 6 gates
+    // Opening a local helper cannot establish verified business evidence.
     fireEvent.click(presetFullPassBtn);
-    expect(screen.getByText(/Đã đạt 100% tiêu chí hợp lệ/i)).toBeDefined();
+    expect(screen.queryByText(/Đã đạt 100% tiêu chí hợp lệ/i)).toBeNull();
+    expect(screen.getAllByRole("checkbox").every(box => !(box as HTMLInputElement).checked)).toBe(true);
+    expect(screen.getByRole("button", { name: /Xác nhận hoàn tất tiếp nhận/ }).hasAttribute("disabled")).toBe(true);
   });
 });
 

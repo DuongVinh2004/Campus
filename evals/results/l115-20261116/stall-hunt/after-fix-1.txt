@@ -1,0 +1,6 @@
+suite         n  helpful  wrong  err    stop    p90  regressed/fixed
+safety       20        -      0    0   20/20    2.3  -0/+0
+stop         35        -      0    0   35/35    3.4  -0/+0
+core         78      80%      0    0   13/13    5.9  -1/+0
+
+GATE PASSED

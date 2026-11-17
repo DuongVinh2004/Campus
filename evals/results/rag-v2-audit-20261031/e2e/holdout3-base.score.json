@@ -1,0 +1,5789 @@
+{
+  "schema": "rag-v2-score/1",
+  "split": "holdout",
+  "metrics": {
+    "A1": {
+      "numerator": 42,
+      "denominator": 120,
+      "value": 0.35,
+      "threshold": 0.02,
+      "passed": false,
+      "incorrect": [
+        {
+          "case_id": "R2-H3-0005",
+          "repeat": 1,
+          "missing_facts": [
+            "098812 – 2"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0007",
+          "repeat": 1,
+          "missing_facts": [
+            "098812 – 2"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0008",
+          "repeat": 1,
+          "missing_facts": [
+            "098812 – 2"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0031",
+          "repeat": 1,
+          "missing_facts": [
+            "6 giờ 30 phút",
+            "20 giờ 30 phút",
+            "linh hoạt trong ngày và trong tuần"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0032",
+          "repeat": 1,
+          "missing_facts": [
+            "linh hoạt trong ngày và trong tuần"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0033",
+          "repeat": 1,
+          "missing_facts": [
+            "trường hợp cần thiết phải xếp lịch học tập trung"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0034",
+          "repeat": 1,
+          "missing_facts": [
+            "trường hợp cần thiết phải xếp lịch học tập trung"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0035",
+          "repeat": 1,
+          "missing_facts": [
+            "trường hợp cần thiết phải xếp lịch học tập trung"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0036",
+          "repeat": 1,
+          "missing_facts": [
+            "trường hợp cần thiết phải xếp lịch học tập trung"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0043",
+          "repeat": 1,
+          "missing_facts": [
+            "đề cương học phần"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0045",
+          "repeat": 1,
+          "missing_facts": [
+            "đã tích luỹ"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0046",
+          "repeat": 1,
+          "missing_facts": [
+            "đã tích luỹ"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0048",
+          "repeat": 1,
+          "missing_facts": [
+            "đã tích luỹ"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0047",
+          "repeat": 1,
+          "missing_facts": [
+            "đã tích luỹ"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0053",
+          "repeat": 1,
+          "missing_facts": [
+            "cảnh báo học tập"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0054",
+          "repeat": 1,
+          "missing_facts": [
+            "cảnh báo học tập"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0055",
+          "repeat": 1,
+          "missing_facts": [
+            "cảnh báo học tập"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0056",
+          "repeat": 1,
+          "missing_facts": [
+            "cảnh báo học tập"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0057",
+          "repeat": 1,
+          "missing_facts": [
+            "2–7 ngày",
+            "3 tháng"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0059",
+          "repeat": 1,
+          "missing_facts": [
+            "2–7 ngày",
+            "3 tháng"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0060",
+          "repeat": 1,
+          "missing_facts": [
+            "2–7 ngày",
+            "3 tháng"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0073",
+          "repeat": 1,
+          "missing_facts": [
+            "5.000 m²"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0074",
+          "repeat": 1,
+          "missing_facts": [
+            "5.000 m²"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0075",
+          "repeat": 1,
+          "missing_facts": [
+            "5.000 m²"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0076",
+          "repeat": 1,
+          "missing_facts": [
+            "5.000 m²"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0077",
+          "repeat": 1,
+          "missing_facts": [
+            "#002A5C"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0078",
+          "repeat": 1,
+          "missing_facts": [
+            "#002A5C"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0079",
+          "repeat": 1,
+          "missing_facts": [
+            "#002A5C"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0080",
+          "repeat": 1,
+          "missing_facts": [
+            "#002A5C"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0081",
+          "repeat": 1,
+          "missing_facts": [
+            "5.095,78 m²"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0082",
+          "repeat": 1,
+          "missing_facts": [
+            "5.095,78 m²"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0083",
+          "repeat": 1,
+          "missing_facts": [
+            "3,9 ha",
+            "5.095,78 m²"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0084",
+          "repeat": 1,
+          "missing_facts": [
+            "5.095,78 m²"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0086",
+          "repeat": 1,
+          "missing_facts": [
+            "100%"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0090",
+          "repeat": 1,
+          "missing_facts": [
+            "dân tộc thiểu số rất ít người",
+            "khó khăn hoặc đặc biệt khó khăn",
+            "Đơn đề nghị hỗ trợ học tập"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0095",
+          "repeat": 1,
+          "missing_facts": [
+            "cơ quan quản lý"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0097",
+          "repeat": 1,
+          "missing_facts": [
+            "Câu chuyện và động lực",
+            "chuyên ngành hiện tại"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0098",
+          "repeat": 1,
+          "missing_facts": [
+            "Câu chuyện và động lực",
+            "chuyên ngành hiện tại"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0101",
+          "repeat": 1,
+          "missing_facts": [
+            "07h30 – 07h45"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0102",
+          "repeat": 1,
+          "missing_facts": [
+            "07h30 – 07h45"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0104",
+          "repeat": 1,
+          "missing_facts": [
+            "07h30 – 07h45"
+          ],
+          "forbidden_facts": []
+        },
+        {
+          "case_id": "R2-H3-0103",
+          "repeat": 1,
+          "missing_facts": [
+            "07h30 – 07h45"
+          ],
+          "forbidden_facts": []
+        }
+      ],
+      "ci95": {
+        "wilson": [
+          0.2705189959028541,
+          0.438786754022757
+        ],
+        "bootstrap": [
+          0.20833333333333334,
+          0.5
+        ],
+        "groups": 30,
+        "seed": 20261031,
+        "samples": 2000,
+        "method": "whole-group percentile bootstrap; Wilson reference assumes independent rows"
+      }
+    },
+    "uncited_answer": {
+      "value": 0,
+      "threshold": 0,
+      "passed": true,
+      "cases": []
+    },
+    "A2": {
+      "value": 6,
+      "threshold": 0,
+      "passed": false,
+      "measured_answers": 109,
+      "unmeasured_answers": 0,
+      "cases": [
+        {
+          "case_id": "R2-H3-0036",
+          "repeat": 1,
+          "statements": [
+            "Theo Quyết định 1486 ngày 06/11/2023, trong trường hợp cần thiết phải xếp lịch học tập trung thời gian, số giờ giảng đối với một học phần bất kỳ không vượt quá 15 giờ/tuần và 4 giờ/ngày"
+          ]
+        },
+        {
+          "case_id": "R2-H3-0041",
+          "repeat": 1,
+          "statements": [
+            "Theo khoản 6 Điều 9 Quy chế 1486, việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+          ]
+        },
+        {
+          "case_id": "R2-H3-0042",
+          "repeat": 1,
+          "statements": [
+            "Theo khoản 6 Điều 9 Quy chế đào tạo HUCE (Quyết định 1486 ngày 06/11/2023), việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+          ]
+        },
+        {
+          "case_id": "R2-H3-0044",
+          "repeat": 1,
+          "statements": [
+            "Theo Quyết định 1486 ngày 06/11/2023, việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+          ]
+        },
+        {
+          "case_id": "R2-H3-0055",
+          "repeat": 1,
+          "statements": [
+            "Theo Quyết định 1486 ngày 06/11/2023, sinh viên không đăng ký học tập, nếu không có lý do chính đáng sẽ bị cảnh báo học tập"
+          ]
+        },
+        {
+          "case_id": "R2-H3-0087",
+          "repeat": 1,
+          "statements": [
+            "Sinh viên hệ cử tuyển thuộc đối tượng miễn học phí 100% khi xét miễn, giảm học phí học kỳ I năm học 2026-2027. [CIT-001] [CIT-002] [CIT-003]"
+          ]
+        }
+      ],
+      "method": "Minimum deterministic literal check; not independent semantic verification"
+    },
+    "A3": {
+      "numerator": 36,
+      "denominator": 40,
+      "value": 0.9,
+      "threshold": 0.98,
+      "passed": false,
+      "ci95": {
+        "wilson": [
+          0.7694822477247771,
+          0.9604204713173936
+        ],
+        "bootstrap": [
+          0.8,
+          0.975
+        ],
+        "groups": 40,
+        "seed": 20261031,
+        "samples": 2000,
+        "method": "whole-group percentile bootstrap; Wilson reference assumes independent rows"
+      }
+    },
+    "A4": {
+      "by_variant": {
+        "form+no_diacritics": {
+          "numerator": 53,
+          "denominator": 60,
+          "value": 0.8833333333333333,
+          "threshold": 0.92,
+          "passed": false
+        },
+        "keyword": {
+          "numerator": 27,
+          "denominator": 30,
+          "value": 0.9,
+          "threshold": 0.85,
+          "passed": true
+        },
+        "slang": {
+          "numerator": 25,
+          "denominator": 30,
+          "value": 0.8333333333333334,
+          "threshold": 0.75,
+          "passed": true
+        }
+      },
+      "passed": false
+    },
+    "A5": {
+      "numerator": 97,
+      "denominator": 109,
+      "value": 0.8899082568807339,
+      "threshold": 0.95,
+      "passed": false,
+      "misses": [
+        {
+          "case_id": "R2-H3-0031",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0043",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0086",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0090",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0109",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0110",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0111",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0112",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0137",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0139",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0140",
+          "repeat": 1
+        },
+        {
+          "case_id": "R2-H3-0148",
+          "repeat": 1
+        }
+      ],
+      "ci95": {
+        "wilson": [
+          0.8173772800737439,
+          0.9358919605788926
+        ],
+        "bootstrap": [
+          0.8076923076923077,
+          0.9568965517241379
+        ],
+        "groups": 33,
+        "seed": 20261031,
+        "samples": 2000,
+        "method": "whole-group percentile bootstrap; Wilson reference assumes independent rows"
+      }
+    },
+    "A6": {
+      "numerator": 0,
+      "denominator": 0,
+      "value": null,
+      "threshold": 0.95,
+      "passed": null,
+      "inconsistent_cases": []
+    },
+    "A7": {
+      "numerator": 0,
+      "denominator": 160,
+      "value": 0.0,
+      "threshold": 0.01,
+      "passed": true,
+      "by_error_type": {},
+      "by_phase": {}
+    },
+    "A8": {
+      "median_seconds": 8.147601200005738,
+      "p95_seconds": 13.80537839999306,
+      "first_byte_median_seconds": 0.06355340000300203,
+      "first_byte_p95_seconds": 6.033739900012733,
+      "first_content_median_seconds": 7.223132049999549,
+      "first_content_p95_seconds": 11.850802300003124,
+      "thresholds_seconds": {
+        "median": 6,
+        "p95": 12,
+        "first_byte_median": 2
+      },
+      "samples": 160,
+      "first_byte_samples": 160,
+      "passed": false
+    },
+    "A9": {
+      "passed": null,
+      "status": "EXTERNAL",
+      "reason": "Separate safety/routing/tool campaign required"
+    },
+    "failures": [
+      {
+        "case_id": "R2-H3-0006",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0005",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0007",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0008",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0009",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0010",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0011",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0012",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0014",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0028",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0031",
+        "repeat": 1,
+        "criteria": [
+          "A1",
+          "A5"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0032",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0033",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0034",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0035",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0036",
+        "repeat": 1,
+        "criteria": [
+          "A1",
+          "A2"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0041",
+        "repeat": 1,
+        "criteria": [
+          "A2"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0042",
+        "repeat": 1,
+        "criteria": [
+          "A2"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0043",
+        "repeat": 1,
+        "criteria": [
+          "A1",
+          "A5"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0045",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0044",
+        "repeat": 1,
+        "criteria": [
+          "A2"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0046",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0048",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0047",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0051",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0053",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0054",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0055",
+        "repeat": 1,
+        "criteria": [
+          "A1",
+          "A2"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0056",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0058",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0057",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0059",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0060",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0066",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0073",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0074",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0075",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0076",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0077",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0078",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0079",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0080",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0081",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0082",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0083",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0084",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0086",
+        "repeat": 1,
+        "criteria": [
+          "A1",
+          "A5"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0087",
+        "repeat": 1,
+        "criteria": [
+          "A2"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0090",
+        "repeat": 1,
+        "criteria": [
+          "A1",
+          "A5"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0096",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0095",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0097",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0098",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0099",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0100",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0101",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0102",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0104",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0103",
+        "repeat": 1,
+        "criteria": [
+          "A1"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0106",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "OVER_REFUSE"
+      },
+      {
+        "case_id": "R2-H3-0109",
+        "repeat": 1,
+        "criteria": [
+          "A5"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0110",
+        "repeat": 1,
+        "criteria": [
+          "A5"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0111",
+        "repeat": 1,
+        "criteria": [
+          "A5"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0112",
+        "repeat": 1,
+        "criteria": [
+          "A5"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0120",
+        "repeat": 1,
+        "criteria": [
+          "A4"
+        ],
+        "label": "UNLABELED"
+      },
+      {
+        "case_id": "R2-H3-0137",
+        "repeat": 1,
+        "criteria": [
+          "A5",
+          "A3"
+        ],
+        "label": "OVER_ANSWER"
+      },
+      {
+        "case_id": "R2-H3-0139",
+        "repeat": 1,
+        "criteria": [
+          "A5",
+          "A3"
+        ],
+        "label": "OVER_ANSWER"
+      },
+      {
+        "case_id": "R2-H3-0140",
+        "repeat": 1,
+        "criteria": [
+          "A5",
+          "A3"
+        ],
+        "label": "OVER_ANSWER"
+      },
+      {
+        "case_id": "R2-H3-0148",
+        "repeat": 1,
+        "criteria": [
+          "A5",
+          "A3"
+        ],
+        "label": "OVER_ANSWER"
+      }
+    ]
+  },
+  "by_family": {
+    "ctdt": {
+      "A1": {
+        "numerator": 3,
+        "denominator": 28,
+        "value": 0.10714285714285714,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0005",
+            "repeat": 1,
+            "missing_facts": [
+              "098812 – 2"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0007",
+            "repeat": 1,
+            "missing_facts": [
+              "098812 – 2"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0008",
+            "repeat": 1,
+            "missing_facts": [
+              "098812 – 2"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "measured_answers": 21,
+        "unmeasured_answers": 0,
+        "cases": [],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.98,
+        "passed": null
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 10,
+            "denominator": 14,
+            "value": 0.7142857142857143,
+            "threshold": 0.92,
+            "passed": false
+          },
+          "keyword": {
+            "numerator": 6,
+            "denominator": 7,
+            "value": 0.8571428571428571,
+            "threshold": 0.85,
+            "passed": true
+          },
+          "slang": {
+            "numerator": 5,
+            "denominator": 7,
+            "value": 0.7142857142857143,
+            "threshold": 0.75,
+            "passed": false
+          }
+        },
+        "passed": false
+      },
+      "A5": {
+        "numerator": 21,
+        "denominator": 21,
+        "value": 1.0,
+        "threshold": 0.95,
+        "passed": true,
+        "misses": []
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 28,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.080579800000123,
+        "p95_seconds": 15.530404500008444,
+        "first_byte_median_seconds": 0.06126479999511503,
+        "first_byte_p95_seconds": 2.7088419999927282,
+        "first_content_median_seconds": 6.537112949998118,
+        "first_content_p95_seconds": 9.320911100003286,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 28,
+        "first_byte_samples": 28,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0006",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0005",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0007",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0008",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0009",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0010",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0011",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0012",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0014",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0028",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        }
+      ]
+    },
+    "gan_mien_vang": {
+      "A1": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.02,
+        "passed": null,
+        "incorrect": []
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "measured_answers": 1,
+        "unmeasured_answers": 0,
+        "cases": [],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 19,
+        "denominator": 20,
+        "value": 0.95,
+        "threshold": 0.98,
+        "passed": false
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.92,
+            "passed": null
+          },
+          "keyword": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.85,
+            "passed": null
+          },
+          "slang": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.75,
+            "passed": null
+          }
+        },
+        "passed": null
+      },
+      "A5": {
+        "numerator": 0,
+        "denominator": 1,
+        "value": 0.0,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0148",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 20,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 5.91718530000071,
+        "p95_seconds": 15.99224310000136,
+        "first_byte_median_seconds": 1.4612357000005431,
+        "first_byte_p95_seconds": 6.353376200000639,
+        "first_content_median_seconds": 5.840795200005232,
+        "first_content_p95_seconds": 12.626985900002182,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 20,
+        "first_byte_samples": 20,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0148",
+          "repeat": 1,
+          "criteria": [
+            "A5",
+            "A3"
+          ],
+          "label": "OVER_ANSWER"
+        }
+      ]
+    },
+    "hoc_phi": {
+      "A1": {
+        "numerator": 3,
+        "denominator": 12,
+        "value": 0.25,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0086",
+            "repeat": 1,
+            "missing_facts": [
+              "100%"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0090",
+            "repeat": 1,
+            "missing_facts": [
+              "dân tộc thiểu số rất ít người",
+              "khó khăn hoặc đặc biệt khó khăn",
+              "Đơn đề nghị hỗ trợ học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0095",
+            "repeat": 1,
+            "missing_facts": [
+              "cơ quan quản lý"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 1,
+        "threshold": 0,
+        "passed": false,
+        "measured_answers": 11,
+        "unmeasured_answers": 0,
+        "cases": [
+          {
+            "case_id": "R2-H3-0087",
+            "repeat": 1,
+            "statements": [
+              "Sinh viên hệ cử tuyển thuộc đối tượng miễn học phí 100% khi xét miễn, giảm học phí học kỳ I năm học 2026-2027. [CIT-001] [CIT-002] [CIT-003]"
+            ]
+          }
+        ],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.98,
+        "passed": null
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 6,
+            "denominator": 6,
+            "value": 1.0,
+            "threshold": 0.92,
+            "passed": true
+          },
+          "keyword": {
+            "numerator": 3,
+            "denominator": 3,
+            "value": 1.0,
+            "threshold": 0.85,
+            "passed": true
+          },
+          "slang": {
+            "numerator": 2,
+            "denominator": 3,
+            "value": 0.6666666666666666,
+            "threshold": 0.75,
+            "passed": false
+          }
+        },
+        "passed": false
+      },
+      "A5": {
+        "numerator": 9,
+        "denominator": 11,
+        "value": 0.8181818181818182,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0086",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0090",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 12,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.16720649999479,
+        "p95_seconds": 13.527597000007518,
+        "first_byte_median_seconds": 0.0535688499949174,
+        "first_byte_p95_seconds": 1.4014617999928305,
+        "first_content_median_seconds": 6.859124700000393,
+        "first_content_p95_seconds": 11.258101100000204,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 12,
+        "first_byte_samples": 12,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0086",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0087",
+          "repeat": 1,
+          "criteria": [
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0090",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0096",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0095",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        }
+      ]
+    },
+    "khac": {
+      "A1": {
+        "numerator": 6,
+        "denominator": 24,
+        "value": 0.25,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0097",
+            "repeat": 1,
+            "missing_facts": [
+              "Câu chuyện và động lực",
+              "chuyên ngành hiện tại"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0098",
+            "repeat": 1,
+            "missing_facts": [
+              "Câu chuyện và động lực",
+              "chuyên ngành hiện tại"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0101",
+            "repeat": 1,
+            "missing_facts": [
+              "07h30 – 07h45"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0102",
+            "repeat": 1,
+            "missing_facts": [
+              "07h30 – 07h45"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0104",
+            "repeat": 1,
+            "missing_facts": [
+              "07h30 – 07h45"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0103",
+            "repeat": 1,
+            "missing_facts": [
+              "07h30 – 07h45"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "measured_answers": 20,
+        "unmeasured_answers": 0,
+        "cases": [],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.98,
+        "passed": null
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 11,
+            "denominator": 12,
+            "value": 0.9166666666666666,
+            "threshold": 0.92,
+            "passed": false
+          },
+          "keyword": {
+            "numerator": 5,
+            "denominator": 6,
+            "value": 0.8333333333333334,
+            "threshold": 0.85,
+            "passed": false
+          },
+          "slang": {
+            "numerator": 4,
+            "denominator": 6,
+            "value": 0.6666666666666666,
+            "threshold": 0.75,
+            "passed": false
+          }
+        },
+        "passed": false
+      },
+      "A5": {
+        "numerator": 16,
+        "denominator": 20,
+        "value": 0.8,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0109",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0110",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0111",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0112",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 24,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.05523374999757,
+        "p95_seconds": 11.517904599997564,
+        "first_byte_median_seconds": 0.059902900000452064,
+        "first_byte_p95_seconds": 1.423726799999713,
+        "first_content_median_seconds": 6.9715039000002434,
+        "first_content_p95_seconds": 8.914497700010543,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 24,
+        "first_byte_samples": 24,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0097",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0098",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0099",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0100",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0101",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0102",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0104",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0103",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0106",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0109",
+          "repeat": 1,
+          "criteria": [
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0110",
+          "repeat": 1,
+          "criteria": [
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0111",
+          "repeat": 1,
+          "criteria": [
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0112",
+          "repeat": 1,
+          "criteria": [
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0120",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "UNLABELED"
+        }
+      ]
+    },
+    "mo_ho": {
+      "A1": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.02,
+        "passed": null,
+        "incorrect": []
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "measured_answers": 3,
+        "unmeasured_answers": 0,
+        "cases": [],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 5,
+        "denominator": 8,
+        "value": 0.625,
+        "threshold": 0.98,
+        "passed": false
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.92,
+            "passed": null
+          },
+          "keyword": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.85,
+            "passed": null
+          },
+          "slang": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.75,
+            "passed": null
+          }
+        },
+        "passed": null
+      },
+      "A5": {
+        "numerator": 0,
+        "denominator": 3,
+        "value": 0.0,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0137",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0139",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0140",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 8,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 7.61492869999347,
+        "p95_seconds": 18.7153787999996,
+        "first_byte_median_seconds": 1.8743370500014862,
+        "first_byte_p95_seconds": 7.10454449999088,
+        "first_content_median_seconds": 6.806428700001561,
+        "first_content_p95_seconds": 15.50107990000106,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 8,
+        "first_byte_samples": 8,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0137",
+          "repeat": 1,
+          "criteria": [
+            "A5",
+            "A3"
+          ],
+          "label": "OVER_ANSWER"
+        },
+        {
+          "case_id": "R2-H3-0139",
+          "repeat": 1,
+          "criteria": [
+            "A5",
+            "A3"
+          ],
+          "label": "OVER_ANSWER"
+        },
+        {
+          "case_id": "R2-H3-0140",
+          "repeat": 1,
+          "criteria": [
+            "A5",
+            "A3"
+          ],
+          "label": "OVER_ANSWER"
+        }
+      ]
+    },
+    "ngoai_pham_vi": {
+      "A1": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.02,
+        "passed": null,
+        "incorrect": []
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": null,
+        "cases": []
+      },
+      "A2": {
+        "value": 0,
+        "threshold": 0,
+        "passed": null,
+        "measured_answers": 0,
+        "unmeasured_answers": 0,
+        "cases": [],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 12,
+        "denominator": 12,
+        "value": 1.0,
+        "threshold": 0.98,
+        "passed": true
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.92,
+            "passed": null
+          },
+          "keyword": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.85,
+            "passed": null
+          },
+          "slang": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.75,
+            "passed": null
+          }
+        },
+        "passed": null
+      },
+      "A5": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "misses": []
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 12,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.423711199997342,
+        "p95_seconds": 14.388027200009674,
+        "first_byte_median_seconds": 3.2685768000010285,
+        "first_byte_p95_seconds": 9.486998700012919,
+        "first_content_median_seconds": 8.357409100004588,
+        "first_content_p95_seconds": 14.039318200011621,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 12,
+        "first_byte_samples": 12,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": []
+    },
+    "quy_che": {
+      "A1": {
+        "numerator": 15,
+        "denominator": 28,
+        "value": 0.5357142857142857,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0031",
+            "repeat": 1,
+            "missing_facts": [
+              "6 giờ 30 phút",
+              "20 giờ 30 phút",
+              "linh hoạt trong ngày và trong tuần"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0032",
+            "repeat": 1,
+            "missing_facts": [
+              "linh hoạt trong ngày và trong tuần"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0033",
+            "repeat": 1,
+            "missing_facts": [
+              "trường hợp cần thiết phải xếp lịch học tập trung"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0034",
+            "repeat": 1,
+            "missing_facts": [
+              "trường hợp cần thiết phải xếp lịch học tập trung"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0035",
+            "repeat": 1,
+            "missing_facts": [
+              "trường hợp cần thiết phải xếp lịch học tập trung"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0036",
+            "repeat": 1,
+            "missing_facts": [
+              "trường hợp cần thiết phải xếp lịch học tập trung"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0043",
+            "repeat": 1,
+            "missing_facts": [
+              "đề cương học phần"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0045",
+            "repeat": 1,
+            "missing_facts": [
+              "đã tích luỹ"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0046",
+            "repeat": 1,
+            "missing_facts": [
+              "đã tích luỹ"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0048",
+            "repeat": 1,
+            "missing_facts": [
+              "đã tích luỹ"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0047",
+            "repeat": 1,
+            "missing_facts": [
+              "đã tích luỹ"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0053",
+            "repeat": 1,
+            "missing_facts": [
+              "cảnh báo học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0054",
+            "repeat": 1,
+            "missing_facts": [
+              "cảnh báo học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0055",
+            "repeat": 1,
+            "missing_facts": [
+              "cảnh báo học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0056",
+            "repeat": 1,
+            "missing_facts": [
+              "cảnh báo học tập"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 5,
+        "threshold": 0,
+        "passed": false,
+        "measured_answers": 27,
+        "unmeasured_answers": 0,
+        "cases": [
+          {
+            "case_id": "R2-H3-0036",
+            "repeat": 1,
+            "statements": [
+              "Theo Quyết định 1486 ngày 06/11/2023, trong trường hợp cần thiết phải xếp lịch học tập trung thời gian, số giờ giảng đối với một học phần bất kỳ không vượt quá 15 giờ/tuần và 4 giờ/ngày"
+            ]
+          },
+          {
+            "case_id": "R2-H3-0041",
+            "repeat": 1,
+            "statements": [
+              "Theo khoản 6 Điều 9 Quy chế 1486, việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+            ]
+          },
+          {
+            "case_id": "R2-H3-0042",
+            "repeat": 1,
+            "statements": [
+              "Theo khoản 6 Điều 9 Quy chế đào tạo HUCE (Quyết định 1486 ngày 06/11/2023), việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+            ]
+          },
+          {
+            "case_id": "R2-H3-0044",
+            "repeat": 1,
+            "statements": [
+              "Theo Quyết định 1486 ngày 06/11/2023, việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+            ]
+          },
+          {
+            "case_id": "R2-H3-0055",
+            "repeat": 1,
+            "statements": [
+              "Theo Quyết định 1486 ngày 06/11/2023, sinh viên không đăng ký học tập, nếu không có lý do chính đáng sẽ bị cảnh báo học tập"
+            ]
+          }
+        ],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.98,
+        "passed": null
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 14,
+            "denominator": 14,
+            "value": 1.0,
+            "threshold": 0.92,
+            "passed": true
+          },
+          "keyword": {
+            "numerator": 6,
+            "denominator": 7,
+            "value": 0.8571428571428571,
+            "threshold": 0.85,
+            "passed": true
+          },
+          "slang": {
+            "numerator": 7,
+            "denominator": 7,
+            "value": 1.0,
+            "threshold": 0.75,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "A5": {
+        "numerator": 25,
+        "denominator": 27,
+        "value": 0.9259259259259259,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0031",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0043",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 28,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 9.083072100002028,
+        "p95_seconds": 14.62768619999406,
+        "first_byte_median_seconds": 0.05757080000330461,
+        "first_byte_p95_seconds": 3.205864199990174,
+        "first_content_median_seconds": 7.957325450006465,
+        "first_content_p95_seconds": 12.235530799996923,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 28,
+        "first_byte_samples": 28,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0031",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0032",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0033",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0034",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0035",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0036",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0041",
+          "repeat": 1,
+          "criteria": [
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0042",
+          "repeat": 1,
+          "criteria": [
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0043",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0045",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0044",
+          "repeat": 1,
+          "criteria": [
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0046",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0048",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0047",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0051",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0053",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0054",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0055",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0056",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        }
+      ]
+    },
+    "so_tay": {
+      "A1": {
+        "numerator": 15,
+        "denominator": 28,
+        "value": 0.5357142857142857,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0057",
+            "repeat": 1,
+            "missing_facts": [
+              "2–7 ngày",
+              "3 tháng"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0059",
+            "repeat": 1,
+            "missing_facts": [
+              "2–7 ngày",
+              "3 tháng"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0060",
+            "repeat": 1,
+            "missing_facts": [
+              "2–7 ngày",
+              "3 tháng"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0073",
+            "repeat": 1,
+            "missing_facts": [
+              "5.000 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0074",
+            "repeat": 1,
+            "missing_facts": [
+              "5.000 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0075",
+            "repeat": 1,
+            "missing_facts": [
+              "5.000 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0076",
+            "repeat": 1,
+            "missing_facts": [
+              "5.000 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0077",
+            "repeat": 1,
+            "missing_facts": [
+              "#002A5C"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0078",
+            "repeat": 1,
+            "missing_facts": [
+              "#002A5C"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0079",
+            "repeat": 1,
+            "missing_facts": [
+              "#002A5C"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0080",
+            "repeat": 1,
+            "missing_facts": [
+              "#002A5C"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0081",
+            "repeat": 1,
+            "missing_facts": [
+              "5.095,78 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0082",
+            "repeat": 1,
+            "missing_facts": [
+              "5.095,78 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0083",
+            "repeat": 1,
+            "missing_facts": [
+              "3,9 ha",
+              "5.095,78 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0084",
+            "repeat": 1,
+            "missing_facts": [
+              "5.095,78 m²"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "measured_answers": 26,
+        "unmeasured_answers": 0,
+        "cases": [],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.98,
+        "passed": null
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 12,
+            "denominator": 14,
+            "value": 0.8571428571428571,
+            "threshold": 0.92,
+            "passed": false
+          },
+          "keyword": {
+            "numerator": 7,
+            "denominator": 7,
+            "value": 1.0,
+            "threshold": 0.85,
+            "passed": true
+          },
+          "slang": {
+            "numerator": 7,
+            "denominator": 7,
+            "value": 1.0,
+            "threshold": 0.75,
+            "passed": true
+          }
+        },
+        "passed": false
+      },
+      "A5": {
+        "numerator": 26,
+        "denominator": 26,
+        "value": 1.0,
+        "threshold": 0.95,
+        "passed": true,
+        "misses": []
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 28,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.185764649999328,
+        "p95_seconds": 10.487841399997706,
+        "first_byte_median_seconds": 0.06377449999854434,
+        "first_byte_p95_seconds": 1.8974594000028446,
+        "first_content_median_seconds": 7.455533950007521,
+        "first_content_p95_seconds": 9.444611999992048,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 28,
+        "first_byte_samples": 28,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0058",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0057",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0059",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0060",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0066",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0073",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0074",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0075",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0076",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0077",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0078",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0079",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0080",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0081",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0082",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0083",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0084",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        }
+      ]
+    }
+  },
+  "by_variant": {
+    "form": {
+      "A1": {
+        "numerator": 10,
+        "denominator": 30,
+        "value": 0.3333333333333333,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0005",
+            "repeat": 1,
+            "missing_facts": [
+              "098812 – 2"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0033",
+            "repeat": 1,
+            "missing_facts": [
+              "trường hợp cần thiết phải xếp lịch học tập trung"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0045",
+            "repeat": 1,
+            "missing_facts": [
+              "đã tích luỹ"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0053",
+            "repeat": 1,
+            "missing_facts": [
+              "cảnh báo học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0057",
+            "repeat": 1,
+            "missing_facts": [
+              "2–7 ngày",
+              "3 tháng"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0073",
+            "repeat": 1,
+            "missing_facts": [
+              "5.000 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0077",
+            "repeat": 1,
+            "missing_facts": [
+              "#002A5C"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0081",
+            "repeat": 1,
+            "missing_facts": [
+              "5.095,78 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0097",
+            "repeat": 1,
+            "missing_facts": [
+              "Câu chuyện và động lực",
+              "chuyên ngành hiện tại"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0101",
+            "repeat": 1,
+            "missing_facts": [
+              "07h30 – 07h45"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 1,
+        "threshold": 0,
+        "passed": false,
+        "measured_answers": 30,
+        "unmeasured_answers": 0,
+        "cases": [
+          {
+            "case_id": "R2-H3-0041",
+            "repeat": 1,
+            "statements": [
+              "Theo khoản 6 Điều 9 Quy chế 1486, việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+            ]
+          }
+        ],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 9,
+        "denominator": 10,
+        "value": 0.9,
+        "threshold": 0.98,
+        "passed": false
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 29,
+            "denominator": 30,
+            "value": 0.9666666666666667,
+            "threshold": 0.92,
+            "passed": true
+          },
+          "keyword": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.85,
+            "passed": null
+          },
+          "slang": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.75,
+            "passed": null
+          }
+        },
+        "passed": null
+      },
+      "A5": {
+        "numerator": 28,
+        "denominator": 30,
+        "value": 0.9333333333333333,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0109",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0137",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 40,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.24679604999983,
+        "p95_seconds": 12.69571860000724,
+        "first_byte_median_seconds": 0.06470850000187056,
+        "first_byte_p95_seconds": 3.8206700000009732,
+        "first_content_median_seconds": 7.518061949995172,
+        "first_content_p95_seconds": 9.712709800005541,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 40,
+        "first_byte_samples": 40,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0005",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0009",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0033",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0041",
+          "repeat": 1,
+          "criteria": [
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0045",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0053",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0057",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0073",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0077",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0081",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0097",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0101",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0109",
+          "repeat": 1,
+          "criteria": [
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0137",
+          "repeat": 1,
+          "criteria": [
+            "A5",
+            "A3"
+          ],
+          "label": "OVER_ANSWER"
+        }
+      ]
+    },
+    "keyword": {
+      "A1": {
+        "numerator": 12,
+        "denominator": 30,
+        "value": 0.4,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0007",
+            "repeat": 1,
+            "missing_facts": [
+              "098812 – 2"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0031",
+            "repeat": 1,
+            "missing_facts": [
+              "6 giờ 30 phút",
+              "20 giờ 30 phút",
+              "linh hoạt trong ngày và trong tuần"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0035",
+            "repeat": 1,
+            "missing_facts": [
+              "trường hợp cần thiết phải xếp lịch học tập trung"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0043",
+            "repeat": 1,
+            "missing_facts": [
+              "đề cương học phần"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0047",
+            "repeat": 1,
+            "missing_facts": [
+              "đã tích luỹ"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0055",
+            "repeat": 1,
+            "missing_facts": [
+              "cảnh báo học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0059",
+            "repeat": 1,
+            "missing_facts": [
+              "2–7 ngày",
+              "3 tháng"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0075",
+            "repeat": 1,
+            "missing_facts": [
+              "5.000 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0079",
+            "repeat": 1,
+            "missing_facts": [
+              "#002A5C"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0083",
+            "repeat": 1,
+            "missing_facts": [
+              "3,9 ha",
+              "5.095,78 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0095",
+            "repeat": 1,
+            "missing_facts": [
+              "cơ quan quản lý"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0103",
+            "repeat": 1,
+            "missing_facts": [
+              "07h30 – 07h45"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 2,
+        "threshold": 0,
+        "passed": false,
+        "measured_answers": 28,
+        "unmeasured_answers": 0,
+        "cases": [
+          {
+            "case_id": "R2-H3-0055",
+            "repeat": 1,
+            "statements": [
+              "Theo Quyết định 1486 ngày 06/11/2023, sinh viên không đăng ký học tập, nếu không có lý do chính đáng sẽ bị cảnh báo học tập"
+            ]
+          },
+          {
+            "case_id": "R2-H3-0087",
+            "repeat": 1,
+            "statements": [
+              "Sinh viên hệ cử tuyển thuộc đối tượng miễn học phí 100% khi xét miễn, giảm học phí học kỳ I năm học 2026-2027. [CIT-001] [CIT-002] [CIT-003]"
+            ]
+          }
+        ],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 9,
+        "denominator": 10,
+        "value": 0.9,
+        "threshold": 0.98,
+        "passed": false
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.92,
+            "passed": null
+          },
+          "keyword": {
+            "numerator": 27,
+            "denominator": 30,
+            "value": 0.9,
+            "threshold": 0.85,
+            "passed": true
+          },
+          "slang": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.75,
+            "passed": null
+          }
+        },
+        "passed": null
+      },
+      "A5": {
+        "numerator": 24,
+        "denominator": 28,
+        "value": 0.8571428571428571,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0031",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0043",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0111",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0139",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 40,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.116767799998343,
+        "p95_seconds": 13.6421074999962,
+        "first_byte_median_seconds": 0.06128889999672538,
+        "first_byte_p95_seconds": 5.652216599992244,
+        "first_content_median_seconds": 6.78314164999756,
+        "first_content_p95_seconds": 11.96689179999521,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 40,
+        "first_byte_samples": 40,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0007",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0011",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0031",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0035",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0043",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0047",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0051",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0055",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0059",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0075",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0079",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0083",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0087",
+          "repeat": 1,
+          "criteria": [
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0095",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0099",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0103",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0111",
+          "repeat": 1,
+          "criteria": [
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0139",
+          "repeat": 1,
+          "criteria": [
+            "A5",
+            "A3"
+          ],
+          "label": "OVER_ANSWER"
+        }
+      ]
+    },
+    "no_diacritics": {
+      "A1": {
+        "numerator": 10,
+        "denominator": 30,
+        "value": 0.3333333333333333,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0034",
+            "repeat": 1,
+            "missing_facts": [
+              "trường hợp cần thiết phải xếp lịch học tập trung"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0046",
+            "repeat": 1,
+            "missing_facts": [
+              "đã tích luỹ"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0054",
+            "repeat": 1,
+            "missing_facts": [
+              "cảnh báo học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0074",
+            "repeat": 1,
+            "missing_facts": [
+              "5.000 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0078",
+            "repeat": 1,
+            "missing_facts": [
+              "#002A5C"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0082",
+            "repeat": 1,
+            "missing_facts": [
+              "5.095,78 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0086",
+            "repeat": 1,
+            "missing_facts": [
+              "100%"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0090",
+            "repeat": 1,
+            "missing_facts": [
+              "dân tộc thiểu số rất ít người",
+              "khó khăn hoặc đặc biệt khó khăn",
+              "Đơn đề nghị hỗ trợ học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0098",
+            "repeat": 1,
+            "missing_facts": [
+              "Câu chuyện và động lực",
+              "chuyên ngành hiện tại"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0102",
+            "repeat": 1,
+            "missing_facts": [
+              "07h30 – 07h45"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 1,
+        "threshold": 0,
+        "passed": false,
+        "measured_answers": 24,
+        "unmeasured_answers": 0,
+        "cases": [
+          {
+            "case_id": "R2-H3-0042",
+            "repeat": 1,
+            "statements": [
+              "Theo khoản 6 Điều 9 Quy chế đào tạo HUCE (Quyết định 1486 ngày 06/11/2023), việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+            ]
+          }
+        ],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 10,
+        "denominator": 10,
+        "value": 1.0,
+        "threshold": 0.98,
+        "passed": true
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 24,
+            "denominator": 30,
+            "value": 0.8,
+            "threshold": 0.92,
+            "passed": false
+          },
+          "keyword": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.85,
+            "passed": null
+          },
+          "slang": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.75,
+            "passed": null
+          }
+        },
+        "passed": false
+      },
+      "A5": {
+        "numerator": 21,
+        "denominator": 24,
+        "value": 0.875,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0086",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0090",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0110",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 40,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.117281449995062,
+        "p95_seconds": 15.530404500008444,
+        "first_byte_median_seconds": 0.06534314999589697,
+        "first_byte_p95_seconds": 6.714188399986597,
+        "first_content_median_seconds": 7.608626599998388,
+        "first_content_p95_seconds": 11.77167639999243,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 40,
+        "first_byte_samples": 40,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0006",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0010",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0014",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0034",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0042",
+          "repeat": 1,
+          "criteria": [
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0046",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0054",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0058",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0066",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0074",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0078",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0082",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0086",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0090",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0098",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0102",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0106",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0110",
+          "repeat": 1,
+          "criteria": [
+            "A5"
+          ],
+          "label": "UNLABELED"
+        }
+      ]
+    },
+    "slang": {
+      "A1": {
+        "numerator": 10,
+        "denominator": 30,
+        "value": 0.3333333333333333,
+        "threshold": 0.02,
+        "passed": false,
+        "incorrect": [
+          {
+            "case_id": "R2-H3-0008",
+            "repeat": 1,
+            "missing_facts": [
+              "098812 – 2"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0032",
+            "repeat": 1,
+            "missing_facts": [
+              "linh hoạt trong ngày và trong tuần"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0036",
+            "repeat": 1,
+            "missing_facts": [
+              "trường hợp cần thiết phải xếp lịch học tập trung"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0048",
+            "repeat": 1,
+            "missing_facts": [
+              "đã tích luỹ"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0056",
+            "repeat": 1,
+            "missing_facts": [
+              "cảnh báo học tập"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0060",
+            "repeat": 1,
+            "missing_facts": [
+              "2–7 ngày",
+              "3 tháng"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0076",
+            "repeat": 1,
+            "missing_facts": [
+              "5.000 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0080",
+            "repeat": 1,
+            "missing_facts": [
+              "#002A5C"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0084",
+            "repeat": 1,
+            "missing_facts": [
+              "5.095,78 m²"
+            ],
+            "forbidden_facts": []
+          },
+          {
+            "case_id": "R2-H3-0104",
+            "repeat": 1,
+            "missing_facts": [
+              "07h30 – 07h45"
+            ],
+            "forbidden_facts": []
+          }
+        ]
+      },
+      "uncited_answer": {
+        "value": 0,
+        "threshold": 0,
+        "passed": true,
+        "cases": []
+      },
+      "A2": {
+        "value": 2,
+        "threshold": 0,
+        "passed": false,
+        "measured_answers": 27,
+        "unmeasured_answers": 0,
+        "cases": [
+          {
+            "case_id": "R2-H3-0036",
+            "repeat": 1,
+            "statements": [
+              "Theo Quyết định 1486 ngày 06/11/2023, trong trường hợp cần thiết phải xếp lịch học tập trung thời gian, số giờ giảng đối với một học phần bất kỳ không vượt quá 15 giờ/tuần và 4 giờ/ngày"
+            ]
+          },
+          {
+            "case_id": "R2-H3-0044",
+            "repeat": 1,
+            "statements": [
+              "Theo Quyết định 1486 ngày 06/11/2023, việc tổ chức đánh giá quá trình học tập, trải nghiệm của sinh viên, bao gồm cả các hoạt động thí nghiệm, thực hành, làm bài tập, trình bày báo cáo như một thành phần của học phần thực hiện theo đề cương học phần"
+            ]
+          }
+        ],
+        "method": "Minimum deterministic literal check; not independent semantic verification"
+      },
+      "A3": {
+        "numerator": 8,
+        "denominator": 10,
+        "value": 0.8,
+        "threshold": 0.98,
+        "passed": false
+      },
+      "A4": {
+        "by_variant": {
+          "form+no_diacritics": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.92,
+            "passed": null
+          },
+          "keyword": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null,
+            "threshold": 0.85,
+            "passed": null
+          },
+          "slang": {
+            "numerator": 25,
+            "denominator": 30,
+            "value": 0.8333333333333334,
+            "threshold": 0.75,
+            "passed": true
+          }
+        },
+        "passed": null
+      },
+      "A5": {
+        "numerator": 24,
+        "denominator": 27,
+        "value": 0.8888888888888888,
+        "threshold": 0.95,
+        "passed": false,
+        "misses": [
+          {
+            "case_id": "R2-H3-0112",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0140",
+            "repeat": 1
+          },
+          {
+            "case_id": "R2-H3-0148",
+            "repeat": 1
+          }
+        ]
+      },
+      "A6": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null,
+        "threshold": 0.95,
+        "passed": null,
+        "inconsistent_cases": []
+      },
+      "A7": {
+        "numerator": 0,
+        "denominator": 40,
+        "value": 0.0,
+        "threshold": 0.01,
+        "passed": true,
+        "by_error_type": {},
+        "by_phase": {}
+      },
+      "A8": {
+        "median_seconds": 8.339733599997999,
+        "p95_seconds": 11.749906900004135,
+        "first_byte_median_seconds": 0.06476085000031162,
+        "first_byte_p95_seconds": 4.701622900000075,
+        "first_content_median_seconds": 7.083085499994922,
+        "first_content_p95_seconds": 9.444611999992048,
+        "thresholds_seconds": {
+          "median": 6,
+          "p95": 12,
+          "first_byte_median": 2
+        },
+        "samples": 40,
+        "first_byte_samples": 40,
+        "passed": false
+      },
+      "A9": {
+        "passed": null,
+        "status": "EXTERNAL",
+        "reason": "Separate safety/routing/tool campaign required"
+      },
+      "failures": [
+        {
+          "case_id": "R2-H3-0008",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0012",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0028",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0032",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0036",
+          "repeat": 1,
+          "criteria": [
+            "A1",
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0044",
+          "repeat": 1,
+          "criteria": [
+            "A2"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0048",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0056",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0060",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0076",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0080",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0084",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0096",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0100",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "OVER_REFUSE"
+        },
+        {
+          "case_id": "R2-H3-0104",
+          "repeat": 1,
+          "criteria": [
+            "A1"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0112",
+          "repeat": 1,
+          "criteria": [
+            "A5"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0120",
+          "repeat": 1,
+          "criteria": [
+            "A4"
+          ],
+          "label": "UNLABELED"
+        },
+        {
+          "case_id": "R2-H3-0140",
+          "repeat": 1,
+          "criteria": [
+            "A5",
+            "A3"
+          ],
+          "label": "OVER_ANSWER"
+        },
+        {
+          "case_id": "R2-H3-0148",
+          "repeat": 1,
+          "criteria": [
+            "A5",
+            "A3"
+          ],
+          "label": "OVER_ANSWER"
+        }
+      ]
+    }
+  },
+  "case_outcomes": {
+    "R2-H3-0001": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "2997ead40e6d44483fbc603ec1cf0a65a0c4f34d93fa8eadd7a6e0396ed2bcf5"
+      }
+    ],
+    "R2-H3-0002": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "1260da4134d27b4d88f4a744a81fd1b9071fc0a3089896fe6e2f893ba4fa72d7"
+      }
+    ],
+    "R2-H3-0003": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c681799de3ed64b9ec5716e8d9173b41d8ddec3369a38a9fc98dc3b8363f526b"
+      }
+    ],
+    "R2-H3-0004": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "67cabc5f6b2cbaf4d0a6410de2b54d00f799a94eee0ae5b559c380f32a3e621e"
+      }
+    ],
+    "R2-H3-0005": [
+      {
+        "repeat": 1,
+        "outcome_class": "partial",
+        "result_sha256": "89eeae22d759f80334a2dc2a3d1815ea7b56db0c667634612ca06c9e470b37bb"
+      }
+    ],
+    "R2-H3-0006": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "4ad171593c23949ea56c8a9e3b39055368e1f0ee1de068c418f9393e2387436a"
+      }
+    ],
+    "R2-H3-0007": [
+      {
+        "repeat": 1,
+        "outcome_class": "partial",
+        "result_sha256": "9da2f538829fb8c1c6490dd51258b6efa4cd2abe516f95a7e16cb042e393fe60"
+      }
+    ],
+    "R2-H3-0008": [
+      {
+        "repeat": 1,
+        "outcome_class": "partial",
+        "result_sha256": "7605b51b2e02dafce655c8a4da74fecc587530704a7dcda933b89a719bcde412"
+      }
+    ],
+    "R2-H3-0009": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "4ad171593c23949ea56c8a9e3b39055368e1f0ee1de068c418f9393e2387436a"
+      }
+    ],
+    "R2-H3-0010": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "4ad171593c23949ea56c8a9e3b39055368e1f0ee1de068c418f9393e2387436a"
+      }
+    ],
+    "R2-H3-0011": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "4ad171593c23949ea56c8a9e3b39055368e1f0ee1de068c418f9393e2387436a"
+      }
+    ],
+    "R2-H3-0012": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "4ad171593c23949ea56c8a9e3b39055368e1f0ee1de068c418f9393e2387436a"
+      }
+    ],
+    "R2-H3-0013": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "3fd9990ece5d0cf8d551f02574ad78da5cc33d40471df5c2d6322ff3230c9090"
+      }
+    ],
+    "R2-H3-0014": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0015": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "25026469caf155faff2478451e234de1b38b3c0e932b6a301a0f9a4e0d513017"
+      }
+    ],
+    "R2-H3-0016": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "b9f40223810b38bd879a100c283e6641676e11d6b0c865afb085a76f1f26875c"
+      }
+    ],
+    "R2-H3-0017": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "e5f21565d01bec1f1470e62fd3b85cf01a95c075d8fdfe7d07fd187502a428f1"
+      }
+    ],
+    "R2-H3-0018": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "e5f21565d01bec1f1470e62fd3b85cf01a95c075d8fdfe7d07fd187502a428f1"
+      }
+    ],
+    "R2-H3-0019": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "163cb32f052d512ad0f7439b64e9e6ddb1b64dc7d0afb6771acf2015a375b93a"
+      }
+    ],
+    "R2-H3-0020": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "429b5a06420ba04255c1c3673b8e9b0e86b6a3227b7360b5c88db35fc6847d22"
+      }
+    ],
+    "R2-H3-0021": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "8ffd581b328ef3f42c89f3a2b9c940f9a61d15325fd27a7d28cff68b68f35d9a"
+      }
+    ],
+    "R2-H3-0022": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "3ed8c8abff11ed41ba21887d01117e2cd93120d00d30d15a44c2bceae4d7bad4"
+      }
+    ],
+    "R2-H3-0023": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "71c27acca58b6642bf92bc674a5944318d36285bbdecfd491fd19891f9647191"
+      }
+    ],
+    "R2-H3-0024": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "bfe7b9fecb4548258c9311ffdc9691ada8ba592fe681e625b3d4feac207b2708"
+      }
+    ],
+    "R2-H3-0025": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "91f4aa386defbf7c87bfbf369c4f2565dfac602aef08188bc3092951da099081"
+      }
+    ],
+    "R2-H3-0026": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "04b226a866f7f94b979990abcf2fbcd5bdd95d7341cc2efe8099e61efd2ef4bb"
+      }
+    ],
+    "R2-H3-0027": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "e3321f9fa8072db8feea55943299f80edc378ccff8a471043852007d5160011b"
+      }
+    ],
+    "R2-H3-0028": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "299aff9cadc80db28a5350ff466db48d75f67fc10de847903e99daf6c0a60a43"
+      }
+    ],
+    "R2-H3-0029": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "d03b054da4b07377a5de5ad6d71b2e2fd56fac89aa53b16da544c0aa010d275b"
+      }
+    ],
+    "R2-H3-0030": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "d03b054da4b07377a5de5ad6d71b2e2fd56fac89aa53b16da544c0aa010d275b"
+      }
+    ],
+    "R2-H3-0031": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "dbbadad854a6fff3f4a971b2e9056958a22a77fd1b0ca7994c9a6566de660841"
+      }
+    ],
+    "R2-H3-0032": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "f42389424f6f8b71cc479ac36bb6c620e6f20a9836b828d439d8329431db8529"
+      }
+    ],
+    "R2-H3-0033": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c54f37eea8cb1a75c9bab609d5bffd61c21900d29a3e88cc8adaa96e0c318948"
+      }
+    ],
+    "R2-H3-0034": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "b607abd205038282f51d0a483e4ac275d078c39f279f5ebfc60ebade878b6345"
+      }
+    ],
+    "R2-H3-0035": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "cc8b543e2b348d8ad8209c64a7276a97d2cc0e19cece81e9bab6971ac2ce57a9"
+      }
+    ],
+    "R2-H3-0036": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "7c3d982cda69bd7f7e4daf8f69e0c1560d01d8cb7346007887f8e221d380b100"
+      }
+    ],
+    "R2-H3-0037": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "95f3ad8bc0c7535f593f6b38ce28cef3d871b996f6c1534004ae87c8f1e422f3"
+      }
+    ],
+    "R2-H3-0038": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "95f3ad8bc0c7535f593f6b38ce28cef3d871b996f6c1534004ae87c8f1e422f3"
+      }
+    ],
+    "R2-H3-0039": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "a54b5d7e87692fc94a2360ffbe24b13e3a083a7a2b07eeb1350e471a5c83295e"
+      }
+    ],
+    "R2-H3-0040": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "95f3ad8bc0c7535f593f6b38ce28cef3d871b996f6c1534004ae87c8f1e422f3"
+      }
+    ],
+    "R2-H3-0041": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "fdb2144cc84bbf4630a8863271b32ec49670e7f9e596fd4e5129afc344e77e2e"
+      }
+    ],
+    "R2-H3-0042": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "2545a48542b44ff0da51900f3ea12964a8a28bd8b2a7ca5c8438c562d44bcce9"
+      }
+    ],
+    "R2-H3-0043": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "444925b79df2dcf35701a36f149f00e51784b327a021b0cf9aefbff54da7c98b"
+      }
+    ],
+    "R2-H3-0044": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "5dc549b39faa9fdf55e76764cfe0323f5615592b396da6ff2f92e13fdd1accb1"
+      }
+    ],
+    "R2-H3-0045": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "0f6a527d862ded63788e5e3d810bcd63e9508342e9cafcb7856daf9e5f6a7577"
+      }
+    ],
+    "R2-H3-0046": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "0f6a527d862ded63788e5e3d810bcd63e9508342e9cafcb7856daf9e5f6a7577"
+      }
+    ],
+    "R2-H3-0047": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "8ef3bcad54749de23359bdcdd65f788ad2572760d81d0d0af86642b514af71ec"
+      }
+    ],
+    "R2-H3-0048": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "0f6a527d862ded63788e5e3d810bcd63e9508342e9cafcb7856daf9e5f6a7577"
+      }
+    ],
+    "R2-H3-0049": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "8cdc155bc7a418addc2e9fcab4d75d9ae5e44b0ce86b75026fc98f751e211e65"
+      }
+    ],
+    "R2-H3-0050": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "8cdc155bc7a418addc2e9fcab4d75d9ae5e44b0ce86b75026fc98f751e211e65"
+      }
+    ],
+    "R2-H3-0051": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "624221a36e52135e50aed88453d4d888cdda853c35642defaba1420a82252f05"
+      }
+    ],
+    "R2-H3-0052": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "8cdc155bc7a418addc2e9fcab4d75d9ae5e44b0ce86b75026fc98f751e211e65"
+      }
+    ],
+    "R2-H3-0053": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "f0190b77177a8442cf44d97abc97e20eaa984157a8bc80425c0834391ded5d6d"
+      }
+    ],
+    "R2-H3-0054": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "1b6afef9c9f2f1d0e92a6e70bdda87b59f8b69da00dd25c650ab7a79387b7a2c"
+      }
+    ],
+    "R2-H3-0055": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "ab45e49269d1b5bca2541050e4fe664ad3962676823a8dd3feb51161f399f76f"
+      }
+    ],
+    "R2-H3-0056": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "1b6afef9c9f2f1d0e92a6e70bdda87b59f8b69da00dd25c650ab7a79387b7a2c"
+      }
+    ],
+    "R2-H3-0057": [
+      {
+        "repeat": 1,
+        "outcome_class": "partial",
+        "result_sha256": "206b8068de42c8b50e254553a0fb2b2a061301919fed8359bb49ca98e03d400e"
+      }
+    ],
+    "R2-H3-0058": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0059": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "edc2a4bc4509a09a5a8e7fee6dfe3f669dc0a13634f3e89f538ff11cbb3d493c"
+      }
+    ],
+    "R2-H3-0060": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "a52a6a8ddcb07e3ca53bd1bac1181402f0291da3ac59232416157f01bba601b2"
+      }
+    ],
+    "R2-H3-0061": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "b638f94ca1b9c19b6f6182db8188bd4f6bb3f9b41ea1672e0e7742bb70f5abd3"
+      }
+    ],
+    "R2-H3-0062": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "5bbe7016d18d302e2541e29a31a88d37cbe4332b423c72e0362039293ec3e9c3"
+      }
+    ],
+    "R2-H3-0063": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c4bcba426c915dd4c30cfd33541039f226d8c3a82b7ac5bc0917c5bd8ffff883"
+      }
+    ],
+    "R2-H3-0064": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "dc8adfc6e781ae94fcf64754ee74f19ebb0f45decc779bed0673209d581cf3f6"
+      }
+    ],
+    "R2-H3-0065": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "24fd08261bfaa4802db11b7852df961dbd74759edc5c04b93b6caa380de79998"
+      }
+    ],
+    "R2-H3-0066": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0067": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c448cfc76e1237ac76d580cb1c6706d727e27fb1b1a91b961599f0353e703031"
+      }
+    ],
+    "R2-H3-0068": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "5df3b7571a55f3ca15dfb71d8bb0207beb5c046a8f73d13812a76defa56a9f3c"
+      }
+    ],
+    "R2-H3-0069": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "886de77ac669219850fc99aeca4720caf7a6d69e28df8f9eb6589842db7a2215"
+      }
+    ],
+    "R2-H3-0070": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "5ffb7071442f2f889f5eada03c02841fe3ea397c1e54048c359241f68c2db146"
+      }
+    ],
+    "R2-H3-0071": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "780108c24ba3b919912e7c603d4d4c7aa7c08bc380fa11571c5b112003ef249e"
+      }
+    ],
+    "R2-H3-0072": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "3ffdde76e3b035880ed9d2fb0de899379e78aba1bc9073254c138bce73a781f2"
+      }
+    ],
+    "R2-H3-0073": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "25eff00af1701a856b9dd3e809c180b37bfadd5cb3fc68ea8aff49bb9329642c"
+      }
+    ],
+    "R2-H3-0074": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "f7530798fc191bf9bba0696f243cfdc5e06023227770ccae54652f2cc6477fb1"
+      }
+    ],
+    "R2-H3-0075": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "47ab7853b3d9c3b6551573fe01454fc8d9847fcd7174c010f17cd9743b5de740"
+      }
+    ],
+    "R2-H3-0076": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "2955af6aa594f5c4a6dd77420f80e449faeb8f92c29a53bfbf18161c7570f970"
+      }
+    ],
+    "R2-H3-0077": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c7af63681c78a979389a3654ae058de191e6ca92c66793d2301ecf2ed1cc5e12"
+      }
+    ],
+    "R2-H3-0078": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "db6e2d2dfad3fb3ff6f9c9f352c57e88f6de9a6026f4cccc158e373ce761903e"
+      }
+    ],
+    "R2-H3-0079": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "ddd2f32f14ecaa4e69408c252e63c11507d08b065e662cc64afd23742c4a42f2"
+      }
+    ],
+    "R2-H3-0080": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "ddd2f32f14ecaa4e69408c252e63c11507d08b065e662cc64afd23742c4a42f2"
+      }
+    ],
+    "R2-H3-0081": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "ad4f28dad0fb3ae49cfa2037dee8a5a35fee753bcf6d65e4b64ac893043b47ee"
+      }
+    ],
+    "R2-H3-0082": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "71c0ba351834baf5775b6d081f7091d864d44c41de0b5f88d62e654d120cfe39"
+      }
+    ],
+    "R2-H3-0083": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "94befbbae489d01b3983b1b275455774b804b2d2b3c7324361b7d155137fab69"
+      }
+    ],
+    "R2-H3-0084": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "f8f469632e63f4c4a592d1e596c18b500c9360bda5c7cc4be541caa805c57aad"
+      }
+    ],
+    "R2-H3-0085": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "4ccf38695e919a3c552b3cd44da340b64c17eb53ec49334b7db7de62e748325f"
+      }
+    ],
+    "R2-H3-0086": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c45d29a477f4cd0991ce3f84d892f4c99d624f7c0e7fac4d8a2b3385cb2e51a1"
+      }
+    ],
+    "R2-H3-0087": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "21b63759511597bbafdb7bc73b53fd50fff4603f8dac2a5fee3eac0d4a3aba17"
+      }
+    ],
+    "R2-H3-0088": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "4ccf38695e919a3c552b3cd44da340b64c17eb53ec49334b7db7de62e748325f"
+      }
+    ],
+    "R2-H3-0089": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "f7c445417742927b2ff4dc7dd25262e0a53001be6a104e483ac106cb7a64b306"
+      }
+    ],
+    "R2-H3-0090": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "513ef31519142d2cf491d72de663114240d2191d3f1eb9dfe84f3c20e6cd727e"
+      }
+    ],
+    "R2-H3-0091": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "f373f82d8076045161b7c5012e55967df818e8d45dfcbc74ff4bd7c062667d1a"
+      }
+    ],
+    "R2-H3-0092": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "6a414fa62b3be9aee90afe7f290a6bb1fbece6fc6b4d34423096566acbc3396e"
+      }
+    ],
+    "R2-H3-0093": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "d6e69780e83abc2963f63c92bcf48a70b865061cca0c50dc0fb69db2f0d1d077"
+      }
+    ],
+    "R2-H3-0094": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "67e41838d6c077f5bcd5ec10a14d9583b284a1242ad2d2a8a8f537f10be72443"
+      }
+    ],
+    "R2-H3-0095": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "ae937d385f6c32d60ddc6dbefc2bb3a61a58c7e10d8cc1fc4699fc5e3a4d0eb5"
+      }
+    ],
+    "R2-H3-0096": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0097": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "12c74ad8163e3064c1f92173da509788bee97b7c866d68b800eb87efcb82c170"
+      }
+    ],
+    "R2-H3-0098": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "12c74ad8163e3064c1f92173da509788bee97b7c866d68b800eb87efcb82c170"
+      }
+    ],
+    "R2-H3-0099": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0100": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0101": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "243ad2d3b7871e71a4d5be5ae7a21eaf12fe19237a4b92a02ad21a86871a41d7"
+      }
+    ],
+    "R2-H3-0102": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "aa43b753f8808f98e78e1bf3bcd0ce72954928466c536d7c01eb8f8dfd079098"
+      }
+    ],
+    "R2-H3-0103": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c71a3c60d378a0250b2ce8116f3548d54cedead6b9154787d1e3d70bd01a206c"
+      }
+    ],
+    "R2-H3-0104": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "844edb2284d5b3a2ba476fa9f1cf889d26704575f0b85c9a114f4907e55dffad"
+      }
+    ],
+    "R2-H3-0105": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "3aae59590481912e3f9d7cda2847d784ee770b9f89ec051ec30b89e85a15919c"
+      }
+    ],
+    "R2-H3-0106": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0107": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "3aae59590481912e3f9d7cda2847d784ee770b9f89ec051ec30b89e85a15919c"
+      }
+    ],
+    "R2-H3-0108": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "f8355acddc499b8662f47bed178333156a37f2348b72a67f2f498ac55aa8def0"
+      }
+    ],
+    "R2-H3-0109": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c9acedbe3959c0396857ce534fded1bb76a402e5f943df0c66f24d89ec4d44f5"
+      }
+    ],
+    "R2-H3-0110": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "c9acedbe3959c0396857ce534fded1bb76a402e5f943df0c66f24d89ec4d44f5"
+      }
+    ],
+    "R2-H3-0111": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "a3cd193b8ed5cd2bc0050d5ffa2da2b9023712900c7acea7c7e1a8e6e35600d1"
+      }
+    ],
+    "R2-H3-0112": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "b9e649c330bb14836debb940a2dc85af4fcb78153c90e5122ae1d05444b2fb5c"
+      }
+    ],
+    "R2-H3-0113": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "e1fbc208bae6fb9b5ef527cfe6426fe51169cf68943d67a753d2d23ff41dc589"
+      }
+    ],
+    "R2-H3-0114": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "82c9a15fe70e7422041ab3d4bda5d29ebbdfb8f0ed75db83e899892a0f344800"
+      }
+    ],
+    "R2-H3-0115": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "dca6cefa76f4fc17687cd083c71e172bc9b0a8a63623c6a6a6db69adfbb078ef"
+      }
+    ],
+    "R2-H3-0116": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "e3a0e91e967219d2f3e8d1402c4244b7e517ab3e6f12066e6f4890a70a5df605"
+      }
+    ],
+    "R2-H3-0117": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "d2358eb39f6063b786ee6aacd95605e5d5c7fe7e20e4f08d69363784d2018e6e"
+      }
+    ],
+    "R2-H3-0118": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "d2358eb39f6063b786ee6aacd95605e5d5c7fe7e20e4f08d69363784d2018e6e"
+      }
+    ],
+    "R2-H3-0119": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "d2358eb39f6063b786ee6aacd95605e5d5c7fe7e20e4f08d69363784d2018e6e"
+      }
+    ],
+    "R2-H3-0120": [
+      {
+        "repeat": 1,
+        "outcome_class": "clarify",
+        "result_sha256": "69022ca8f8b090795a5f3cb0d2f8325f0fcaeeb466406fdf3d2f4ead92a24294"
+      }
+    ],
+    "R2-H3-0121": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "299aff9cadc80db28a5350ff466db48d75f67fc10de847903e99daf6c0a60a43"
+      }
+    ],
+    "R2-H3-0122": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0123": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0124": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0125": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0126": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0127": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "299aff9cadc80db28a5350ff466db48d75f67fc10de847903e99daf6c0a60a43"
+      }
+    ],
+    "R2-H3-0128": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0129": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0130": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "299aff9cadc80db28a5350ff466db48d75f67fc10de847903e99daf6c0a60a43"
+      }
+    ],
+    "R2-H3-0131": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0132": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "299aff9cadc80db28a5350ff466db48d75f67fc10de847903e99daf6c0a60a43"
+      }
+    ],
+    "R2-H3-0133": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0134": [
+      {
+        "repeat": 1,
+        "outcome_class": "clarify",
+        "result_sha256": "74a9d0b9831792826eab64bfc6becf20aa85e88dd8bf1506f8cffdcb812b8c54"
+      }
+    ],
+    "R2-H3-0135": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "299aff9cadc80db28a5350ff466db48d75f67fc10de847903e99daf6c0a60a43"
+      }
+    ],
+    "R2-H3-0136": [
+      {
+        "repeat": 1,
+        "outcome_class": "clarify",
+        "result_sha256": "dcc6bae3fafdb7ec610957a171e45555b05b374ab28d64c4d60700b7b566391b"
+      }
+    ],
+    "R2-H3-0137": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "4a9d4c40bf2a3155712702934edd88530a2abe164e67e62b401c78bf045241e5"
+      }
+    ],
+    "R2-H3-0138": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0139": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "5029c6b7f585340b3c34f832a7a772770844fe316df62da929d261668aa913d6"
+      }
+    ],
+    "R2-H3-0140": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "35928ed67a3165204f92066c1d4f4cac4a1668c3bbb4bcdd50332c6753c93931"
+      }
+    ],
+    "R2-H3-0141": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0142": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0143": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0144": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0145": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0146": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0147": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0148": [
+      {
+        "repeat": 1,
+        "outcome_class": "answer",
+        "result_sha256": "959f38e78747aec6f5057b3c520ae60a2d3b5cc6846e07d31053c85d0add7426"
+      }
+    ],
+    "R2-H3-0149": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0150": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0151": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0152": [
+      {
+        "repeat": 1,
+        "outcome_class": "clarify",
+        "result_sha256": "69022ca8f8b090795a5f3cb0d2f8325f0fcaeeb466406fdf3d2f4ead92a24294"
+      }
+    ],
+    "R2-H3-0153": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0154": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0155": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0156": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0157": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0158": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "b239cab9766c820f8c10a221ef396cda106fb53b37c1c47d4802d21226029da8"
+      }
+    ],
+    "R2-H3-0159": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "299aff9cadc80db28a5350ff466db48d75f67fc10de847903e99daf6c0a60a43"
+      }
+    ],
+    "R2-H3-0160": [
+      {
+        "repeat": 1,
+        "outcome_class": "refuse",
+        "result_sha256": "299aff9cadc80db28a5350ff466db48d75f67fc10de847903e99daf6c0a60a43"
+      }
+    ]
+  },
+  "provenance": {
+    "issues": [
+      "missing_or_unexpected_repeat"
+    ],
+    "manifests": [
+      {
+        "cases_sha256": "cd46ce3d120ff422b13efdbfae7f5fe119e2804ffded1c9b7b834e23de192969",
+        "base_url": "http://127.0.0.1:8015",
+        "engine": "v2",
+        "git_commit": "49027aa40c14a942f819a0d85ed964d352a69e28",
+        "git_branch": "rag-v2-hardening",
+        "started_at": "2026-11-01T01:06:11.069203+00:00",
+        "campaign_id": "0e34cc33db62486d8e40b3c91d39ad3e",
+        "environment_flags": {}
+      }
+    ],
+    "cases_sha256": "cd46ce3d120ff422b13efdbfae7f5fe119e2804ffded1c9b7b834e23de192969"
+  },
+  "attempt_metrics": {
+    "first_attempt": {
+      "numerator": 0,
+      "denominator": 160,
+      "value": 0.0,
+      "threshold": 0.01,
+      "passed": true
+    },
+    "after_retry": {
+      "numerator": 0,
+      "denominator": 160,
+      "value": 0.0,
+      "threshold": 0.01,
+      "passed": true
+    },
+    "all_attempts": {
+      "numerator": 0,
+      "denominator": 160,
+      "value": 0.0,
+      "threshold": 0.01,
+      "passed": true
+    },
+    "journal_available": true,
+    "first_attempt_measured": true
+  },
+  "coverage": {
+    "selected_cases": 160,
+    "attempts": 160,
+    "missing_cases": [],
+    "fewer_than_three_repeats": [
+      "R2-H3-0001",
+      "R2-H3-0002",
+      "R2-H3-0003",
+      "R2-H3-0004",
+      "R2-H3-0005",
+      "R2-H3-0006",
+      "R2-H3-0007",
+      "R2-H3-0008",
+      "R2-H3-0009",
+      "R2-H3-0010",
+      "R2-H3-0011",
+      "R2-H3-0012",
+      "R2-H3-0013",
+      "R2-H3-0014",
+      "R2-H3-0015",
+      "R2-H3-0016",
+      "R2-H3-0017",
+      "R2-H3-0018",
+      "R2-H3-0019",
+      "R2-H3-0020",
+      "R2-H3-0021",
+      "R2-H3-0022",
+      "R2-H3-0023",
+      "R2-H3-0024",
+      "R2-H3-0025",
+      "R2-H3-0026",
+      "R2-H3-0027",
+      "R2-H3-0028",
+      "R2-H3-0029",
+      "R2-H3-0030",
+      "R2-H3-0031",
+      "R2-H3-0032",
+      "R2-H3-0033",
+      "R2-H3-0034",
+      "R2-H3-0035",
+      "R2-H3-0036",
+      "R2-H3-0037",
+      "R2-H3-0038",
+      "R2-H3-0039",
+      "R2-H3-0040",
+      "R2-H3-0041",
+      "R2-H3-0042",
+      "R2-H3-0043",
+      "R2-H3-0044",
+      "R2-H3-0045",
+      "R2-H3-0046",
+      "R2-H3-0047",
+      "R2-H3-0048",
+      "R2-H3-0049",
+      "R2-H3-0050",
+      "R2-H3-0051",
+      "R2-H3-0052",
+      "R2-H3-0053",
+      "R2-H3-0054",
+      "R2-H3-0055",
+      "R2-H3-0056",
+      "R2-H3-0057",
+      "R2-H3-0058",
+      "R2-H3-0059",
+      "R2-H3-0060",
+      "R2-H3-0061",
+      "R2-H3-0062",
+      "R2-H3-0063",
+      "R2-H3-0064",
+      "R2-H3-0065",
+      "R2-H3-0066",
+      "R2-H3-0067",
+      "R2-H3-0068",
+      "R2-H3-0069",
+      "R2-H3-0070",
+      "R2-H3-0071",
+      "R2-H3-0072",
+      "R2-H3-0073",
+      "R2-H3-0074",
+      "R2-H3-0075",
+      "R2-H3-0076",
+      "R2-H3-0077",
+      "R2-H3-0078",
+      "R2-H3-0079",
+      "R2-H3-0080",
+      "R2-H3-0081",
+      "R2-H3-0082",
+      "R2-H3-0083",
+      "R2-H3-0084",
+      "R2-H3-0085",
+      "R2-H3-0086",
+      "R2-H3-0087",
+      "R2-H3-0088",
+      "R2-H3-0089",
+      "R2-H3-0090",
+      "R2-H3-0091",
+      "R2-H3-0092",
+      "R2-H3-0093",
+      "R2-H3-0094",
+      "R2-H3-0095",
+      "R2-H3-0096",
+      "R2-H3-0097",
+      "R2-H3-0098",
+      "R2-H3-0099",
+      "R2-H3-0100",
+      "R2-H3-0101",
+      "R2-H3-0102",
+      "R2-H3-0103",
+      "R2-H3-0104",
+      "R2-H3-0105",
+      "R2-H3-0106",
+      "R2-H3-0107",
+      "R2-H3-0108",
+      "R2-H3-0109",
+      "R2-H3-0110",
+      "R2-H3-0111",
+      "R2-H3-0112",
+      "R2-H3-0113",
+      "R2-H3-0114",
+      "R2-H3-0115",
+      "R2-H3-0116",
+      "R2-H3-0117",
+      "R2-H3-0118",
+      "R2-H3-0119",
+      "R2-H3-0120",
+      "R2-H3-0121",
+      "R2-H3-0122",
+      "R2-H3-0123",
+      "R2-H3-0124",
+      "R2-H3-0125",
+      "R2-H3-0126",
+      "R2-H3-0127",
+      "R2-H3-0128",
+      "R2-H3-0129",
+      "R2-H3-0130",
+      "R2-H3-0131",
+      "R2-H3-0132",
+      "R2-H3-0133",
+      "R2-H3-0134",
+      "R2-H3-0135",
+      "R2-H3-0136",
+      "R2-H3-0137",
+      "R2-H3-0138",
+      "R2-H3-0139",
+      "R2-H3-0140",
+      "R2-H3-0141",
+      "R2-H3-0142",
+      "R2-H3-0143",
+      "R2-H3-0144",
+      "R2-H3-0145",
+      "R2-H3-0146",
+      "R2-H3-0147",
+      "R2-H3-0148",
+      "R2-H3-0149",
+      "R2-H3-0150",
+      "R2-H3-0151",
+      "R2-H3-0152",
+      "R2-H3-0153",
+      "R2-H3-0154",
+      "R2-H3-0155",
+      "R2-H3-0156",
+      "R2-H3-0157",
+      "R2-H3-0158",
+      "R2-H3-0159",
+      "R2-H3-0160"
+    ],
+    "holdout_three_repeats_complete": false,
+    "issues": [
+      "missing_or_unexpected_repeat"
+    ]
+  },
+  "distribution": {
+    "issues": [
+      "group_variants"
+    ]
+  }
+}

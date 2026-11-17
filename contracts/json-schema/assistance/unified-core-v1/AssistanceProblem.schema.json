@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "unified-error.v1",
+      "default": "unified-error.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "maximum": 599,
+      "minimum": 400,
+      "title": "Status",
+      "type": "integer"
+    },
+    "code": {
+      "pattern": "^[A-Z][A-Z0-9_]{2,63}$",
+      "title": "Code",
+      "type": "string"
+    },
+    "request_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "retryable": {
+      "title": "Retryable",
+      "type": "boolean"
+    },
+    "detail": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Detail",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "code",
+    "request_id",
+    "retryable",
+    "detail"
+  ],
+  "title": "AssistanceProblem",
+  "type": "object"
+}

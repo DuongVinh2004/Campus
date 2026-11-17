@@ -18,7 +18,7 @@ describe("CapabilityBanner Component (TASK-WEB-OPS-002)", () => {
     render(<CapabilityBanner status={status} />);
 
     expect(screen.getByRole("region")).toBeDefined();
-    expect(screen.getByText(/suy giảm năng lực/i)).toBeDefined();
+    expect(screen.getAllByText(status.message)).toHaveLength(2);
     expect(screen.getByText(/LLM Streaming/i)).toBeDefined();
     expect(screen.getByText(/Vector Search/i)).toBeDefined();
     // Non-color indicator

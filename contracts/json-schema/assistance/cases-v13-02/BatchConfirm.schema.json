@@ -1,0 +1,27 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "batch_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Batch Id",
+      "type": "string"
+    },
+    "target_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Target Hash",
+      "type": "string"
+    },
+    "confirmed": {
+      "const": true,
+      "title": "Confirmed",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "batch_id",
+    "target_hash",
+    "confirmed"
+  ],
+  "title": "BatchConfirm",
+  "type": "object"
+}

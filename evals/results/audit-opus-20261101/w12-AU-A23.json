@@ -1,0 +1,58 @@
+{
+  "case_id": "AU-A23",
+  "question": "Ngành Logistics đô thị do khoa nào quản lý, bằng gì?",
+  "required_facts": [
+    "Cầu Đường",
+    "Cử nhân"
+  ],
+  "indexes": {
+    "embedded2": {
+      "facts": {
+        "Cầu Đường": true,
+        "Cử nhân": true
+      },
+      "all_facts": true,
+      "units": [
+        {
+          "label": "[U1]",
+          "text": "⟦RAG_V2_CONTEXT⟧\nKế hoạch giảng dạy chương trình đào tạo trình độ cử nhân — Ngành Logistics và quản lý chuỗi cung ứng — Chuyên ngành Logistics đô thị (K71LGTDT)\n⟦RAG_V2_SOURCE⟧\nBỘ GIÁO DỤC VÀ ĐÀO TẠO\nTRƯỜNG ĐH XÂY DỰNG HN\nKẾ HOẠCH GIẢNG DẠY CHƯƠNG TRÌNH ĐÀO TẠO TRÌNH ĐỘ CỬ NHÂN \nNGÀNH LOGISTICS VÀ QUẢN LÝ CHUỖI CUNG ỨNG/CHUYÊN NGÀNH LOGISTICS ĐÔ THỊ\n(K71LGTDT)\nHọc kỳ 1 Học kỳ 2 Học kỳ 3 Học kỳ 4 Học kỳ 5 Học kỳ 6 Học kỳ 7\n4288011 – 3\nTriết học Mác-Lênin\n428802 – 2\nKinh tế chính trị Mác\u0002Lênin\n428803 – 2\nChủ nghĩa xã hội \nkhoa học\n418801 – 2\nLịch sử Đảng cộng sản \nVN\n418802 – 2\nTư tưởng \nHồ Chí Minh\n370407 – 3\nTài chính kế toán và \nTMĐT\n160479 – 3\nThực tập\ntốt nghiệp\n370401 – 3\nKinh tế học vi mô\n370404 – 2\nKinh tế học vĩ mô\n160504 – 2\nĐầu tư cơ sở hạ tầng\nLogistics\n160502 – 3 (2)\nVận tải đa phương thức\n160434 – 1\nChuyên đề Logistics \nđô thị 1\n160448 – 1\nChuyên đề Logistics\nđô thị 2\n160480 – 7\nĐồ án tốt nghiệp\n361455 – 2\nCơ sở khoa học \nquản lý\n360401 – 2\nQuản trị học\n170402 – 3\nQuản lý Logistics\n170406 – 3\nQuản lý thu mua\n170413– 3\nQuản lý rủi ro trong \nLogistics và CCU\n160444 – 3 (2)\nQuản lý Logistics GTVT \nđô thị\n510211 – 2\nPháp luật đại cương\n400101 – 2\nXác suất thống kê\n160432 – 3\nĐịa lý giao thông vận \ntải\n140419 – 3\nHệ thống thông tin quản \nlý\n170405– 3\nMô hình RQĐ trong \nCCU\n140420 – 2\nỨng dụng GIS trong quản \nlý phát triển đô thị\n160430 – 2\nNhập môn Logistics \nđô thị\n320203 – 3 \nĐô thị học\n360402 – 3 (2)\nKinh tế kỹ thuật\n160435 – 2\nNền tảng đô thị thông \nminh và bền vững\n160505 – 2\nPhát triển bền vững hạ\ntầng Logistics\n160442 – 3\nLập kế hoạch và thiết kế\nLogistics đô thị\n390111 – 3\nĐại số\ntuyến tính\n400401 – 3\nToán kinh tế\n160501 – 3\nVận trù học\n450121 – 3\nNgôn ngữ lập trình \nPython \n170408 – 3\nQuản lý tồn kho trong \nCCU \n160438 – 3\nTối ưu hóa hệ thống \nLogistics đô thị\n940201 – 2\nNăng lực số cơ bản\n160431 – 2\nKỹ thuật dự báo\n170404 – 3\nQuản lý chuỗi cung \nứng\n471726– 2\nThuật toán và cấu trúc \ndữ liệu\n160433 – 3\nPhân tích cơ sở dữ liệu \nLogistics\n160443 – 2\nDự báo Logistics\nGiáo dục\nthể chất 1 – 1TC\n446601 – 2\nAnh ngữ 1 \n446602 – 2\nAnh ngữ 2 \n446603 – 2\nAnh ngữ 3\n446604 – 2\nAnh ngữ 4\n160439 – 2\nLogistics chặng cuối\n510401 – 2\nPháp luật Logistics\nGiáo dục \nThế chất 3 – 1TC\nMôn tự chọn – 2 \n(Chọn 1 trong 2 môn)\nMôn tự chọn – 2\n(Chọn 1 trong 2 môn)\nGiáo dục \nThế chất 2 – 1TC\n160436 – 2\nPhương pháp NCKH\n280402 – 2\nƯD Robotic và tự vận hành \ntrong Logistics GTVT\n480101 – 8\nGiáo dục quốc phòng \n1,2,3,4\n160437 – 2\nKỹ năng nghề nghiệp\n160481 – 2\nỨng dụng công nghệ mới \ntrong Logistics đô thị\n17 20 21 20 21 21 10\nTổng 130 TC (Không tính HP Giáo dục thể chất và Giáo dục quốc phòng)\nGhi chú và kí hiệu: Học phần tiên quyết Học phần; Học phần song hành; Học phần tự chọn.\nNgười lập Trưởng khoa Cầu đường Trưởng phòng Quản lý Đào tạo",
+          "scope": {
+            "cohorts": [],
+            "programs": [],
+            "academic_years": []
+          }
+        }
+      ],
+      "chunk_ids": [
+        "01a16d41-d718-76e3-95f7-90b0009ba0f0"
+      ],
+      "context_sha256": "12a7c6a7fdae3e345a2dc2837874ce5b91cd9127a4edd734d96a08e095e636fc",
+      "packing": "RagV2Service -> generate_draft (recording gateway)",
+      "provider_calls": 0
+    },
+    "embedded3": {
+      "facts": {
+        "Cầu Đường": true,
+        "Cử nhân": true
+      },
+      "all_facts": true,
+      "units": [
+        {
+          "label": "[U1]",
+          "text": "⟦RAG_V2_CONTEXT⟧\nKế hoạch giảng dạy chương trình đào tạo trình độ cử nhân — Ngành Logistics và quản lý chuỗi cung ứng — Chuyên ngành Logistics đô thị (K71LGTDT)\n⟦RAG_V2_SOURCE⟧\nBỘ GIÁO DỤC VÀ ĐÀO TẠO\nTRƯỜNG ĐH XÂY DỰNG HN\nKẾ HOẠCH GIẢNG DẠY CHƯƠNG TRÌNH ĐÀO TẠO TRÌNH ĐỘ CỬ NHÂN \nNGÀNH LOGISTICS VÀ QUẢN LÝ CHUỖI CUNG ỨNG/CHUYÊN NGÀNH LOGISTICS ĐÔ THỊ\n(K71LGTDT)\nHọc kỳ 1 Học kỳ 2 Học kỳ 3 Học kỳ 4 Học kỳ 5 Học kỳ 6 Học kỳ 7\n4288011 – 3\nTriết học Mác-Lênin\n428802 – 2\nKinh tế chính trị Mác\u0002Lênin\n428803 – 2\nChủ nghĩa xã hội \nkhoa học\n418801 – 2\nLịch sử Đảng cộng sản \nVN\n418802 – 2\nTư tưởng \nHồ Chí Minh\n370407 – 3\nTài chính kế toán và \nTMĐT\n160479 – 3\nThực tập\ntốt nghiệp\n370401 – 3\nKinh tế học vi mô\n370404 – 2\nKinh tế học vĩ mô\n160504 – 2\nĐầu tư cơ sở hạ tầng\nLogistics\n160502 – 3 (2)\nVận tải đa phương thức\n160434 – 1\nChuyên đề Logistics \nđô thị 1\n160448 – 1\nChuyên đề Logistics\nđô thị 2\n160480 – 7\nĐồ án tốt nghiệp\n361455 – 2\nCơ sở khoa học \nquản lý\n360401 – 2\nQuản trị học\n170402 – 3\nQuản lý Logistics\n170406 – 3\nQuản lý thu mua\n170413– 3\nQuản lý rủi ro trong \nLogistics và CCU\n160444 – 3 (2)\nQuản lý Logistics GTVT \nđô thị\n510211 – 2\nPháp luật đại cương\n400101 – 2\nXác suất thống kê\n160432 – 3\nĐịa lý giao thông vận \ntải\n140419 – 3\nHệ thống thông tin quản \nlý\n170405– 3\nMô hình RQĐ trong \nCCU\n140420 – 2\nỨng dụng GIS trong quản \nlý phát triển đô thị\n160430 – 2\nNhập môn Logistics \nđô thị\n320203 – 3 \nĐô thị học\n360402 – 3 (2)\nKinh tế kỹ thuật\n160435 – 2\nNền tảng đô thị thông \nminh và bền vững\n160505 – 2\nPhát triển bền vững hạ\ntầng Logistics\n160442 – 3\nLập kế hoạch và thiết kế\nLogistics đô thị\n390111 – 3\nĐại số\ntuyến tính\n400401 – 3\nToán kinh tế\n160501 – 3\nVận trù học\n450121 – 3\nNgôn ngữ lập trình \nPython \n170408 – 3\nQuản lý tồn kho trong \nCCU \n160438 – 3\nTối ưu hóa hệ thống \nLogistics đô thị\n940201 – 2\nNăng lực số cơ bản\n160431 – 2\nKỹ thuật dự báo\n170404 – 3\nQuản lý chuỗi cung \nứng\n471726– 2\nThuật toán và cấu trúc \ndữ liệu\n160433 – 3\nPhân tích cơ sở dữ liệu \nLogistics\n160443 – 2\nDự báo Logistics\nGiáo dục\nthể chất 1 – 1TC\n446601 – 2\nAnh ngữ 1 \n446602 – 2\nAnh ngữ 2 \n446603 – 2\nAnh ngữ 3\n446604 – 2\nAnh ngữ 4\n160439 – 2\nLogistics chặng cuối\n510401 – 2\nPháp luật Logistics\nGiáo dục \nThế chất 3 – 1TC\nMôn tự chọn – 2 \n(Chọn 1 trong 2 môn)\nMôn tự chọn – 2\n(Chọn 1 trong 2 môn)\nGiáo dục \nThế chất 2 – 1TC\n160436 – 2\nPhương pháp NCKH\n280402 – 2\nƯD Robotic và tự vận hành \ntrong Logistics GTVT\n480101 – 8\nGiáo dục quốc phòng \n1,2,3,4\n160437 – 2\nKỹ năng nghề nghiệp\n160481 – 2\nỨng dụng công nghệ mới \ntrong Logistics đô thị\n17 20 21 20 21 21 10\nTổng 130 TC (Không tính HP Giáo dục thể chất và Giáo dục quốc phòng)\nGhi chú và kí hiệu: Học phần tiên quyết Học phần; Học phần song hành; Học phần tự chọn.\nNgười lập Trưởng khoa Cầu đường Trưởng phòng Quản lý Đào tạo",
+          "scope": {
+            "cohorts": [],
+            "programs": [],
+            "academic_years": []
+          }
+        }
+      ],
+      "chunk_ids": [
+        "01a16d41-d718-76e3-95f7-90b0009ba0f0"
+      ],
+      "context_sha256": "12a7c6a7fdae3e345a2dc2837874ce5b91cd9127a4edd734d96a08e095e636fc",
+      "packing": "RagV2Service -> generate_draft (recording gateway)",
+      "provider_calls": 0
+    }
+  }
+}

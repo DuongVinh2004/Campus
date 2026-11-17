@@ -1,0 +1,144 @@
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [  9%]
+........................................................................ [ 12%]
+........................................................................ [ 15%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 24%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+........................................................................ [ 34%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 46%]
+..sssssssss........ssssssss.........s...ss..................ssss........ [ 49%]
+....ssssss................................s....ssss..................... [ 52%]
+........................................................................ [ 55%]
+...............ss.s.................................ss.................. [ 58%]
+.................................................s...................... [ 61%]
+..........................F............................................. [ 65%]
+............................................F........................... [ 68%]
+........................................................................ [ 71%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+........................................................................ [ 89%]
+........................................................................ [ 92%]
+........................................................................ [ 96%]
+........................................................................ [ 99%]
+.....................                                                    [100%]
+================================== FAILURES ===================================
+______________________ test_chat_sse_with_agent_workflow ______________________
+
+    @pytest.mark.asyncio
+    async def test_chat_sse_with_agent_workflow():
+        from campus247.agent.graph import CampusAgentWorkflow
+    
+        app = FastAPI()
+        identity_adapter = SyntheticIdentityAdapter(secret_key="secret-test-key-247")
+        app.add_middleware(IdentityMiddleware, adapter=identity_adapter)
+    
+        conv_service = ConversationMessageService()
+        workflow = CampusAgentWorkflow()
+        chat_router = create_chat_router(conv_service, agent_runner=workflow)
+        app.include_router(chat_router)
+    
+        client = TestClient(app)
+        student_id = "4b419a1b-6d41-7dfb-8943-2edd9f071385"
+        token = identity_adapter.mint_token(student_id)
+    
+        conv = await conv_service.create_conversation(owner_user_id=student_id)
+        resp = client.post(
+            f"/v1/conversations/{conv.id}/messages:stream",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"content": "Th\u1eddi kh\xf3a bi\u1ec3u tu\u1ea7n n\xe0y c\u1ee7a t\xf4i?"},
+        )
+        assert resp.status_code == 200
+        assert "event: message.started" in resp.text
+        assert "event: message.delta" in resp.text
+        assert "event: message.completed" in resp.text
+    
+        msgs = await conv_service.list_messages(conv.id)
+        assert len(msgs) == 2
+>       assert "Th\u1eddi kh\xf3a bi\u1ec3u" in msgs[1].content_redacted
+E       AssertionError: assert 'Th\u1eddi kh\xf3a bi\u1ec3u' in 'Ch\u1ee9c n\u0103ng n\xe0y ch\u01b0a k\u1ebft n\u1ed1i d\u1eef li\u1ec7u l\u1ecbch h\u1ecdc c\xe1 nh\xe2n c\u1ee7a HUCE. B\u1ea1n c\u1ea7n xem l\u1ecbch tr\xean c\u1ed5ng sinh vi\xean ch\xednh th\u1ee9c.'
+E        +  where 'Ch\u1ee9c n\u0103ng n\xe0y ch\u01b0a k\u1ebft n\u1ed1i d\u1eef li\u1ec7u l\u1ecbch h\u1ecdc c\xe1 nh\xe2n c\u1ee7a HUCE. B\u1ea1n c\u1ea7n xem l\u1ecbch tr\xean c\u1ed5ng sinh vi\xean ch\xednh th\u1ee9c.' = MessageRecord(id='01a197e5-f0d4-7da4-ae01-dd4a2911850b', conversation_id='01a197e5-f0cc-7ee1-9124-47213438c59c', seque...answered', response_class='tool_result', citations=(), agent_run_id=None, turn_client_id=None, turn_intent_sha256=None).content_redacted
+
+tests\api\test_chat_sse.py:150: AssertionError
+___ test_corrective_worker_calls_actual_lexical_search_and_original_reader ____
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit-opus-final3/test_corrective_worker_calls_a0')
+
+    @pytest.mark.asyncio
+    async def test_corrective_worker_calls_actual_lexical_search_and_original_reader(tmp_path):
+        """Actual source tools, scripted decisions/generation; no live-model quality claim."""
+        import re
+        from datetime import datetime, timezone
+        from campus247.agent.multi_rag import MultiAgentWorkflow
+        from campus247.agent.state import NormalizedTurn, Terminal
+        from campus247.domain.retrieval import AuthorizedScope, RetrievalContext, SimulationPolicy
+        from campus247.domain.shared.values import generate_uuid7
+        question = "T\xf3m t\u1eaft c\xe1c b\u01b0\u1edbc xin gi\u1ea5y x\xe1c nh\u1eadn sinh vi\xean c\xf3 c\u0103n c\u1ee9 t\u1eeb s\u1ed5 tay."
+        corpus = PublicKnowledgeStore(ROOT / "data/huce-public-20261013", tenant_id="huce-local-public", campus_id="HUCE", faq_directory=ROOT / "data/huce-faq-20261013")
+        class Corrective(SourceModel):
+            async def generate(self, request):
+                route = request.route_id
+                if route == "multi_coordinator_plan":
+                    self.plan["tasks"][0]["goal"] = question
+                    self.plan["items"] = [item("Q1", question)]
+                if route == "multi_research_query":
+                    self.calls.append(request)
+                    data = json.loads(request.input_items[0]["content"])["untrusted_data"]
+                    value = {"query": question if data["task"]["id"] == "T1" else
+                        "Quy tr\xecnh x\xe1c nh\u1eadn sinh vi\xean \u0111\u0103ng k\xfd M\u1ed9t c\u1eeda d\u1ecbch v\u1ee5 m\u1eabu x\xe1c nh\u1eadn tr\xecnh k\xfd l\u1ea5y d\u1ea5u tr\u1ea3 k\u1ebft qu\u1ea3 theo l\u1ecbch h\u1eb9n"}
+                    return LlmResponse(LlmResponseStatus.COMPLETED, "scripted", "source-control-flow", output_text=json.dumps(value, ensure_ascii=False), usage=TokenUsage(10, 0, 20))
+                if route in {"multi_research_report", "multi_verifier_coverage"}:
+                    self.calls.append(request)
+                    data = json.loads(request.input_items[0]["content"])["untrusted_data"]
+                    procedure = next((row for row in data["evidence"] if any(
+                        "2. Quy tr\xecnh x\xe1c nh\u1eadn sinh vi\xean" in span["text"] for span in row["original_spans"])), None)
+                    value = {"coverage": [{"item_id": "Q1", "status": "supported" if procedure else "missing_source", "supports": [
+                        {"requirement_id": "R1", "evidence_id": procedure["evidence_id"], "span_id": next(
+                            span["span_id"] for span in procedure["original_spans"] if "motcua.huce.edu.vn" in span["text"])}
+                    ] if procedure else []}]}
+                    return LlmResponse(LlmResponseStatus.COMPLETED, "scripted", "source-control-flow", output_text=json.dumps(value, ensure_ascii=False), usage=TokenUsage(10, 0, 20))
+                response = await super().generate(request)
+                if route == "grounded_faq":
+                    rendered = "\n".join(row["content"] for row in request.input_items)
+                    match = re.search(r"\\[(CIT-\\d{3})\\] Ngu\u1ed3n:[^\\n]*\\(Trang 39\\)", rendered)
+                    assert match
+                    value = json.loads(response.output_text)
+                    value["claims"][0]["citation_ids"] = [match.group(1)]
+                    return replace(response, output_text=json.dumps(value, ensure_ascii=False))
+                return response
+        model = Corrective(); model.supplement = True
+        turn = NormalizedTurn(generate_uuid7(), generate_uuid7(), "source-test-student", question)
+        ctx = RetrievalContext(AuthorizedScope("huce-local-public", "HUCE", turn.user_id,
+            frozenset({"STUDENT"}), frozenset({"STUDENT"}), frozenset({"PUBLIC"}), frozenset({"PUBLIC"})), "vi",
+            datetime.now(timezone.utc), SimulationPolicy.DENY, "1"*32)
+        workflow = MultiAgentWorkflow(store=SQLiteAgentRunStore(tmp_path / "real-source-runs.sqlite3"), source_reader=corpus,
+            context_search_fn=corpus.search, llm_gateway=model, require_retrieval_context=True, evidence_support_threshold=.78)
+        result = await workflow.arun(turn, retrieval_context=ctx)
+>       assert result.terminal == Terminal.ANSWERED, result.errors
+E       AssertionError: ('AI_AGENT_EVIDENCE_BUDGET_EXHAUSTED',)
+E       assert <Terminal.ABS...: 'abstained'> == <Terminal.ANS...D: 'answered'>
+E         
+E         - answered
+E         + abstained
+
+tests\api\test_multi_agent_api.py:260: AssertionError
+============================== warnings summary ===============================
+scripts\rag_v2_build_index.py:43
+scripts\rag_v2_build_index.py:43
+  C:\Users\Duong Vinh\Vinh\scripts\rag_v2_build_index.py:43: UserWarning: LEGACY_EMBED_CACHE_IGNORED
+    warnings.warn("LEGACY_EMBED_CACHE_IGNORED", stacklevel=1)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/api/test_chat_sse.py::test_chat_sse_with_agent_workflow - Assert...
+FAILED tests/api/test_multi_agent_api.py::test_corrective_worker_calls_actual_lexical_search_and_original_reader
+2 failed, 2282 passed, 41 skipped, 2 warnings in 425.96s (0:07:05)

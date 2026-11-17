@@ -1,0 +1,58 @@
+{
+  "$defs": {
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "resource": {
+      "$ref": "#/$defs/ResourceRef"
+    },
+    "binding_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Binding Hash",
+      "type": "string"
+    },
+    "source_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Source Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "resource",
+    "binding_hash",
+    "source_id"
+  ],
+  "title": "StaffSourceRead",
+  "type": "object"
+}

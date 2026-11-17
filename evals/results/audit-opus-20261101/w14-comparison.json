@@ -1,0 +1,70 @@
+{
+  "baseline": {
+    "facts_in_context": 281,
+    "dev": 262,
+    "audit": 19
+  },
+  "cases": 477,
+  "runs": {
+    "A": {
+      "summary": {
+        "facts_in_context": 281,
+        "dev": 262,
+        "audit": 19
+      },
+      "gained": [],
+      "lost": [],
+      "AU-A23": {
+        "case_id": "AU-A23",
+        "facts_in_context": true,
+        "chunk_ids": [
+          "01a16d41-d718-76e3-95f7-90b0009ba0f0"
+        ],
+        "context_sha256": "12a7c6a7fdae3e345a2dc2837874ce5b91cd9127a4edd734d96a08e095e636fc",
+        "line29_in_context": false
+      },
+      "sha256": "e75e7b89f2d996834a2c65aa50426aab78dc87e73e8bdfa97927ab3d06611b25"
+    },
+    "B": {
+      "summary": {
+        "facts_in_context": 281,
+        "dev": 262,
+        "audit": 19
+      },
+      "gained": [
+        "R2-A0-0142",
+        "R2-A3-0116",
+        "R2-Q2-0003",
+        "R2-Q2-0026"
+      ],
+      "lost": [
+        "R2-A0-0019",
+        "R2-A0-0062",
+        "R2-A3-0028",
+        "R2-A3-0040"
+      ],
+      "AU-A23": {
+        "case_id": "AU-A23",
+        "facts_in_context": true,
+        "chunk_ids": [
+          "01a16d41-d718-76e3-95f7-90b0009ba0f0"
+        ],
+        "context_sha256": "12a7c6a7fdae3e345a2dc2837874ce5b91cd9127a4edd734d96a08e095e636fc",
+        "line29_in_context": false
+      },
+      "sha256": "51a5dc05cd70c649ed11af5a8065948f7f335907c99d989886327e72fc7901de"
+    }
+  },
+  "adoptable": false,
+  "protected_sha256": {
+    "evals/corpus/served-chunks.jsonl": "ddeca7cb59d307be519dfca5ae7fa8e061cacd306e6d1af25718a1f8fc042524",
+    "evals/results/audit-opus-20261101/w12_sweep.py": "f136d4e42e6de63a63e4b24672a48e5ab2cc13b021325d452e8f4fa52e202b3c",
+    "evals/results/audit-opus-20261101/w12-embedded2-sweep.json": "ca28e3ec0f48ad5e642550dc5eb9d2aff5acc0940dbef010e4e468bbbd6cf78a",
+    "evals/datasets/rag-v2/cases.jsonl": "0b6ffbac00ccba1e8326f1d7437ff08c1a06c0658fdc15c17b765db6dc0d9cbf",
+    "evals/results/audit-opus-20261101/cases.jsonl": "cc63e385f7a5f565c1ac5eb50ad5f0973f74c4e8d04866ec2d99091c216f2bbe",
+    "data/rag_v2_index/embedded2/embeddings.npy": "ba14882995f58dce585556f14af1f3e1fef6e0f3e0ab106746a810694eb59dc8",
+    "data/rag_v2_index/embedded2/facts.jsonl": "a92211d63f1fc0215ad67fa09da9198e3d5a31f6635b50de45366f54abde0241",
+    "data/rag_v2_index/embedded2/manifest.json": "3215451df0b8db581b56bd96b2650bc857f7c70399e5f91006237477009e82a0",
+    "data/rag_v2_index/embedded2/units.jsonl": "2b2b883df15e484d5214a0f911bb283fe9e7b28ae23036bc626c13911701beae"
+  }
+}

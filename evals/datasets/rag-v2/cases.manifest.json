@@ -1,0 +1,34 @@
+{
+  "case_count": 760,
+  "group_count": 280,
+  "counts": {
+    "split": {
+      "dev": 533,
+      "holdout": 227
+    },
+    "family": {
+      "ctdt": 132,
+      "gan_mien_vang": 60,
+      "hoc_phi": 40,
+      "khac": 216,
+      "mo_ho": 30,
+      "ngoai_pham_vi": 30,
+      "quy_che": 124,
+      "so_tay": 108,
+      "thong_bao": 20
+    },
+    "variant": {
+      "form": 190,
+      "keyword": 190,
+      "no_diacritics": 190,
+      "slang": 190
+    },
+    "expected": {
+      "abstain": 90,
+      "answer": 640,
+      "clarify": 30
+    }
+  },
+  "sha256": "0b6ffbac00ccba1e8326f1d7437ff08c1a06c0658fdc15c17b765db6dc0d9cbf",
+  "split_algorithm": "sha256(group_id UTF-8), first 8 bytes big-endian, mod 10 < 7 => dev"
+}

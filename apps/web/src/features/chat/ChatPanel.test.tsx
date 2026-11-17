@@ -8,6 +8,20 @@ describe("ChatPanel Component (TASK-WEB-CHAT-003)", () => {
     cleanup();
   });
 
+  it("shows cited public knowledge without fabricating an account, history or procedural links", () => {
+    render(<ChatPanel messages={[{ id: "public-answer", role: "assistant", status: "success",
+      content: "Xin bảng điểm qua Một cửa. Phòng tự học ở tầng 2 thư viện. [CIT-001]",
+      citations: [{ id: "source", index: 1, title: "Sổ tay HUCE" }] }]} />);
+    expect(screen.queryByText("HUCE Demo")).toBeNull();
+    expect(screen.queryByText("SV240000")).toBeNull();
+    expect(screen.queryByText("Hội thoại gần đây")).toBeNull();
+    expect(screen.queryByRole("link", { name: /Nộp hồ sơ Một cửa/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Thông tin thư viện/ })).toBeNull();
+    expect(screen.getByRole("button", { name: /Xem nguồn trích dẫn \[1\]: Sổ tay HUCE/ })).toBeDefined();
+    expect(screen.getByText(/Xin bảng điểm qua Một cửa/).textContent).toContain("[1]");
+    expect(screen.getByText(/Xin bảng điểm qua Một cửa/).textContent).not.toContain("CIT-");
+  });
+
   it("renders assistant workspace with AI disclosure, ordered turns and transcript hierarchy", () => {
     const messages: ChatMessage[] = [
       { id: "msg-1", role: "user", content: "Điều kiện xét học bổng khuyến khích học tập là gì?" },
@@ -21,9 +35,9 @@ describe("ChatPanel Component (TASK-WEB-CHAT-003)", () => {
 
     render(<ChatPanel messages={messages} />);
 
-    // AI Disclosure banner
+    // AI Notice header
     expect(screen.getByText(/Trợ lý AI Campus 24\/7/i)).toBeDefined();
-    expect(screen.getByText(/HUCE Demo — Môi trường thử nghiệm/i)).toBeDefined();
+    expect(screen.getByText(/Cổng thông tin & Trợ lý học vụ số — Trường Đại học Xây dựng Hà Nội/i)).toBeDefined();
 
     // Ordered turns
     expect(screen.getByText("Bạn")).toBeDefined();
@@ -103,7 +117,7 @@ describe("ChatPanel Component (TASK-WEB-CHAT-003)", () => {
     expect(handleHandover).toHaveBeenCalled();
   });
 
-  it("renders actionable procedural shortcuts for relevant AI answers", () => {
+  it("does not infer procedural actions from unstructured AI text", () => {
     const messages: ChatMessage[] = [
       {
         id: "msg-proc-1",
@@ -114,8 +128,36 @@ describe("ChatPanel Component (TASK-WEB-CHAT-003)", () => {
 
     render(<ChatPanel messages={messages} />);
 
-    expect(screen.getByText(/Gợi ý hành động/i)).toBeDefined();
-    expect(screen.getByText(/Nộp hồ sơ Một cửa trực tuyến/i)).toBeDefined();
+    expect(screen.getByText(messages[0].content)).toBeDefined();
+    expect(screen.queryByText(/Gợi ý hành động/i)).toBeNull();
+    expect(screen.queryByRole("link", { name: /Nộp hồ sơ Một cửa trực tuyến/i })).toBeNull();
+  });
+
+  it("does not invent a One-door scholarship application from general eligibility rules", () => {
+    render(<ChatPanel messages={[{ id: "scholarship", role: "assistant", status: "success",
+      content: "Khoa xét học bổng theo kết quả học tập, rèn luyện và số suất được phân bổ." }]} />);
+    expect(screen.queryByRole("link", { name: /Nộp hồ sơ Một cửa/ })).toBeNull();
+  });
+
+  it("labels provisional text and keeps citations, actions and feedback unavailable", () => {
+    render(<ChatPanel messages={[{
+      id: "provisional", role: "assistant", status: "streaming", content: "Thủ tục xin cấp bảng điểm",
+      citations: [{ id: "provisional-citation", index: 1, title: "Provisional source" }],
+    }]} />);
+    expect(screen.getByText(/Nội dung tạm/i)).toBeDefined();
+    expect(screen.queryByText("Provisional source")).toBeNull();
+    expect(screen.queryByText(/Gợi ý hành động/i)).toBeNull();
+    expect(screen.queryByRole("button", { name: /Hữu ích/i })).toBeNull();
+  });
+
+  it("shows explicit unknown and stopped states without action suggestions", () => {
+    render(<ChatPanel messages={[
+      { id: "unknown", role: "assistant", status: "unknown", content: "Chưa xác nhận thủ tục bảng điểm" },
+      { id: "stopped", role: "assistant", status: "stopped", content: "Câu trả lời bảng điểm đã dừng" },
+    ]} />);
+    expect(screen.getByText(/UNKNOWN/i)).toBeDefined();
+    expect(screen.getByText(/Đã dừng — chưa xác nhận/i)).toBeDefined();
+    expect(screen.queryByText(/Gợi ý hành động/i)).toBeNull();
   });
 });
 

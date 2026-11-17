@@ -1,0 +1,1812 @@
+........................................................................ [  1%]
+......................................................F................. [  3%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+.........F.............................................................. [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+....................................................................sF.. [ 20%]
+......s............s.................................................... [ 21%]
+........................s....F..............sFs......................... [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+................................FF.......................FF............. [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+.............................................sssssssss........ssssssss.. [ 32%]
+.......s...ss..................ssss............ssssss................... [ 34%]
+.............s....ssss.................................................. [ 36%]
+..........................................................ss.s.......... [ 37%]
+.......................ss............................................... [ 39%]
+....................s................................................... [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+.....................................F.....................EEE.......... [ 58%]
+EEEEEEEEEEE..............EEEEEEEEEE.EEEEEEEE..........................F. [ 59%]
+............................F...................................F....... [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+................................................F............. [ 75%]
+....F............................................................... [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+................................................................F....... [ 87%]
+........................................................................ [ 89%]
+.................................F...................................... [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+....................F.....................F...F...F...F................. [ 98%]
+...............................................................          [100%]
+=================================== ERRORS ====================================
+_ ERROR at setup of test_real_scoped_context_uses_actor_memory_and_forget_removes_derived_text _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_real_scoped_context_uses_0')
+
+    @pytest.fixture
+    def composed(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path)
+E       AssertionError: assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_real_scoped_context_uses_0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_real_scoped_context_uses_0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_real_scoped_context_uses_0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_real_scoped_context_uses_0'))
+
+tests\unified_final\test_composed_personal_c.py:23: AssertionError
+_ ERROR at setup of test_actual_composition_missing_personal_stores_reports_unavailable _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_composition_missin0')
+
+    @pytest.fixture
+    def composed(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path)
+E       AssertionError: assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_composition_missin0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_composition_missin0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_composition_missin0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_composition_missin0'))
+
+tests\unified_final\test_composed_personal_c.py:23: AssertionError
+_ ERROR at setup of test_actual_business_outbox_delivers_current_recipient_then_revoke_hides_inbox _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_business_outbox_de0')
+
+    @pytest.fixture
+    def composed(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path)
+E       AssertionError: assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_business_outbox_de0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_business_outbox_de0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_business_outbox_de0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_business_outbox_de0'))
+
+tests\unified_final\test_composed_personal_c.py:23: AssertionError
+_ ERROR at setup of test_C_two_processes_preserve_receipt_or_cas_semantics[case_confirm] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_processes_c.py'>
+request = <SubRequest 'runtime' for <Function test_C_two_processes_preserve_receipt_or_cas_semantics[case_confirm]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_C_two_processes_preserve_receipt_or_cas_semantics[draft] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_processes_c.py'>
+request = <SubRequest 'runtime' for <Function test_C_two_processes_preserve_receipt_or_cas_semantics[draft]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_1')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_1').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_1') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_1').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_1'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_C_two_processes_preserve_receipt_or_cas_semantics[claim] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_processes_c.py'>
+request = <SubRequest 'runtime' for <Function test_C_two_processes_preserve_receipt_or_cas_semantics[claim]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_2')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_2').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_2') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_2').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_two_processes_preserve_2'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+___ ERROR at setup of test_C_actual_worker_process_restart_never_redelivers ___
+
+fixturedef = <FixtureDef argname='composed' scope='function' baseid='tests/unified_final/test_processes_c.py'>
+request = <SubRequest 'composed' for <Function test_C_actual_worker_process_restart_never_redelivers>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_actual_worker_process_r0')
+
+    @pytest.fixture
+    def composed(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path)
+E       AssertionError: assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_actual_worker_process_r0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_actual_worker_process_r0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_actual_worker_process_r0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_C_actual_worker_process_r0'))
+
+tests\unified_final\test_composed_personal_c.py:23: AssertionError
+_ ERROR at setup of test_supplement_commit_rolls_back_business_and_mapping_when_receipt_fails[response] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_roundtrip_c.py'>
+request = <SubRequest 'runtime' for <Function test_supplement_commit_rolls_back_business_and_mapping_when_receipt_fails[response]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_supplement_commit_rolls_back_business_and_mapping_when_receipt_fails[student_receipt] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_roundtrip_c.py'>
+request = <SubRequest 'runtime' for <Function test_supplement_commit_rolls_back_business_and_mapping_when_receipt_fails[student_receipt]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b1')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b1').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b1') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b1').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_commit_rolls_b1'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[source] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_roundtrip_c.py'>
+request = <SubRequest 'runtime' for <Function test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[source]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[session] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_roundtrip_c.py'>
+request = <SubRequest 'runtime' for <Function test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[session]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot1')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot1').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot1') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot1').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot1'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[other_student] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_roundtrip_c.py'>
+request = <SubRequest 'runtime' for <Function test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[other_student]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot2')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot2').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot2') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot2').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_supplement_preview_cannot2'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_student_correction_requires_new_officer_review_before_result _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_roundtrip_c.py'>
+request = <SubRequest 'runtime' for <Function test_student_correction_requires_new_officer_review_before_result>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_correction_requir0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_correction_requir0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_correction_requir0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_correction_requir0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_correction_requir0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_internal_handover_text_never_enters_student_projection_or_event_feed _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_roundtrip_c.py'>
+request = <SubRequest 'runtime' for <Function test_internal_handover_text_never_enters_student_projection_or_event_feed>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_internal_handover_text_ne0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_internal_handover_text_ne0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_internal_handover_text_ne0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_internal_handover_text_ne0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_internal_handover_text_ne0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_student_confirmation_is_bound_to_actor_form_and_exact_record[different_actor] _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_student_confirmation_is_bound_to_actor_form_and_exact_record[changed_form] _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b1')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b1').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b1') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b1').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b1'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_student_confirmation_is_bound_to_actor_form_and_exact_record[different_record] _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b2')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b2').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b2') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b2').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_student_confirmation_is_b2'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_review_note_injection_is_data_and_never_a_result_or_public_content _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_review_note_injection_is_0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_review_note_injection_is_0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_review_note_injection_is_0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_review_note_injection_is_0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_review_note_injection_is_0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_old_review_replay_cannot_cross_record_even_with_valid_binding _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_old_review_replay_cannot_0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_old_review_replay_cannot_0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_old_review_replay_cannot_0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_old_review_replay_cannot_0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_old_review_replay_cannot_0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_staff_read_rejects_client_authority_without_preparation_effect[injection0] _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_staff_read_rejects_client_authority_without_preparation_effect[injection1] _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client1')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client1').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client1') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client1').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client1'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_staff_read_rejects_client_authority_without_preparation_effect[injection2] _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client2')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client2').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client2') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client2').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client2'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_staff_read_rejects_client_authority_without_preparation_effect[injection3] _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client3')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client3').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client3') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client3').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client3'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_staff_read_rejects_client_authority_without_preparation_effect[injection4] _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client4')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client4').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client4') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client4').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_staff_read_rejects_client4'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_explicit_staff_confirmation_must_be_json_boolean_true[1] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_workflow_c.py'>
+request = <SubRequest 'runtime' for <Function test_explicit_staff_confirmation_must_be_json_boolean_true[1]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_explicit_staff_confirmation_must_be_json_boolean_true[1.0] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_workflow_c.py'>
+request = <SubRequest 'runtime' for <Function test_explicit_staff_confirmation_must_be_json_boolean_true[1.0]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati1')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati1').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati1') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati1').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati1'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_explicit_staff_confirmation_must_be_json_boolean_true[true] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_workflow_c.py'>
+request = <SubRequest 'runtime' for <Function test_explicit_staff_confirmation_must_be_json_boolean_true[true]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati2')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati2').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati2') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati2').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati2'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_explicit_staff_confirmation_must_be_json_boolean_true[None] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_workflow_c.py'>
+request = <SubRequest 'runtime' for <Function test_explicit_staff_confirmation_must_be_json_boolean_true[None]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati3')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati3').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati3') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati3').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati3'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_explicit_staff_confirmation_must_be_json_boolean_true[False] _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_workflow_c.py'>
+request = <SubRequest 'runtime' for <Function test_explicit_staff_confirmation_must_be_json_boolean_true[False]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati4')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati4').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati4') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati4').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_explicit_staff_confirmati4'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_receipt_storage_failure_rolls_back_business_event_and_result _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_workflow_c.py'>
+request = <SubRequest 'runtime' for <Function test_receipt_storage_failure_rolls_back_business_event_and_result>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_receipt_storage_failure_r0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_receipt_storage_failure_r0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_receipt_storage_failure_r0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_receipt_storage_failure_r0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_receipt_storage_failure_r0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_competing_confirmations_have_one_business_effect_and_one_receipt _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_workflow_c.py'>
+request = <SubRequest 'runtime' for <Function test_competing_confirmations_have_one_business_effect_and_one_receipt>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_competing_confirmations_h0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_competing_confirmations_h0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_competing_confirmations_h0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_competing_confirmations_h0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_competing_confirmations_h0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+_ ERROR at setup of test_batch_hash_drift_and_stale_item_cannot_expand_or_duplicate_targets _
+
+fixturedef = <FixtureDef argname='runtime' scope='function' baseid='tests/unified_final/test_workflow_c.py'>
+request = <SubRequest 'runtime' for <Function test_batch_hash_drift_and_stale_item_cannot_expand_or_duplicate_targets>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_batch_hash_drift_and_stal0')
+
+    @pytest.fixture
+    def runtime(tmp_path):
+>       assert tmp_path.resolve().is_relative_to(STATE.resolve()) or completion_fixture(tmp_path), "exclusive registered fixture required"
+E       AssertionError: exclusive registered fixture required
+E       assert (False or False)
+E        +  where False = is_relative_to(WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c'))
+E        +    where is_relative_to = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_batch_hash_drift_and_stal0').is_relative_to
+E        +      where WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_batch_hash_drift_and_stal0') = resolve()
+E        +        where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_batch_hash_drift_and_stal0').resolve
+E        +    and   WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c') = resolve()
+E        +      where resolve = WindowsPath('C:/Users/Duong Vinh/Vinh/infra/local/unified-ai-parallel-20261015-01/stream-c').resolve
+E        +  and   False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_batch_hash_drift_and_stal0'))
+
+tests\unified_final\test_security_c.py:25: AssertionError
+================================== FAILURES ===================================
+___ test_corrective_worker_calls_actual_lexical_search_and_original_reader ____
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_corrective_worker_calls_a0')
+
+    @pytest.mark.asyncio
+    async def test_corrective_worker_calls_actual_lexical_search_and_original_reader(tmp_path):
+        """Actual source tools, scripted decisions/generation; no live-model quality claim."""
+        import re
+        from datetime import datetime, timezone
+        from campus247.agent.multi_rag import MultiAgentWorkflow
+        from campus247.agent.state import NormalizedTurn, Terminal
+        from campus247.domain.retrieval import AuthorizedScope, RetrievalContext, SimulationPolicy
+        from campus247.domain.shared.values import generate_uuid7
+        question = "T\xf3m t\u1eaft c\xe1c b\u01b0\u1edbc xin gi\u1ea5y x\xe1c nh\u1eadn sinh vi\xean c\xf3 c\u0103n c\u1ee9 t\u1eeb s\u1ed5 tay."
+        corpus = PublicKnowledgeStore(ROOT / "data/huce-public-20261013", tenant_id="huce-local-public", campus_id="HUCE", faq_directory=ROOT / "data/huce-faq-20261013")
+        class Corrective(SourceModel):
+            async def generate(self, request):
+                route = request.route_id
+                if route == "multi_coordinator_plan":
+                    self.plan["tasks"][0]["goal"] = question
+                    self.plan["items"] = [item("Q1", question)]
+                if route == "multi_research_query":
+                    self.calls.append(request)
+                    data = json.loads(request.input_items[0]["content"])["untrusted_data"]
+                    value = {"query": question if data["task"]["id"] == "T1" else
+                        "Quy tr\xecnh x\xe1c nh\u1eadn sinh vi\xean \u0111\u0103ng k\xfd M\u1ed9t c\u1eeda d\u1ecbch v\u1ee5 m\u1eabu x\xe1c nh\u1eadn tr\xecnh k\xfd l\u1ea5y d\u1ea5u tr\u1ea3 k\u1ebft qu\u1ea3 theo l\u1ecbch h\u1eb9n"}
+                    return LlmResponse(LlmResponseStatus.COMPLETED, "scripted", "source-control-flow", output_text=json.dumps(value, ensure_ascii=False), usage=TokenUsage(10, 0, 20))
+                if route in {"multi_research_report", "multi_verifier_coverage"}:
+                    self.calls.append(request)
+                    data = json.loads(request.input_items[0]["content"])["untrusted_data"]
+                    procedure = next((row for row in data["evidence"] if any(
+                        "2. Quy tr\xecnh x\xe1c nh\u1eadn sinh vi\xean" in span["text"] for span in row["original_spans"])), None)
+                    value = {"coverage": [{"item_id": "Q1", "status": "supported" if procedure else "missing_source", "supports": [
+                        {"requirement_id": "R1", "evidence_id": procedure["evidence_id"], "span_id": next(
+                            span["span_id"] for span in procedure["original_spans"] if "motcua.huce.edu.vn" in span["text"])}
+                    ] if procedure else []}]}
+                    return LlmResponse(LlmResponseStatus.COMPLETED, "scripted", "source-control-flow", output_text=json.dumps(value, ensure_ascii=False), usage=TokenUsage(10, 0, 20))
+                response = await super().generate(request)
+                if route == "grounded_faq":
+                    rendered = "\n".join(row["content"] for row in request.input_items)
+                    match = re.search(r"\\[(CIT-\\d{3})\\] Ngu\u1ed3n:[^\\n]*\\(Trang 39\\)", rendered)
+                    assert match
+                    value = json.loads(response.output_text)
+                    value["claims"][0]["citation_ids"] = [match.group(1)]
+                    return replace(response, output_text=json.dumps(value, ensure_ascii=False))
+                return response
+        model = Corrective(); model.supplement = True
+        turn = NormalizedTurn(generate_uuid7(), generate_uuid7(), "source-test-student", question)
+        ctx = RetrievalContext(AuthorizedScope("huce-local-public", "HUCE", turn.user_id,
+            frozenset({"STUDENT"}), frozenset({"STUDENT"}), frozenset({"PUBLIC"}), frozenset({"PUBLIC"})), "vi",
+            datetime.now(timezone.utc), SimulationPolicy.DENY, "1"*32)
+        workflow = MultiAgentWorkflow(store=SQLiteAgentRunStore(tmp_path / "real-source-runs.sqlite3"), source_reader=corpus,
+            context_search_fn=corpus.search, llm_gateway=model, require_retrieval_context=True, evidence_support_threshold=.78)
+        result = await workflow.arun(turn, retrieval_context=ctx)
+>       assert result.terminal == Terminal.ANSWERED, result.errors
+E       AssertionError: ('AI_AGENT_EVIDENCE_BUDGET_EXHAUSTED',)
+E       assert <Terminal.ABS...: 'abstained'> == <Terminal.ANS...D: 'answered'>
+E         
+E         - answered
+E         + abstained
+
+tests\api\test_multi_agent_api.py:260: AssertionError
+___________ test_ac_03_route_inventory_classifies_all_write_routes ____________
+
+    def test_ac_03_route_inventory_classifies_all_write_routes() -> None:
+        """AC-TASK-API-WRITEFIX-001-03: Every write route is registered and classified in the controlled-write catalog."""
+        app = create_app()
+        schema = app.openapi()
+        paths = schema.get("paths", {})
+    
+        write_routes: list[tuple[str, str]] = []
+        for path, path_item in paths.items():
+            for method in path_item.keys():
+                if method.upper() in ("POST", "PUT", "PATCH", "DELETE"):
+                    write_routes.append((method.upper(), path))
+    
+        # Approved classified catalog of write operations
+        KNOWN_WRITE_CATALOG = {
+            ("POST", "/v1/auth/demo-session"): "demo_session_minting",
+            ("POST", "/v1/auth/logout"): "session_revocation",
+            ("POST", "/v1/logout"): "session_revocation",
+            ("POST", "/v1/tickets/preview"): "write_preview_generation",
+            ("POST", "/v1/tickets/{preview_id}/confirm"): "controlled_write_confirmation",
+            ("POST", "/v1/tickets"): "guarded_blocked_direct_write",
+            ("POST", "/v1/rooms/book"): "guarded_disabled_room_booking",
+            ("POST", "/v1/conversations"): "conversation_initialization",
+            ("POST", "/v1/conversations/{conversation_id}/messages:stream"): "chat_stream_query",
+            ("POST", "/v1/conversations/{conversation_id}/messages/{message_id}/feedback"): "user_feedback_submission",
+            ("POST", "/v1/privacy/consents"): "privacy_consent_recording",
+            ("POST", "/v1/privacy/requests"): "privacy_request_submission",
+        }
+    
+        unclassified_routes = []
+        for route in write_routes:
+            if route not in KNOWN_WRITE_CATALOG:
+                unclassified_routes.append(route)
+    
+>       assert not unclassified_routes, f"Found unclassified or unguarded write routes: {unclassified_routes}"
+E       AssertionError: Found unclassified or unguarded write routes: [('POST', '/v1/actions/preview'), ('POST', '/v1/actions/{preview_id}/confirm')]
+E       assert not [('POST', '/v1/actions/preview'), ('POST', '/v1/actions/{preview_id}/confirm')]
+
+tests\contract\test_write_route_inventory.py:150: AssertionError
+_ FixtureGuardTests.test_reviewed_addition_preserves_historical_baseline_and_ancestry _
+
+self = <tests.integration.rag_fixture.test_guard.FixtureGuardTests testMethod=test_reviewed_addition_preserves_historical_baseline_and_ancestry>
+
+    def test_reviewed_addition_preserves_historical_baseline_and_ancestry(self):
+>       _, script, head, tables = fixture.chain()
+                                  ^^^^^^^^^^^^^^^
+
+tests\integration\rag_fixture\test_guard.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+infra\local\rag-fixture\fixture.py:208: in chain
+    directory = reviewed_sources()
+                ^^^^^^^^^^^^^^^^^^
+infra\local\rag-fixture\fixture.py:202: in reviewed_sources
+    require(actual == REVIEWED | REVIEWED_ADDITIONS,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False
+message = 'migration source changed or unreviewed; stop before DB mutation'
+
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise FixtureError(message)
+E           rag_fixture_tool.FixtureError: migration source changed or unreviewed; stop before DB mutation
+
+infra\local\rag-fixture\fixture.py:72: FixtureError
+_______________ test_historical_0009_0010_ancestry_is_preserved _______________
+
+    def test_historical_0009_0010_ancestry_is_preserved():
+        config = Config(str(ALEMBIC_INI))
+        script = ScriptDirectory.from_config(config)
+        assert script.get_revision("0009").down_revision == "0008"
+        assert script.get_revision("0010").down_revision == "0009"
+        assert [rev.revision for rev in script.walk_revisions("base", "0010")] == [
+            "0010", "0009", "0008", "0007", "0006", "0005", "0004", "0003", "0002", "0001"
+        ]
+        # A new head is valid only through the additive manifest descendant, with
+        # separate live schema/data preservation evidence in the manifest suite.
+        heads = script.get_heads()
+        assert len(heads) == 1
+        descendants = list(script.iterate_revisions(heads[0], "0010"))
+        # FILTER-001 has independent live schema/data/index preservation evidence.
+>       assert [(rev.revision, rev.down_revision) for rev in descendants] == [
+            ("0013", "0012"), ("0012", "0011"), ("0011", "0010")]
+E       AssertionError: assert [('0022', '00... '0016'), ...] == [('0013', '00...011', '0010')]
+E         
+E         At index 0 diff: ('0022', '0021') != ('0013', '0012')
+E         Left contains 9 more items, first extra item: ('0019', '0018')
+E         Use -v to get more diff
+
+tests\integration\test_migration_0009.py:45: AssertionError
+______________ test_reviewed_ancestry_and_forward_only_recovery _______________
+
+    def test_reviewed_ancestry_and_forward_only_recovery():
+        f = load("filter_fixture", HERE / "fixture.py")
+>       _, script, head, _ = f.chain()
+                             ^^^^^^^^^
+
+tests\integration\test_retrieval_scope_migration.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+infra\local\rag-fixture\fixture.py:208: in chain
+    directory = reviewed_sources()
+                ^^^^^^^^^^^^^^^^^^
+infra\local\rag-fixture\fixture.py:202: in reviewed_sources
+    require(actual == REVIEWED | REVIEWED_ADDITIONS,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False
+message = 'migration source changed or unreviewed; stop before DB mutation'
+
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+>           raise FixtureError(message)
+E           filter_fixture.FixtureError: migration source changed or unreviewed; stop before DB mutation
+
+infra\local\rag-fixture\fixture.py:72: FixtureError
+__________________ test_actual_two_process_staff_cas[draft] ___________________
+
+runtime = (<fastapi.applications.FastAPI object at 0x000001E2CC3C4550>, <starlette.testclient.TestClient object at 0x000001E3164...4:16:11.257841+00:00', ...}, WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_two_process_staff_0'))
+kind = 'draft'
+
+    @pytest.mark.parametrize("kind", ["draft", "claim"])
+    def test_actual_two_process_staff_cas(runtime, kind):
+        app, client, _, _, record, path = runtime
+        if kind == "claim":
+            _, record, _ = sent(client)
+        actor = identity(client)
+        processes = []
+        for index in range(2):
+            command = [sys.executable, "-B", str(ROOT / "scripts/probe_unified_staff_process12.py"),
+                "--fixture", str(path), "--ready", f"{kind}-ready-{index}.json", "--gate", f"{kind}-gate.json",
+                "--output", f"{kind}-result-{index}.json", "--owner", actor.subject_id, "--case", record["id"],
+                "--client", generate_uuid7(), "--kind", kind, "--version", str(record["version"])]
+            with (path / f"{kind}-worker-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT, creationflags=0x08000000))
+        deadline = time.monotonic() + 20
+        while not all((path / f"{kind}-ready-{i}.json").exists() for i in range(2)):
+>           assert time.monotonic() < deadline, [p.poll() for p in processes]
+E           AssertionError: [1, 1]
+E           assert 258246.3189191 < 258246.3105683
+E            +  where 258246.3189191 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\integration\test_unified_staff12.py:385: AssertionError
+__________________ test_actual_two_process_staff_cas[claim] ___________________
+
+runtime = (<fastapi.applications.FastAPI object at 0x000001E2D5C2DA90>, <starlette.testclient.TestClient object at 0x000001E2D37...4:16:31.640221+00:00', ...}, WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_two_process_staff_1'))
+kind = 'claim'
+
+    @pytest.mark.parametrize("kind", ["draft", "claim"])
+    def test_actual_two_process_staff_cas(runtime, kind):
+        app, client, _, _, record, path = runtime
+        if kind == "claim":
+            _, record, _ = sent(client)
+        actor = identity(client)
+        processes = []
+        for index in range(2):
+            command = [sys.executable, "-B", str(ROOT / "scripts/probe_unified_staff_process12.py"),
+                "--fixture", str(path), "--ready", f"{kind}-ready-{index}.json", "--gate", f"{kind}-gate.json",
+                "--output", f"{kind}-result-{index}.json", "--owner", actor.subject_id, "--case", record["id"],
+                "--client", generate_uuid7(), "--kind", kind, "--version", str(record["version"])]
+            with (path / f"{kind}-worker-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT, creationflags=0x08000000))
+        deadline = time.monotonic() + 20
+        while not all((path / f"{kind}-ready-{i}.json").exists() for i in range(2)):
+>           assert time.monotonic() < deadline, [p.poll() for p in processes]
+E           AssertionError: [1, 1]
+E           assert 258266.7508554 < 258266.7483997
+E            +  where 258266.7508554 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\integration\test_unified_staff12.py:385: AssertionError
+______ test_actual_two_process_cas_or_resume_has_one_commit[preferences] ______
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_two_process_cas_or0')
+kind = 'preferences'
+
+    @pytest.mark.parametrize("kind",["preferences","resume"])
+    def test_actual_two_process_cas_or_resume_has_one_commit(tmp_path,kind):
+        root = Path(__file__).resolve().parents[2];database = tmp_path / "process.sqlite3"
+        run,conversation = generate_uuid7(),generate_uuid7()
+        if kind == "preferences":SQLiteActorStateStore(database)
+        else:
+            store = SQLiteAgentRunStore(database,tenant=TENANT)
+            store.create(run,OWNER,conversation,{"goal":"Process fixture"},10)
+            store.save(run,OWNER,conversation,1,"waiting_user",{"goal":"Process fixture"})
+        gate = tmp_path / "gate.json";processes = []
+        for index in range(2):
+            command = [sys.executable,"-B",str(root / "scripts/probe_unified_storage_process07.py"),"--kind",kind,
+                "--database",str(database),"--gate",str(gate),"--ready",str(tmp_path / f"ready-{index}.json"),
+                "--output",str(tmp_path / f"result-{index}.json"),"--client",generate_uuid7(),"--run",run,"--conversation",conversation,"--fixture-root",str(tmp_path)]
+            with (tmp_path / f"worker-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen(command,cwd=root,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,creationflags=0x08000000))
+        deadline = time.monotonic()+10
+        while not all((tmp_path / f"ready-{index}.json").exists() for index in range(2)):
+>           assert time.monotonic() < deadline
+E           assert 258281.959769 < 258281.9595651
+E            +  where 258281.959769 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\integration\test_unified_storage_completion.py:304: AssertionError
+________ test_actual_two_process_cas_or_resume_has_one_commit[resume] _________
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_two_process_cas_or1')
+kind = 'resume'
+
+    @pytest.mark.parametrize("kind",["preferences","resume"])
+    def test_actual_two_process_cas_or_resume_has_one_commit(tmp_path,kind):
+        root = Path(__file__).resolve().parents[2];database = tmp_path / "process.sqlite3"
+        run,conversation = generate_uuid7(),generate_uuid7()
+        if kind == "preferences":SQLiteActorStateStore(database)
+        else:
+            store = SQLiteAgentRunStore(database,tenant=TENANT)
+            store.create(run,OWNER,conversation,{"goal":"Process fixture"},10)
+            store.save(run,OWNER,conversation,1,"waiting_user",{"goal":"Process fixture"})
+        gate = tmp_path / "gate.json";processes = []
+        for index in range(2):
+            command = [sys.executable,"-B",str(root / "scripts/probe_unified_storage_process07.py"),"--kind",kind,
+                "--database",str(database),"--gate",str(gate),"--ready",str(tmp_path / f"ready-{index}.json"),
+                "--output",str(tmp_path / f"result-{index}.json"),"--client",generate_uuid7(),"--run",run,"--conversation",conversation,"--fixture-root",str(tmp_path)]
+            with (tmp_path / f"worker-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen(command,cwd=root,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,creationflags=0x08000000))
+        deadline = time.monotonic()+10
+        while not all((tmp_path / f"ready-{index}.json").exists() for index in range(2)):
+>           assert time.monotonic() < deadline
+E           assert 258292.0307319 < 258292.0279175
+E            +  where 258292.0307319 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\integration\test_unified_storage_completion.py:304: AssertionError
+________ test_registered_process_scope_denies_outside_and_unregistered ________
+
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_registered_process_scope_0')
+
+    def test_registered_process_scope_denies_outside_and_unregistered(tmp_path):
+>       assert completion_fixture(tmp_path)
+E       AssertionError: assert False
+E        +  where False = completion_fixture(WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_registered_process_scope_0'))
+
+tests\unified_completion\test_personal_chat.py:139: AssertionError
+_____________ test_worker_real_process_restart_does_not_redeliver _____________
+
+tracking = namespace(consent=True, revoked=False, mode='settings', actor=IdentityContext(subject_id='01a19ca1-3108-7bf6-8a6d-5da8...:00', expires_at='2026-11-02T14:29:31.985348+00:00', state='active', uses=[], action_authority='read_or_prepare_only'))
+tmp_path = WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_worker_real_process_resta0')
+
+    def test_worker_real_process_restart_does_not_redeliver(tracking, tmp_path):
+        from dataclasses import asdict
+        from pathlib import Path
+        import os
+        import subprocess
+        import sys
+        env = tracking
+        subscribe(env)
+        env.source.emit(env.actor, env.target)
+        fields = asdict(env.actor)
+        fields['auth_time'], fields['expires_at'] = env.actor.auth_time.isoformat(), env.actor.expires_at.isoformat()
+        config = tmp_path/'worker-config.json'
+        with config.open('x', encoding='utf-8') as handle:
+            json.dump({'actor': fields, 'tracking_path': str(env.tracking_store.path), 'source_path': str(env.source.path), 'grant': env.grant.model_dump(mode='json')}, handle)
+        script = Path(__file__).resolve().parents[2]/'scripts/unified_parallel_b_fixture_worker.py'
+        results = []
+        for number in (1, 2):
+            command = [sys.executable, '-B', str(script), str(config)]
+            completed = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'}, timeout=30)
+            with (tmp_path/f'process-{number}.json').open('x', encoding='utf-8') as handle:
+                json.dump({'command': command, 'exit': completed.returncode, 'stdout': completed.stdout, 'stderr': completed.stderr}, handle)
+>           assert completed.returncode == 0, completed.stderr
+E           AssertionError: Traceback (most recent call last):
+E               File "C:\Users\Duong Vinh\Vinh\scripts\unified_parallel_b_fixture_worker.py", line 59, in <module>
+E                 print(json.dumps(tick(Path(sys.argv[1]))))
+E                                  ~~~~^^^^^^^^^^^^^^^^^^^
+E               File "C:\Users\Duong Vinh\Vinh\scripts\unified_parallel_b_fixture_worker.py", line 24, in tick
+E                 raise ValueError('B fixture only')
+E             ValueError: B fixture only
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['C:\\Users\\Duong Vinh\\Vinh\\.venv\\Scripts\\python.exe', '-B', 'C:\\Users\\Duong Vinh\\Vinh\\...rallel_b_fixture_worker.py", line 24, in tick\n    raise ValueError(\'B fixture only\')\nValueError: B fixture only\n').returncode
+
+tests\unified_personal13b\test_memory_tracking.py:416: AssertionError
+_____________ test_actual_A_business_outbox_two_process_recovery ______________
+
+wired = (<fastapi.applications.FastAPI object at 0x000001E31573BD90>, <starlette.testclient.TestClient object at 0x000001E2D41...4:19:43.034109+00:00', ...}, WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_actual_A_business_outbox_0'))
+
+    def test_actual_A_business_outbox_two_process_recovery(wired):
+        import os
+        from pathlib import Path
+        import subprocess
+        import sys
+        _, client, student, staff, record, path = wired
+        subscribe(client, student, record)
+        assert act(client, staff, record, 'respond').status_code == 200
+        config = path/'unified-worker-config.json'
+        with config.open('x', encoding='utf-8') as handle:
+            json.dump({'kind': 'unified', 'business_path': str(path/'business.sqlite3'), 'actor_path': str(path/'actor.sqlite3'),
+                'memory_path': str(path/'memory.sqlite3'), 'tracking_path': str(path/'tracking.sqlite3')}, handle)
+        script = Path(__file__).resolve().parents[2]/'scripts/unified_parallel_b_fixture_worker.py'
+        outcomes = []
+        for attempt in (1, 2):
+            command = [sys.executable, '-B', str(script), str(config)]
+            result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'}, timeout=30)
+            with (path/f'unified-process-{attempt}.json').open('x', encoding='utf-8') as handle:
+                json.dump({'command': command, 'exit': result.returncode, 'stdout': result.stdout, 'stderr': result.stderr}, handle)
+>           assert result.returncode == 0, result.stderr
+E           AssertionError: Traceback (most recent call last):
+E               File "C:\Users\Duong Vinh\Vinh\scripts\unified_parallel_b_fixture_worker.py", line 59, in <module>
+E                 print(json.dumps(tick(Path(sys.argv[1]))))
+E                                  ~~~~^^^^^^^^^^^^^^^^^^^
+E               File "C:\Users\Duong Vinh\Vinh\scripts\unified_parallel_b_fixture_worker.py", line 24, in tick
+E                 raise ValueError('B fixture only')
+E             ValueError: B fixture only
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['C:\\Users\\Duong Vinh\\Vinh\\.venv\\Scripts\\python.exe', '-B', 'C:\\Users\\Duong Vinh\\Vinh\\...rallel_b_fixture_worker.py", line 24, in tick\n    raise ValueError(\'B fixture only\')\nValueError: B fixture only\n').returncode
+
+tests\unified_personal13b\test_wired_consumers.py:233: AssertionError
+______ test_two_fresh_processes_confirm_one_transaction_and_same_receipt ______
+
+runtime = (<fastapi.applications.FastAPI object at 0x000001E2C8CF6C10>, <starlette.testclient.TestClient object at 0x000001E2D57...4:20:05.722142+00:00', ...}, WindowsPath('C:/Users/Duong Vinh/Vinh/.pytest-tmp-audit/test_two_fresh_processes_confi0'))
+
+    def test_two_fresh_processes_confirm_one_transaction_and_same_receipt(runtime):
+        app, client, student, staff, record, path = runtime
+        body = draft_body(client, staff, record); prepare(client, staff, body); p = preview(client, staff, body)
+        from campus247.infrastructure.identity.mock import SyntheticIdentityAdapter
+        actor = SyntheticIdentityAdapter("campus247-demo-secret-key-huce", environment="development", tenant_id="huce-local-public").resolve_token(staff["Authorization"].split(" ")[1])
+        with (path / "process-input.json").open("x", encoding="utf-8") as f:
+            json.dump({"owner": actor.subject_id, "session": actor.session_id, "confirmation": confirmation(p)}, f)
+        processes = []
+        for index in range(2):
+            with (path / f"process-log-{index}.log").open("xb") as log:
+                processes.append(subprocess.Popen([sys.executable, "-B", str(ROOT / "scripts/unified_parallel_a_process.py"), str(path), str(index)], cwd=ROOT, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT, creationflags=0x08000000))
+        deadline = time.monotonic() + 20
+        while not all((path / f"process-ready-{i}.json").exists() for i in range(2)):
+>           assert time.monotonic() < deadline, [p.poll() for p in processes]
+E           AssertionError: [1, 1]
+E           assert 258480.9331531 < 258480.9311522
+E            +  where 258480.9331531 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests\unified_workflow13a\test_durability.py:26: AssertionError
+_ DependencyGateTests.test_candidate_count_mismatch_does_not_enable_prerelease_exception _
+
+self = <tests.unit.dependency_resolution.test_verifier.DependencyGateTests testMethod=test_candidate_count_mismatch_does_not_enable_prerelease_exception>
+
+    def test_candidate_count_mismatch_does_not_enable_prerelease_exception(self):
+        with patch.object(gate, "APPROVED_ADDITIONAL_PACKAGE_COUNT", 131):
+            valid, errors = gate.verify_dependencies(ROOT)
+        self.assertFalse(valid)
+>       self.assertIn("approved candidate package count differs", errors)
+E       AssertionError: 'approved candidate package count differs' not found in ['human approval reference or candidate checksum mismatch', 'dependency must use an exact stable == pin; URL/VCS/range/wildcard denied', 'immutable stable version required: opentelemetry-exporter-http-transport', 'immutable stable version required: opentelemetry-exporter-otlp-common', 'immutable stable version required: opentelemetry-instrumentation', 'immutable stable version required: opentelemetry-instrumentation-asgi', 'immutable stable version required: opentelemetry-instrumentation-fastapi', 'immutable stable version required: opentelemetry-instrumentation-httpx', 'immutable stable version required: opentelemetry-instrumentation-redis', 'immutable stable version required: opentelemetry-instrumentation-sqlalchemy', 'immutable stable version required: opentelemetry-semantic-conventions', 'immutable stable version required: opentelemetry-util-http', 'lock drift: production requirement metadata differs', 'lock drift: root dependency references differ', 'unapproved declared dependency: cryptography', 'unapproved declared dependency: langchain-core', 'unapproved declared dependency: langfuse', 'unapproved declared dependency: locust', 'unapproved declared dependency: mypy', 'unapproved declared dependency: numpy', 'unapproved declared dependency: openai', 'unapproved declared dependency: opentelemetry-api', 'unapproved declared dependency: opentelemetry-exporter-otlp', 'unapproved declared dependency: opentelemetry-sdk', 'unapproved declared dependency: pdfplumber', 'unapproved declared dependency: prometheus-client', 'unapproved declared dependency: pyjwt', 'unapproved declared dependency: pypdf', 'unapproved declared dependency: pytest-benchmark', 'unapproved declared dependency: pytest-mock', 'unapproved declared dependency: python-multipart', 'unapproved declared dependency: ruff', 'unapproved declared dependency: scikit-learn', 'unapproved declared dependency: structlog', 'unapproved declared dependency: tiktoken', 'unapproved resolved dependency: annotated-doc', 'unapproved resolved dependency: annotated-types', 'unapproved resolved dependency: anyio', 'unapproved resolved dependency: asgiref', 'unapproved resolved dependency: ast-serialize', 'unapproved resolved dependency: attrs', 'unapproved resolved dependency: backoff', 'unapproved resolved dependency: bidict', 'unapproved resolved dependency: blinker', 'unapproved resolved dependency: brotli', 'unapproved resolved dependency: certifi', 'unapproved resolved dependency: cffi', 'unapproved resolved dependency: charset-normalizer', 'unapproved resolved dependency: click', 'unapproved resolved dependency: cloudpickle', 'unapproved resolved dependency: colorama', 'unapproved resolved dependency: configargparse', 'unapproved resolved dependency: cryptography', 'unapproved resolved dependency: distro', 'unapproved resolved dependency: flask', 'unapproved resolved dependency: flask-cors', 'unapproved resolved dependency: flask-login', 'unapproved resolved dependency: gevent', 'unapproved resolved dependency: geventhttpclient', 'unapproved resolved dependency: googleapis-common-protos', 'unapproved resolved dependency: greenlet', 'unapproved resolved dependency: grpcio', 'unapproved resolved dependency: h11', 'unapproved resolved dependency: httpcore', 'unapproved resolved dependency: httpcore2', 'unapproved resolved dependency: httptools', 'unapproved resolved dependency: httpx2', 'unapproved resolved dependency: httpx2-jsfetch', 'unapproved resolved dependency: idna', 'unapproved resolved dependency: iniconfig', 'unapproved resolved dependency: itsdangerous', 'unapproved resolved dependency: jinja2', 'unapproved resolved dependency: jiter', 'unapproved resolved dependency: joblib', 'unapproved resolved dependency: jsonpatch', 'unapproved resolved dependency: jsonpointer', 'unapproved resolved dependency: jsonschema-specifications', 'unapproved resolved dependency: langchain-core', 'unapproved resolved dependency: langchain-protocol', 'unapproved resolved dependency: langfuse', 'unapproved resolved dependency: langgraph-checkpoint', 'unapproved resolved dependency: langgraph-prebuilt', 'unapproved resolved dependency: langgraph-sdk', 'unapproved resolved dependency: langsmith', 'unapproved resolved dependency: librt', 'unapproved resolved dependency: locust', 'unapproved resolved dependency: mako', 'unapproved resolved dependency: markupsafe', 'unapproved resolved dependency: msgpack', 'unapproved resolved dependency: mypy', 'unapproved resolved dependency: mypy-extensions', 'unapproved resolved dependency: narwhals', 'unapproved resolved dependency: numpy', 'unapproved resolved dependency: openai', 'unapproved resolved dependency: opentelemetry-api', 'unapproved resolved dependency: opentelemetry-exporter-http-transport', 'unapproved resolved dependency: opentelemetry-exporter-otlp', 'unapproved resolved dependency: opentelemetry-exporter-otlp-common', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-common', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-grpc', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-http', 'unapproved resolved dependency: opentelemetry-instrumentation', 'unapproved resolved dependency: opentelemetry-instrumentation-asgi', 'unapproved resolved dependency: opentelemetry-instrumentation-fastapi', 'unapproved resolved dependency: opentelemetry-instrumentation-httpx', 'unapproved resolved dependency: opentelemetry-instrumentation-redis', 'unapproved resolved dependency: opentelemetry-instrumentation-sqlalchemy', 'unapproved resolved dependency: opentelemetry-proto', 'unapproved resolved dependency: opentelemetry-sdk', 'unapproved resolved dependency: opentelemetry-semantic-conventions', 'unapproved resolved dependency: opentelemetry-util-http', 'unapproved resolved dependency: orjson', 'unapproved resolved dependency: ormsgpack', 'unapproved resolved dependency: packaging', 'unapproved resolved dependency: pathspec', 'unapproved resolved dependency: pdfminer-six', 'unapproved resolved dependency: pdfplumber', 'unapproved resolved dependency: pillow', 'unapproved resolved dependency: pluggy', 'unapproved resolved dependency: prometheus-client', 'unapproved resolved dependency: protobuf', 'unapproved resolved dependency: psutil', 'unapproved resolved dependency: py-cpuinfo2', 'unapproved resolved dependency: pycparser', 'unapproved resolved dependency: pydantic-core', 'unapproved resolved dependency: pygments', 'unapproved resolved dependency: pyjwt', 'unapproved resolved dependency: pypdf', 'unapproved resolved dependency: pypdfium2', 'unapproved resolved dependency: pytest-benchmark', 'unapproved resolved dependency: pytest-mock', 'unapproved resolved dependency: python-dotenv', 'unapproved resolved dependency: python-engineio', 'unapproved resolved dependency: python-multipart', 'unapproved resolved dependency: python-socketio', 'unapproved resolved dependency: pywin32', 'unapproved resolved dependency: pyzmq', 'unapproved resolved dependency: referencing', 'unapproved resolved dependency: regex', 'unapproved resolved dependency: requests', 'unapproved resolved dependency: requests-toolbelt', 'unapproved resolved dependency: rpds-py', 'unapproved resolved dependency: ruff', 'unapproved resolved dependency: scikit-learn', 'unapproved resolved dependency: scipy', 'unapproved resolved dependency: simple-websocket', 'unapproved resolved dependency: sniffio', 'unapproved resolved dependency: starlette', 'unapproved resolved dependency: structlog', 'unapproved resolved dependency: tenacity', 'unapproved resolved dependency: threadpoolctl', 'unapproved resolved dependency: tiktoken', 'unapproved resolved dependency: truststore', 'unapproved resolved dependency: typing-extensions', 'unapproved resolved dependency: typing-inspection', 'unapproved resolved dependency: urllib3', 'unapproved resolved dependency: uuid-utils', 'unapproved resolved dependency: uvloop', 'unapproved resolved dependency: watchfiles', 'unapproved resolved dependency: websocket-client', 'unapproved resolved dependency: websockets', 'unapproved resolved dependency: werkzeug', 'unapproved resolved dependency: wrapt', 'unapproved resolved dependency: wsproto', 'unapproved resolved dependency: xxhash', 'unapproved resolved dependency: zope-event', 'unapproved resolved dependency: zope-interface', 'unapproved resolved dependency: zstandard']
+
+tests\unit\dependency_resolution\test_verifier.py:213: AssertionError
+_ DependencyGateTests.test_repository_candidate_matches_exact_human_approval __
+
+self = <tests.unit.dependency_resolution.test_verifier.DependencyGateTests testMethod=test_repository_candidate_matches_exact_human_approval>
+
+    def test_repository_candidate_matches_exact_human_approval(self):
+        valid, errors = gate.verify_dependencies(ROOT)
+>       self.assertTrue(valid, errors)
+E       AssertionError: False is not true : ['human approval reference or candidate checksum mismatch', 'dependency must use an exact stable == pin; URL/VCS/range/wildcard denied', 'immutable stable version required: opentelemetry-exporter-http-transport', 'immutable stable version required: opentelemetry-exporter-otlp-common', 'immutable stable version required: opentelemetry-instrumentation', 'immutable stable version required: opentelemetry-instrumentation-asgi', 'immutable stable version required: opentelemetry-instrumentation-fastapi', 'immutable stable version required: opentelemetry-instrumentation-httpx', 'immutable stable version required: opentelemetry-instrumentation-redis', 'immutable stable version required: opentelemetry-instrumentation-sqlalchemy', 'immutable stable version required: opentelemetry-semantic-conventions', 'immutable stable version required: opentelemetry-util-http', 'lock drift: production requirement metadata differs', 'lock drift: root dependency references differ', 'unapproved declared dependency: cryptography', 'unapproved declared dependency: langchain-core', 'unapproved declared dependency: langfuse', 'unapproved declared dependency: locust', 'unapproved declared dependency: mypy', 'unapproved declared dependency: numpy', 'unapproved declared dependency: openai', 'unapproved declared dependency: opentelemetry-api', 'unapproved declared dependency: opentelemetry-exporter-otlp', 'unapproved declared dependency: opentelemetry-sdk', 'unapproved declared dependency: pdfplumber', 'unapproved declared dependency: prometheus-client', 'unapproved declared dependency: pyjwt', 'unapproved declared dependency: pypdf', 'unapproved declared dependency: pytest-benchmark', 'unapproved declared dependency: pytest-mock', 'unapproved declared dependency: python-multipart', 'unapproved declared dependency: ruff', 'unapproved declared dependency: scikit-learn', 'unapproved declared dependency: structlog', 'unapproved declared dependency: tiktoken', 'unapproved resolved dependency: annotated-doc', 'unapproved resolved dependency: annotated-types', 'unapproved resolved dependency: anyio', 'unapproved resolved dependency: asgiref', 'unapproved resolved dependency: ast-serialize', 'unapproved resolved dependency: attrs', 'unapproved resolved dependency: backoff', 'unapproved resolved dependency: bidict', 'unapproved resolved dependency: blinker', 'unapproved resolved dependency: brotli', 'unapproved resolved dependency: certifi', 'unapproved resolved dependency: cffi', 'unapproved resolved dependency: charset-normalizer', 'unapproved resolved dependency: click', 'unapproved resolved dependency: cloudpickle', 'unapproved resolved dependency: colorama', 'unapproved resolved dependency: configargparse', 'unapproved resolved dependency: cryptography', 'unapproved resolved dependency: distro', 'unapproved resolved dependency: flask', 'unapproved resolved dependency: flask-cors', 'unapproved resolved dependency: flask-login', 'unapproved resolved dependency: gevent', 'unapproved resolved dependency: geventhttpclient', 'unapproved resolved dependency: googleapis-common-protos', 'unapproved resolved dependency: greenlet', 'unapproved resolved dependency: grpcio', 'unapproved resolved dependency: h11', 'unapproved resolved dependency: httpcore', 'unapproved resolved dependency: httpcore2', 'unapproved resolved dependency: httptools', 'unapproved resolved dependency: httpx2', 'unapproved resolved dependency: httpx2-jsfetch', 'unapproved resolved dependency: idna', 'unapproved resolved dependency: iniconfig', 'unapproved resolved dependency: itsdangerous', 'unapproved resolved dependency: jinja2', 'unapproved resolved dependency: jiter', 'unapproved resolved dependency: joblib', 'unapproved resolved dependency: jsonpatch', 'unapproved resolved dependency: jsonpointer', 'unapproved resolved dependency: jsonschema-specifications', 'unapproved resolved dependency: langchain-core', 'unapproved resolved dependency: langchain-protocol', 'unapproved resolved dependency: langfuse', 'unapproved resolved dependency: langgraph-checkpoint', 'unapproved resolved dependency: langgraph-prebuilt', 'unapproved resolved dependency: langgraph-sdk', 'unapproved resolved dependency: langsmith', 'unapproved resolved dependency: librt', 'unapproved resolved dependency: locust', 'unapproved resolved dependency: mako', 'unapproved resolved dependency: markupsafe', 'unapproved resolved dependency: msgpack', 'unapproved resolved dependency: mypy', 'unapproved resolved dependency: mypy-extensions', 'unapproved resolved dependency: narwhals', 'unapproved resolved dependency: numpy', 'unapproved resolved dependency: openai', 'unapproved resolved dependency: opentelemetry-api', 'unapproved resolved dependency: opentelemetry-exporter-http-transport', 'unapproved resolved dependency: opentelemetry-exporter-otlp', 'unapproved resolved dependency: opentelemetry-exporter-otlp-common', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-common', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-grpc', 'unapproved resolved dependency: opentelemetry-exporter-otlp-proto-http', 'unapproved resolved dependency: opentelemetry-instrumentation', 'unapproved resolved dependency: opentelemetry-instrumentation-asgi', 'unapproved resolved dependency: opentelemetry-instrumentation-fastapi', 'unapproved resolved dependency: opentelemetry-instrumentation-httpx', 'unapproved resolved dependency: opentelemetry-instrumentation-redis', 'unapproved resolved dependency: opentelemetry-instrumentation-sqlalchemy', 'unapproved resolved dependency: opentelemetry-proto', 'unapproved resolved dependency: opentelemetry-sdk', 'unapproved resolved dependency: opentelemetry-semantic-conventions', 'unapproved resolved dependency: opentelemetry-util-http', 'unapproved resolved dependency: orjson', 'unapproved resolved dependency: ormsgpack', 'unapproved resolved dependency: packaging', 'unapproved resolved dependency: pathspec', 'unapproved resolved dependency: pdfminer-six', 'unapproved resolved dependency: pdfplumber', 'unapproved resolved dependency: pillow', 'unapproved resolved dependency: pluggy', 'unapproved resolved dependency: prometheus-client', 'unapproved resolved dependency: protobuf', 'unapproved resolved dependency: psutil', 'unapproved resolved dependency: py-cpuinfo2', 'unapproved resolved dependency: pycparser', 'unapproved resolved dependency: pydantic-core', 'unapproved resolved dependency: pygments', 'unapproved resolved dependency: pyjwt', 'unapproved resolved dependency: pypdf', 'unapproved resolved dependency: pypdfium2', 'unapproved resolved dependency: pytest-benchmark', 'unapproved resolved dependency: pytest-mock', 'unapproved resolved dependency: python-dotenv', 'unapproved resolved dependency: python-engineio', 'unapproved resolved dependency: python-multipart', 'unapproved resolved dependency: python-socketio', 'unapproved resolved dependency: pywin32', 'unapproved resolved dependency: pyzmq', 'unapproved resolved dependency: referencing', 'unapproved resolved dependency: regex', 'unapproved resolved dependency: requests', 'unapproved resolved dependency: requests-toolbelt', 'unapproved resolved dependency: rpds-py', 'unapproved resolved dependency: ruff', 'unapproved resolved dependency: scikit-learn', 'unapproved resolved dependency: scipy', 'unapproved resolved dependency: simple-websocket', 'unapproved resolved dependency: sniffio', 'unapproved resolved dependency: starlette', 'unapproved resolved dependency: structlog', 'unapproved resolved dependency: tenacity', 'unapproved resolved dependency: threadpoolctl', 'unapproved resolved dependency: tiktoken', 'unapproved resolved dependency: truststore', 'unapproved resolved dependency: typing-extensions', 'unapproved resolved dependency: typing-inspection', 'unapproved resolved dependency: urllib3', 'unapproved resolved dependency: uuid-utils', 'unapproved resolved dependency: uvloop', 'unapproved resolved dependency: watchfiles', 'unapproved resolved dependency: websocket-client', 'unapproved resolved dependency: websockets', 'unapproved resolved dependency: werkzeug', 'unapproved resolved dependency: wrapt', 'unapproved resolved dependency: wsproto', 'unapproved resolved dependency: xxhash', 'unapproved resolved dependency: zope-event', 'unapproved resolved dependency: zope-interface', 'unapproved resolved dependency: zstandard']
+
+tests\unit\dependency_resolution\test_verifier.py:159: AssertionError
+__ test_qlda_visual_correction_preserves_original_document_and_old_citation ___
+
+    @pytest.mark.asyncio
+    async def test_qlda_visual_correction_preserves_original_document_and_old_citation():
+        directory = ROOT / "data/huce-public-20261013"
+        old = PublicKnowledgeStore(directory, tenant_id="HUCE", campus_id="HUCE", include_reviewed_course_review=False)
+        new = PublicKnowledgeStore(directory, tenant_id="HUCE", campus_id="HUCE")
+>       prior = next(row for row in old.rows if row["title"] == "K71 \u2014 Qu\u1ea3n l\xfd d\u1ef1 \xe1n")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\unit\retrieval\test_huce_service_release.py:43: StopIteration
+
+The above exception was the direct cause of the following exception:
+
+self = <Coroutine test_qlda_visual_correction_preserves_original_document_and_old_citation>
+
+    def runtest(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        runner = self._request.getfixturevalue(runner_fixture_id)
+        context = contextvars.copy_context()
+        synchronized_obj = _synchronize_coroutine(
+            getattr(*self._synchronization_target_attr), runner, context
+        )
+        with MonkeyPatch.context() as c:
+            c.setattr(*self._synchronization_target_attr, synchronized_obj)
+>           super().runtest()
+
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:569: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\pytest_asyncio\plugin.py:905: in inner
+    runner.run(coro, context=context)
+.tooling\python\cpython-3.13.16-windows-x86_64-none\Lib\asyncio\runners.py:119: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <ProactorEventLoop running=False closed=False debug=False>
+future = <Task finished name='Task-24001' coro=<test_qlda_visual_correction_preserves_original_document_and_old_citation() done...nh\Vinh\tests\unit\retrieval\test_huce_service_release.py:38> exception=RuntimeError('coroutine raised StopIteration')>
+
+    def run_until_complete(self, future):
+        """Run until the Future is done.
+    
+        If the argument is a coroutine, it is wrapped in a Task.
+    
+        WARNING: It would be disastrous to call run_until_complete()
+        with the same coroutine twice -- it would wrap it in two
+        different Tasks and that can't be good.
+    
+        Return the Future's result, or raise its exception.
+        """
+        self._check_closed()
+        self._check_running()
+    
+        new_task = not futures.isfuture(future)
+        future = tasks.ensure_future(future, loop=self)
+        if new_task:
+            # An exception is raised if the future didn't complete, so there
+            # is no need to log the "destroy pending task" message
+            future._log_destroy_pending = False
+    
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        finally:
+            future.remove_done_callback(_run_until_complete_cb)
+        if not future.done():
+            raise RuntimeError('Event loop stopped before Future completed.')
+    
+>       return future.result()
+               ^^^^^^^^^^^^^^^
+E       RuntimeError: coroutine raised StopIteration
+
+.tooling\python\cpython-3.13.16-windows-x86_64-none\Lib\asyncio\base_events.py:726: RuntimeError
+_________ test_retained_huce_index_loads_without_model_or_paid_calls __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E2DF0417F0>
+
+    def test_retained_huce_index_loads_without_model_or_paid_calls(monkeypatch):
+        def no_http(*args, **kwargs):
+            pytest.fail("Index validation must not call a model")
+        monkeypatch.setattr(wiring.httpx, "AsyncClient", no_http)
+        value = wiring.load_public_hybrid_store(public.CORPUS, tenant_id=public.TENANT,
+            campus_id=public.CAMPUS, faq_directory=ROOT / "data/huce-faq-20261013")
+        assert value.vectors and len(value.vectors) == len(value.children)
+        # Validate the retained curriculum release independently of additive service releases.
+        retained = wiring.create_public_hybrid_store(public.CORPUS, tenant_id=public.TENANT,
+            campus_id=public.CAMPUS, faq_directory=ROOT / "data/huce-faq-20261013", include_reviewed_services=False)
+        assert retained.fingerprint == "dc625eaaa3ccccfe5b703ca8a540cb66ee4dd1e2400e10b34002335a6f93bf93"
+        retained.load_vectors(json.loads(wiring.public_hybrid_index_path(retained).read_text(encoding="utf-8")))
+        # Visually corrected excerpts replace automated QLDA, handbook flow-chart,
+        # and title-only curricula; their historical readbacks are covered separately.
+        untouched = {c["id"] for c in retained.children
+                     if retained.rows[c["parent"]]["title"] != "K71 \u2014 Qu\u1ea3n l\xfd d\u1ef1 \xe1n"
+                     and retained.rows[c["parent"]]["section_path"] != "Trang 27"
+                     and not retained.rows[c["parent"]]["section_path"].endswith("\u2014 ti\xeau \u0111\u1ec1 (t\u1ed5ng t\xedn ch\u1ec9 ch\u01b0a x\xe1c \u0111\u1ecbnh)")}
+>       assert untouched < {c["id"] for c in value.children}
+E       AssertionError: assert {'0093ee08-e9d...aafd317', ...} < {'00375ded-976...f450cb9', ...}
+E         
+E         Extra items in the left set:
+E         '5b175728-e1cb-777b-8741-32ea8b858d5a'
+E         '993dfd85-c376-7623-8ebc-79c910aaf7a1'
+E         '47be2a59-19ce-7518-851e-3f7b42c98ff0'
+E         '8e906c5d-973d-7389-82d4-c94c57454d13'
+E         '724622ed-685e-7f80-8a16-273e035f7978'...
+E         
+E         ...Full output truncated (35 lines hidden), use '-vv' to show
+
+tests\unit\retrieval\test_public_rag_wiring.py:75: AssertionError
+______ test_composed_guard_retains_eight_historical_reservations_exactly ______
+
+    def test_composed_guard_retains_eight_historical_reservations_exactly():
+        rows, before, last = journal.journal()
+>       assert rows == [] and last == journal.OLD_LAST_SHA
+E       AssertionError: assert ([{'after': {'...append', ...}] == []
+E         
+E         Left contains 2 more items, first extra item: {'after': {'conversation': [{'channel': 'WEB', 'created_at': '2026-10-06T00:00:00+00:00', 'id': '019a0000-0023-7000-80...at': 'MARKDOWN_SAFE', 'content_redacted': 'H\u1ecdc ph\xed m\u1ed7i t\xedn ch\u1ec9 l\xe0 bao nhi\xeau?', ...}, ...]}, 'operation': 'create', ...}
+E         Use -v to get more diff)
+
+tests\unit\runtime_review\test_m1_additive_journal_33.py:23: AssertionError
+______ test_static_counter_survives_app_phase_and_refuses_process_reset _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E2C851E510>
+
+    def test_static_counter_survives_app_phase_and_refuses_process_reset(monkeypatch):
+        monkeypatch.setenv("C247_M1_FRONTEND_PROXY", str(proxy.audit.HERE / "acceptance-20261011-43-frontend"))
+        monkeypatch.setattr(proxy, "SHARED_COUNTERS", None)
+        receipts = []
+        monkeypatch.setattr(proxy.base, "put", lambda *args: receipts.append(args))
+>       proxy.install(FastAPI())
+
+tests\unit\runtime_review\test_m1_continuation_43.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = <fastapi.applications.FastAPI object at 0x000001E2C8B242D0>
+
+    def install(app):
+        global SHARED_COUNTERS
+        from fastapi import Request, HTTPException
+        from starlette.responses import Response
+        import httpx
+        # FastAPI resolves this route annotation from the module namespace.
+        globals()["Request"] = Request
+        root = audit.checked(Path(os.environ["C247_M1_FRONTEND_PROXY"]).resolve())
+        assert root.name == "acceptance-20261011-43-frontend"
+        if SHARED_COUNTERS is None:
+>           assert not (audit.HERE / "acceptance-20261011-43-static-forwarding-authority.json").exists(), "fresh process cannot reset an existing ledger"
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: fresh process cannot reset an existing ledger
+
+infra\local\rag-fixture\m1_frontend_proxy_20261011_43.py:23: AssertionError
+______ test_static_counter_survives_app_phase_and_refuses_process_reset _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E2C863AC80>
+
+    def test_static_counter_survives_app_phase_and_refuses_process_reset(monkeypatch):
+        monkeypatch.setenv("C247_M1_FRONTEND_PROXY", str(proxy.audit.HERE / "acceptance-20261011-48-frontend"))
+        monkeypatch.setattr(proxy, "SHARED_COUNTERS", None)
+        receipts = []
+        monkeypatch.setattr(proxy.base, "put", lambda *args: receipts.append(args))
+>       proxy.install(FastAPI())
+
+tests\unit\runtime_review\test_m1_continuation_48.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = <fastapi.applications.FastAPI object at 0x000001E2C8AB7890>
+
+    def install(app):
+        global SHARED_COUNTERS
+        from fastapi import Request, HTTPException
+        from starlette.responses import Response
+        import httpx
+        # FastAPI resolves this route annotation from the module namespace.
+        globals()["Request"] = Request
+        root = audit.checked(Path(os.environ["C247_M1_FRONTEND_PROXY"]).resolve())
+        assert root.name == "acceptance-20261011-48-frontend"
+        if SHARED_COUNTERS is None:
+>           assert not (audit.HERE / "acceptance-20261011-48-static-forwarding-authority.json").exists(), "fresh process cannot reset an existing ledger"
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: fresh process cannot reset an existing ledger
+
+infra\local\rag-fixture\m1_frontend_proxy_20261011_48.py:23: AssertionError
+______ test_static_counter_survives_app_phase_and_refuses_process_reset _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E2C863B930>
+
+    def test_static_counter_survives_app_phase_and_refuses_process_reset(monkeypatch):
+        monkeypatch.setenv("C247_M1_FRONTEND_PROXY", str(proxy.audit.HERE / "acceptance-20261011-50-frontend"))
+        monkeypatch.setattr(proxy, "SHARED_COUNTERS", None)
+        receipts = []
+        monkeypatch.setattr(proxy.base, "put", lambda *args: receipts.append(args))
+>       proxy.install(FastAPI())
+
+tests\unit\runtime_review\test_m1_continuation_50.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = <fastapi.applications.FastAPI object at 0x000001E2C8B24410>
+
+    def install(app):
+        global SHARED_COUNTERS
+        from fastapi import Request, HTTPException
+        from starlette.responses import Response
+        import httpx
+        # FastAPI resolves this route annotation from the module namespace.
+        globals()["Request"] = Request
+        root = audit.checked(Path(os.environ["C247_M1_FRONTEND_PROXY"]).resolve())
+        assert root.name == "acceptance-20261011-50-frontend"
+        if SHARED_COUNTERS is None:
+>           assert not (audit.HERE / "acceptance-20261011-50-static-forwarding-authority.json").exists(), "fresh process cannot reset an existing ledger"
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: fresh process cannot reset an existing ledger
+
+infra\local\rag-fixture\m1_frontend_proxy_20261011_50.py:23: AssertionError
+______ test_static_counter_survives_app_phase_and_refuses_process_reset _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E2C8600980>
+
+    def test_static_counter_survives_app_phase_and_refuses_process_reset(monkeypatch):
+        monkeypatch.setenv("C247_M1_FRONTEND_PROXY", str(proxy.audit.HERE / "acceptance-20261011-52-frontend"))
+        monkeypatch.setattr(proxy, "SHARED_COUNTERS", None)
+        receipts = []
+        monkeypatch.setattr(proxy.base, "put", lambda *args: receipts.append(args))
+>       proxy.install(FastAPI())
+
+tests\unit\runtime_review\test_m1_continuation_52.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = <fastapi.applications.FastAPI object at 0x000001E2C8B27D90>
+
+    def install(app):
+        global SHARED_COUNTERS
+        from fastapi import Request, HTTPException
+        from starlette.responses import Response
+        import httpx
+        # FastAPI resolves this route annotation from the module namespace.
+        globals()["Request"] = Request
+        root = audit.checked(Path(os.environ["C247_M1_FRONTEND_PROXY"]).resolve())
+        assert root.name == "acceptance-20261011-52-frontend"
+        if SHARED_COUNTERS is None:
+>           assert not (audit.HERE / "acceptance-20261011-52-static-forwarding-authority.json").exists(), "fresh process cannot reset an existing ledger"
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: fresh process cannot reset an existing ledger
+
+infra\local\rag-fixture\m1_frontend_proxy_20261011_52.py:23: AssertionError
+============================== warnings summary ===============================
+scripts\rag_v2_build_index.py:43
+scripts\rag_v2_build_index.py:43
+  C:\Users\Duong Vinh\Vinh\scripts\rag_v2_build_index.py:43: UserWarning: LEGACY_EMBED_CACHE_IGNORED
+    warnings.warn("LEGACY_EMBED_CACHE_IGNORED", stacklevel=1)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/api/test_multi_agent_api.py::test_corrective_worker_calls_actual_lexical_search_and_original_reader
+FAILED tests/contract/test_write_route_inventory.py::test_ac_03_route_inventory_classifies_all_write_routes
+FAILED tests/integration/rag_fixture/test_guard.py::FixtureGuardTests::test_reviewed_addition_preserves_historical_baseline_and_ancestry
+FAILED tests/integration/test_migration_0009.py::test_historical_0009_0010_ancestry_is_preserved
+FAILED tests/integration/test_retrieval_scope_migration.py::test_reviewed_ancestry_and_forward_only_recovery
+FAILED tests/integration/test_unified_staff12.py::test_actual_two_process_staff_cas[draft]
+FAILED tests/integration/test_unified_staff12.py::test_actual_two_process_staff_cas[claim]
+FAILED tests/integration/test_unified_storage_completion.py::test_actual_two_process_cas_or_resume_has_one_commit[preferences]
+FAILED tests/integration/test_unified_storage_completion.py::test_actual_two_process_cas_or_resume_has_one_commit[resume]
+FAILED tests/unified_completion/test_personal_chat.py::test_registered_process_scope_denies_outside_and_unregistered
+FAILED tests/unified_personal13b/test_memory_tracking.py::test_worker_real_process_restart_does_not_redeliver
+FAILED tests/unified_personal13b/test_wired_consumers.py::test_actual_A_business_outbox_two_process_recovery
+FAILED tests/unified_workflow13a/test_durability.py::test_two_fresh_processes_confirm_one_transaction_and_same_receipt
+FAILED tests/unit/dependency_resolution/test_verifier.py::DependencyGateTests::test_candidate_count_mismatch_does_not_enable_prerelease_exception
+FAILED tests/unit/dependency_resolution/test_verifier.py::DependencyGateTests::test_repository_candidate_matches_exact_human_approval
+FAILED tests/unit/retrieval/test_huce_service_release.py::test_qlda_visual_correction_preserves_original_document_and_old_citation
+FAILED tests/unit/retrieval/test_public_rag_wiring.py::test_retained_huce_index_loads_without_model_or_paid_calls
+FAILED tests/unit/runtime_review/test_m1_additive_journal_33.py::test_composed_guard_retains_eight_historical_reservations_exactly
+FAILED tests/unit/runtime_review/test_m1_continuation_43.py::test_static_counter_survives_app_phase_and_refuses_process_reset
+FAILED tests/unit/runtime_review/test_m1_continuation_48.py::test_static_counter_survives_app_phase_and_refuses_process_reset
+FAILED tests/unit/runtime_review/test_m1_continuation_50.py::test_static_counter_survives_app_phase_and_refuses_process_reset
+FAILED tests/unit/runtime_review/test_m1_continuation_52.py::test_static_counter_survives_app_phase_and_refuses_process_reset
+ERROR tests/unified_final/test_composed_personal_c.py::test_real_scoped_context_uses_actor_memory_and_forget_removes_derived_text
+ERROR tests/unified_final/test_composed_personal_c.py::test_actual_composition_missing_personal_stores_reports_unavailable
+ERROR tests/unified_final/test_composed_personal_c.py::test_actual_business_outbox_delivers_current_recipient_then_revoke_hides_inbox
+ERROR tests/unified_final/test_processes_c.py::test_C_two_processes_preserve_receipt_or_cas_semantics[case_confirm]
+ERROR tests/unified_final/test_processes_c.py::test_C_two_processes_preserve_receipt_or_cas_semantics[draft]
+ERROR tests/unified_final/test_processes_c.py::test_C_two_processes_preserve_receipt_or_cas_semantics[claim]
+ERROR tests/unified_final/test_processes_c.py::test_C_actual_worker_process_restart_never_redelivers
+ERROR tests/unified_final/test_roundtrip_c.py::test_supplement_commit_rolls_back_business_and_mapping_when_receipt_fails[response]
+ERROR tests/unified_final/test_roundtrip_c.py::test_supplement_commit_rolls_back_business_and_mapping_when_receipt_fails[student_receipt]
+ERROR tests/unified_final/test_roundtrip_c.py::test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[source]
+ERROR tests/unified_final/test_roundtrip_c.py::test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[session]
+ERROR tests/unified_final/test_roundtrip_c.py::test_supplement_preview_cannot_be_confirmed_after_scope_or_source_drift[other_student]
+ERROR tests/unified_final/test_roundtrip_c.py::test_student_correction_requires_new_officer_review_before_result
+ERROR tests/unified_final/test_roundtrip_c.py::test_internal_handover_text_never_enters_student_projection_or_event_feed
+ERROR tests/unified_final/test_security_c.py::test_student_confirmation_is_bound_to_actor_form_and_exact_record[different_actor]
+ERROR tests/unified_final/test_security_c.py::test_student_confirmation_is_bound_to_actor_form_and_exact_record[changed_form]
+ERROR tests/unified_final/test_security_c.py::test_student_confirmation_is_bound_to_actor_form_and_exact_record[different_record]
+ERROR tests/unified_final/test_security_c.py::test_review_note_injection_is_data_and_never_a_result_or_public_content
+ERROR tests/unified_final/test_security_c.py::test_old_review_replay_cannot_cross_record_even_with_valid_binding
+ERROR tests/unified_final/test_security_c.py::test_staff_read_rejects_client_authority_without_preparation_effect[injection0]
+ERROR tests/unified_final/test_security_c.py::test_staff_read_rejects_client_authority_without_preparation_effect[injection1]
+ERROR tests/unified_final/test_security_c.py::test_staff_read_rejects_client_authority_without_preparation_effect[injection2]
+ERROR tests/unified_final/test_security_c.py::test_staff_read_rejects_client_authority_without_preparation_effect[injection3]
+ERROR tests/unified_final/test_security_c.py::test_staff_read_rejects_client_authority_without_preparation_effect[injection4]
+ERROR tests/unified_final/test_workflow_c.py::test_explicit_staff_confirmation_must_be_json_boolean_true[1]
+ERROR tests/unified_final/test_workflow_c.py::test_explicit_staff_confirmation_must_be_json_boolean_true[1.0]
+ERROR tests/unified_final/test_workflow_c.py::test_explicit_staff_confirmation_must_be_json_boolean_true[true]
+ERROR tests/unified_final/test_workflow_c.py::test_explicit_staff_confirmation_must_be_json_boolean_true[None]
+ERROR tests/unified_final/test_workflow_c.py::test_explicit_staff_confirmation_must_be_json_boolean_true[False]
+ERROR tests/unified_final/test_workflow_c.py::test_receipt_storage_failure_rolls_back_business_event_and_result
+ERROR tests/unified_final/test_workflow_c.py::test_competing_confirmations_have_one_business_effect_and_one_receipt
+ERROR tests/unified_final/test_workflow_c.py::test_batch_hash_drift_and_stale_item_cannot_expand_or_duplicate_targets
+22 failed, 4484 passed, 47 skipped, 2 warnings, 32 errors, 14 subtests passed in 1101.06s (0:18:21)

@@ -1,0 +1,1163 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Campus 24/7 knowledge platform local annex",
+    "version": "2026-10-23"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8015"
+    }
+  ],
+  "paths": {
+    "/v1/knowledge/platform/state": {
+      "get": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "State",
+        "operationId": "state_v1_knowledge_platform_state_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/knowledge/platform/uploads": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Upload",
+        "operationId": "upload_v1_knowledge_platform_uploads_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "metadata": {
+                    "type": "string",
+                    "description": "IntakeMetadata JSON; explicit audiences/programs/effective dates"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "file",
+                  "metadata"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/platform/versions/{version_id}/original": {
+      "get": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Original",
+        "operationId": "original_v1_knowledge_platform_versions__version_id__original_get",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/knowledge/platform/versions/{version_id}/rendition": {
+      "get": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Rendition",
+        "operationId": "rendition_v1_knowledge_platform_versions__version_id__rendition_get",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/knowledge/platform/versions/{version_id}/reviews": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Review",
+        "operationId": "review_v1_knowledge_platform_versions__version_id__reviews_post",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/platform/versions/{version_id}/applicability-versions": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Applicability",
+        "operationId": "applicability_v1_knowledge_platform_versions__version_id__applicability_versions_post",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicabilityInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/platform/versions/{version_id}/releases": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Release",
+        "operationId": "release_v1_knowledge_platform_versions__version_id__releases_post",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/platform/previews": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Preview",
+        "operationId": "preview_v1_knowledge_platform_previews_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/platform/confirmations": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Confirm",
+        "operationId": "confirm_v1_knowledge_platform_confirmations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/platform/jobs/{job_id}/retry": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Retry",
+        "operationId": "retry_v1_knowledge_platform_jobs__job_id__retry_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/platform/jobs/{job_id}/cancel": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Cancel",
+        "operationId": "cancel_v1_knowledge_platform_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/platform/search-preview": {
+      "post": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Search Preview",
+        "operationId": "search_preview_v1_knowledge_platform_search_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchPreviewInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-browser-origin-policy": "If Origin is supplied, it must equal the request origin."
+      }
+    },
+    "/v1/knowledge/sources": {
+      "get": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Sources",
+        "operationId": "sources_v1_knowledge_sources_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/knowledge/document-versions/{version_id}": {
+      "get": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Version",
+        "operationId": "version_v1_knowledge_document_versions__version_id__get",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/knowledge/sources/{source_id}": {
+      "get": {
+        "tags": [
+          "Knowledge platform"
+        ],
+        "summary": "Source",
+        "operationId": "source_v1_knowledge_sources__source_id__get",
+        "parameters": [
+          {
+            "name": "source_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Source Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/knowledge/platform/local-session": {
+      "post": {
+        "summary": "Local Session",
+        "operationId": "local_session_v1_knowledge_platform_local_session_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "description": "Development launcher only; loopback synthetic accounts KA01/KA02/SV01. Not production SSO."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApplicabilityInput": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Effective From"
+          },
+          "effective_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Until"
+          },
+          "basis": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Basis"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "effective_from",
+          "basis"
+        ],
+        "title": "ApplicabilityInput"
+      },
+      "ConfirmInput": {
+        "properties": {
+          "preview_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f-]{36}$",
+            "title": "Preview Id"
+          },
+          "confirmation_token": {
+            "type": "string",
+            "maxLength": 4096,
+            "minLength": 20,
+            "title": "Confirmation Token"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "title": "Confirmed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "preview_id",
+          "confirmation_token",
+          "confirmed"
+        ],
+        "title": "ConfirmInput"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LoginBody": {
+        "properties": {
+          "account": {
+            "type": "string",
+            "title": "Account"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account"
+        ],
+        "title": "LoginBody"
+      },
+      "PreviewInput": {
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "activate",
+              "revoke",
+              "rollback"
+            ],
+            "title": "Operation"
+          },
+          "target_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f-]{36}$",
+            "title": "Target Id"
+          },
+          "expected_generation": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Expected Generation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "operation",
+          "target_id",
+          "expected_generation"
+        ],
+        "title": "PreviewInput"
+      },
+      "ReviewInput": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "REJECTED"
+            ],
+            "title": "Verdict"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 5,
+            "title": "Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "verdict",
+          "note"
+        ],
+        "title": "ReviewInput"
+      },
+      "SearchPreviewInput": {
+        "properties": {
+          "release_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Release Id"
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Query"
+          }
+        },
+        "type": "object",
+        "required": [
+          "release_id",
+          "query"
+        ],
+        "title": "SearchPreviewInput"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "IntakeMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "maxLength": 300,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          },
+          "owner_unit": {
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Owner Unit",
+            "type": "string"
+          },
+          "canonical_uri": {
+            "maxLength": 1000,
+            "minLength": 3,
+            "title": "Canonical Uri",
+            "type": "string"
+          },
+          "campus": {
+            "const": "HUCE",
+            "default": "HUCE",
+            "title": "Campus",
+            "type": "string"
+          },
+          "faculties": {
+            "items": {
+              "const": "FIT",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Faculties",
+            "type": "array"
+          },
+          "programs": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "minItems": 1,
+            "title": "Programs",
+            "type": "array"
+          },
+          "audiences": {
+            "items": {
+              "enum": [
+                "STUDENT",
+                "SUPPORT_OFFICER",
+                "KNOWLEDGE_ADMIN",
+                "SYSTEM_ADMIN"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Audiences",
+            "type": "array"
+          },
+          "effective_from": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Effective From"
+          },
+          "effective_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Effective Until"
+          },
+          "authority_level": {
+            "default": 50,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Authority Level",
+            "type": "integer"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f-]{36}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Id"
+          }
+        },
+        "required": [
+          "title",
+          "owner_unit",
+          "canonical_uri",
+          "programs",
+          "audiences"
+        ],
+        "title": "IntakeMetadata",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "auth_token"
+      }
+    }
+  },
+  "x-scope": "Actual local endpoints; all catalog/platform operations require KNOWLEDGE_ADMIN. No sync/OCR/DOCX endpoints implied.",
+  "x-upload-metadata": "multipart metadata is a JSON string validated against components.schemas.IntakeMetadata; file limit 50 MiB.",
+  "x-state-pagination": "Bounded state projection: 200 sources, versions and jobs; 50 sealed releases. No cursor pagination yet."
+}

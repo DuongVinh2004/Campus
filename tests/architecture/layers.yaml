@@ -20,3 +20,40 @@ forbidden_imports:
     - campus247.infrastructure
   infrastructure:
     - campus247.presentation
+
+  # RAG v2 domain modules stay free of graph, HTTP and infrastructure (DESIGN-v2); adapters/ is the seam.
+  rag_v2/ingest:
+    - campus247.agent
+    - campus247.presentation
+    - campus247.infrastructure
+    - campus247.bootstrap
+  rag_v2/facts:
+    - campus247.agent
+    - campus247.presentation
+    - campus247.infrastructure
+    - campus247.bootstrap
+  rag_v2/understanding:
+    - campus247.agent
+    - campus247.presentation
+    - campus247.infrastructure
+    - campus247.bootstrap
+  rag_v2/retrieval:
+    - campus247.agent
+    - campus247.presentation
+    - campus247.infrastructure
+    - campus247.bootstrap
+  rag_v2/generation:
+    - campus247.agent
+    - campus247.presentation
+    - campus247.infrastructure
+    - campus247.bootstrap
+  rag_v2/verification:
+    - campus247.agent
+    - campus247.presentation
+    - campus247.infrastructure
+    - campus247.bootstrap
+  rag_v2/outcome:
+    - campus247.agent
+    - campus247.presentation
+    - campus247.infrastructure
+    - campus247.bootstrap

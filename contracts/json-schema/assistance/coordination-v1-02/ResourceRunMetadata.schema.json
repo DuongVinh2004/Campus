@@ -1,0 +1,40 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "state": {
+      "enum": [
+        "partial",
+        "interrupted"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "receipt_id": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Receipt Id",
+      "type": "string"
+    },
+    "is_replay": {
+      "title": "Is Replay",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "state",
+    "receipt_id",
+    "is_replay"
+  ],
+  "title": "ResourceRunMetadata",
+  "type": "object"
+}

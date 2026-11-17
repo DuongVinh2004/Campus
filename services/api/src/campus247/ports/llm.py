@@ -126,3 +126,10 @@ class LlmGateway(Protocol):
 
     def capabilities(self, provider_id: str, model_id: str) -> ModelCapabilities:
         ...
+
+
+class EgressViolationError(Exception):
+    def __init__(self, safe_reason: str, message: str | None = None) -> None:
+        self.safe_reason = safe_reason
+        # Never use caller-supplied message: it may contain the rejected value.
+        super().__init__(safe_reason)

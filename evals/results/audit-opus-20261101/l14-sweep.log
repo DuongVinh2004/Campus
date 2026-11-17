@@ -1,0 +1,21 @@
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.481,"total":1.494}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.655,"total":0.669}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.958,"total":0.968}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.046,"total":1.059}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.941,"total":0.954}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.444,"total":0.456}}
+60 {'facts_in_context': 280, 'dev': 262, 'audit': 18}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.014,"total":1.024}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.536,"total":0.547}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.978,"total":0.988}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.954,"total":0.964}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.946,"total":0.956}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.405,"total":0.416}}
+20 {'facts_in_context': 281, 'dev': 263, 'audit': 18}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.055,"total":1.066}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.528,"total":0.538}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":1.026,"total":1.036}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.939,"total":0.956}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.942,"total":0.953}}
+rag_v2_trace {"candidate_count":0,"rerank_scores":[],"statement_rejections":[],"outcome_kind":"clarify","latency_ms":{"understanding":0.4,"total":0.411}}
+10 {'facts_in_context': 281, 'dev': 263, 'audit': 18}

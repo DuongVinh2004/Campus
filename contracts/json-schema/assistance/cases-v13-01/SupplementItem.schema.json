@@ -1,0 +1,67 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "pattern": "^[a-z0-9_-]{1,80}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "criterion_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Criterion Id",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 6,
+      "minItems": 1,
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "field": {
+      "enum": [
+        "reason",
+        "purpose",
+        "recipient",
+        "attachments",
+        "course_record_id",
+        "quantity",
+        "delivery_method",
+        "contact_preference"
+      ],
+      "title": "Field",
+      "type": "string"
+    },
+    "public_reason": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Public Reason",
+      "type": "string"
+    },
+    "accepted_format": {
+      "enum": [
+        "text",
+        "text/plain",
+        "course_reference",
+        "integer",
+        "delivery_method",
+        "contact_preference"
+      ],
+      "title": "Accepted Format",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "criterion_id",
+    "source_ids",
+    "field",
+    "public_reason",
+    "accepted_format"
+  ],
+  "title": "SupplementItem",
+  "type": "object"
+}

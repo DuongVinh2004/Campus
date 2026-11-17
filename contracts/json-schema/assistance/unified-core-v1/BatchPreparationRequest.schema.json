@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "DraftProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "unified-proposal.v1",
+          "default": "unified-proposal.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "client_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Client Id",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/ResourceRef"
+        },
+        "workflow_binding": {
+          "$ref": "#/$defs/WorkflowBinding"
+        },
+        "audience": {
+          "enum": [
+            "student",
+            "staff_internal"
+          ],
+          "title": "Audience",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "revise_draft",
+            "prepare_response",
+            "prepare_internal_note"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/FieldChange"
+          },
+          "maxItems": 24,
+          "minItems": 1,
+          "title": "Changes",
+          "type": "array"
+        },
+        "action_authority": {
+          "const": "none",
+          "default": "none",
+          "title": "Action Authority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "client_id",
+        "target",
+        "workflow_binding",
+        "audience",
+        "operation",
+        "changes"
+      ],
+      "title": "DraftProposal",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "version_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Version Id",
+          "type": "string"
+        },
+        "locator": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "synthetic",
+            "public_snapshot"
+          ],
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "version_id",
+        "locator",
+        "sha256",
+        "classification"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "FieldChange": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "enum": [
+            "purpose",
+            "recipient",
+            "quantity",
+            "delivery_method",
+            "reason",
+            "course_record_id",
+            "contact_preference",
+            "public_response",
+            "internal_note"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Before"
+        },
+        "candidate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Candidate"
+        },
+        "origin": {
+          "enum": [
+            "user_statement",
+            "source_reference",
+            "inference"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "field",
+        "before",
+        "candidate",
+        "origin"
+      ],
+      "title": "FieldChange",
+      "type": "object"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    },
+    "WorkflowBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "workflow": {
+          "enum": [
+            "STUDENT_CERTIFICATE",
+            "GRADE_APPEAL",
+            "GENERAL_SUPPORT"
+          ],
+          "title": "Workflow",
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "effective_from": {
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_until": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective Until"
+        }
+      },
+      "required": [
+        "workflow",
+        "version",
+        "source",
+        "effective_from"
+      ],
+      "title": "WorkflowBinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/DraftProposal"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Items",
+      "type": "array"
+    },
+    "mode": {
+      "const": "prepare_only",
+      "default": "prepare_only",
+      "title": "Mode",
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "items"
+  ],
+  "title": "BatchPreparationRequest",
+  "type": "object"
+}

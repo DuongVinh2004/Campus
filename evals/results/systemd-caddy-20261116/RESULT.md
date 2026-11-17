@@ -1,0 +1,14 @@
+# Chạy thật systemd và Caddy HTTPS trong container Ubuntu 24.04 (2026-11-16)
+
+Container `campus247-systemd` (`infra/cloud/docker/Dockerfile.systemd`): systemd là PID 1, `--cpus=4 --memory=7500m`, dữ liệu khôi phục từ backup thật bằng `backup.py restore`, frontend dựng bằng `infra/cloud/build_frontend.sh`, các đơn vị `campus247-*.service` sinh từ hồ sơ `cloud` bằng `render_units.py`, Caddy với chứng chỉ do CA nội bộ của chính Caddy cấp (tên `localhost`, vì không có tên miền thật). Provider giả qua drop-in (không có khóa, không tốn lời gọi). Khách đi qua HTTPS từ chính trong container (cùng mạng loopback như VPS thật).
+
+Kết quả: Postgres, models, gateway, API (2 worker), frontend và Caddy đều `active` dưới systemd; `https://localhost/health/ready` 200, `/chat` và `/login` 200, nén gzip, HSTS; một lượt chat thật (đăng nhập, luồng SSE, câu trả lời có trích dẫn) qua HTTPS đạt. `kill -9` tiến trình chính của API: systemd khởi động lại (NRestarts 1) và sẵn sàng trở lại; `kill -9` một worker: supervisor dựng lại, vẫn sẵn sàng; restart gateway: API (Requires) cũng quay lại; 0 vi phạm sandbox (`ProtectSystem=strict`, `PrivateTmp`, `NoNewPrivileges`) trong nhật ký.
+
+## Ba lỗi của bộ triển khai mà chỉ chạy thật mới lộ ra (đã sửa)
+1. **Caddyfile trỏ sai cổng.** Trỏ vào frontend 3015 thì `/health` và `/v1` trả 404 (frontend không proxy ngược). Sửa: trỏ vào API 8015, nơi vừa phục vụ API vừa proxy trang web (đúng như trên máy local). Test `test_caddy_exposes_only_https_...` ghi sai khẳng định cũ nên đã sửa theo.
+2. **Đơn vị models không khởi động lại được.** Máy chủ mô hình từ chối dùng lại thư mục trạng thái (`fresh owned model namespace required`), nên `systemctl restart` hay tự khởi động lại sau lỗi đều hỏng với `--state` cố định. Sửa: `infra/cloud/start_models.sh` tạo thư mục mới mỗi lần và tiếp tục từ thư mục cũ nhất; thử restart 2 lần liên tiếp đạt.
+3. **API khởi động trước khi gateway sẵn sàng.** Đơn vị gateway "active" ngay khi tiến trình bắt đầu, nên API đọc tệp token chưa có và thoát. Sửa: `ExecStartPost` chờ gateway trả lời `/health` (và models mở cổng) rồi mới coi là active; chỉ chạy `systemctl start campus247-api` cũng kéo và chờ đúng các đơn vị phụ thuộc.
+Còn lại: dựng frontend lần đầu trong container phát hiện mẫu Windows còn sót ở `infra/local/rag-fixture` bị dùng nhầm trên Linux (`outputFileTracingRoot` kiểu `C:/...`); đã sửa để Linux luôn dùng mẫu di động.
+## Khởi động lại cả máy (đã kiểm)
+Dựng lại container từ đầu theo runbook (khôi phục backup, `build_frontend.sh`, Caddyfile, `systemctl enable` cho 6 đơn vị) rồi `docker restart` (systemd PID 1 khởi động lại, `/run` bị xóa, mọi tiến trình bị dừng), không chạy gì bằng tay: Postgres, models, gateway, API, frontend và Caddy tự lên `active`, `/health/ready` sẵn sàng, `https://localhost/health/ready`, `/chat`, `/login` đều 200, đúng một leader.
+Chưa kiểm: chứng chỉ Let's Encrypt thật cho tên miền thật (cần DNS) và tốc độ CPU VPS.

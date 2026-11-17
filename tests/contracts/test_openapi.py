@@ -17,6 +17,12 @@ from contracts.tools.validate_openapi import (
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def inline_operations(document: dict) -> list[dict]:
+    """Operations written inside the document (path items that are only a $ref to another file have none here)."""
+    return [value for item in document["paths"].values() if isinstance(item, dict)
+            for value in item.values() if isinstance(value, dict) and "responses" in value]
+
+
 @pytest.fixture(scope="module")
 def openapi_doc() -> dict:
     return load_document(OPENAPI_PATH)
@@ -72,8 +78,7 @@ def test_openapi_negative_missing_problem_response(
     """Verify validator rejects operation lacking RFC 9457 Problem error response."""
     req_ids, ctrl_ids, test_ids = validation_catalogs
     mutated = copy.deepcopy(openapi_doc)
-    first_path = next(iter(mutated["paths"].values()))
-    first_op = next(iter(first_path.values()))
+    first_op = inline_operations(mutated)[0]
     # Remove Problem error response
     first_op["responses"] = {"200": {"description": "OK"}}
     with pytest.raises(ValueError, match="RFC 9457 Problem error response is required"):
@@ -86,9 +91,7 @@ def test_openapi_negative_duplicate_operation_id(
     """Verify validator rejects duplicate operationId."""
     req_ids, ctrl_ids, test_ids = validation_catalogs
     mutated = copy.deepcopy(openapi_doc)
-    path_items = list(mutated["paths"].values())
-    op1 = next(iter(path_items[0].values()))
-    op2 = next(iter(path_items[1].values()))
+    op1, op2 = inline_operations(mutated)[:2]
     op2["operationId"] = op1["operationId"]
     with pytest.raises(ValueError, match="duplicate operationId"):
         validate_operations(mutated, req_ids, ctrl_ids, test_ids)

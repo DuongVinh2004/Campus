@@ -1,0 +1,14 @@
+# A5 — Phương pháp đo và bằng chứng khả năng tổng quát
+Đọc `A0-common.md` cùng thư mục trước và tuân thủ nguyên văn. Mã phiên: A5.
+
+Phạm vi đọc chính: `evals/runners/rag_v2_{eval,cases,suite,newdoc,gate_compare,context_probe,retrieval_probe}.py`, `evals/datasets/rag-v2/{cases.manifest.json,newdoc/**}` (đọc newdoc đầy đủ; với `cases.jsonl` và `holdout*/` chỉ đếm cấu trúc/trường, không đọc nội dung từng ca để chỉnh), `evals/gates/regression-gates.yaml`, `evals/results/rag-judge-20261028/{SPEC-v2,REPORT-v2,PLAN-v2-next}.md`, `briefs/T2-common.md`, `briefs/T16-newdoc.md`, tests `tests/evals/**` liên quan v2.
+
+Câu hỏi bắt buộc trả lời (có bằng chứng):
+1. Bộ chấm (`rag_v2_eval.py score`): định nghĩa chính xác A1–A8 trong mã; chỗ nào lệch SPEC; proxy A1 (khớp dữ kiện) bỏ sót loại sai nào (sai điều kiện, sai đối tượng, đúng số nhưng sai ngữ cảnh, thêm phát biểu sai ngoài dữ kiện) và chấm nhầm loại đúng nào (diễn đạt khác, đơn vị khác). Có kiểm `forbidden_facts` không. Chạy `score` ngoại tuyến trên một tệp kết quả có sẵn trong `evals/results/rag-judge-20261028/runs/` nếu được để xác nhận.
+2. Tính độc lập của bằng chứng: mọi bộ ca do cùng một mô hình viết từ cùng kho; holdout6 có thực sự sạch không (cách chọn `used-chunk-ids`, có rò qua chẩn đoán tổng hợp); mức tương quan giữa người viết câu hỏi và văn phong kho. Độ rộng khoảng tin cậy với 120 ca có đáp án ×3 lượt (Wilson/bootstrap theo nhóm cho A1 ≈ 4,4%, A3 ≈ 97,5%) — có đủ để kết luận đạt ngưỡng 2% / 98% không; cần bao nhiêu ca.
+3. Phép thử tài liệu mới (`rag_v2_newdoc.py`, `newdoc/`): nó đo cái gì, bỏ qua gì (không qua nút an toàn/định tuyến? tài liệu do cùng mô hình viết theo văn phong kho? một tài liệu? không có tài liệu thay thế/mâu thuẫn? không qua đường phát hành/ủy quyền thật?). Đề xuất một giao thức "tài liệu mới" đủ tin cậy: số lượng và loại tài liệu (văn bản quy phạm nhiều điều khoản, bảng lớn, thông báo ngắn, văn bản thay thế bản cũ, văn bản có phạm vi khóa/ngành, tài liệu OCR kém, tài liệu song ngữ), nguồn tài liệu (tài liệu thật công khai của HUCE chưa có trong kho do chủ dự án cung cấp, hoặc tổng hợp có kiểm), câu hỏi do mô hình KHÁC/khác prompt viết, tiêu chí đạt (không sửa dòng mã nào, A1–A5 trên ca tài liệu mới, không suy giảm trên ca cũ — đo bằng gì).
+4. Cổng hồi quy rẻ: bộ nào chạy được không gọi mô hình (probe ngữ cảnh, test xác định), bộ nào cần mô hình; đề xuất bộ cổng nhiều tầng (0 lời gọi → ~100 lời gọi → đo cuối) với ngưỡng cụ thể, chạy được cho mỗi thay đổi mã và mỗi lần nạp tài liệu.
+5. Ổn định A6/A7: cách đo hiện tại có tách được nhiễu nhà cung cấp khỏi lỗi mã không; đề xuất cách đo ổn định (lặp, nhiệt độ, độ đồng thời, chạy dài/ngâm).
+6. Bộ safety (A9): phần nào đo lõi v2, phần nào đo nút dùng chung; định mức có hợp lý không.
+
+Kết thúc bằng mục "Giao thức nghiệm thu đề xuất" (≤ 30 dòng): các bộ đo, cỡ mẫu, ngưỡng, thứ tự, chi phí lời gọi ước tính, và điều kiện để nói "v2 ổn định với tài liệu mới".

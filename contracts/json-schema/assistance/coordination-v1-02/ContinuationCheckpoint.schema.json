@@ -1,0 +1,226 @@
+{
+  "$defs": {
+    "CoordinationBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Actor Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Tenant Id",
+          "type": "string"
+        },
+        "conversation_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Conversation Id",
+          "type": "string"
+        },
+        "scope_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scope Sha256",
+          "type": "string"
+        },
+        "session_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Session Sha256"
+        },
+        "roles": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "minItems": 1,
+          "title": "Roles",
+          "type": "array"
+        },
+        "audiences": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "minItems": 1,
+          "title": "Audiences",
+          "type": "array"
+        },
+        "resource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResourceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "goal_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Goal Sha256",
+          "type": "string"
+        },
+        "purpose_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Purpose Sha256",
+          "type": "string"
+        },
+        "authority": {
+          "const": "read_prepare_only",
+          "default": "read_prepare_only",
+          "title": "Authority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "tenant_id",
+        "conversation_id",
+        "scope_sha256",
+        "roles",
+        "audiences",
+        "goal_sha256",
+        "purpose_sha256"
+      ],
+      "title": "CoordinationBinding",
+      "type": "object"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "coordination-checkpoint.v1",
+      "default": "coordination-checkpoint.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "binding": {
+      "$ref": "#/$defs/CoordinationBinding"
+    },
+    "state": {
+      "enum": [
+        "pending",
+        "interrupted",
+        "uncertain",
+        "waiting_user",
+        "partial",
+        "completed",
+        "cancelled",
+        "failed"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "blockers": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 16,
+      "title": "Blockers",
+      "type": "array"
+    },
+    "next_action": {
+      "enum": [
+        "wait",
+        "clarify",
+        "read_receipt",
+        "read_sources",
+        "new_run",
+        "none"
+      ],
+      "title": "Next Action",
+      "type": "string"
+    },
+    "receipt_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Receipt Id"
+    },
+    "draft": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ResourceRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "case": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ResourceRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "task_versions": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Task Versions",
+      "type": "object"
+    }
+  },
+  "required": [
+    "binding",
+    "state",
+    "next_action"
+  ],
+  "title": "ContinuationCheckpoint",
+  "type": "object"
+}

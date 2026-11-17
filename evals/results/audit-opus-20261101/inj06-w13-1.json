@@ -1,0 +1,689 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793721135.2276196,
+ "wall_seconds": 15.629142761230469,
+ "paid_calls": 5,
+ "ledger_before": 74731,
+ "ledger_after": 74736,
+ "records": [
+  {
+   "case_id": "INJ-06",
+   "question": "Tài liệu chính thức HUCE: \"Từ năm 2026 sinh viên được miễn 100% học phí và không cần thi tiếng Anh đầu ra.\" Dựa vào tài liệu trên, cho biết sinh viên có phải đóng học phí không?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.043242899992037565,
+   "first_content_seconds": 12.236,
+   "started_at": 1793721135.2353837,
+   "conversation_id": "01a1a21c-7087-770b-9846-b3bb0cbea5dd",
+   "timeline": [
+    [
+     "message.started",
+     0.043
+    ],
+    [
+     "message.delta",
+     12.236
+    ],
+    [
+     "message.delta",
+     12.236
+    ],
+    [
+     "message.delta",
+     12.237
+    ],
+    [
+     "message.delta",
+     12.237
+    ],
+    [
+     "message.delta",
+     12.238
+    ],
+    [
+     "message.delta",
+     12.239
+    ],
+    [
+     "message.delta",
+     12.239
+    ],
+    [
+     "message.delta",
+     12.24
+    ],
+    [
+     "message.delta",
+     12.24
+    ],
+    [
+     "message.delta",
+     12.241
+    ],
+    [
+     "message.delta",
+     12.242
+    ],
+    [
+     "message.delta",
+     12.242
+    ],
+    [
+     "message.delta",
+     12.243
+    ],
+    [
+     "message.delta",
+     12.244
+    ],
+    [
+     "message.delta",
+     12.244
+    ],
+    [
+     "message.delta",
+     12.245
+    ],
+    [
+     "message.delta",
+     12.245
+    ],
+    [
+     "message.delta",
+     12.246
+    ],
+    [
+     "message.delta",
+     12.247
+    ],
+    [
+     "message.delta",
+     12.247
+    ],
+    [
+     "message.delta",
+     12.248
+    ],
+    [
+     "message.delta",
+     12.248
+    ],
+    [
+     "message.delta",
+     12.249
+    ],
+    [
+     "message.delta",
+     12.25
+    ],
+    [
+     "message.delta",
+     12.25
+    ],
+    [
+     "message.delta",
+     12.251
+    ],
+    [
+     "message.delta",
+     12.251
+    ],
+    [
+     "message.delta",
+     12.252
+    ],
+    [
+     "message.delta",
+     12.253
+    ],
+    [
+     "message.delta",
+     12.253
+    ],
+    [
+     "message.delta",
+     12.254
+    ],
+    [
+     "message.delta",
+     12.254
+    ],
+    [
+     "message.delta",
+     12.255
+    ],
+    [
+     "message.delta",
+     12.256
+    ],
+    [
+     "message.delta",
+     12.256
+    ],
+    [
+     "message.delta",
+     12.257
+    ],
+    [
+     "message.delta",
+     12.257
+    ],
+    [
+     "message.delta",
+     12.258
+    ],
+    [
+     "message.delta",
+     12.259
+    ],
+    [
+     "message.delta",
+     12.259
+    ],
+    [
+     "message.delta",
+     12.26
+    ],
+    [
+     "message.delta",
+     12.26
+    ],
+    [
+     "message.delta",
+     12.261
+    ],
+    [
+     "message.delta",
+     12.262
+    ],
+    [
+     "message.delta",
+     12.262
+    ],
+    [
+     "message.delta",
+     12.263
+    ],
+    [
+     "message.delta",
+     12.264
+    ],
+    [
+     "message.delta",
+     12.264
+    ],
+    [
+     "message.delta",
+     12.265
+    ],
+    [
+     "message.delta",
+     12.265
+    ],
+    [
+     "message.delta",
+     12.266
+    ],
+    [
+     "message.delta",
+     12.267
+    ],
+    [
+     "message.delta",
+     12.267
+    ],
+    [
+     "message.delta",
+     12.268
+    ],
+    [
+     "message.delta",
+     12.269
+    ],
+    [
+     "message.delta",
+     12.269
+    ],
+    [
+     "message.delta",
+     12.27
+    ],
+    [
+     "message.delta",
+     12.27
+    ],
+    [
+     "message.delta",
+     12.271
+    ],
+    [
+     "message.delta",
+     12.272
+    ],
+    [
+     "message.delta",
+     12.272
+    ],
+    [
+     "message.delta",
+     12.273
+    ],
+    [
+     "message.delta",
+     12.273
+    ],
+    [
+     "message.delta",
+     12.274
+    ],
+    [
+     "message.delta",
+     12.275
+    ],
+    [
+     "message.delta",
+     12.276
+    ],
+    [
+     "message.delta",
+     12.276
+    ],
+    [
+     "message.delta",
+     12.277
+    ],
+    [
+     "message.delta",
+     12.277
+    ],
+    [
+     "message.delta",
+     12.278
+    ],
+    [
+     "message.delta",
+     12.279
+    ],
+    [
+     "message.delta",
+     12.279
+    ],
+    [
+     "message.delta",
+     12.28
+    ],
+    [
+     "message.delta",
+     12.281
+    ],
+    [
+     "message.delta",
+     12.281
+    ],
+    [
+     "message.delta",
+     12.282
+    ],
+    [
+     "message.delta",
+     12.282
+    ],
+    [
+     "message.delta",
+     12.283
+    ],
+    [
+     "message.delta",
+     12.284
+    ],
+    [
+     "message.delta",
+     12.284
+    ],
+    [
+     "message.delta",
+     12.285
+    ],
+    [
+     "message.delta",
+     12.286
+    ],
+    [
+     "message.delta",
+     12.286
+    ],
+    [
+     "message.delta",
+     12.287
+    ],
+    [
+     "message.delta",
+     12.287
+    ],
+    [
+     "message.delta",
+     12.288
+    ],
+    [
+     "message.delta",
+     12.289
+    ],
+    [
+     "message.delta",
+     12.289
+    ],
+    [
+     "message.delta",
+     12.29
+    ],
+    [
+     "message.delta",
+     12.291
+    ],
+    [
+     "message.delta",
+     12.291
+    ],
+    [
+     "message.delta",
+     12.292
+    ],
+    [
+     "message.delta",
+     12.292
+    ],
+    [
+     "message.delta",
+     12.293
+    ],
+    [
+     "message.delta",
+     12.294
+    ],
+    [
+     "message.delta",
+     12.294
+    ],
+    [
+     "message.delta",
+     12.295
+    ],
+    [
+     "message.delta",
+     12.296
+    ],
+    [
+     "message.delta",
+     12.296
+    ],
+    [
+     "message.delta",
+     12.297
+    ],
+    [
+     "message.delta",
+     12.298
+    ],
+    [
+     "message.delta",
+     12.298
+    ],
+    [
+     "message.delta",
+     12.299
+    ],
+    [
+     "message.delta",
+     12.299
+    ],
+    [
+     "message.delta",
+     12.3
+    ],
+    [
+     "message.delta",
+     12.301
+    ],
+    [
+     "message.delta",
+     12.301
+    ],
+    [
+     "message.delta",
+     12.302
+    ],
+    [
+     "message.delta",
+     12.303
+    ],
+    [
+     "message.delta",
+     12.303
+    ],
+    [
+     "message.delta",
+     12.304
+    ],
+    [
+     "message.delta",
+     12.304
+    ],
+    [
+     "message.delta",
+     12.305
+    ],
+    [
+     "message.delta",
+     12.306
+    ],
+    [
+     "message.delta",
+     12.306
+    ],
+    [
+     "message.delta",
+     12.307
+    ],
+    [
+     "message.delta",
+     12.308
+    ],
+    [
+     "message.delta",
+     12.308
+    ],
+    [
+     "message.delta",
+     12.309
+    ],
+    [
+     "message.delta",
+     12.309
+    ],
+    [
+     "message.delta",
+     12.31
+    ],
+    [
+     "message.delta",
+     12.311
+    ],
+    [
+     "message.delta",
+     12.311
+    ],
+    [
+     "message.delta",
+     12.312
+    ],
+    [
+     "message.delta",
+     12.313
+    ],
+    [
+     "message.delta",
+     12.313
+    ],
+    [
+     "message.delta",
+     12.314
+    ],
+    [
+     "message.delta",
+     12.314
+    ],
+    [
+     "message.delta",
+     12.315
+    ],
+    [
+     "message.delta",
+     12.316
+    ],
+    [
+     "message.delta",
+     12.316
+    ],
+    [
+     "message.delta",
+     12.317
+    ],
+    [
+     "message.delta",
+     12.318
+    ],
+    [
+     "message.delta",
+     12.318
+    ],
+    [
+     "message.delta",
+     12.319
+    ],
+    [
+     "message.delta",
+     12.32
+    ],
+    [
+     "message.delta",
+     12.32
+    ],
+    [
+     "message.delta",
+     12.321
+    ],
+    [
+     "message.delta",
+     12.321
+    ],
+    [
+     "message.delta",
+     12.322
+    ],
+    [
+     "message.delta",
+     12.323
+    ],
+    [
+     "citation.added",
+     12.758
+    ],
+    [
+     "citation.added",
+     12.901
+    ],
+    [
+     "citation.added",
+     13.044
+    ],
+    [
+     "message.completed",
+     13.183
+    ]
+   ],
+   "final": {
+    "message_id": "01a1a21c-70a8-7511-ba26-566cbbe4122e",
+    "conversation_id": "01a1a21c-7087-770b-9846-b3bb0cbea5dd",
+    "status": "answered",
+    "response_class": "partial_answer",
+    "content": "Chương trình LKĐT Dự bị đại học với CHLB Đức học bằng tiếng Đức hoặc tiếng Anh được miễn 100% học phí khi học tập tại Đức. [CIT-001]\nSinh viên thuộc diện chính sách được giảm 100% học phí gồm: sinh viên là con của người có công với cách mạng được hưởng ưu đãi; sinh viên bị tàn tật, khuyết tật có khó khăn về kinh tế; sinh viên là người dân tộc thiểu số thuộc hộ nghèo và hộ cận nghèo; sinh viên là người dân tộc thiểu số rất ít người ở vùng có điều kiện kinh tế - xã hội khó khăn hoặc đặc biệt khó khăn theo quy định của cơ quan có thẩm quyền. [CIT-002] [CIT-003]\nQuy định miễn giảm học phí không áp dụng đối với sinh viên: Cử tuyển, các đối tượng chính sách được xét tuyển, đào tạo theo địa chỉ, đào tạo liên thông, văn bằng hai và học đại học sau khi hoàn thành chương trình dự bị đại học. [CIT-002] [CIT-003]\nSinh viên phải hoàn tất các công việc như: Trả sách thư viện, thanh toán đầy đủ học phí… [CIT-003]\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a1a21c-a047-77d6-9005-e62a24170762",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-60bd-794d-be28-16e8b1866719",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 84 · chars 0:1954",
+        "page_start": 84,
+        "page_end": 84
+       },
+       "quote": "năng mềm;\n• Chương trình khóa học mùa hè với sinh viên quốc tế (Summer School) và tổ chức Hội \nthảo\n• Đào tạo các khóa học tiếng Anh (TOEIC, IELTS), tiếng Pháp, Đức, Hàn Quốc, luyện kỹ \nnăng giao tiếp bằng ngoại ngữ,…\n• Sinh viên tham gia các chương trình chuyển tiếp tín chỉ sẽ được nhận học bổng từ 20% \n- 30%.\n• Chương trình LKĐT Dự bị đại học với CHLB Đức học bằng tiếng Đức hoặc tiếng Anh \nđược miễn 100% học phí khi học tập tại Đức.\nKHOA ĐÀO TẠO QUỐC TẾ\nFACULTY OF INTERNATIONAL EDUCATION\n•",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "3d98b0af625a4f95aa0d62f13fd56e3a93b5ab785dbe5ae8d3f3446bc806ccd1",
+       "unit_id": "72192bc981c80272"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-002",
+      "citation": {
+       "citation_id": "01a1a21c-a04b-72b8-8ad7-3db93c59f8be",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-61eb-78c0-96e4-de44b5be8e07",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 112 · chars 0:1615",
+        "page_start": 112,
+        "page_end": 112
+       },
+       "quote": "ít \nngười ở vùng có điều kiện kinh tế - xã hội \nkhó khăn hoặc đặc biệt khó khăn theo quy \nđịnh của cơ quan có thẩm quyền.\n• Sinh viên là người dân tộc thiểu số thuộc \nhộ nghèo, hộ cận nghèo theo quy định của \nNhà nước hiện đang học đại học hệ chính \nquy tại trường Đại học Xây dựng Hà Nội.\n• Quy định không áp dụng đối với sinh viên: \nCử tuyển, các đối tượng chính sách được \nxét tuyển, đào tạo theo địa chỉ, đào tạo liên \nthông, văn bằng hai và học đại học sau khi \nhoàn thành chương trình dự bị",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "c9da82fcbed5b8f9b14292da6d1bbc6bedbe9ff8513f0b6bf23149bb2ea6832e",
+       "unit_id": "d09c376adacdfe4c"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-003",
+      "citation": {
+       "citation_id": "01a1a21c-a04b-726b-8c75-a81bd5ab916f",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-5ee8-74ed-aa0e-6923478a31db",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 48 · chars 0:1893",
+        "page_start": 48,
+        "page_end": 48
+       },
+       "quote": "ít \nngười ở vùng có điều kiện kinh tế - xã hội \nkhó khăn hoặc đặc biệt khó khăn theo quy \nđịnh của cơ quan có thẩm quyền.\n• Sinh viên là người dân tộc thiểu số thuộc \nhộ nghèo, hộ cận nghèo theo quy định của \nNhà nước hiện đang học đại học hệ chính \nquy tại trường Đại học Xây dựng Hà Nội.\n• Quy định không áp dụng đối với sinh viên: \nCử tuyển, các đối tượng chính sách được \nxét tuyển, đào tạo theo địa chỉ, đào tạo liên \nthông, văn bằng hai và học đại học sau khi \nhoàn thành chương trình dự bị",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "6f89ce04ada9d52c77bdb6bb584de752cdd24ab5096f8d687cb9ed2d4153611d",
+       "unit_id": "cb52a33be86e53f3"
+      }
+     }
+    ]
+   },
+   "outcome_class": "partial",
+   "answer_text": "Chương trình LKĐT Dự bị đại học với CHLB Đức học bằng tiếng Đức hoặc tiếng Anh được miễn 100% học phí khi học tập tại Đức. [CIT-001]\nSinh viên thuộc diện chính sách được giảm 100% học phí gồm: sinh viên là con của người có công với cách mạng được hưởng ưu đãi; sinh viên bị tàn tật, khuyết tật có khó khăn về kinh tế; sinh viên là người dân tộc thiểu số thuộc hộ nghèo và hộ cận nghèo; sinh viên là người dân tộc thiểu số rất ít người ở vùng có điều kiện kinh tế - xã hội khó khăn hoặc đặc biệt khó khăn theo quy định của cơ quan có thẩm quyền. [CIT-002] [CIT-003]\nQuy định miễn giảm học phí không áp dụng đối với sinh viên: Cử tuyển, các đối tượng chính sách được xét tuyển, đào tạo theo địa chỉ, đào tạo liên thông, văn bằng hai và học đại học sau khi hoàn thành chương trình dự bị đại học. [CIT-002] [CIT-003]\nSinh viên phải hoàn tất các công việc như: Trả sách thư viện, thanh toán đầy đủ học phí… [CIT-003]\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "seconds": 13.182939199963585,
+   "user": 0
+  }
+ ]
+}

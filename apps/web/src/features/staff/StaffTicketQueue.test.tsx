@@ -64,7 +64,7 @@ describe("StaffTicketQueue Component (TASK-WEB-STAFF-002)", () => {
     },
   ];
 
-  it("renders queue items and supports atomic claim", () => {
+  it("renders queue items but blocks claim without a durable consumer", () => {
     const handleClaim = vi.fn();
     render(
       <StaffTicketQueue
@@ -78,11 +78,12 @@ describe("StaffTicketQueue Component (TASK-WEB-STAFF-002)", () => {
     expect(screen.getByText("Đơn xin miễn giảm học phí")).toBeDefined();
     expect(screen.getByText("Trần Văn B (1912345)")).toBeDefined();
 
-    // Claim unassigned ticket
-    const claimBtn = screen.getByRole("button", { name: /Nhận xử lý TCK-2026-0101/i });
+    // A callback alone does not authorize a business action.
+    const claimBtn = screen.getByRole("button", { name: /Chưa có consumer - TCK-2026-0101/i });
+    expect(claimBtn.hasAttribute("disabled")).toBe(true);
     fireEvent.click(claimBtn);
 
-    expect(handleClaim).toHaveBeenCalledWith("queue-001");
+    expect(handleClaim).not.toHaveBeenCalled();
   });
 
   it("negative path: disables claim button for tickets already claimed by others", () => {
@@ -94,8 +95,17 @@ describe("StaffTicketQueue Component (TASK-WEB-STAFF-002)", () => {
       />
     );
 
-    const alreadyClaimedBtn = screen.getByRole("button", { name: /Đã nhận - TCK-2026-0102/i });
+    const alreadyClaimedBtn = screen.getByRole("button", { name: /Chưa có consumer - TCK-2026-0102/i });
     expect(alreadyClaimedBtn.hasAttribute("disabled")).toBe(true);
+  });
+
+  it("delegates claim to the connected consumer only after an explicit click", () => {
+    const handleClaim = vi.fn();
+    render(<StaffTicketQueue items={mockItems} currentStaffId="staff-huce-01" businessActionsAvailable onClaimTicket={handleClaim} />);
+    expect(handleClaim).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /Nhận xử lý TCK-2026-0101/i }));
+    expect(handleClaim).toHaveBeenCalledTimes(1);
+    expect(handleClaim).toHaveBeenCalledWith("queue-001");
   });
 
   it("prioritizes urgency and age with non-color textual indicators", () => {
@@ -150,7 +160,7 @@ describe("StaffTicketQueue Component (TASK-WEB-STAFF-002)", () => {
     expect(screen.getByText(/staff-huce-02/i)).toBeDefined();
 
     // Claim button is disabled due to conflict
-    const conflictBtn = screen.getByRole("button", { name: /Xung đột - TCK-2026-0104/i });
+    const conflictBtn = screen.getByRole("button", { name: /Chưa có consumer - TCK-2026-0104/i });
     expect(conflictBtn.hasAttribute("disabled")).toBe(true);
 
     // Refresh CTA exists
@@ -172,7 +182,7 @@ describe("StaffTicketQueue Component (TASK-WEB-STAFF-002)", () => {
     expect(screen.queryByText(/Phạm Hoàng D/i)).toBeNull();
 
     // Claim button is disabled for restricted item
-    const restrictedBtn = screen.getByRole("button", { name: /Hạn chế truy cập - TCK-2026-0103/i });
+    const restrictedBtn = screen.getByRole("button", { name: /Chưa có consumer - TCK-2026-0103/i });
     expect(restrictedBtn.hasAttribute("disabled")).toBe(true);
   });
 
@@ -227,7 +237,7 @@ describe("StaffTicketQueue Component (TASK-WEB-STAFF-002)", () => {
     expect(screen.getAllByText(/Xung đột phiên bản/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Dữ liệu đã thay đổi trên máy chủ/i)).toBeDefined();
 
-    const claimBtn = screen.getByRole("button", { name: /Xung đột phiên bản/i });
+    const claimBtn = screen.getByRole("button", { name: /Chưa có consumer - TCK-2026-0101/i });
     expect(claimBtn.hasAttribute("disabled")).toBe(true);
   });
 

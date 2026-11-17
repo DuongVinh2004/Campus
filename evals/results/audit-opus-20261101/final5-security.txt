@@ -1,0 +1,45 @@
+roles ['STUDENT'] ['KNOWLEDGE_ADMIN']
+{"test": "S1 anon GET /v1/users/me", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S1 anon GET /v1/student-preparations", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S1 anon GET /v1/privacy/consents", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S1 anon GET /v1/knowledge/platform/state", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S1 anon POST conversation", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S2 tampered cookie /v1/users/me", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S2 bearer header with valid token", "expected": "info", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S3 student GET /v1/knowledge/platform/state", "expected": "403 (trừ nguồn công khai)", "status": 403, "code": "KNOWLEDGE_FORBIDDEN"}
+{"test": "S3 student GET /v1/knowledge/platform/intakes", "expected": "403 (trừ nguồn công khai)", "status": 403, "code": "KNOWLEDGE_FORBIDDEN"}
+{"test": "S3 student GET /v1/knowledge/platform/schedules", "expected": "403 (trừ nguồn công khai)", "status": 403, "code": "KNOWLEDGE_FORBIDDEN"}
+{"test": "S3 student POST /v1/knowledge/platform/schedules/tick", "expected": "403 (trừ nguồn công khai)", "status": 403, "code": "KNOWLEDGE_FORBIDDEN"}
+{"test": "S3 student POST /v1/knowledge/platform/search-preview", "expected": "403 (trừ nguồn công khai)", "status": 422, "code": "VALIDATION_FAILED"}
+{"test": "S3 student POST /v1/knowledge/platform/url-intakes", "expected": "403 (trừ nguồn công khai)", "status": 403, "code": "KNOWLEDGE_FORBIDDEN"}
+{"test": "S3 student POST /v1/knowledge/platform/previews", "expected": "403 (trừ nguồn công khai)", "status": 422, "code": "VALIDATION_FAILED"}
+{"test": "S3 student GET /v1/knowledge/sources", "expected": "403 (trừ nguồn công khai)", "status": 403, "code": "KNOWLEDGE_FORBIDDEN"}
+{"test": "S3 student page /admin", "expected": "404/redirect hoặc trang báo không đủ quyền", "status": 404, "code": "RESOURCE_NOT_FOUND", "location": null}
+{"test": "S3 student page /staff", "expected": "404/redirect hoặc trang báo không đủ quyền", "status": 404, "code": "RESOURCE_NOT_FOUND", "location": null}
+{"test": "S3 student page /knowledge/sources", "expected": "404/redirect hoặc trang báo không đủ quyền", "status": 200, "code": null, "location": null}
+{"test": "S3 student page /knowledge", "expected": "404/redirect hoặc trang báo không đủ quyền", "status": 307, "code": null, "location": "/knowledge/sources"}
+{"test": "S4 owner create conversation", "expected": "201", "status": 201, "code": null}
+{"test": "S4a student GET owner messages", "expected": "403/404", "status": 404, "code": "RESOURCE_NOT_FOUND"}
+{"test": "S4b anon GET owner messages", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S4c student POST stream into owner conversation", "expected": "403/404, 0 lời gọi mô hình", "status": 403, "code": "FORBIDDEN", "paid_calls": 0, "body_head": "{\"type\":\"https://campus247.example/problems/forbidden\",\"title\":\"Không có quyền sở hữu tài nguyên\",\"status\":403,\"detail\":\"Forbidden: conversation ownership requi"}
+{"test": "S4d student feedback on owner message id", "expected": "403/404", "status": 422, "code": "VALIDATION_FAILED"}
+{"test": "S5 student preview", "expected": "200", "status": 200, "code": null}
+{"test": "S5a save confirmed=false", "expected": "422", "status": 422, "code": "CONFIRMATION_REQUIRED"}
+{"test": "S5b save forged token", "expected": "409", "status": 409, "code": "PREVIEW_INVALID"}
+{"test": "S5c owner saves student's preview", "expected": "403/404", "status": 403, "code": "STUDENT_REQUIRED"}
+{"test": "S5d other session of same student saves preview", "expected": "403/409 (token gắn phiên)", "status": 409, "code": "PREVIEW_INVALID"}
+{"test": "S5e save confirmed=true", "expected": "200, sent_to_university=false", "status": 200, "code": null}
+{"test": "S5f replay same client_id", "expected": "200 is_replay", "status": 200, "code": null}
+{"test": "S5g reuse consumed preview new client_id", "expected": "409 PREVIEW_CONSUMED", "status": 409, "code": "STALE_VERSION"}
+{"test": "S5h student reads own draft", "expected": "200", "status": 200, "code": null}
+{"test": "S5i owner reads student's draft", "expected": "403/404", "status": 403, "code": "STUDENT_REQUIRED"}
+{"test": "S5j other-session student lists drafts", "expected": "200 includes draft", "status": 200, "code": null}
+{"test": "S6 logout", "expected": "200/204", "status": 200, "code": null}
+{"test": "S6 reuse cookie after logout", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S6 reuse cookie after logout on drafts", "expected": "401", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S7 login foreign Origin", "expected": "403", "status": 403, "code": "FORBIDDEN"}
+{"test": "S7 6th wrong password", "expected": "401/429 (giới hạn thử)", "status": 401, "code": "AUTHENTICATION_REQUIRED"}
+{"test": "S7 cross-origin preview with cookie", "expected": "info (SameSite=Strict chặn ở trình duyệt)", "status": 200, "code": null}
+{"test": "S8 openapi exposed", "expected": "info", "status": 404, "code": "RESOURCE_NOT_FOUND"}
+{"test": "S8 docs exposed", "expected": "info", "status": 404, "code": "RESOURCE_NOT_FOUND"}
+paid calls 0

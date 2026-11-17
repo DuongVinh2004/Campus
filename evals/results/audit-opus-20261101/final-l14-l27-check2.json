@@ -1,0 +1,191 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793625408.5514848,
+ "wall_seconds": 18.690636157989502,
+ "paid_calls": 8,
+ "ledger_before": 73640,
+ "ledger_after": 73648,
+ "records": [
+  {
+   "case_id": "AU-A12",
+   "question": "Mã trường của Đại học Xây dựng Hà Nội khi đăng ký xét tuyển là gì?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04226569997263141,
+   "first_content_seconds": 7.65,
+   "started_at": 1793625408.5587263,
+   "conversation_id": "01a19c67-c432-7926-9e52-ba46764f5d71",
+   "timeline": [
+    [
+     "message.started",
+     0.042
+    ],
+    [
+     "message.delta",
+     7.65
+    ],
+    [
+     "message.delta",
+     7.65
+    ],
+    [
+     "message.delta",
+     7.65
+    ],
+    [
+     "message.delta",
+     7.651
+    ],
+    [
+     "message.delta",
+     7.652
+    ],
+    [
+     "message.delta",
+     7.653
+    ],
+    [
+     "message.delta",
+     7.653
+    ],
+    [
+     "message.delta",
+     7.654
+    ],
+    [
+     "message.delta",
+     7.655
+    ],
+    [
+     "message.delta",
+     7.655
+    ],
+    [
+     "message.delta",
+     7.656
+    ],
+    [
+     "message.delta",
+     7.656
+    ],
+    [
+     "citation.added",
+     8.109
+    ],
+    [
+     "message.completed",
+     8.252
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c67-c453-7b39-a83b-1b3f763dd37e",
+    "conversation_id": "01a19c67-c432-7926-9e52-ba46764f5d71",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Mã trường của Trường Đại học Xây dựng Hà Nội khi đăng ký xét tuyển là XDS. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c67-e208-79cb-a287-9dfb20dc7e7a",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-5d70-7dd9-9dd7-5d8ba801f70a",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 17 · chars 0:1174",
+        "page_start": 17,
+        "page_end": 17
+       },
+       "quote": "theo kết quả Kỳ thi tốt nghiệp THPT\nXét tuyển sử dụng kết quả của Kỳ thi tốt nghiệp THPT \nvà kết quả thi các môn năng khiếu (với các chương \ntrình đào tạo có xét tuyển các môn năng khiếu).\n2. Xét tuyển theo kết quả học tập THPT (học bạ)\nXét tuyển dựa trên kết quả học tập THPT theo tiêu chí \nvà quy định của Nhà trường.\n3. Xét tuyển theo kết quả các kỳ thi đánh giá \nnăng lực, đánh giá tư duy\nSử dụng kết quả các kỳ thi như TSA, SPT, V-SAT \nhoặc các kỳ thi được Nhà trường công nhận.\nMÃ TRƯỜNG: XDS",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "6e18764eb86a3a64dc6ecd887055288558472662b65eec1b1346c2cd7f6cd746",
+       "unit_id": "6008455769d0790d"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Mã trường của Trường Đại học Xây dựng Hà Nội khi đăng ký xét tuyển là XDS. [CIT-001]",
+   "seconds": 8.252090399997542,
+   "user": 0
+  },
+  {
+   "case_id": "AU-P06",
+   "question": "Em bị bắt quả tang dùng điện thoại trong phòng thi thì chắc chắn bị đình chỉ học đúng không?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03229889998328872,
+   "first_content_seconds": 5.807,
+   "started_at": 1793625418.8123791,
+   "conversation_id": "01a19c67-ec3f-7839-8870-99b0257dffee",
+   "timeline": [
+    [
+     "message.started",
+     0.032
+    ],
+    [
+     "message.delta",
+     5.807
+    ],
+    [
+     "message.delta",
+     5.807
+    ],
+    [
+     "message.delta",
+     5.808
+    ],
+    [
+     "message.delta",
+     5.809
+    ],
+    [
+     "message.delta",
+     5.809
+    ],
+    [
+     "message.delta",
+     5.81
+    ],
+    [
+     "message.delta",
+     5.811
+    ],
+    [
+     "message.delta",
+     5.811
+    ],
+    [
+     "message.delta",
+     5.812
+    ],
+    [
+     "message.delta",
+     5.812
+    ],
+    [
+     "message.completed",
+     5.975
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c67-ec57-7e7d-9716-0dded4218bbc",
+    "conversation_id": "01a19c67-ec3f-7839-8870-99b0257dffee",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Mình đã tìm thấy nguồn nhưng chưa xác minh được phát biểu để trả lời.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Mình đã tìm thấy nguồn nhưng chưa xác minh được phát biểu để trả lời.",
+   "seconds": 5.975035799987381,
+   "user": 0
+  }
+ ]
+}

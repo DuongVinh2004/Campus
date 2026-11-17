@@ -1,0 +1,343 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793627670.038205,
+ "wall_seconds": 28.091019868850708,
+ "paid_calls": 12,
+ "ledger_before": 74155,
+ "ledger_after": 74167,
+ "records": [
+  {
+   "case_id": "AU-A01",
+   "question": "Cho em hỏi lớp học online được chiếm tối đa bao nhiêu phần trăm chương trình đào tạo chính quy ạ?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.03808030000072904,
+   "first_content_seconds": 6.909,
+   "started_at": 1793627670.0510144,
+   "conversation_id": "01a19c8a-4627-7dd4-b26a-8d3fcda720a3",
+   "timeline": [
+    [
+     "message.started",
+     0.038
+    ],
+    [
+     "message.delta",
+     6.909
+    ],
+    [
+     "message.delta",
+     6.909
+    ],
+    [
+     "message.delta",
+     6.91
+    ],
+    [
+     "message.delta",
+     6.911
+    ],
+    [
+     "message.delta",
+     6.911
+    ],
+    [
+     "message.delta",
+     6.912
+    ],
+    [
+     "message.delta",
+     6.912
+    ],
+    [
+     "message.delta",
+     6.913
+    ],
+    [
+     "message.delta",
+     6.914
+    ],
+    [
+     "message.delta",
+     6.914
+    ],
+    [
+     "message.delta",
+     6.915
+    ],
+    [
+     "message.delta",
+     6.915
+    ],
+    [
+     "message.delta",
+     6.916
+    ],
+    [
+     "message.delta",
+     6.917
+    ],
+    [
+     "message.delta",
+     6.917
+    ],
+    [
+     "message.delta",
+     6.918
+    ],
+    [
+     "message.delta",
+     6.919
+    ],
+    [
+     "message.delta",
+     6.919
+    ],
+    [
+     "message.delta",
+     6.92
+    ],
+    [
+     "message.delta",
+     6.92
+    ],
+    [
+     "message.delta",
+     6.921
+    ],
+    [
+     "message.delta",
+     6.922
+    ],
+    [
+     "message.delta",
+     6.922
+    ],
+    [
+     "citation.added",
+     7.249
+    ],
+    [
+     "message.completed",
+     7.353
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c8a-4643-7d1d-8366-52c78f7f883c",
+    "conversation_id": "01a19c8a-4627-7dd4-b26a-8d3fcda720a3",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Đối với đào tạo theo hình thức chính quy và vừa làm vừa học, tối đa 30% tổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c8a-6117-7e54-8cfd-cb3083625016",
+       "source_id": "253eb450-c57a-79a7-84a4-b0d85e12de1c",
+       "document_version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+       "chunk_id": "01a17057-0d62-76af-8733-fb90d72a2762",
+       "source_title": "Quy chế đào tạo HUCE — Quyết định 1486 ngày 06/11/2023",
+       "canonical_uri": "https://drive.google.com/file/d/1vyhUdenpbRKFC_hlFIgnh5oyEz56s8sF/preview?",
+       "version_label": "verified-effective-01a17057-0cbd-7504-a63c-b4c0ca345694",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Quy chế 1486 — Điều 8, khoản 2 — PDF 10",
+        "page_start": 10,
+        "page_end": 10
+       },
+       "quote": "tổ chức các lớp học phương thức trực tuyến khi đáp ứng các quy\nđịnh về ứng dụng công nghệ thông tin trong quản lý và tổ chức đào tạo qua mạng:\ncó các giải pháp bảo đảm chất lượng và minh chứng về chất lượng tổ chức lớp học\nphương thức trực tuyến không thấp hơn chất lượng lớp học phương thức trực tiếp;\n\nb) Đối với đào tạo theo hình thức chính quy và vừa làm vừa học, tối đa 30%\ntổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến.\nTrong trường hợp thiên tai, dịch bệnh",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "6e2d5044b4308a73e85ab30059d232a37fac1bed3306a98ceedcc11b305c7dd6",
+       "unit_id": "96425620e206054d"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Đối với đào tạo theo hình thức chính quy và vừa làm vừa học, tối đa 30% tổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến. [CIT-001]",
+   "seconds": 7.353400799998781,
+   "user": 0
+  },
+  {
+   "case_id": "AU-A12",
+   "question": "Mã trường của Đại học Xây dựng Hà Nội khi đăng ký xét tuyển là gì?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.06355289998464286,
+   "first_content_seconds": 7.138,
+   "started_at": 1793627679.4057813,
+   "conversation_id": "01a19c8a-6abd-7883-a6cc-8c3672f181f0",
+   "timeline": [
+    [
+     "message.started",
+     0.064
+    ],
+    [
+     "message.delta",
+     7.138
+    ],
+    [
+     "message.delta",
+     7.138
+    ],
+    [
+     "message.delta",
+     7.139
+    ],
+    [
+     "message.delta",
+     7.139
+    ],
+    [
+     "message.delta",
+     7.14
+    ],
+    [
+     "message.delta",
+     7.141
+    ],
+    [
+     "message.delta",
+     7.141
+    ],
+    [
+     "message.delta",
+     7.142
+    ],
+    [
+     "message.delta",
+     7.143
+    ],
+    [
+     "message.delta",
+     7.143
+    ],
+    [
+     "message.delta",
+     7.144
+    ],
+    [
+     "message.delta",
+     7.145
+    ],
+    [
+     "citation.added",
+     7.684
+    ],
+    [
+     "message.completed",
+     7.819
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c8a-6ae7-7b42-ad23-44cddea007dc",
+    "conversation_id": "01a19c8a-6abd-7883-a6cc-8c3672f181f0",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Mã trường của Trường Đại học Xây dựng Hà Nội khi đăng ký xét tuyển là XDS. [CIT-001]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c8a-868d-7623-b869-f7d93ab13ca3",
+       "source_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+       "document_version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "chunk_id": "01a16d1e-5d70-7dd9-9dd7-5d8ba801f70a",
+       "source_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+       "canonical_uri": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+       "version_label": "public-snapshot-01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 17 · chars 0:1174",
+        "page_start": 17,
+        "page_end": 17
+       },
+       "quote": "theo kết quả Kỳ thi tốt nghiệp THPT\nXét tuyển sử dụng kết quả của Kỳ thi tốt nghiệp THPT \nvà kết quả thi các môn năng khiếu (với các chương \ntrình đào tạo có xét tuyển các môn năng khiếu).\n2. Xét tuyển theo kết quả học tập THPT (học bạ)\nXét tuyển dựa trên kết quả học tập THPT theo tiêu chí \nvà quy định của Nhà trường.\n3. Xét tuyển theo kết quả các kỳ thi đánh giá \nnăng lực, đánh giá tư duy\nSử dụng kết quả các kỳ thi như TSA, SPT, V-SAT \nhoặc các kỳ thi được Nhà trường công nhận.\nMÃ TRƯỜNG: XDS",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "6e18764eb86a3a64dc6ecd887055288558472662b65eec1b1346c2cd7f6cd746",
+       "unit_id": "6008455769d0790d"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Mã trường của Trường Đại học Xây dựng Hà Nội khi đăng ký xét tuyển là XDS. [CIT-001]",
+   "seconds": 7.818882799998391,
+   "user": 0
+  },
+  {
+   "case_id": "AU-P06",
+   "question": "Em bị bắt quả tang dùng điện thoại trong phòng thi thì chắc chắn bị đình chỉ học đúng không?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.061691600014455616,
+   "first_content_seconds": 5.724,
+   "started_at": 1793627689.2248008,
+   "conversation_id": "01a19c8a-910d-7468-999c-9635c88b41c9",
+   "timeline": [
+    [
+     "message.started",
+     0.062
+    ],
+    [
+     "message.delta",
+     5.724
+    ],
+    [
+     "message.delta",
+     5.725
+    ],
+    [
+     "message.delta",
+     5.725
+    ],
+    [
+     "message.delta",
+     5.726
+    ],
+    [
+     "message.delta",
+     5.726
+    ],
+    [
+     "message.delta",
+     5.727
+    ],
+    [
+     "message.delta",
+     5.727
+    ],
+    [
+     "message.delta",
+     5.728
+    ],
+    [
+     "message.delta",
+     5.729
+    ],
+    [
+     "message.delta",
+     5.729
+    ],
+    [
+     "message.completed",
+     6.464
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c8a-9141-7c5e-852f-1fab7b4f31d6",
+    "conversation_id": "01a19c8a-910d-7468-999c-9635c88b41c9",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Mình đã tìm thấy nguồn nhưng chưa xác minh được phát biểu để trả lời.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Mình đã tìm thấy nguồn nhưng chưa xác minh được phát biểu để trả lời.",
+   "seconds": 6.46392680000281,
+   "user": 0
+  }
+ ]
+}

@@ -1,0 +1,373 @@
+{
+  "protected_sha256": {
+    "evals/corpus/served-chunks.jsonl": "ddeca7cb59d307be519dfca5ae7fa8e061cacd306e6d1af25718a1f8fc042524",
+    "evals/results/audit-opus-20261101/w12_sweep.py": "f136d4e42e6de63a63e4b24672a48e5ab2cc13b021325d452e8f4fa52e202b3c",
+    "evals/results/audit-opus-20261101/w12-embedded2-sweep.json": "ca28e3ec0f48ad5e642550dc5eb9d2aff5acc0940dbef010e4e468bbbd6cf78a",
+    "evals/datasets/rag-v2/cases.jsonl": "0b6ffbac00ccba1e8326f1d7437ff08c1a06c0658fdc15c17b765db6dc0d9cbf",
+    "evals/results/audit-opus-20261101/cases.jsonl": "cc63e385f7a5f565c1ac5eb50ad5f0973f74c4e8d04866ec2d99091c216f2bbe",
+    "data/rag_v2_index/embedded2/embeddings.npy": "ba14882995f58dce585556f14af1f3e1fef6e0f3e0ab106746a810694eb59dc8",
+    "data/rag_v2_index/embedded2/facts.jsonl": "a92211d63f1fc0215ad67fa09da9198e3d5a31f6635b50de45366f54abde0241",
+    "data/rag_v2_index/embedded2/manifest.json": "3215451df0b8db581b56bd96b2650bc857f7c70399e5f91006237477009e82a0",
+    "data/rag_v2_index/embedded2/units.jsonl": "2b2b883df15e484d5214a0f911bb283fe9e7b28ae23036bc626c13911701beae"
+  },
+  "protected_unchanged": true,
+  "baseline_units_reproduced_exactly": true,
+  "chunk_count": 2019,
+  "before_units": 9173,
+  "after_units": 9251,
+  "before_kinds": {
+    "curriculum_row": 6820,
+    "clause": 345,
+    "notice": 234,
+    "table_row": 626,
+    "page": 809,
+    "article": 99,
+    "handbook_section": 240
+  },
+  "after_kinds": {
+    "curriculum_row": 6820,
+    "clause": 345,
+    "notice": 233,
+    "table_row": 705,
+    "page": 809,
+    "article": 99,
+    "handbook_section": 240
+  },
+  "unaffected_units_identical": 9070,
+  "unaffected_pipe_chunks": 62,
+  "affected_chunks": [
+    {
+      "chunk_id": "01a16d17-1b9d-73c4-ad76-7667add6a06d",
+      "page": 5,
+      "rows": 15
+    },
+    {
+      "chunk_id": "01a16d17-1ba2-7e5e-81cc-960089adc52a",
+      "page": 5,
+      "rows": 15
+    },
+    {
+      "chunk_id": "01a16d17-1ba8-77b6-ab2e-cf4bc27dd106",
+      "page": 5,
+      "rows": 15
+    },
+    {
+      "chunk_id": "01a16d17-1bc9-70d6-92a6-2e3ef4039fe5",
+      "page": 6,
+      "rows": 11
+    },
+    {
+      "chunk_id": "01a16d17-1bcd-7229-8529-02e4b6274f4c",
+      "page": 6,
+      "rows": 11
+    },
+    {
+      "chunk_id": "01a16d17-1bd2-732b-96fd-4cf126e73c99",
+      "page": 6,
+      "rows": 11
+    },
+    {
+      "chunk_id": "01a16d1e-5df2-7a57-ba93-b461684fb7b6",
+      "page": 24,
+      "rows": 24
+    },
+    {
+      "chunk_id": "01a16d1e-5df5-7a67-8653-16e3a6ad3632",
+      "page": 24,
+      "rows": 24
+    },
+    {
+      "chunk_id": "01a16d1e-5df9-7e46-96f2-4e8ba14be0a5",
+      "page": 24,
+      "rows": 24
+    },
+    {
+      "chunk_id": "01a16d1e-5dfd-71bf-9f08-60dd0a0d5a3f",
+      "page": 25,
+      "rows": 20
+    },
+    {
+      "chunk_id": "01a16d1e-5e00-7e06-b5a8-f4e3b6817b57",
+      "page": 25,
+      "rows": 20
+    },
+    {
+      "chunk_id": "01a16d1e-5e03-7aa1-92fd-b1de97dd4cc6",
+      "page": 25,
+      "rows": 20
+    },
+    {
+      "chunk_id": "01a16d41-bdaf-7eaa-a0fc-a6bfd1cefb95",
+      "page": 2,
+      "rows": 8
+    },
+    {
+      "chunk_id": "01a16d41-bdb5-7738-8c5c-c68b8f39eb60",
+      "page": 2,
+      "rows": 8
+    },
+    {
+      "chunk_id": "01a16d41-bdbc-7fb8-9832-64e07b6612f5",
+      "page": 2,
+      "rows": 8
+    },
+    {
+      "chunk_id": "01a16d41-c498-7322-8ee6-b7efc4b39cac",
+      "page": 2,
+      "rows": 14
+    },
+    {
+      "chunk_id": "01a16d41-c49e-7c27-88d5-242048c6c00b",
+      "page": 2,
+      "rows": 14
+    },
+    {
+      "chunk_id": "01a16eec-221e-7a24-a7ad-7768321fdced",
+      "page": 1,
+      "rows": 26
+    },
+    {
+      "chunk_id": "01a16eec-2226-728d-bae5-65274db6ad3f",
+      "page": 1,
+      "rows": 26
+    },
+    {
+      "chunk_id": "01a16eec-222a-7f8c-a220-4afbd49d9e0d",
+      "page": 1,
+      "rows": 26
+    },
+    {
+      "chunk_id": "01a16eec-222f-787a-b8ea-959a6236cd35",
+      "page": 2,
+      "rows": 9
+    },
+    {
+      "chunk_id": "01a16eec-2235-70ee-9ab0-d7b50b31aa82",
+      "page": 2,
+      "rows": 9
+    },
+    {
+      "chunk_id": "01a16eec-223a-7915-86be-44147c52c834",
+      "page": 2,
+      "rows": 9
+    },
+    {
+      "chunk_id": "01a16eec-2240-794b-87b3-9c1dd18a1ee0",
+      "page": 2,
+      "rows": 9
+    }
+  ],
+  "new_ids": [
+    "0223bd74211912a4",
+    "02727295a2c82a81",
+    "054a1c830e10953b",
+    "0610d4b9b78f0f94",
+    "0f6805d952f0299d",
+    "1192317d62355d60",
+    "196e31326c8cf566",
+    "23f2913153e94c0a",
+    "28ec336251121d6d",
+    "2ce1a511b69c0812",
+    "2ff75d235d49e461",
+    "30f5549275996673",
+    "31f502a327465cd1",
+    "3950707ec408e686",
+    "3ed8bbb91e5c27d5",
+    "430c8d0bf39201a6",
+    "47935c84c78cba0f",
+    "4a1c7b9cb2899e4d",
+    "4cd1873169e7f203",
+    "4d8da55e4c145460",
+    "5065a7a64bb732f3",
+    "558c5518871e85b2",
+    "582c7235216433aa",
+    "5a3ee28f83f3c91a",
+    "5b1287374e0e5480",
+    "5cf1090472df4383",
+    "60e2b96fd6634996",
+    "61d20dd09a0a2763",
+    "623cabeba71c936b",
+    "62b763f0fa5d64cb",
+    "635642fc5ce8e77c",
+    "68d1d02d247521d6",
+    "6c380648be419c5b",
+    "762ab8119f147574",
+    "7a5c9eb27ad19190",
+    "7c8f98516af4be30",
+    "7e2f6b34a138260f",
+    "7f764abad020d588",
+    "80de774a0350f082",
+    "8323817a3c766d97",
+    "86fbd93562a75d3b",
+    "8ae43d831e633cc3",
+    "8b6d80fbcead9ee3",
+    "8e242e64820699f4",
+    "8e9aea6fc4375cc2",
+    "94d9527a6f36f8f7",
+    "974a8cbafc2021c1",
+    "9772bdf7bbe032ac",
+    "9c9b4932b766b204",
+    "9f51d73b5d6d00ae",
+    "9f697551add323fa",
+    "a01f31da6faee222",
+    "a0a0b84ba8b0f2b9",
+    "a796f3f65e5bc327",
+    "abea32130e44879c",
+    "ad886558e5ca34fe",
+    "adb1d0401aed00e8",
+    "ae0566e629571149",
+    "b0b0fd398f407f93",
+    "b8edc8294a0f6ef1",
+    "bf4ee96f2138acff",
+    "bf968b3787b57078",
+    "c12a2067e91343bc",
+    "c21060bec8bee0f2",
+    "c45d8b0d2ef06a07",
+    "d2b8c0488c3adf91",
+    "d562d375c60b2459",
+    "dbe1f66049e588b3",
+    "dc150deaad6bcbf4",
+    "df1f828d8f98887e",
+    "e3f4c561d2bffe79",
+    "e530a14e9a3e88e8",
+    "e69304ba835bf124",
+    "ec95dce3e78ef6cc",
+    "f00d5940eebce7bf",
+    "f0f18d6ba4e9e0c8",
+    "f1ca9a01fa8d4efa",
+    "f2315fdd9b5b9861",
+    "f28c8c6c77869915",
+    "f29af25d5c5dfba7",
+    "f2cd98af278896e6",
+    "f3da47ed73a7cc58",
+    "f65736bbcd275170",
+    "f68934450df5752a",
+    "f7910cba160e92c2",
+    "f8b97f025002225f",
+    "fa69d0439ad60253"
+  ],
+  "absent_old_ids_in_new_snapshot": [
+    "19d0e818a1124176",
+    "1c5382d637fc3d36",
+    "4493d3c521f89e75",
+    "a4fae3d4173ff431",
+    "a742bda385ae596a",
+    "d33688cd04c3262d",
+    "d37963859e244292",
+    "e5f5a024c439f8a9",
+    "e92cdec925b629fd"
+  ],
+  "changed_common_ids": [
+    "02c6d6f98c811744",
+    "0b0b66748b656117",
+    "0b3ecafe9136ff19",
+    "11f8e99abf9894ac",
+    "16abdfd4e1603d28",
+    "1cb09e82ad057212",
+    "1f6404b6efa16133",
+    "25ec020ac6895e37",
+    "36fdff1da65752f3",
+    "38b2d66da89da165",
+    "3a90552184e72c72",
+    "3c96031412bc76d9",
+    "41827a46018f9044",
+    "4b06e7b9bd4a3831",
+    "52697dbb68d07233",
+    "572081c8efc41b6b",
+    "5da034abdc3131ef",
+    "603784e10542922e",
+    "676ebe741218c50f",
+    "6902a40ed28eb1b1",
+    "696e3c943e616301",
+    "6fc6ca31c29e951b",
+    "7014c078c5e39576",
+    "750568ed81cb2f69",
+    "771c4b0fa6022b3e",
+    "878ed9ebd6afd177",
+    "8d43ca066256a0b0",
+    "8f76ffd151717841",
+    "97f79ff8ef21de7b",
+    "a2a5a98aa09d7a60",
+    "abd591922fba15ad",
+    "aeda7b8b00639898",
+    "b19603a0e8ab800e",
+    "b4a699f6ed413cae",
+    "b8016c9c35fc6494",
+    "bc249810adb7afd8",
+    "c67599cf37800599",
+    "c7a2aca8230d568f",
+    "c817b312d68449ca",
+    "d6417dae93dda490",
+    "da21a02a589a7e16",
+    "de7b934024e2d219",
+    "df52c43cff7f38ba",
+    "e600cfc86b7a2cbe",
+    "eb5f13e5f421ad40",
+    "f77d8e1250fdd39c",
+    "feed32855fb8df69",
+    "ffd4cb007f57ce04"
+  ],
+  "checks": [],
+  "coverage": {
+    "ctdt": {
+      "chunks": 405,
+      "units": 2937,
+      "meaningful_chars": 562663,
+      "covered_chars": 562663,
+      "coverage": 1.0,
+      "min_chunk_coverage": 1.0
+    },
+    "hoc_phi": {
+      "chunks": 125,
+      "units": 291,
+      "meaningful_chars": 105707,
+      "covered_chars": 105707,
+      "coverage": 1.0,
+      "min_chunk_coverage": 1.0
+    },
+    "khac": {
+      "chunks": 850,
+      "units": 4983,
+      "meaningful_chars": 1374457,
+      "covered_chars": 1374457,
+      "coverage": 1.0,
+      "min_chunk_coverage": 1.0
+    },
+    "quy_che": {
+      "chunks": 299,
+      "units": 545,
+      "meaningful_chars": 344284,
+      "covered_chars": 344284,
+      "coverage": 1.0,
+      "min_chunk_coverage": 1.0
+    },
+    "so_tay": {
+      "chunks": 330,
+      "units": 481,
+      "meaningful_chars": 432129,
+      "covered_chars": 432129,
+      "coverage": 1.0,
+      "min_chunk_coverage": 1.0
+    },
+    "thong_bao": {
+      "chunks": 10,
+      "units": 14,
+      "meaningful_chars": 11298,
+      "covered_chars": 11298,
+      "coverage": 1.0,
+      "min_chunk_coverage": 1.0
+    }
+  },
+  "facts_identical": true,
+  "manifest": {
+    "unit_count": 9251,
+    "fact_count": 136,
+    "splitter_version": "structural-spans-v3",
+    "embedding_status": "complete",
+    "embedding_dimension": 1024,
+    "embedding_model": "BAAI/bge-m3",
+    "embedding_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "embedding_batch_size": 1,
+    "binding_sha256": "164e1127358b15cb5ae27ee85d6ae9592e99e8fda91bdcdc2916ab0a71450521"
+  }
+}

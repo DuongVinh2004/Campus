@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "unified-assistance.v1",
+      "default": "unified-assistance.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "surface": {
+      "enum": [
+        "service",
+        "certificate"
+      ],
+      "title": "Surface",
+      "type": "string"
+    },
+    "resource": {
+      "$ref": "#/$defs/ResourceRef"
+    },
+    "field": {
+      "anyOf": [
+        {
+          "enum": [
+            "reason",
+            "course_record_id",
+            "contact_preference",
+            "purpose",
+            "recipient",
+            "quantity",
+            "delivery_method"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Field"
+    }
+  },
+  "required": [
+    "surface",
+    "resource"
+  ],
+  "title": "AssistanceRequest",
+  "type": "object"
+}

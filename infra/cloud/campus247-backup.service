@@ -1,0 +1,6 @@
+[Unit]
+Description=Campus 24/7 daily backup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/campus247-backup

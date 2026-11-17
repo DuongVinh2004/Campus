@@ -1,0 +1,345 @@
+{
+ "schema": "audit-run/1",
+ "users": 1,
+ "started": 1793622548.20252,
+ "wall_seconds": 15.760607957839966,
+ "paid_calls": 7,
+ "ledger_before": 73129,
+ "ledger_after": 73136,
+ "records": [
+  {
+   "case_id": "AU-A12",
+   "question": "Mã trường của Đại học Xây dựng Hà Nội khi đăng ký xét tuyển là gì?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04376060000504367,
+   "first_content_seconds": 4.919,
+   "started_at": 1793622548.2099595,
+   "conversation_id": "01a19c3c-1ef5-79e6-b457-8bfd130dcd40",
+   "timeline": [
+    [
+     "message.started",
+     0.044
+    ],
+    [
+     "message.delta",
+     4.919
+    ],
+    [
+     "message.delta",
+     4.919
+    ],
+    [
+     "message.delta",
+     4.92
+    ],
+    [
+     "message.delta",
+     4.921
+    ],
+    [
+     "message.delta",
+     4.921
+    ],
+    [
+     "message.delta",
+     4.922
+    ],
+    [
+     "message.delta",
+     4.922
+    ],
+    [
+     "message.delta",
+     4.923
+    ],
+    [
+     "message.delta",
+     4.924
+    ],
+    [
+     "message.completed",
+     5.269
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c3c-1f17-7c67-b0fb-5e9565e36fca",
+    "conversation_id": "01a19c3c-1ef5-79e6-b457-8bfd130dcd40",
+    "status": "abstained",
+    "response_class": "safe_refusal",
+    "content": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+    "citations": []
+   },
+   "outcome_class": "refuse",
+   "answer_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "seconds": 5.269424900005106,
+   "user": 0
+  },
+  {
+   "case_id": "AU-P06",
+   "question": "Em bị bắt quả tang dùng điện thoại trong phòng thi thì chắc chắn bị đình chỉ học đúng không?",
+   "http_status": 200,
+   "error": null,
+   "first_byte_seconds": 0.04689120000693947,
+   "first_content_seconds": 5.672,
+   "started_at": 1793622555.480869,
+   "conversation_id": "01a19c3c-3b61-72b0-b8aa-ae19d3ff2299",
+   "timeline": [
+    [
+     "message.started",
+     0.047
+    ],
+    [
+     "message.delta",
+     5.672
+    ],
+    [
+     "message.delta",
+     5.673
+    ],
+    [
+     "message.delta",
+     5.674
+    ],
+    [
+     "message.delta",
+     5.674
+    ],
+    [
+     "message.delta",
+     5.675
+    ],
+    [
+     "message.delta",
+     5.675
+    ],
+    [
+     "message.delta",
+     5.676
+    ],
+    [
+     "message.delta",
+     5.677
+    ],
+    [
+     "message.delta",
+     5.677
+    ],
+    [
+     "message.delta",
+     5.678
+    ],
+    [
+     "message.delta",
+     5.678
+    ],
+    [
+     "message.delta",
+     5.679
+    ],
+    [
+     "message.delta",
+     5.68
+    ],
+    [
+     "message.delta",
+     5.68
+    ],
+    [
+     "message.delta",
+     5.681
+    ],
+    [
+     "message.delta",
+     5.681
+    ],
+    [
+     "message.delta",
+     5.682
+    ],
+    [
+     "message.delta",
+     5.682
+    ],
+    [
+     "message.delta",
+     5.683
+    ],
+    [
+     "message.delta",
+     5.684
+    ],
+    [
+     "message.delta",
+     5.684
+    ],
+    [
+     "message.delta",
+     5.685
+    ],
+    [
+     "message.delta",
+     5.686
+    ],
+    [
+     "message.delta",
+     5.686
+    ],
+    [
+     "message.delta",
+     5.687
+    ],
+    [
+     "message.delta",
+     5.687
+    ],
+    [
+     "message.delta",
+     5.688
+    ],
+    [
+     "message.delta",
+     5.689
+    ],
+    [
+     "message.delta",
+     5.689
+    ],
+    [
+     "message.delta",
+     5.69
+    ],
+    [
+     "message.delta",
+     5.69
+    ],
+    [
+     "message.delta",
+     5.691
+    ],
+    [
+     "message.delta",
+     5.692
+    ],
+    [
+     "message.delta",
+     5.692
+    ],
+    [
+     "message.delta",
+     5.693
+    ],
+    [
+     "message.delta",
+     5.693
+    ],
+    [
+     "message.delta",
+     5.694
+    ],
+    [
+     "message.delta",
+     5.695
+    ],
+    [
+     "citation.added",
+     5.853
+    ],
+    [
+     "citation.added",
+     5.903
+    ],
+    [
+     "citation.added",
+     5.966
+    ],
+    [
+     "message.completed",
+     6.012
+    ]
+   ],
+   "final": {
+    "message_id": "01a19c3c-3b81-7774-a9f6-838e75c63ef4",
+    "conversation_id": "01a19c3c-3b61-72b0-b8aa-ae19d3ff2299",
+    "status": "answered",
+    "response_class": "grounded_answer",
+    "content": "Theo Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL, không được sử dụng điện thoại di động trong phòng máy. [CIT-001] [CIT-002]\nSinh viên vi phạm một trong những điều quy định trên sẽ bị đình chỉ học tại phòng máy và bị xử lý kỷ luật theo quy chế của nhà trường. [CIT-003] [CIT-002]",
+    "citations": [
+     {
+      "turn_citation_id": "CIT-001",
+      "citation": {
+       "citation_id": "01a19c3c-517a-7e01-8b62-cbef6c68ecaf",
+       "source_id": "2d8c1b76-749f-7a7a-890b-e41c8646affe",
+       "document_version_id": "01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "chunk_id": "01a168c6-d256-7d8d-babd-fcec2dfc7eed",
+       "source_title": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024",
+       "canonical_uri": "https://drive.google.com/file/d/17fHGSp05BTd0tp2qwJKtX_wdO6ykJu1G/preview?",
+       "version_label": "original-span-01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024 — Nội quy — khoản6",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "6. Trang phục gọn gàng, lịch sự, tư thế ngồi học phải ngay ngắn, nghiêm túc. Không: nói chuyện, đi lại tự do, sử dụng điện thoại di động, sử dụng máy tính xách tay",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "871e6794a3d216c0757957438e6d146efb585696eb69593d3efbd93a89aba55b",
+       "unit_id": "722557b39e8883b4"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-002",
+      "citation": {
+       "citation_id": "01a19c3c-517e-72c8-a124-4a9c1f0f42ad",
+       "source_id": "2d8c1b76-749f-7a7a-890b-e41c8646affe",
+       "document_version_id": "01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "chunk_id": "01a168c6-d1d1-7d9a-b71d-c82f306d0ed2",
+       "source_title": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024",
+       "canonical_uri": "https://drive.google.com/file/d/17fHGSp05BTd0tp2qwJKtX_wdO6ykJu1G/preview?",
+       "version_label": "original-span-01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024 — Trang 2",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "phải được sự đồng ý của cán bộ phòng máy. Cấm mang thiết bị, máy móc, dụng cụ, vật tư ra ngoài phòng máy.\n10. Không ra ngoài trong giờ học, thực hành.\n11. Khi kết thúc ca học, thực hành phải tắt máy, sắp xếp: màn hình, chuột, bàn phím, ghế ngay ngắn theo quy định, làm tốt vệ sinh phòng máy. Cán bộ lớp bàn giao phòng máy cho giảng viên hướng dẫn.\n12. Sinh viên nào vi phạm một trong những điều quy định trên sẽ bị đình chỉ học tại phòng máy và bị xử lý kỷ luật theo quy chế của nhà trường. Làm mất,",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "10edebadcfe495536d4606b62f68befb0588f93b5ee802d69b4c84c51b453d17",
+       "unit_id": "359e819dcfdd6dda"
+      }
+     },
+     {
+      "turn_citation_id": "CIT-003",
+      "citation": {
+       "citation_id": "01a19c3c-517e-7b9c-b408-f749db9adf26",
+       "source_id": "2d8c1b76-749f-7a7a-890b-e41c8646affe",
+       "document_version_id": "01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "chunk_id": "01a168c6-d266-7eb9-95c9-d9106cef6bb7",
+       "source_title": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024",
+       "canonical_uri": "https://drive.google.com/file/d/17fHGSp05BTd0tp2qwJKtX_wdO6ykJu1G/preview?",
+       "version_label": "original-span-01a168c6-d1c7-7ddb-9590-f7a141f31698",
+       "source_status": "CURRENT",
+       "locator": {
+        "section_path": "Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL — bản quyết định09/4/2024 — Nội quy — khoản12",
+        "page_start": 2,
+        "page_end": 2
+       },
+       "quote": "12. Sinh viên nào vi phạm một trong những điều quy định trên sẽ bị đình chỉ học tại phòng máy và bị xử lý kỷ luật theo quy chế của nhà trường. Làm mất, hỏng thiết bị của phòng máy phải bồi thường",
+       "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+       "release_generation": 27,
+       "evidence_sha256": "71b839742d77b4a8464208c54efd96f1765b4ab6a7bce70bd9e400356d0d4da6",
+       "unit_id": "4e058fe0c1d6984b"
+      }
+     }
+    ]
+   },
+   "outcome_class": "answer",
+   "answer_text": "Theo Nội quy Phòng thực hành máy tính Trung tâm CNTT&CSDL, không được sử dụng điện thoại di động trong phòng máy. [CIT-001] [CIT-002]\nSinh viên vi phạm một trong những điều quy định trên sẽ bị đình chỉ học tại phòng máy và bị xử lý kỷ luật theo quy chế của nhà trường. [CIT-003] [CIT-002]",
+   "seconds": 6.012477800017223,
+   "user": 0
+  }
+ ]
+}

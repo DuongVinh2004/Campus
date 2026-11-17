@@ -1,0 +1,10 @@
+# Same Ubuntu 24.04 image as the simulation, but with systemd as PID 1, so the real campus247-*.service units and Caddy can be
+# started with systemctl (rollout step "real systemd and HTTPS run"). Needs a privileged container with the host's cgroups:
+#   docker run -d --name campus247-systemd --privileged --cgroupns=host --tmpfs /run --tmpfs /run/lock \
+#     -v /sys/fs/cgroup:/sys/fs/cgroup:rw --cpus=4 --memory=7500m ... campus247-systemd
+# Build after the simulation image:  docker build -f infra/cloud/docker/Dockerfile.systemd -t campus247-systemd infra/cloud/docker
+FROM campus247-sim
+ENV container=docker DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq && apt-get install -y -qq systemd systemd-sysv dbus procps iproute2 && rm -rf /var/lib/apt/lists/*
+STOPSIGNAL SIGRTMIN+3
+ENTRYPOINT ["/sbin/init"]

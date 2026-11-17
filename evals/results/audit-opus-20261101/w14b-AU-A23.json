@@ -1,0 +1,314 @@
+{
+  "case_id": "AU-A23",
+  "required_facts": [
+    "Cầu Đường",
+    "Cử nhân"
+  ],
+  "queries": {
+    "original": "ngành logistics đô thị do khoa nào quản lý, bằng gì?",
+    "focused": "ngành logistics đô thị khoa quản lý, bằng"
+  },
+  "target": {
+    "unit_id": "430c8d0bf39201a6",
+    "chunk_ids": [
+      "01a16d1e-5dfd-71bf-9f08-60dd0a0d5a3f",
+      "01a16d1e-5e00-7e06-b5a8-f4e3b6817b57",
+      "01a16d1e-5e03-7aa1-92fd-b1de97dd4cc6"
+    ],
+    "document_id": "55df8e8c-00d5-716a-8b1c-9bc5a74d46a1",
+    "version_id": "01a16d1e-5cdf-7a0c-8c6a-b5fe98ca1f9c",
+    "doc_title": "Sổ tay sinh viên HUCE năm học 2026–2027",
+    "doc_family": "so_tay",
+    "kind": "table_row",
+    "path": "Sổ tay sinh viên HUCE năm học 2026–2027 · trang 25 · chars 0:1409 > Dòng 181 > tr.25",
+    "page": 25,
+    "text": "⟦RAG_V2_CONTEXT⟧\nSổ tay sinh viên HUCE năm học 2026–2027\nTrang 25\n⟦RAG_V2_SPAN:181:219⟧\n⟦RAG_V2_SOURCE⟧\n29 Logistics đô thị Cầu Đường Cử nhân\n",
+    "effective_from": null,
+    "effective_until": null,
+    "scope": {
+      "cohorts": [],
+      "programs": [],
+      "academic_years": [
+        "2026-2027"
+      ]
+    },
+    "parent_unit_id": null
+  },
+  "lexical_ranks": {
+    "original": 331,
+    "focused": 330
+  },
+  "provider_calls": 0,
+  "A": {
+    "focused_lexical": false,
+    "facts_in_context": true,
+    "line29_in_context": false,
+    "target_in_retrieved_candidates": false,
+    "target_parent_packed": false,
+    "candidates": [
+      {
+        "unit_id": "e2c8f6b8472af051",
+        "lexical_rank": 1,
+        "vector_rank": 5,
+        "fused_score": 0.03177805800756621,
+        "rerank_score": null,
+        "final_rank": 1
+      },
+      {
+        "unit_id": "291d90dc423b83d9",
+        "lexical_rank": 5,
+        "vector_rank": 2,
+        "fused_score": 0.0315136476426799,
+        "rerank_score": null,
+        "final_rank": 2
+      },
+      {
+        "unit_id": "a71b480e8e8e03e0",
+        "lexical_rank": 4,
+        "vector_rank": 3,
+        "fused_score": 0.03149801587301587,
+        "rerank_score": null,
+        "final_rank": 3
+      },
+      {
+        "unit_id": "4827ded7ea59a579",
+        "lexical_rank": 3,
+        "vector_rank": 6,
+        "fused_score": 0.031024531024531024,
+        "rerank_score": null,
+        "final_rank": 4
+      },
+      {
+        "unit_id": "aa7543ba910d1379",
+        "lexical_rank": 2,
+        "vector_rank": 8,
+        "fused_score": 0.030834914611005692,
+        "rerank_score": null,
+        "final_rank": 5
+      },
+      {
+        "unit_id": "0eb4bfeb30a6b769",
+        "lexical_rank": 11,
+        "vector_rank": 1,
+        "fused_score": 0.03047794966520434,
+        "rerank_score": null,
+        "final_rank": 6
+      },
+      {
+        "unit_id": "7d9ebf519614ddee",
+        "lexical_rank": 8,
+        "vector_rank": 4,
+        "fused_score": 0.030330882352941176,
+        "rerank_score": null,
+        "final_rank": 7
+      },
+      {
+        "unit_id": "8c4a1634bae7d223",
+        "lexical_rank": 7,
+        "vector_rank": 13,
+        "fused_score": 0.02862400327131466,
+        "rerank_score": null,
+        "final_rank": 8
+      },
+      {
+        "unit_id": "cc636523f143c7ef",
+        "lexical_rank": 9,
+        "vector_rank": 11,
+        "fused_score": 0.028577260665441927,
+        "rerank_score": null,
+        "final_rank": 9
+      },
+      {
+        "unit_id": "938ba218b7c8b6e7",
+        "lexical_rank": 13,
+        "vector_rank": 12,
+        "fused_score": 0.02758751902587519,
+        "rerank_score": null,
+        "final_rank": 10
+      },
+      {
+        "unit_id": "65f1a61e006e2b6e",
+        "lexical_rank": 12,
+        "vector_rank": 20,
+        "fused_score": 0.02638888888888889,
+        "rerank_score": null,
+        "final_rank": 11
+      },
+      {
+        "unit_id": "44e9ac3a23a5c39c",
+        "lexical_rank": 17,
+        "vector_rank": 15,
+        "fused_score": 0.02632034632034632,
+        "rerank_score": null,
+        "final_rank": 12
+      }
+    ],
+    "trace": {
+      "status": "RRF_TIMEOUT",
+      "eligible": 9251,
+      "lexical": 40,
+      "vector": 40,
+      "vector_failed": false,
+      "fused": 51,
+      "preselected": 12,
+      "documents": 1,
+      "articles": 1,
+      "returned": 12
+    },
+    "context": {
+      "units": [
+        {
+          "label": "[U1]",
+          "text": "⟦RAG_V2_CONTEXT⟧\nKế hoạch giảng dạy chương trình đào tạo trình độ cử nhân — Ngành Logistics và quản lý chuỗi cung ứng — Chuyên ngành Logistics đô thị (K71LGTDT)\n⟦RAG_V2_SOURCE⟧\nBỘ GIÁO DỤC VÀ ĐÀO TẠO\nTRƯỜNG ĐH XÂY DỰNG HN\nKẾ HOẠCH GIẢNG DẠY CHƯƠNG TRÌNH ĐÀO TẠO TRÌNH ĐỘ CỬ NHÂN \nNGÀNH LOGISTICS VÀ QUẢN LÝ CHUỖI CUNG ỨNG/CHUYÊN NGÀNH LOGISTICS ĐÔ THỊ\n(K71LGTDT)\nHọc kỳ 1 Học kỳ 2 Học kỳ 3 Học kỳ 4 Học kỳ 5 Học kỳ 6 Học kỳ 7\n4288011 – 3\nTriết học Mác-Lênin\n428802 – 2\nKinh tế chính trị Mác\u0002Lênin\n428803 – 2\nChủ nghĩa xã hội \nkhoa học\n418801 – 2\nLịch sử Đảng cộng sản \nVN\n418802 – 2\nTư tưởng \nHồ Chí Minh\n370407 – 3\nTài chính kế toán và \nTMĐT\n160479 – 3\nThực tập\ntốt nghiệp\n370401 – 3\nKinh tế học vi mô\n370404 – 2\nKinh tế học vĩ mô\n160504 – 2\nĐầu tư cơ sở hạ tầng\nLogistics\n160502 – 3 (2)\nVận tải đa phương thức\n160434 – 1\nChuyên đề Logistics \nđô thị 1\n160448 – 1\nChuyên đề Logistics\nđô thị 2\n160480 – 7\nĐồ án tốt nghiệp\n361455 – 2\nCơ sở khoa học \nquản lý\n360401 – 2\nQuản trị học\n170402 – 3\nQuản lý Logistics\n170406 – 3\nQuản lý thu mua\n170413– 3\nQuản lý rủi ro trong \nLogistics và CCU\n160444 – 3 (2)\nQuản lý Logistics GTVT \nđô thị\n510211 – 2\nPháp luật đại cương\n400101 – 2\nXác suất thống kê\n160432 – 3\nĐịa lý giao thông vận \ntải\n140419 – 3\nHệ thống thông tin quản \nlý\n170405– 3\nMô hình RQĐ trong \nCCU\n140420 – 2\nỨng dụng GIS trong quản \nlý phát triển đô thị\n160430 – 2\nNhập môn Logistics \nđô thị\n320203 – 3 \nĐô thị học\n360402 – 3 (2)\nKinh tế kỹ thuật\n160435 – 2\nNền tảng đô thị thông \nminh và bền vững\n160505 – 2\nPhát triển bền vững hạ\ntầng Logistics\n160442 – 3\nLập kế hoạch và thiết kế\nLogistics đô thị\n390111 – 3\nĐại số\ntuyến tính\n400401 – 3\nToán kinh tế\n160501 – 3\nVận trù học\n450121 – 3\nNgôn ngữ lập trình \nPython \n170408 – 3\nQuản lý tồn kho trong \nCCU \n160438 – 3\nTối ưu hóa hệ thống \nLogistics đô thị\n940201 – 2\nNăng lực số cơ bản\n160431 – 2\nKỹ thuật dự báo\n170404 – 3\nQuản lý chuỗi cung \nứng\n471726– 2\nThuật toán và cấu trúc \ndữ liệu\n160433 – 3\nPhân tích cơ sở dữ liệu \nLogistics\n160443 – 2\nDự báo Logistics\nGiáo dục\nthể chất 1 – 1TC\n446601 – 2\nAnh ngữ 1 \n446602 – 2\nAnh ngữ 2 \n446603 – 2\nAnh ngữ 3\n446604 – 2\nAnh ngữ 4\n160439 – 2\nLogistics chặng cuối\n510401 – 2\nPháp luật Logistics\nGiáo dục \nThế chất 3 – 1TC\nMôn tự chọn – 2 \n(Chọn 1 trong 2 môn)\nMôn tự chọn – 2\n(Chọn 1 trong 2 môn)\nGiáo dục \nThế chất 2 – 1TC\n160436 – 2\nPhương pháp NCKH\n280402 – 2\nƯD Robotic và tự vận hành \ntrong Logistics GTVT\n480101 – 8\nGiáo dục quốc phòng \n1,2,3,4\n160437 – 2\nKỹ năng nghề nghiệp\n160481 – 2\nỨng dụng công nghệ mới \ntrong Logistics đô thị\n17 20 21 20 21 21 10\nTổng 130 TC (Không tính HP Giáo dục thể chất và Giáo dục quốc phòng)\nGhi chú và kí hiệu: Học phần tiên quyết Học phần; Học phần song hành; Học phần tự chọn.\nNgười lập Trưởng khoa Cầu đường Trưởng phòng Quản lý Đào tạo",
+          "scope": {
+            "cohorts": [],
+            "programs": [],
+            "academic_years": []
+          }
+        }
+      ],
+      "chunk_ids": [
+        "01a16d41-d718-76e3-95f7-90b0009ba0f0"
+      ],
+      "context_sha256": "12a7c6a7fdae3e345a2dc2837874ce5b91cd9127a4edd734d96a08e095e636fc",
+      "packing": "RagV2Service -> generate_draft (recording gateway)",
+      "provider_calls": 0
+    }
+  },
+  "B": {
+    "focused_lexical": true,
+    "facts_in_context": true,
+    "line29_in_context": false,
+    "target_in_retrieved_candidates": false,
+    "target_parent_packed": false,
+    "candidates": [
+      {
+        "unit_id": "e2c8f6b8472af051",
+        "lexical_rank": 1,
+        "vector_rank": 5,
+        "fused_score": 0.048171500630517027,
+        "rerank_score": null,
+        "final_rank": 1
+      },
+      {
+        "unit_id": "a71b480e8e8e03e0",
+        "lexical_rank": 4,
+        "vector_rank": 3,
+        "fused_score": 0.04712301587301587,
+        "rerank_score": null,
+        "final_rank": 2
+      },
+      {
+        "unit_id": "aa7543ba910d1379",
+        "lexical_rank": 2,
+        "vector_rank": 8,
+        "fused_score": 0.04696394686907021,
+        "rerank_score": null,
+        "final_rank": 3
+      },
+      {
+        "unit_id": "291d90dc423b83d9",
+        "lexical_rank": 5,
+        "vector_rank": 2,
+        "fused_score": 0.04689826302729529,
+        "rerank_score": null,
+        "final_rank": 4
+      },
+      {
+        "unit_id": "4827ded7ea59a579",
+        "lexical_rank": 3,
+        "vector_rank": 6,
+        "fused_score": 0.046897546897546896,
+        "rerank_score": null,
+        "final_rank": 5
+      },
+      {
+        "unit_id": "7d9ebf519614ddee",
+        "lexical_rank": 8,
+        "vector_rank": 4,
+        "fused_score": 0.04503676470588235,
+        "rerank_score": null,
+        "final_rank": 6
+      },
+      {
+        "unit_id": "0eb4bfeb30a6b769",
+        "lexical_rank": 11,
+        "vector_rank": 1,
+        "fused_score": 0.04456245670745786,
+        "rerank_score": null,
+        "final_rank": 7
+      },
+      {
+        "unit_id": "8c4a1634bae7d223",
+        "lexical_rank": 7,
+        "vector_rank": 13,
+        "fused_score": 0.04354937640564302,
+        "rerank_score": null,
+        "final_rank": 8
+      },
+      {
+        "unit_id": "cc636523f143c7ef",
+        "lexical_rank": 9,
+        "vector_rank": 11,
+        "fused_score": 0.04307001428863033,
+        "rerank_score": null,
+        "final_rank": 9
+      },
+      {
+        "unit_id": "938ba218b7c8b6e7",
+        "lexical_rank": 13,
+        "vector_rank": 12,
+        "fused_score": 0.04128614916286149,
+        "rerank_score": null,
+        "final_rank": 10
+      },
+      {
+        "unit_id": "2b3b2eff51e0a562",
+        "lexical_rank": 6,
+        "vector_rank": 39,
+        "fused_score": 0.04040404040404041,
+        "rerank_score": null,
+        "final_rank": 11
+      },
+      {
+        "unit_id": "65f1a61e006e2b6e",
+        "lexical_rank": 12,
+        "vector_rank": 20,
+        "fused_score": 0.04027777777777777,
+        "rerank_score": null,
+        "final_rank": 12
+      }
+    ],
+    "trace": {
+      "status": "RRF_TIMEOUT",
+      "eligible": 9251,
+      "lexical": 40,
+      "vector": 40,
+      "vector_failed": false,
+      "fused": 51,
+      "preselected": 12,
+      "documents": 1,
+      "articles": 1,
+      "returned": 12
+    },
+    "context": {
+      "units": [
+        {
+          "label": "[U1]",
+          "text": "⟦RAG_V2_CONTEXT⟧\nKế hoạch giảng dạy chương trình đào tạo trình độ cử nhân — Ngành Logistics và quản lý chuỗi cung ứng — Chuyên ngành Logistics đô thị (K71LGTDT)\n⟦RAG_V2_SOURCE⟧\nBỘ GIÁO DỤC VÀ ĐÀO TẠO\nTRƯỜNG ĐH XÂY DỰNG HN\nKẾ HOẠCH GIẢNG DẠY CHƯƠNG TRÌNH ĐÀO TẠO TRÌNH ĐỘ CỬ NHÂN \nNGÀNH LOGISTICS VÀ QUẢN LÝ CHUỖI CUNG ỨNG/CHUYÊN NGÀNH LOGISTICS ĐÔ THỊ\n(K71LGTDT)\nHọc kỳ 1 Học kỳ 2 Học kỳ 3 Học kỳ 4 Học kỳ 5 Học kỳ 6 Học kỳ 7\n4288011 – 3\nTriết học Mác-Lênin\n428802 – 2\nKinh tế chính trị Mác\u0002Lênin\n428803 – 2\nChủ nghĩa xã hội \nkhoa học\n418801 – 2\nLịch sử Đảng cộng sản \nVN\n418802 – 2\nTư tưởng \nHồ Chí Minh\n370407 – 3\nTài chính kế toán và \nTMĐT\n160479 – 3\nThực tập\ntốt nghiệp\n370401 – 3\nKinh tế học vi mô\n370404 – 2\nKinh tế học vĩ mô\n160504 – 2\nĐầu tư cơ sở hạ tầng\nLogistics\n160502 – 3 (2)\nVận tải đa phương thức\n160434 – 1\nChuyên đề Logistics \nđô thị 1\n160448 – 1\nChuyên đề Logistics\nđô thị 2\n160480 – 7\nĐồ án tốt nghiệp\n361455 – 2\nCơ sở khoa học \nquản lý\n360401 – 2\nQuản trị học\n170402 – 3\nQuản lý Logistics\n170406 – 3\nQuản lý thu mua\n170413– 3\nQuản lý rủi ro trong \nLogistics và CCU\n160444 – 3 (2)\nQuản lý Logistics GTVT \nđô thị\n510211 – 2\nPháp luật đại cương\n400101 – 2\nXác suất thống kê\n160432 – 3\nĐịa lý giao thông vận \ntải\n140419 – 3\nHệ thống thông tin quản \nlý\n170405– 3\nMô hình RQĐ trong \nCCU\n140420 – 2\nỨng dụng GIS trong quản \nlý phát triển đô thị\n160430 – 2\nNhập môn Logistics \nđô thị\n320203 – 3 \nĐô thị học\n360402 – 3 (2)\nKinh tế kỹ thuật\n160435 – 2\nNền tảng đô thị thông \nminh và bền vững\n160505 – 2\nPhát triển bền vững hạ\ntầng Logistics\n160442 – 3\nLập kế hoạch và thiết kế\nLogistics đô thị\n390111 – 3\nĐại số\ntuyến tính\n400401 – 3\nToán kinh tế\n160501 – 3\nVận trù học\n450121 – 3\nNgôn ngữ lập trình \nPython \n170408 – 3\nQuản lý tồn kho trong \nCCU \n160438 – 3\nTối ưu hóa hệ thống \nLogistics đô thị\n940201 – 2\nNăng lực số cơ bản\n160431 – 2\nKỹ thuật dự báo\n170404 – 3\nQuản lý chuỗi cung \nứng\n471726– 2\nThuật toán và cấu trúc \ndữ liệu\n160433 – 3\nPhân tích cơ sở dữ liệu \nLogistics\n160443 – 2\nDự báo Logistics\nGiáo dục\nthể chất 1 – 1TC\n446601 – 2\nAnh ngữ 1 \n446602 – 2\nAnh ngữ 2 \n446603 – 2\nAnh ngữ 3\n446604 – 2\nAnh ngữ 4\n160439 – 2\nLogistics chặng cuối\n510401 – 2\nPháp luật Logistics\nGiáo dục \nThế chất 3 – 1TC\nMôn tự chọn – 2 \n(Chọn 1 trong 2 môn)\nMôn tự chọn – 2\n(Chọn 1 trong 2 môn)\nGiáo dục \nThế chất 2 – 1TC\n160436 – 2\nPhương pháp NCKH\n280402 – 2\nƯD Robotic và tự vận hành \ntrong Logistics GTVT\n480101 – 8\nGiáo dục quốc phòng \n1,2,3,4\n160437 – 2\nKỹ năng nghề nghiệp\n160481 – 2\nỨng dụng công nghệ mới \ntrong Logistics đô thị\n17 20 21 20 21 21 10\nTổng 130 TC (Không tính HP Giáo dục thể chất và Giáo dục quốc phòng)\nGhi chú và kí hiệu: Học phần tiên quyết Học phần; Học phần song hành; Học phần tự chọn.\nNgười lập Trưởng khoa Cầu đường Trưởng phòng Quản lý Đào tạo",
+          "scope": {
+            "cohorts": [],
+            "programs": [],
+            "academic_years": []
+          }
+        }
+      ],
+      "chunk_ids": [
+        "01a16d41-d718-76e3-95f7-90b0009ba0f0"
+      ],
+      "context_sha256": "12a7c6a7fdae3e345a2dc2837874ce5b91cd9127a4edd734d96a08e095e636fc",
+      "packing": "RagV2Service -> generate_draft (recording gateway)",
+      "provider_calls": 0
+    }
+  }
+}

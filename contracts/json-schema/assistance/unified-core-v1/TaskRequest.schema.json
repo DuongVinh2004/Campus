@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CoverageItem": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^Q[1-4]$",
+          "title": "Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 700,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "requirements": {
+          "items": {
+            "$ref": "#/$defs/Requirement"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Requirements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "question",
+        "requirements"
+      ],
+      "title": "CoverageItem",
+      "type": "object"
+    },
+    "Requirement": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 3,
+          "pattern": "^R[1-9][0-9]?$",
+          "title": "Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "question"
+      ],
+      "title": "Requirement",
+      "type": "object"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "service_request",
+            "certificate_request"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "minimum": 1,
+          "title": "Expected Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "expected_version"
+      ],
+      "title": "ResourceRef",
+      "type": "object"
+    },
+    "TaskAssignment": {
+      "additionalProperties": false,
+      "description": "Compact model proposal; role permissions are bound by server.",
+      "properties": {
+        "id": {
+          "pattern": "^T[1-8]$",
+          "title": "Id",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "research",
+            "verifier"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "goal": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Goal",
+          "type": "string"
+        },
+        "coverage_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Coverage Ids",
+          "type": "array"
+        },
+        "dependencies": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 7,
+          "title": "Dependencies",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "goal",
+        "coverage_ids"
+      ],
+      "title": "TaskAssignment",
+      "type": "object"
+    },
+    "TaskPlanProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/$defs/CoverageItem"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Items",
+          "type": "array"
+        },
+        "tasks": {
+          "items": {
+            "$ref": "#/$defs/TaskAssignment"
+          },
+          "maxItems": 8,
+          "title": "Tasks",
+          "type": "array"
+        },
+        "clarification": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Clarification"
+        }
+      },
+      "required": [
+        "items",
+        "tasks"
+      ],
+      "title": "TaskPlanProposal",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "unified-task.v1",
+      "default": "unified-task.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "client_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "title": "Client Id",
+      "type": "string"
+    },
+    "goal": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Goal",
+      "type": "string"
+    },
+    "resources": {
+      "items": {
+        "$ref": "#/$defs/ResourceRef"
+      },
+      "maxItems": 8,
+      "minItems": 1,
+      "title": "Resources",
+      "type": "array"
+    },
+    "plan": {
+      "$ref": "#/$defs/TaskPlanProposal"
+    },
+    "action_authority": {
+      "const": "none",
+      "default": "none",
+      "title": "Action Authority",
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "goal",
+    "resources",
+    "plan"
+  ],
+  "title": "TaskRequest",
+  "type": "object"
+}

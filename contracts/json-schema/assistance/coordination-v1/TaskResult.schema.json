@@ -1,0 +1,125 @@
+{
+  "$defs": {
+    "CoverageFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "pattern": "^Q[1-4]$",
+          "title": "Item Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "supported",
+            "missing_user_fact",
+            "missing_source",
+            "conflicting",
+            "out_of_scope"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "supports": {
+          "items": {
+            "$ref": "#/$defs/Support"
+          },
+          "maxItems": 16,
+          "title": "Supports",
+          "type": "array"
+        }
+      },
+      "required": [
+        "item_id",
+        "status",
+        "supports"
+      ],
+      "title": "CoverageFinding",
+      "type": "object"
+    },
+    "Support": {
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "pattern": "^R[1-9][0-9]?$",
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "quote": {
+          "maxLength": 700,
+          "minLength": 8,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "evidence_id",
+        "quote"
+      ],
+      "title": "Support",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "task_id": {
+      "pattern": "^T[1-8]$",
+      "title": "Task Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "succeeded",
+        "partial",
+        "failed",
+        "cancelled"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "maxItems": 6,
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/CoverageFinding"
+      },
+      "maxItems": 4,
+      "title": "Coverage",
+      "type": "array"
+    },
+    "error_code": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error Code"
+    }
+  },
+  "required": [
+    "task_id",
+    "status"
+  ],
+  "title": "TaskResult",
+  "type": "object"
+}

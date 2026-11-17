@@ -1,0 +1,416 @@
+"""Port-only orchestration with one repair, one semantic call and a total deadline."""
+from __future__ import annotations
+
+import asyncio
+import json
+import logging
+import math
+import re
+from dataclasses import replace
+from time import monotonic
+
+from campus247.ports.llm import LlmResponseStatus
+from campus247.rag_v2.generation.generate import clarification_question, generate_draft
+from campus247.rag_v2.generation.packing import pack_context
+from campus247.rag_v2.ingest.units import context_text, source_text
+from campus247.rag_v2.observability.trace import TurnTrace, emit
+from campus247.rag_v2.outcome.compose import TIMEOUT_HINT, TIMEOUT_MESSAGE, TOPIC_CHIPS, build_outcome
+from campus247.rag_v2.outcome.guidance import related_documents, scope_chips
+from campus247.rag_v2.retrieval.hybrid import retrieve, scope_allows
+from campus247.rag_v2.verification.venue import venue_conflict
+from campus247.rag_v2.types import Fact, Outcome, Statement
+from campus247.rag_v2.understanding.analyze import analyze, contains, program_key
+from campus247.rag_v2.understanding.normalize import fold, normalize_query
+from campus247.rag_v2.verification.deterministic import REASON_CODES, check_statement, program_mismatch
+from campus247.rag_v2.verification.semantic import verify_semantic
+from campus247.rag_v2.verification.verbatim import all_verbatim, mode as verbatim_mode
+
+REPAIRABLE = REASON_CODES - {"SEMANTIC_UNSUPPORTED"}
+
+
+class _GenerationGateway:
+    def __init__(self, gateway, reasons=()):
+        self.gateway, self.reasons = gateway, reasons
+
+    async def generate(self, request):
+        request = replace(request, max_output_tokens=min(request.max_output_tokens, 1000))
+        if self.reasons:
+            request = replace(request, system_instructions=request.system_instructions +
+                "\nLần sửa duy nhất. Mã lỗi xác định: " + ", ".join(self.reasons) +
+                ". Đối chiếu lại nguồn, giữ đủ điều kiện và chỉ dẫn đúng nhãn nguồn.")
+        response = await self.gateway.generate(request)
+        if response.status != LlmResponseStatus.COMPLETED:
+            raise RuntimeError("GENERATION_UNAVAILABLE")
+        return response
+
+
+def scope_difference_note(asked, units) -> str:
+    """Server-built caveat shown BEFORE an answer taken from sources whose scope differs from the question's."""
+    wanted = [label for label in (f"năm học {asked.academic_year}" if asked.academic_year else None,
+                                  f"khóa {asked.cohort}" if asked.cohort else None) if label]
+    years = sorted({y for unit in units for y in unit.scope.academic_years})
+    cohorts = sorted({c for unit in units for c in unit.scope.cohorts})
+    actual = [label for label in (("năm học " + ", ".join(years)) if years else None,
+                                  ("khóa " + ", ".join(cohorts)) if cohorts else None) if label]
+    where = " và ".join(actual) if actual else "một phạm vi khác với câu hỏi"
+    return (f"Mình chưa có văn bản áp dụng cho {' và '.join(wanted)}. Thông tin dưới đây thuộc văn bản áp dụng cho {where}; "
+            "bạn nên đối chiếu lại trước khi dùng cho trường hợp của mình.")
+
+
+def _uncovered(facets, facet_of, verdicts, supported=None):
+    """The user's own words for the parts of the question no accepted statement covers.
+
+    Unknown coverage (the model assigned no statement to any part) reports nothing rather than guessing.
+    """
+    if not facets or not any(facet_of):
+        return []
+    covered = {facet for i, (facet, verdict) in enumerate(zip(facet_of, verdicts))
+               if facet and verdict.passed and (supported is None or (i < len(supported) and supported[i]))}
+    return [ask for facet_id, ask in facets if facet_id not in covered]
+
+
+def _fact_kind(u):
+    if u.question_type in {"deadline", "contact"}:
+        return u.question_type
+    if contains(fold(u.search_query), "tien quyet"):
+        return "prerequisite"
+    if "hoc_phi" in u.topics and u.question_type in {"number", "lookup"}:
+        return "fee"
+    return None
+
+
+_CONDITION = re.compile(
+    r"\b(?:chi|ap dung|danh cho|doi voi|tru|ngoai tru|rieng|neu|khi|truong hop|khong|chua|"
+    r"toi thieu|toi da|dieu kien|tu khoa|nam hoc|k\d{2,3}|20\d{2})\b", re.IGNORECASE)
+
+
+def _self_contained(fact, unit, parent=None):
+    """Inspect the complete available structure, never a window after the quoted row.
+
+    Sliced/table units need a readable parent. Context and headings are evidence
+    of scope too, including column headings; uncertainty leaves the fast path.
+    """
+    quote = fold(fact.quote)
+    if not quote or (parent is None and (unit.kind in {"table_row", "curriculum_row"} or unit.parent_unit_id)):
+        return False
+    for structure in (unit, parent) if parent is not None else (unit,):
+        whole = fold(source_text(structure))
+        if quote not in whole:
+            return False
+        outside = "\n".join((structure.doc_title, structure.path, context_text(structure),
+                              whole.replace(quote, " ", 1)))
+        if _CONDITION.search(fold(outside)) is not None:
+            return False
+    return True
+
+
+def _matches(fact, u, unit, parent=None):
+    if not _self_contained(fact, unit, parent):
+        return False
+    if not scope_allows(u, unit) or not scope_allows(u, replace(unit, scope=fact.scope)):
+        return False
+    query = fold(u.search_query)
+    subject = fold(normalize_query(fact.subject)).strip()
+    # A shared topic alone cannot identify a department, a deadline event or a
+    # course. Require the complete normalized subject (or equivalent program).
+    if not subject or not (contains(query, subject) or
+            u.program and program_key(subject) == program_key(u.program)):
+        return False
+    scope = fact.scope
+    for value, values in ((u.cohort, scope.cohorts), (u.academic_year, scope.academic_years)):
+        if value and not values and not contains(fold(fact.quote), fold(value)):
+            return False
+        if values and not value:
+            return False  # Do not choose an arbitrary dated/cohort-specific fact.
+    if scope.programs and not u.program:
+        return False
+    if u.program and not scope.programs and not (
+            contains(fold(fact.quote), fold(u.program)) or program_key(subject) == program_key(u.program)):
+        return False
+    # Semester and requested contact channel also change the answer.
+    semesters = re.findall(r"\bhoc ky\s*[123]\b", query)
+    if any(not contains(fold(normalize_query(fact.quote)), semester) for semester in semesters):
+        return False
+    if fact.kind == "contact":
+        channel = fact.attributes.get("contact_type")
+        if contains(query, "email") and channel != "email":
+            return False
+        if contains(query, "dien thoai") and channel != "phone":
+            return False
+    return fact.value in fact.quote and fact.quote in source_text(unit)
+
+
+# Generator slot names -> the slot groups that guidance knows how to offer values for.
+SLOT_GROUP = {"cohort": "cohort|academic_year", "academic_year": "cohort|academic_year", "program": "program",
+              "training_system": "program", "semester": "semester|academic_year"}
+CONTEXT_CHUNKS = 6
+CONTEXT_BYTES = 19_000
+
+
+class RagV2Service:
+    """Facts are injected separately because UnitIndex intentionally has no fact API.
+
+    ``embed`` is the query-embedding dependency already bound into UnitIndex.vector;
+    the service never embeds the same query a second time. All deadlines share one
+    monotonic end time. The retained generation gateway permits at most 5 s/call.
+    """
+
+    def __init__(self, facts: tuple[Fact, ...] = ()):
+        self.facts = tuple(facts)
+
+    def _declined(self, u, draft, units=()) -> Outcome:
+        """The model decided the sources cannot answer: ask back, or refuse with a typed reason."""
+        if draft.decision == "clarify":
+            question = clarification_question(draft.missing_slots)
+            slots = tuple(dict.fromkeys(SLOT_GROUP.get(slot, slot) for slot in draft.missing_slots))
+            # No slot named (a vague pronoun-only question): offer the topics the sources really cover instead.
+            chips = scope_chips(slots, units) if slots else TOPIC_CHIPS
+            return build_outcome(replace(u, missing_slots=draft.missing_slots,
+                clarify_prompt="Câu hỏi chưa đủ rõ để tra đúng nguồn. " + question),
+                suggestions=chips or tuple(draft.missing_slots))
+        near = related_documents(list(units)) if draft.decision == "no_source" else ()
+        return build_outcome(u, refuse_reason=draft.decision, suggestions=near)
+
+    async def answer(self, question, history_turns, *, gateway, index, reranker,
+                     embed, deadline_s=22.0, revalidate=None) -> Outcome:
+        started = monotonic()
+        trace = TurnTrace()
+        u = analyze(question, history_turns)
+        trace.latency_ms["understanding"] = (monotonic() - started) * 1000
+
+        async def validate(units):
+            if revalidate is not None:
+                await revalidate(tuple(dict.fromkeys(chunk for unit in units.values() for chunk in unit.chunk_ids)))
+
+        async def finish(outcome, units=None, *, original_quotes=True):
+            if outcome.kind != "transient_error":
+                await validate(units or {})
+            # Context headers are useful for generation, but only the original
+            # source body is quotable. Never expose the synthetic context marker.
+            if units and original_quotes:
+                outcome = replace(outcome, citations=tuple(replace(c,
+                    quote=source_text(units[c.unit_id])) for c in outcome.citations))
+            trace.outcome_kind = outcome.kind
+            trace.latency_ms["total"] = (monotonic() - started) * 1000
+            emit(trace)
+            return replace(outcome, trace=trace.payload())
+
+        if u.clarify_prompt or u.out_of_scope:
+            return await finish(build_outcome(u))
+        if not math.isfinite(deadline_s) or deadline_s <= 0:
+            return await finish(build_outcome(u, infra_error=True))
+        end = started + deadline_s
+
+        def budget(cap, reserve=0):
+            value = min(cap, end - monotonic() - reserve)
+            if value <= 0:
+                raise TimeoutError
+            return value
+
+        try:
+            async with asyncio.timeout(budget(deadline_s)):
+                phase = monotonic()
+                kind = _fact_kind(u)
+                chunk_unit = getattr(index, "chunk_unit", None)
+                matched = [(fact, unit) for fact in self.facts if fact.kind == kind
+                           and (unit := index.get(fact.unit_id)) is not None
+                           and (all((parent := chunk_unit(chunk)) is not None and _matches(fact, u, unit, parent)
+                                    for chunk in unit.chunk_ids) if chunk_unit else _matches(fact, u, unit))]
+                # A compound question needs the normal generation/coverage path.
+                compound = bool(re.search(r"[;,\n]|\b(?:va|dong thoi|ngoai ra)\b", fold(question)))
+                if matched and not compound and len({f.unit_id for f, _ in matched}) <= 8:
+                    units = {unit.unit_id: unit for _, unit in matched}
+                    statements = tuple(dict.fromkeys(Statement(f.quote, (f.unit_id,)) for f, _ in matched))
+                    verdicts = [check_statement(stmt, units) for stmt in statements]
+                    verdicts = [v if not v.passed or not program_mismatch(u.program, [units[r] for r in v.statement.unit_ids])
+                                else replace(v, passed=False, reasons=(*v.reasons, "SCOPE_MISMATCH")) for v in verdicts]
+                    trace.candidate_count = len(units)
+                    trace.latency_ms["facts"] = (monotonic() - phase) * 1000
+                    for i, verdict in enumerate(verdicts):
+                        if not verdict.passed:
+                            trace.statement_rejections[i] = verdict.reasons
+                    result = build_outcome(u, verdicts, units, semantic_required=False)
+                    # Fact citations use the exact fact quote, including its value.
+                    quotes = {}
+                    for uid, unit in units.items():
+                        body = source_text(unit)
+                        spans = [(body.index(f.quote), body.index(f.quote) + len(f.quote))
+                                 for f, _ in matched if f.unit_id == uid]
+                        quotes[uid] = body[min(a for a, _ in spans):max(b for _, b in spans)]
+                    result = replace(result, citations=tuple(replace(c, quote=quotes[c.unit_id])
+                                                             for c in result.citations))
+                    # Keep the fact-specific citation quote while checking its actual source grant.
+                    return await finish(result, units, original_quotes=False)
+                trace.latency_ms["facts"] = (monotonic() - phase) * 1000
+                phase = monotonic()
+                # Measured on the dev set (445 answerable cases): fused RRF keeps the gold unit in the
+                # top 12 for 92%, while the CPU reranker (~4 s, 320-char windows) lowered survival
+                # to 83% at top 8 and 60% above a -1 logit floor. The generator reads 12 units, so
+                # reranking is left out of the request path.
+                retrieval = await retrieve(u, index, reranker, rerank_deadline_s=0, final_limit=12)
+                relaxed = None
+                if not retrieval.candidates and (u.academic_year or u.cohort):
+                    # Nothing applies to the exact year or cohort asked. Look again without it so the user still
+                    # learns what the sources say, with the difference stated by the server (never hidden).
+                    for loosened in (replace(u, academic_year=None), replace(u, academic_year=None, cohort=None)):
+                        if loosened == u:
+                            continue
+                        retry = await retrieve(loosened, index, reranker, rerank_deadline_s=0, final_limit=12)
+                        if retry.candidates:
+                            retrieval, relaxed = retry, u
+                            break
+                trace.latency_ms["retrieval"] = (monotonic() - phase) * 1000
+                trace.candidate_count = len(retrieval.candidates)
+                trace.rerank_scores = [c.rerank_score for c in retrieval.candidates if c.rerank_score is not None]
+                units = {c.unit_id: unit for c in retrieval.candidates if (unit := index.get(c.unit_id)) is not None}
+                chunk_unit = getattr(index, "chunk_unit", None)
+                if units:
+                    # Read the whole parent rows of the best units (answers often sit in sibling
+                    # rows or footnotes the fine unit lacks). The provider gateway rejects a request
+                    # above 28,000 bytes of JSON, so rows are packed by real payload bytes.
+                    units, _ = pack_context(units.values(), chunk_unit, budget=CONTEXT_BYTES,
+                                                    max_parents=CONTEXT_CHUNKS)
+                if not units and retrieval.trace.get("vector_failed"):
+                    # Nothing came back and a retrieval branch failed: an outage, not an absent source.
+                    return await finish(build_outcome(u, infra_error=True))
+                if not units:
+                    return await finish(build_outcome(u, candidate_count=0))
+                phase = monotonic()
+                # Two full attempts under the provider's 5 s operation bound (the second used to get ~3 s).
+                generation_end = monotonic() + budget(11, reserve=min(4, deadline_s / 4))
+                reasons = ()
+                slow = False
+                malformed = False
+                verdicts, facet_of, facets = [], [], ()
+                carry, focus, repair = None, (), False
+                for attempt in range(2):
+                    verdicts = []  # An unavailable attempt cannot reuse an earlier rejection.
+                    trace.statement_rejections.clear()
+                    milliseconds = int(min(5, generation_end - monotonic()) * 1000)
+                    if milliseconds < 1:
+                        raise TimeoutError
+                    await validate(units)
+                    try:
+                        draft = await generate_draft(_GenerationGateway(gateway, reasons),
+                            u.search_query, u, list(units.values()), deadline_ms=milliseconds,
+                            max_output_tokens=1000 if repair else 900, focus=focus, relaxed=relaxed is not None, repair=repair)
+                        statements = list(draft.statements)
+                    except TimeoutError:
+                        if carry is not None:
+                            # The follow-up for missing parts is optional: keep what already passed.
+                            verdicts, facet_of, facets = carry
+                            break
+                        logging.getLogger("campus247.rag_v2").warning(
+                            "rag_v2_generation_attempt attempt=%d status=timeout", attempt + 1)
+                        # A slow provider answers the second request in time more often than not;
+                        # one retry is made only while a full attempt still fits in the budget.
+                        if attempt or slow or generation_end - monotonic() < 2.5:
+                            raise
+                        slow = True
+                        logging.getLogger("campus247.rag_v2").warning("rag_v2_generation_retry")
+                        continue
+                    if draft.decision != "answer":
+                        if carry is not None:
+                            verdicts, facet_of, facets = carry
+                            break
+                        trace.latency_ms["generation"] = (monotonic() - phase) * 1000
+                        return await finish(self._declined(u, draft, units.values()), units)
+                    malformed = draft.malformed
+                    if malformed and not attempt and generation_end - monotonic() >= 3.0:
+                        # Unparseable output (a cut-off or mangled JSON) is a provider fault that is usually gone on
+                        # the next call; give the answer one more chance before reporting a transient error.
+                        logging.getLogger("campus247.rag_v2").warning("rag_v2_generation_retry reason=malformed")
+                        repair = True
+                        continue
+                    verdicts = [check_statement(stmt, units) for stmt in statements]
+                    facets = draft.facets
+                    facet_of = (list(draft.statement_facets) + [""] * len(verdicts))[:len(verdicts)]
+                    if carry is not None:
+                        # Merge the follow-up (only the missing parts) into the first, already checked draft.
+                        old_verdicts, old_facet_of, old_facets = carry
+                        seen = {v.statement.text for v in old_verdicts}
+                        fresh = [(v, f) for v, f in zip(verdicts, facet_of) if v.statement.text not in seen]
+                        verdicts = old_verdicts + [v for v, _ in fresh]
+                        facet_of = old_facet_of + [f for _, f in fresh]
+                        facets = old_facets
+                    for i, verdict in enumerate(verdicts):
+                        if not verdict.passed:
+                            trace.statement_rejections[i] = verdict.reasons
+                    reasons = tuple(sorted({code for verdict in verdicts for code in verdict.reasons}))
+                    logging.getLogger("campus247.rag_v2").info(
+                        "rag_v2_generation_attempt attempt=%d status=%s", attempt + 1,
+                        "rejected" if reasons else "checked")
+                    uncovered = _uncovered(facets, facet_of, verdicts)
+                    if (not attempt and uncovered and any(v.passed for v in verdicts)
+                            and generation_end - monotonic() >= 3.0):
+                        # A multi-part question answered in part: one more request for the missing parts only.
+                        carry, focus, reasons = (verdicts, facet_of, facets), tuple(uncovered), ()
+                        continue
+                    if (attempt or not verdicts or any(v.passed for v in verdicts)
+                            or not reasons or not set(reasons) <= REPAIRABLE):
+                        break
+                trace.latency_ms["generation"] = (monotonic() - phase) * 1000
+                passed = [v.statement for v in verdicts if v.passed]
+                if not passed:
+                    if malformed:
+                        # Unparseable model output is a provider fault, not missing evidence.
+                        return await finish(build_outcome(u, infra_error=True))
+                    return await finish(build_outcome(u, verdicts, units,
+                        suggestions=related_documents(list(units.values()))), units)
+                phase = monotonic()
+                semantic = None
+                # L1: when every accepted statement is an exact excerpt of a cited source and the scope was not relaxed,
+                # the model-based check is skipped ("on") or only compared with the code decision ("shadow").
+                skip_mode = verbatim_mode()
+                verbatim = (skip_mode != "off" and relaxed is None and not u.missing_slots
+                            and all_verbatim(passed, units, u.search_query))
+                if verbatim and skip_mode == "on":
+                    semantic = [True] * len(passed)
+                    trace.semantic_skipped = True
+                    logging.getLogger("campus247.rag_v2").warning("rag_v2_l1_skipped statements=%d", len(passed))
+                for attempt in range(2 if semantic is None else 0):
+                    # One retry: a malformed or late verdict is usually transient and the deterministic
+                    # checks above have already passed, so a second look is cheaper than an error.
+                    await validate(units)
+                    try:
+                        semantic = await verify_semantic(_GenerationGateway(gateway), passed, units, u.search_query,
+                            deadline_ms=max(1, int(budget(3.5, reserve=0.5 if attempt == 0 else 0) * 1000)))
+                    except TimeoutError:
+                        semantic = None
+                    if semantic is not None:
+                        break
+                    logging.getLogger("campus247.rag_v2").warning("rag_v2_semantic_unavailable attempt=%d", attempt + 1)
+                trace.latency_ms["semantic"] = (monotonic() - phase) * 1000
+                if skip_mode == "shadow" and semantic is not None:
+                    logging.getLogger("campus247.rag_v2").warning(
+                        "rag_v2_l1_shadow eligible=%d statements=%d model_all_supported=%d",
+                        int(verbatim), len(passed), int(all(semantic)))
+                if semantic is None:
+                    return await finish(build_outcome(u, infra_error=True))
+                iterator = iter(semantic)
+                aligned = [next(iterator) if verdict.passed else False for verdict in verdicts]
+                for i, (verdict, supported) in enumerate(zip(verdicts, aligned)):
+                    if verdict.passed and supported and venue_conflict(
+                            u.search_query, [units[ref] for ref in verdict.statement.unit_ids]):
+                        aligned[i] = supported = False
+                        trace.statement_rejections[i] = ("SCOPE_MISMATCH",)
+                    elif verdict.passed and not supported:
+                        trace.statement_rejections[i] = ("SEMANTIC_UNSUPPORTED",)
+                missing = _uncovered(facets, facet_of, verdicts, aligned)
+                used = [units[ref] for verdict, ok in zip(verdicts, aligned) if verdict.passed and ok
+                        for ref in verdict.statement.unit_ids]
+                chips = scope_chips(u.missing_slots, used) if u.missing_slots else ()
+                note = scope_difference_note(relaxed, used) if relaxed is not None else None
+                return await finish(build_outcome(u, verdicts, units, semantic_results=aligned,
+                    coverage=0.9 if missing else 1.0, missing_parts=missing, suggestions=chips,
+                    scope_note=note), units)
+        except Exception as exc:  # noqa: BLE001 -- port failures must become content-free typed outcomes
+            logging.getLogger("campus247.rag_v2").warning("rag_v2_failure kind=%s where=%s detail=%s", type(exc).__name__,
+                exc.__traceback__.tb_next.tb_frame.f_code.co_name if exc.__traceback__ and exc.__traceback__.tb_next else "?",
+                str(getattr(getattr(exc, "response", None), "status_code", ""))
+                # A provider-gateway bound ("provider usage unavailable", "provider model mismatch") names itself; any
+                # other message may carry private text and is never logged.
+                or (str(exc)[:40] if isinstance(exc, ValueError) and str(exc).startswith(("provider ", "rag_v2 ")) else ""))
+            if isinstance(exc, TimeoutError):
+                return await finish(Outcome("transient_error", TIMEOUT_MESSAGE, retry_hint=TIMEOUT_HINT))
+            return await finish(build_outcome(u, infra_error=True))
