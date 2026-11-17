@@ -38,7 +38,7 @@ EXTRA_DIRS = (Path("infra/local/multi-agent-integrated-20261013-01"), Path("infr
               Path("infra/local/learning-materials-20261104-01"))
 EXTRA_MAX_BYTES = 5_000_000
 SQLITE_STORES = ("conversations.sqlite3", "actor-state.sqlite3", "campus-ops.sqlite3", "action-idempotency.sqlite3",
-                 "write-previews.sqlite3")
+                 "write-previews.sqlite3", "source-reviews.sqlite3")
 LEDGER_KEEP = 3000
 LEDGER_SKIP = ("gateway-sidecar.token",)
 SKIP_SUFFIXES = (".png", ".log", ".sqlite3", ".sqlite3-wal", ".sqlite3-shm")
