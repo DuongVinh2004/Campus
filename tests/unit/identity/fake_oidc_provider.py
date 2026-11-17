@@ -1,9 +1,12 @@
 """An OpenID Connect provider simulated in memory (discovery, key set, token endpoint) for tests. No network, no real keys."""
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
+import secrets
 import time
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 import jwt
@@ -43,6 +46,14 @@ class FakeProvider:
         if publish:
             self.published.append(kid)
 
+    def authorize(self, authorization_url: str, **claim_overrides) -> str:
+        """What the user's browser does at the provider: sign in, then come back to the redirect URI with a code and the state."""
+        query = {key: values[0] for key, values in parse_qs(urlparse(authorization_url).query).items()}
+        assert query["code_challenge_method"] == "S256" and query["client_id"] == CLIENT_ID
+        code = secrets.token_urlsafe(12)
+        self.issued_codes[code] = {"challenge": query["code_challenge"], "id_token": self.sign(**({"nonce": query["nonce"]} | claim_overrides))}
+        return f"{query['redirect_uri']}?{urlencode({'code': code, 'state': query['state']})}"
+
     # --------------------------------------------------------------- http
     def jwks(self) -> dict:
         keys = []
@@ -70,7 +81,10 @@ class FakeProvider:
         if request.url.path.endswith("/token") and request.method == "POST":
             form = {key: values[0] for key, values in parse_qs(request.content.decode()).items()}
             issued = self.issued_codes.pop(form.get("code", ""), None)  # a code works once
-            if issued is None or form.get("code_verifier") != issued["verifier"] or form.get("redirect_uri") != REDIRECT:
+            verified = issued is not None and (
+                issued.get("verifier") == form.get("code_verifier") if "verifier" in issued
+                else base64.urlsafe_b64encode(hashlib.sha256(form.get("code_verifier", "").encode()).digest()).rstrip(b"=").decode() == issued["challenge"])
+            if issued is None or not verified or form.get("redirect_uri") != REDIRECT:
                 return httpx.Response(400, json={"error": "invalid_grant"})
             return httpx.Response(200, json={"id_token": issued["id_token"], "access_token": "opaque", "token_type": "Bearer"})
         return httpx.Response(404)
