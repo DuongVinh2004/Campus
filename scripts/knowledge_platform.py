@@ -540,8 +540,16 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 from campus247.infrastructure.leader import BackgroundLeader
                 leader = application.state.background_leader = BackgroundLeader(lambda: pool)
 
+                from campus247.application.campus_ops.reminder_job import run_reminders
+
+                def student_subjects():
+                    # student code -> subject id for the local student account (the only account with a schedule here)
+                    student = campus_adapter.student.directory()
+                    return {student["student_code"]: student["subject_id"]}.get
+
                 async def start_jobs():
                     jobs = [asyncio.create_task(platform.schedules.serve())]
+                    jobs.append(asyncio.create_task(run_reminders(ops_service.store, student_subjects)))
                     if learning_service is not None:
                         jobs.append(asyncio.create_task(learning_worker()))
                         if learning_service.accessible_text_pipeline is not None:
