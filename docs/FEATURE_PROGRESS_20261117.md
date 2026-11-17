@@ -6,9 +6,9 @@
 
 ## Đã xong (đã commit, chưa push)
 
-Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh hiện tại `feat/ops-metrics`
+Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/ops-web-panel`
 chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-and-timezone` → `fix/learning-session-revocation-boundary` →
-`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics`.
+`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel`.
 
 | Task | Commit | Kết quả đo được |
 |---|---|---|
@@ -22,13 +22,17 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 | A2.1/A2.2 | `361c89a` | `observability/ops_metrics.py`, gộp worker qua file snapshot |
 | A2.3 | `24c8a62` | móc vào chat, 429, watchdog; 15 test hook đạt, test admission/abuse/watchdog cũ vẫn đạt (57) |
 | A2.4 | `3fc2279` | gateway `GET /v1/status`; 27 test sidecar đạt |
-| A2.5 (phần dựng tài liệu) | `643f276` | `observability/ops_status.py`; 34 test observability đạt |
+| A2.5 | `643f276` | `observability/ops_status.py`; 34 test observability đạt |
+| A2.6 | `f02fd11` | `presentation/admin_ops.py` (`/v1/admin/operations/status`, `/metrics` chỉ loopback, từ chối mọi header proxy); 13 test đạt |
+| A2.5b (nối runtime) | `7f1d34e` | 20 dòng trong `scripts/knowledge_platform.py` (chỉ phần của mình); **chưa chạy trên runtime thật**, cần khởi động lại 8015 (chủ dự án quyết định) |
+| A2.7 | `4e4988c` | `features/admin/OperationsPanel.tsx`, `lib/ops-assess.ts`, `lib/ops-status-api.ts`: 19 test vitest đạt, `tsc` sạch |
 
 ## Việc dở và việc bị chặn
 
 - **Nối B1.1/B1.2 vào trang lịch**: đã sửa trong working tree `apps/web/src/app/schedule/page.tsx` và
   `apps/web/src/features/schedule/ScheduleView.tsx` (+ test mới `ScheduleView.ics.test.tsx`), vitest 14 đạt, `tsc` sạch. **Không commit**
   vì hai file có thay đổi dở khác của chủ dự án; chủ dự án tự commit cùng thay đổi của mình.
+- **Hiện panel vận hành trên `/admin`**: đã thêm 2 dòng vào `apps/web/src/app/admin/page.tsx` trong working tree (không commit, file có thay đổi dở của chủ dự án). Cần dựng lại frontend snapshot mới thấy trên 8015.
 - **A5.5** (chạy workflow trong Linux): Docker không chạy; WSL Ubuntu có nhưng đang tắt, và `uv sync --frozen` phải tải gói. Chờ cho phép tải.
 - **A5.7** (chạy CI trên GitHub): chờ duyệt push.
 - Test `test_session_revocation_boundary.py` và `test_environments.py` đạt trên working tree, nhưng **không** đạt trên bản checkout sạch của HEAD,
@@ -36,11 +40,8 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 
 ## Làm tiếp theo thứ tự (mỗi mục là một đơn vị commit được)
 
-1. **A2.5b**: gắn `run_writer` vào runtime (`scripts/knowledge_platform.py`, `owned_lifespan`; file này có thay đổi dở của chủ dự án nên dùng cách "stage chỉ phần của mình") và đặt `OpsConfig`.
-2. **A2.6**: `presentation/admin_ops.py`: `GET /v1/admin/operations/status` (`require_admin`, `Cache-Control: no-store`) và `GET /metrics` chỉ loopback; đăng ký router trong `scripts/knowledge_platform.py` hoặc `bootstrap/app.py` (cả hai có thay đổi dở).
-3. **A2.7**: panel web trong `apps/web/src/features/admin/`, hiện trong `/admin`.
-4. **A4.1–A4.4**: `LAST_BACKUP.json` trong `infra/cloud/backup.py`, `rehearse_restore.py`, timer, `offsite.py` với restic giả.
-5. **C3.2–C3.5**, **B1.3–B1.6**, **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
+1. **A4.1–A4.4**: `LAST_BACKUP.json` trong `infra/cloud/backup.py`, `rehearse_restore.py`, timer, `offsite.py` với restic giả.
+2. **C3.2–C3.5**, **B1.3–B1.6**, **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
 
 ## Quy tắc đã dùng (giữ nguyên khi làm tiếp)
 
@@ -52,4 +53,5 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
   (biến `PYTHONPATH` dạng `a:b` qua Git Bash không đáng tin; test học liệu cần `LEARNING_TEST_ROOT` trỏ tới thư mục có sẵn trong repo; `--basetemp` phải nằm trong repo).
 - Web: `npx vitest run <đường dẫn>` và `npx tsc --noEmit -p .` trong `apps/web`.
 - Sửa file bằng công cụ Edit/Write; heredoc Python với `\n` trong chuỗi làm hỏng file (đã gặp).
+- Bẫy vitest: `beforeEach(() => mock.mockReset())` trả về mock, vitest gọi nó như hàm dọn dẹp sau test; dùng `beforeEach(() => { mock.mockReset(); })`.
 - Thư mục `.pytest-tmp-aud1/` là rác của lượt này (đã bị bỏ qua khỏi commit); chủ dự án xóa được.
