@@ -550,6 +550,15 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 async def start_jobs():
                     jobs = [asyncio.create_task(platform.schedules.serve())]
                     jobs.append(asyncio.create_task(run_reminders(ops_service.store, student_subjects)))
+                    from campus247.observability.alert_job import run_alerts
+                    from campus247.observability.alert_notifiers import build_notifier
+                    from campus247.observability.alerts import AlertManager
+                    from campus247.observability.ops_status import ProbeCache, build_status
+                    import httpx
+                    alert_client, alert_cache = httpx.AsyncClient(trust_env=False), ProbeCache()
+                    alert_manager = AlertManager(STATE / "ops-alerts", build_notifier(os.environ))
+                    jobs.append(asyncio.create_task(run_alerts(
+                        alert_manager, lambda: build_status(ops_config, client=alert_client, cache=alert_cache))))
                     if learning_service is not None:
                         jobs.append(asyncio.create_task(learning_worker()))
                         if learning_service.accessible_text_pipeline is not None:
