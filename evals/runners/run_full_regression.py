@@ -36,7 +36,7 @@ CI_PATHS = [
     "tests/operations/test_backup_status.py", "tests/operations/test_rehearse_restore.py", "tests/operations/test_rehearsal_units.py",
     "tests/operations/test_offsite.py", "tests/operations/test_watchdog.py", "tests/evals/test_nightly_retrieval.py",
     "tests/api/test_admin_ops.py", "tests/api/test_knowledge_freshness.py", "tests/api/test_oidc_login.py", "tests/api/test_ops_metrics_hooks.py",
-    "tests/api/test_gateway_sidecar.py", "tests/api/test_chat_admission.py", "tests/api/test_abuse_limits.py",
+    "tests/api/test_gateway_sidecar.py", "tests/api/test_chat_admission.py", "tests/api/test_abuse_limits.py", "tests/api/test_answer_quality.py",
 ]
 
 # (name, test paths, base temp directory relative to infra/local, extra pytest args)
