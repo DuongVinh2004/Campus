@@ -499,6 +499,11 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                             "learning_worker": getattr(app.state, "learning_worker_status", "disabled")})
     app.include_router(create_admin_ops_router(ops_config))
 
+    # Freshness of the sources in the current release, for knowledge managers (reads the release pointer, writes only its own file).
+    from campus247.application.knowledge.freshness_service import FreshnessService, SourceReviewStore
+    from campus247.presentation.knowledge_freshness import create_freshness_router
+    app.include_router(create_freshness_router(FreshnessService(pool, SourceReviewStore(STATE / "source-reviews.sqlite3"), tenant=TENANT)))
+
     @app.get("/health/entry", include_in_schema=False)
     def entry_health():
         return {"entry_url": f"http://127.0.0.1:{api_port}", "api_same_origin": True,
