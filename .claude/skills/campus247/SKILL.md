@@ -31,7 +31,7 @@ Mục tiêu là an toàn vừa đủ, không rườm rà:
 
 - **Bí mật:** không in khóa, token, mật khẩu ra chat/log/commit. Được dùng tài khoản test local để đăng nhập kiểm thử, nhưng không đổi, xóa hay tạo lại tài khoản admin/`student-local` và khóa.
 - **Dữ liệu:** không xóa hoặc ghi đè build cũ, backup, evidence, dữ liệu trong DB local (Postgres native của runtime 8015 ở `127.0.0.1:55437`, cluster `.tooling/knowledge-postgres-20261023`; Postgres compose ở 5433). Test migration và test phá hủy dùng DB tạm. Việc xóa cần được người dùng nói rõ.
-- **Git:** `git status` trước khi sửa. Commit/push/deploy chỉ khi người dùng yêu cầu. Không `reset --hard`, `clean -fd`, ghi lại lịch sử khi chưa được bảo.
+- **Git:** theo quy trình Git của skill `senior-engineer`: task mới ra nhánh mới, xong và đã kiểm thì tự commit (chỉ file của mình; thư mục làm việc có hàng nghìn thay đổi dở chưa commit, không commit lẫn), push/merge/deploy chỉ khi người dùng duyệt. Runtime 8015 chạy thẳng từ thư mục làm việc và nhánh hiện tại (ví dụ `feature/capacity-100-users`) có thể đi trước `main` nhiều commit chưa merge: khi đó tạo nhánh mới từ HEAD hiện tại, không đổi sang `main` (sẽ thay file đang chạy). Không `reset --hard`, `clean -fd`, ghi lại lịch sử khi chưa được bảo.
 - **Chi phí:** không gọi API trả phí hay production nếu chưa được cho phép; test mặc định dùng fake provider.
 - **Trung thực với dữ liệu:** chưa có kết nối HUCE thật (SSO, bảng điểm, lịch cá nhân, tiếp nhận hồ sơ, đặt phòng). Không dùng fixture thay dữ liệu trường rồi nói như thật.
 - **Bảo vệ ứng dụng:** không nới xác thực, phân quyền, xác nhận hành động hay kiểm nguồn chỉ để test qua.
