@@ -6,9 +6,9 @@
 
 ## Đã xong (đã commit, chưa push)
 
-Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/oidc-runtime`
+Các nhánh xếp chồng: mỗi nhánh tạo từ HEAD của nhánh trước, vì nhánh trước còn commit chưa merge. Nhánh cuối `feat/nightly-retrieval`
 chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-and-timezone` → `fix/learning-session-revocation-boundary` →
-`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed` → `feat/alert-engine` → `feat/oidc-client` → `feat/oidc-runtime`.
+`fix/testing-environment-identity` → `feat/source-freshness-state` → `feat/practice-pure-logic` → `feat/ci-regression-mode` → `feat/ops-metrics` → `feat/ops-runtime-wiring` → `feat/ops-web-panel` → `feat/backup-status-files` → `feat/restore-drill` → `feat/offsite-backup` → `feat/source-freshness-api` → `feat/source-freshness-ui` → `feat/reminders-engine` → `feat/schedule-ics-feed` → `feat/alert-engine` → `feat/oidc-client` → `feat/oidc-runtime` → `feat/source-freshness-reminders` → `feat/reminder-preferences` → `feat/nightly-retrieval`.
 
 | Task | Commit | Kết quả đo được |
 |---|---|---|
@@ -44,6 +44,10 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 | A1 (runtime) | `34f141e` | bật khi có `CAMPUS247_OIDC_CONFIG`; thêm `oidc.sqlite3` vào backup; **chưa chạy trên runtime thật** |
 | A1.8 | `66eef78` | `scripts/oidc_preflight.py` + `docs/OIDC_SIGN_IN_SETUP_20261117.md` (danh sách thông tin HUCE phải cấp); 7 test đạt |
 | A1.7 | `f53c1d0` | `features/auth/UniversitySignIn.tsx` (13 test đạt, `tsc` sạch); đã thêm 2 dòng vào `app/login/page.tsx` trong working tree (thư mục untracked, không commit) |
+| C3.4 | `46a5e13` | `freshness_reminders.py`: nhắc quản trị tri thức trước 30 và 7 ngày, tóm tắt tuần cho nguồn quá hạn; 6 test đạt; đã nối leader jobs |
+| B1.6 | `5245e5d`, `2fc9a8f` | `GET/PUT /v1/notifications/preferences` (bật/tắt nhắc thi, nhắc nguồn; boolean thật; audit), `ReminderPreferences.tsx` (6 test đạt); đã thêm vào `app/notifications/page.tsx` trong working tree (thư mục untracked, không commit). Công tắc "nguồn" chưa gắn vào trang (cần biết vai trò) |
+| C2.1-C2.2 | `6aadc02` | `evals/runners/nightly_retrieval.py` (+ timer 02:30): chạy probe truy hồi sẵn có, lưu thư mục mới theo ngày, trend.jsonl, so với baseline (giảm >3 điểm top-8 hoặc >5 điểm sau rerank); 16 test đạt với probe giả. **Chưa chạy probe thật** (cần model server + chỉ mục) |
+| C2.3 | `3a36b54` | trạng thái vận hành có `quality`, tile trên trang, luật `quality_regression`; 93 test Python + 26 test web đạt |
 
 ## Việc dở và việc bị chặn
 
@@ -61,7 +65,7 @@ chứa tất cả. Thứ tự: `docs/feature-design-plan` → `fix/schedule-ics-
 
 ## Làm tiếp theo thứ tự (mỗi mục là một đơn vị commit được)
 
-1. **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3**, **C1.1–C1.4**, **C2.1/C2.4**, **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
+1. **C3.4–C3.5** (nhắc hạn nguồn, nhãn trong CitationDrawer), **B1.5–B1.6** (nhắc phiếu ra lớp, cài đặt nhắc), **A3.1–A3.6**, **A1.1–A1.8**, **B2.1–B2.3** (PWA; cần tạo icon PNG), **C1.1–C1.4** (chỉ làm được phần đếm theo nguồn của đánh giá không hữu ích; câu bị từ chối không có thông tin nguồn nếu không lưu chữ câu hỏi), **C2.4** (chạy khi kích hoạt release), **B3.3–B3.6**, **B4.1–B4.4** (theo `FEATURE_READY_TASKS`).
 
 ## Quy tắc đã dùng (giữ nguyên khi làm tiếp)
 
