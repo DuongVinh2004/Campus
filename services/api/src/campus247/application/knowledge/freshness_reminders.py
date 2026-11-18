@@ -11,12 +11,10 @@ import logging
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from typing import Any
-from zoneinfo import ZoneInfo
 
-from campus247.application.campus_ops.reminders import Candidate, deliver, time_left_text
+from campus247.application.campus_ops.reminders import VN, Candidate, deliver, time_left_text
 
 LOG = logging.getLogger("campus247.freshness")
-VN = ZoneInfo("Asia/Ho_Chi_Minh")
 OFFSETS = (timedelta(days=30), timedelta(days=7))
 LINK = "/knowledge/freshness"
 

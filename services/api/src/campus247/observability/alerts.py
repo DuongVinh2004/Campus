@@ -15,15 +15,18 @@ import logging
 import os
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Protocol
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from campus247.observability.alert_rules import RULES, Reading, Rule, Severity
 
 LOG = logging.getLogger("campus247.alerts")
-VN = ZoneInfo("Asia/Ho_Chi_Minh")
+try:
+    VN = ZoneInfo("Asia/Ho_Chi_Minh")
+except ZoneInfoNotFoundError:  # runtime without tzdata; Vietnam has no daylight saving
+    VN = timezone(timedelta(hours=7), "ICT")
 REPEAT_S = 30 * 60
 RESOLVE_AFTER = 2  # evaluations in a row
 

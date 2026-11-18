@@ -10,12 +10,15 @@ from __future__ import annotations
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 from typing import Any
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 DEFAULT_OFFSETS = (timedelta(hours=24), timedelta(hours=2))
-VN = ZoneInfo("Asia/Ho_Chi_Minh")
+try:
+    VN = ZoneInfo("Asia/Ho_Chi_Minh")
+except ZoneInfoNotFoundError:  # Windows runtimes without the tzdata package; Vietnam has no daylight saving, so UTC+7 is exact
+    VN = timezone(timedelta(hours=7), "ICT")
 SCHEMA = "CREATE TABLE IF NOT EXISTS ops_reminders_sent(key TEXT PRIMARY KEY, sent_at TEXT NOT NULL)"
 PREFS_SCHEMA = """CREATE TABLE IF NOT EXISTS ops_reminder_prefs(subject_id TEXT NOT NULL, kind TEXT NOT NULL, enabled INTEGER NOT NULL,
                   updated_at TEXT NOT NULL, PRIMARY KEY(subject_id, kind))"""
