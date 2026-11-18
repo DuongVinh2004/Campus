@@ -22,6 +22,24 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); window.history.replaceState(null, "", "/chat"); window.localStorage.removeItem("campus247_token"); vi.restoreAllMocks(); });
 describe("chat refresh recovery", () => {
+  it("restores the citation summary and opens its verified source after refresh", async () => {
+    const page = response();
+    const mapping = { turn_citation_id: "CIT-001", citation: {
+      citation_id: id, source_id: conv, document_version_id: conv,
+      source_title: "Synthetic source", canonical_uri: "synthetic://audit/source", version_label: "v1",
+      source_status: "SYNTHETIC", locator: { section_path: "Section 1" }, quote: "Synthetic quote",
+    } };
+    const final = { ...page.items[0].final_result!, status: "answered", response_class: "grounded_answer",
+      content: "Verified answer [CIT-001]", citations: [mapping] };
+    const body = { ...page, items: [{ ...page.items[0], content: final.content,
+      citations: [mapping.citation], final_result: final }] };
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({ ok: true, status: 200, json: async () => body } as Response);
+    render(<ChatPage />);
+    const summary = await screen.findByRole("button", { name: "Xem 1 nguồn trích dẫn" });
+    fireEvent.click(summary);
+    expect(await screen.findByRole("dialog", { name: "Nguồn trích dẫn & Bằng chứng" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "Synthetic source" })).toBeDefined();
+  });
   it("discards an expired local token and restores committed history with cookies", async () => {
     window.localStorage.setItem("campus247_token", btoa(JSON.stringify({ exp: 1 })) + ".signature");
     const fetcher = vi.spyOn(globalThis, "fetch")

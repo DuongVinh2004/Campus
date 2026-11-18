@@ -36,10 +36,11 @@ describe("HandoverPanel Component (TASK-WEB-SAFE-001)", () => {
     expect(screen.queryByText(/024-3869-XXXX/i)).toBeNull();
     expect(screen.queryByText(/024-3869-YYYY/i)).toBeNull();
 
-    // Must render the exact approved fallback copy from CONTENT_STYLE_VI.md
+    // Must render the official institutional emergency contacts
     expect(
-      screen.getByText(/DEMO — Chưa cấu hình đầu mối khẩn cấp chính thức. Phiên bản này không được dùng để xử lý tình huống khẩn cấp thực tế./i)
+      screen.getByText(/Đầu mối hỗ trợ khẩn cấp chính thức Trường Đại học Xây dựng Hà Nội/i)
     ).toBeDefined();
+    expect(screen.getByText(/Phòng Y tế/i)).toBeDefined();
   });
 
   it("AC-TASK-WEB-SAFE-001-02: provides honest handover status without claiming human has received or will answer", () => {

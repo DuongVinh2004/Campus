@@ -1,5 +1,16 @@
-import React, { useState } from "react";
-import { ClipboardListIcon, ClockIcon } from "../../components/Icons";
+import React, { useEffect, useState } from "react";
+import {
+  ClipboardList,
+  Clock,
+  Copy,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  AlertTriangle,
+  Star,
+  Send,
+  MessageSquare,
+} from "lucide-react";
 
 export interface TicketEvent {
   id: string;
@@ -36,21 +47,70 @@ export interface TicketListProps {
   onFeedbackRating?: (ticketId: string, payload: { rating: number; comment?: string }) => void;
 }
 
-const statusLabels: Record<StudentTicket["status"], { label: string; bg: string; color: string; border: string }> = {
-  submitted: { label: "Đã tiếp nhận", bg: "var(--color-slate-100, #f1f5f9)", color: "var(--color-slate-700, #334155)", border: "var(--color-slate-300, #cbd5e1)" },
-  queued: { label: "Đã tiếp nhận", bg: "var(--color-slate-100, #f1f5f9)", color: "var(--color-slate-700, #334155)", border: "var(--color-slate-300, #cbd5e1)" },
-  claimed: { label: "Đã chuyển cán bộ phụ trách", bg: "var(--color-primary-light, #eff6ff)", color: "var(--color-primary, #1e3a8a)", border: "var(--color-blue-200, #bfdbfe)" },
-  in_progress: { label: "Đang xử lý", bg: "var(--color-blue-50, #eff6ff)", color: "var(--color-blue-700, #1d4ed8)", border: "var(--color-blue-200, #bfdbfe)" },
-  waiting_student: { label: "Cần bạn bổ sung thông tin", bg: "var(--color-amber-50, #fffbeb)", color: "var(--color-amber-800, #92400e)", border: "var(--color-amber-200, #fde68a)" },
-  transferred: { label: "Đã chuyển đơn vị phù hợp", bg: "var(--color-blue-50, #eff6ff)", color: "var(--color-blue-700, #1d4ed8)", border: "var(--color-blue-200, #bfdbfe)" },
-  resolved: { label: "Đã có kết quả", bg: "var(--color-emerald-50, #ecfdf5)", color: "var(--color-emerald-800, #065f46)", border: "var(--color-emerald-200, #a7f3d0)" },
-  closed: { label: "Đã đóng", bg: "var(--color-slate-100, #f8fafc)", color: "var(--color-slate-600, #475569)", border: "var(--color-slate-200, #e2e8f0)" },
-  escalated: { label: "Đang được ưu tiên xem xét", bg: "var(--color-amber-50, #fffbeb)", color: "var(--color-amber-800, #92400e)", border: "var(--color-amber-200, #fde68a)" },
+const statusLabels: Record<
+  StudentTicket["status"],
+  { label: string; badgeClass: string }
+> = {
+  submitted: {
+    label: "Đã tiếp nhận",
+    badgeClass:
+      "border border-[var(--border-color)] bg-[var(--surface-subtle)] text-[var(--text-secondary)]",
+  },
+  queued: {
+    label: "Đã tiếp nhận",
+    badgeClass:
+      "border border-[var(--border-color)] bg-[var(--surface-subtle)] text-[var(--text-secondary)]",
+  },
+  claimed: {
+    label: "Đã chuyển cán bộ phụ trách",
+    badgeClass:
+      "border border-[var(--color-primary-subtle)] bg-[var(--color-primary-subtle)] text-[var(--color-primary)]",
+  },
+  in_progress: {
+    label: "Đang xử lý",
+    badgeClass:
+      "border border-[var(--color-primary-subtle)] bg-[var(--color-primary-subtle)] text-[var(--color-primary)]",
+  },
+  waiting_student: {
+    label: "Cần bạn bổ sung thông tin",
+    badgeClass:
+      "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/50",
+  },
+  transferred: {
+    label: "Đã chuyển đơn vị phù hợp",
+    badgeClass:
+      "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-900/50",
+  },
+  resolved: {
+    label: "Đã có kết quả",
+    badgeClass:
+      "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/50",
+  },
+  closed: {
+    label: "Đã đóng",
+    badgeClass:
+      "border border-[var(--border-color)] bg-[var(--surface-subtle)] text-[var(--text-secondary)]",
+  },
+  escalated: {
+    label: "Đang được ưu tiên xem xét",
+    badgeClass:
+      "bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/50",
+  },
 };
 
-export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }: TicketListProps) {
+export function TicketList({
+  tickets = [],
+  onSupplementInfo,
+  onFeedbackRating,
+}: TicketListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "resolved">("all");
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const update = () => setCompact(window.innerWidth < 768);
+    update(); window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "waiting" | "resolved">("all");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   // Additional info state
@@ -75,7 +135,7 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
         setTimeout(() => setCopiedCode(null), 3000);
       }
     } catch {
-      // Fallback ignore if clipboard not permitted
+      // Fallback
     }
   };
 
@@ -95,6 +155,7 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
   };
 
   const filteredTickets = tickets.filter((ticket) => {
+    if (filterStatus === "waiting") return ticket.status === "waiting_student";
     if (filterStatus === "active") {
       return ticket.status !== "resolved" && ticket.status !== "closed";
     }
@@ -105,44 +166,25 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
   });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div className="flex flex-col gap-6">
       {/* Accessible Live Region for Copy Feedback */}
       {copiedCode && (
         <div
           role="status"
           aria-live="polite"
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            backgroundColor: "var(--color-slate-900, #0f172a)",
-            color: "#ffffff",
-            padding: "8px 16px",
-            borderRadius: "var(--radius-md, 10px)",
-            fontSize: "13px",
-            boxShadow: "var(--shadow-md, 0 4px 6px -1px rgba(0,0,0,0.1))",
-            zIndex: 50,
-          }}
+          className="fixed bottom-5 right-5 z-50 rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2 text-xs font-medium text-[var(--text-primary)] shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200"
         >
           Đã sao chép mã {copiedCode} vào bộ nhớ tạm
         </div>
       )}
 
       {/* Header & Filter Controls */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "16px",
-        }}
-      >
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 style={{ margin: "0 0 6px 0", fontSize: "20px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)", letterSpacing: "-0.3px" }}>
+          <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
             Tra cứu & Theo dõi yêu cầu hỗ trợ (Một cửa số)
           </h2>
-          <p style={{ margin: 0, fontSize: "14px", color: "var(--color-slate-600, #475569)" }}>
+          <p className="mt-1 text-xs text-[var(--text-secondary)]">
             Theo dõi trạng thái và tiến độ xử lý hồ sơ hành chính, học vụ của bạn
           </p>
         </div>
@@ -151,31 +193,17 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
         <div
           role="group"
           aria-label="Lọc trạng thái yêu cầu"
-          style={{
-            display: "inline-flex",
-            backgroundColor: "var(--color-slate-100, #f1f5f9)",
-            padding: "4px",
-            borderRadius: "var(--radius-lg, 14px)",
-            gap: "4px",
-            border: "1px solid var(--color-slate-200, #e2e8f0)",
-          }}
+          className="inline-flex rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] p-1"
         >
           <button
             type="button"
             onClick={() => setFilterStatus("all")}
             aria-pressed={filterStatus === "all"}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "var(--radius-md, 10px)",
-              border: "none",
-              backgroundColor: filterStatus === "all" ? "#ffffff" : "transparent",
-              color: filterStatus === "all" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-700, #334155)",
-              fontWeight: filterStatus === "all" ? 600 : 500,
-              fontSize: "13px",
-              cursor: "pointer",
-              boxShadow: filterStatus === "all" ? "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))" : "none",
-              transition: "var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1))",
-            }}
+            className={`rounded-lg px-4 py-1.5 text-xs font-medium transition ${
+              filterStatus === "all"
+                ? "bg-[var(--surface-card)] font-semibold text-[var(--color-primary)] shadow-xs"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
           >
             Tất cả ({tickets.length})
           </button>
@@ -183,80 +211,59 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
             type="button"
             onClick={() => setFilterStatus("active")}
             aria-pressed={filterStatus === "active"}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "var(--radius-md, 10px)",
-              border: "none",
-              backgroundColor: filterStatus === "active" ? "#ffffff" : "transparent",
-              color: filterStatus === "active" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-700, #334155)",
-              fontWeight: filterStatus === "active" ? 600 : 500,
-              fontSize: "13px",
-              cursor: "pointer",
-              boxShadow: filterStatus === "active" ? "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))" : "none",
-              transition: "var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1))",
-            }}
+            className={`rounded-lg px-4 py-1.5 text-xs font-medium transition ${
+              filterStatus === "active"
+                ? "bg-[var(--surface-card)] font-semibold text-[var(--color-primary)] shadow-xs"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
           >
             Đang xử lý
           </button>
           <button
             type="button"
+            aria-pressed={filterStatus === "waiting"}
+            onClick={() => setFilterStatus("waiting")}
+            className={`rounded-lg px-4 py-1.5 text-xs font-medium transition ${
+              filterStatus === "waiting"
+                ? "bg-[var(--surface-card)] font-semibold text-[var(--color-primary)] shadow-xs"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            Cần bổ sung
+          </button>
+          <button
+            type="button"
             onClick={() => setFilterStatus("resolved")}
             aria-pressed={filterStatus === "resolved"}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "var(--radius-md, 10px)",
-              border: "none",
-              backgroundColor: filterStatus === "resolved" ? "#ffffff" : "transparent",
-              color: filterStatus === "resolved" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-700, #334155)",
-              fontWeight: filterStatus === "resolved" ? 600 : 500,
-              fontSize: "13px",
-              cursor: "pointer",
-              boxShadow: filterStatus === "resolved" ? "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))" : "none",
-              transition: "var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1))",
-            }}
+            className={`rounded-lg px-4 py-1.5 text-xs font-medium transition ${
+              filterStatus === "resolved"
+                ? "bg-[var(--surface-card)] font-semibold text-[var(--color-primary)] shadow-xs"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
           >
             Đã hoàn thành
           </button>
         </div>
       </div>
 
+      <div className="campus-record-stats" aria-label="Thống kê hồ sơ">{[
+        ["Tổng hồ sơ", tickets.length], ["Đang xử lý", tickets.filter(ticket => !["resolved", "closed", "waiting_student"].includes(ticket.status)).length], ["Cần bổ sung", tickets.filter(ticket => ticket.status === "waiting_student").length], ["Đã hoàn thành", tickets.filter(ticket => ["resolved", "closed"].includes(ticket.status)).length],
+      ].map(([label, count]) => <div key={label}><span>{label}</span><strong>{count}</strong></div>)}</div>
+      {!compact && filteredTickets.length > 0 && <div className="campus-record-table-wrap"><table className="campus-record-table"><caption className="sr-only">Danh sách hồ sơ sinh viên</caption><thead><tr><th scope="col">Mã hồ sơ / Dịch vụ</th><th scope="col">Ngày gửi</th><th scope="col">Trạng thái</th><th scope="col">Thao tác</th></tr></thead><tbody>{filteredTickets.map(ticket => <tr key={ticket.id}><td><div className="flex items-center gap-2"><strong>{ticket.code}</strong><button type="button" aria-label={`Sao chép mã ${ticket.code}`} onClick={() => handleCopyCode(ticket.code)}><Copy size={14} /></button></div><span>{ticket.title}</span><small>{ticket.category}</small>{ticket.nextAction && <p className="mt-2 text-amber-700 dark:text-amber-300">{ticket.nextAction}</p>}</td><td>{ticket.createdAt}{ticket.updatedAt && <small>Cập nhật: {ticket.updatedAt}</small>}</td><td><span className={`campus-record-status ${statusLabels[ticket.status]?.badgeClass}`}>{statusLabels[ticket.status]?.label}</span></td><td><button type="button" className="fluent-btn-secondary" aria-label={`Chi tiết ${ticket.code}`} aria-expanded={expandedId === ticket.id} aria-controls={`ticket-detail-${ticket.id}`} onClick={() => toggleDetail(ticket.id)}>{expandedId === ticket.id ? "Thu gọn" : ticket.status === "waiting_student" ? "Bổ sung hồ sơ" : "Xem chi tiết"}</button></td></tr>)}</tbody></table></div>}
       {/* Ticket List View */}
       {tickets.length === 0 ? (
         <div
           role="status"
-          style={{
-            padding: "54px 24px",
-            textAlign: "center",
-            color: "var(--color-slate-600, #475569)",
-            backgroundColor: "#ffffff",
-            borderRadius: "var(--radius-xl, 20px)",
-            border: "1.5px dashed var(--color-slate-300, #cbd5e1)",
-            boxShadow: "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "12px",
-          }}
+          className="campus-empty-state flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[var(--border-color)] bg-[var(--surface-card)] py-14 px-6 text-center text-[var(--text-secondary)] shadow-xs"
         >
-          <div
-            style={{
-              width: "56px",
-              height: "56px",
-              borderRadius: "50%",
-              backgroundColor: "var(--color-slate-100, #f1f5f9)",
-              color: "var(--color-slate-500, #64748b)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ClipboardListIcon size={28} />
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-secondary)]">
+            <ClipboardList className="h-7 w-7" />
           </div>
           <div>
-            <p style={{ margin: "0 0 6px 0", fontSize: "16px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+            <p className="mb-1 text-base font-bold text-[var(--text-primary)]">
               Bạn chưa có yêu cầu hỗ trợ nào.
             </p>
-            <p style={{ margin: 0, fontSize: "14px", color: "var(--color-slate-500, #64748b)" }}>
+            <p className="text-xs text-[var(--text-secondary)]">
               Các phiếu hỗ trợ một cửa số sau khi tạo sẽ hiển thị tại đây.
             </p>
           </div>
@@ -264,20 +271,13 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
       ) : filteredTickets.length === 0 ? (
         <div
           role="status"
-          style={{
-            padding: "40px 24px",
-            textAlign: "center",
-            color: "var(--color-slate-600, #475569)",
-            backgroundColor: "#ffffff",
-            borderRadius: "var(--radius-xl, 20px)",
-            border: "1px solid var(--color-slate-200, #e2e8f0)",
-          }}
+          className="rounded-2xl border border-[var(--border-color)] bg-[var(--surface-card)] py-10 px-6 text-center text-xs text-[var(--text-secondary)]"
         >
           Không có kết quả phù hợp với bộ lọc đã chọn.
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          {filteredTickets.map((ticket) => {
+        <div className="flex flex-col gap-4">
+          {filteredTickets.filter(ticket => compact || ticket.id === expandedId).map((ticket) => {
             const isExpanded = expandedId === ticket.id;
             const badge = statusLabels[ticket.status] || statusLabels.submitted;
             const detailId = `ticket-detail-${ticket.id}`;
@@ -291,90 +291,40 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
             return (
               <article
                 key={ticket.id}
-                style={{
-                  border: "1px solid var(--color-slate-200, #e2e8f0)",
-                  borderRadius: "var(--radius-lg, 14px)",
-                  padding: "20px 24px",
-                  backgroundColor: "#ffffff",
-                  boxShadow: "var(--shadow-ambient, 0 1px 3px rgba(15,23,42,0.04), 0 8px 24px -4px rgba(15,23,42,0.06))",
-                  transition: "var(--transition-spring, 220ms cubic-bezier(0.16, 1, 0.3, 1))",
-                }}
+                data-expanded={isExpanded}
+                className="campus-ticket-card overflow-hidden fluent-card p-5 transition hover:border-[var(--color-primary-subtle)] sm:p-6"
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    flexWrap: "wrap",
-                    gap: "14px",
-                  }}
-                >
-                  <div style={{ flex: 1, minWidth: "260px" }}>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "8px", flexWrap: "wrap" }}>
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          fontWeight: 700,
-                          color: "var(--color-primary, #1e3a8a)",
-                          backgroundColor: "var(--color-primary-light, #eff6ff)",
-                          padding: "3px 8px",
-                          borderRadius: "var(--radius-sm, 6px)",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "6px",
-                        }}
-                      >
+                {compact && <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="min-w-[260px] flex-1">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--color-primary-subtle)] px-2 py-0.5 text-xs font-bold text-[var(--color-primary)]">
                         <span>{ticket.code}</span>
                         <button
                           type="button"
                           onClick={() => handleCopyCode(ticket.code)}
                           aria-label={`Sao chép mã ${ticket.code}`}
                           title={`Sao chép mã ${ticket.code}`}
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            cursor: "pointer",
-                            padding: "0 2px",
-                            fontSize: "11px",
-                            color: "var(--color-primary, #1e3a8a)",
-                          }}
+                          className="cursor-pointer text-[var(--color-primary)] hover:opacity-80"
                         >
                           📋
                         </button>
                       </span>
                       <span
-                        style={{
-                          fontSize: "12px",
-                          padding: "3px 10px",
-                          borderRadius: "var(--radius-full, 9999px)",
-                          backgroundColor: badge.bg,
-                          color: badge.color,
-                          border: `1px solid ${badge.border}`,
-                          fontWeight: 600,
-                        }}
+                        className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badge.badgeClass}`}
                       >
                         {badge.label}
                       </span>
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          color: "var(--color-slate-600, #475569)",
-                          backgroundColor: "var(--color-slate-100, #f1f5f9)",
-                          padding: "3px 10px",
-                          borderRadius: "var(--radius-sm, 6px)",
-                          fontWeight: 500,
-                        }}
-                      >
+                      <span className="rounded-md bg-[var(--surface-subtle)] border border-[var(--border-color)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
                         {ticket.category}
                       </span>
                     </div>
 
-                    <h3 style={{ margin: "6px 0 6px 0", fontSize: "17px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+                    <h3 className="my-1.5 text-base font-bold text-[var(--text-primary)] sm:text-lg">
                       {ticket.title}
                     </h3>
 
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--color-slate-600, #475569)", flexWrap: "wrap" }}>
-                      <ClockIcon size={13} style={{ color: "var(--color-slate-400, #94a3b8)" }} />
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-secondary)]">
+                      <Clock className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
                       <span>Ngày gửi: {ticket.createdAt}</span>
                       {ticket.updatedAt && (
                         <span>· Cập nhật: {ticket.updatedAt}</span>
@@ -383,22 +333,12 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
 
                     {/* Next Action Callout for Student Ownership */}
                     {ticket.nextAction && (
-                      <div
-                        style={{
-                          marginTop: "12px",
-                          padding: "10px 14px",
-                          borderRadius: "var(--radius-md, 10px)",
-                          backgroundColor: "var(--color-amber-50, #fffbeb)",
-                          border: "1px solid var(--color-amber-200, #fde68a)",
-                          color: "var(--color-amber-900, #78350f)",
-                          fontSize: "13px",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: "8px",
-                        }}
-                      >
-                        <span style={{ fontWeight: 600 }}>Cần thực hiện:</span>
-                        <span>{ticket.nextAction}</span>
+                      <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300">
+                        <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                        <div>
+                          <span className="font-semibold">Cần thực hiện:</span>{" "}
+                          <span>{ticket.nextAction}</span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -408,88 +348,59 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
                     onClick={() => toggleDetail(ticket.id)}
                     aria-expanded={isExpanded}
                     aria-controls={detailId}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "var(--radius-md, 10px)",
-                      border: "1px solid var(--color-slate-300, #cbd5e1)",
-                      backgroundColor: isExpanded ? "var(--color-slate-100, #f1f5f9)" : "#ffffff",
-                      cursor: "pointer",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "var(--color-slate-800, #1e293b)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      boxShadow: "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))",
-                      transition: "var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1))",
-                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-xs font-semibold shadow-xs transition ${
+                      isExpanded
+                        ? "border-[var(--border-color)] bg-[var(--surface-subtle)] text-[var(--text-primary)]"
+                        : "fluent-btn-secondary"
+                    }`}
                   >
                     <span>{isExpanded ? "Thu gọn" : "Chi tiết"}</span>
-                    <span style={{ fontSize: "10px", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 150ms ease" }}>
-                      ▼
-                    </span>
+                    {isExpanded ? (
+                      <ChevronUp className="h-3.5 w-3.5" />
+                    ) : (
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    )}
                   </button>
-                </div>
+                </div>}
 
                 {isExpanded && (
                   <div
                     id={detailId}
-                    style={{
-                      marginTop: "16px",
-                      paddingTop: "16px",
-                      borderTop: "1px solid var(--color-slate-200, #e2e8f0)",
-                      fontSize: "14px",
-                      backgroundColor: "var(--color-slate-50, #f8fafc)",
-                      padding: "16px 20px",
-                      borderRadius: "var(--radius-md, 10px)",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "16px",
-                    }}
+                    className="mt-4 flex flex-col gap-4 rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] p-4 text-xs sm:p-5"
                   >
                     <div>
-                      <p style={{ margin: "0 0 6px 0", fontWeight: 600, fontSize: "13px", color: "var(--color-slate-800, #1e293b)" }}>
+                      <p className="mb-1.5 font-semibold text-[var(--text-primary)]">
                         Nội dung yêu cầu chi tiết:
                       </p>
-                      <p style={{ margin: 0, color: "var(--color-slate-700, #334155)", lineHeight: 1.6 }}>
+                      <p className="leading-relaxed text-[var(--text-secondary)]">
                         {ticket.description}
                       </p>
                     </div>
 
                     {/* Interactive Supplement Form for waiting_student */}
                     {isWaiting && (
-                      <div
-                        style={{
-                          backgroundColor: "#fffbeb",
-                          border: "1.5px solid #fde68a",
-                          padding: "14px 16px",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/60 dark:bg-amber-950/30">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
                           <div>
-                            <div style={{ fontWeight: 700, color: "#92400e", fontSize: "13px" }}>
+                            <div className="font-bold text-amber-900 dark:text-amber-200">
                               ⚠️ Cán bộ đang chờ bạn bổ sung thông tin hồ sơ
                             </div>
-                            <div style={{ fontSize: "12px", color: "#b45309", marginTop: "2px" }}>
-                              {ticket.nextAction || "Vui lòng phản hồi sớm để quy trình tiếp tục xử lý."}
+                            <div className="mt-0.5 text-amber-800 dark:text-amber-400">
+                              {ticket.nextAction ||
+                                "Vui lòng phản hồi sớm để quy trình tiếp tục xử lý."}
                             </div>
                           </div>
 
                           {!alreadySupplied && !hasSupplementForm && (
                             <button
                               type="button"
-                              onClick={() => setIsSupplementOpen((prev) => ({ ...prev, [ticket.id]: true }))}
-                              style={{
-                                padding: "8px 16px",
-                                borderRadius: "8px",
-                                border: "none",
-                                backgroundColor: "#d97706",
-                                color: "#ffffff",
-                                fontWeight: 600,
-                                fontSize: "13px",
-                                cursor: "pointer",
-                              }}
+                              onClick={() =>
+                                setIsSupplementOpen((prev) => ({
+                                  ...prev,
+                                  [ticket.id]: true,
+                                }))
+                              }
+                              className="rounded-lg bg-amber-600 px-3.5 py-1.5 font-semibold text-white shadow-xs transition hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600"
                             >
                               Bổ sung thông tin theo yêu cầu
                             </button>
@@ -497,57 +408,42 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
                         </div>
 
                         {alreadySupplied && (
-                          <div style={{ marginTop: "10px", fontSize: "13px", color: "#047857", fontWeight: 600 }}>
+                          <div className="mt-2.5 font-semibold text-emerald-700 dark:text-emerald-400">
                             ✓ Bạn đã gửi bổ sung thông tin. Cán bộ Một cửa đang tiến hành thẩm định.
                           </div>
                         )}
 
                         {hasSupplementForm && (
-                          <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                          <div className="mt-3 flex flex-col gap-2.5">
                             <textarea
                               rows={3}
                               placeholder="Nhập nội dung phản hồi hoặc làm rõ thông tin theo yêu cầu cán bộ..."
                               value={supplementTexts[ticket.id] || ""}
                               onChange={(e) =>
-                                setSupplementTexts((prev) => ({ ...prev, [ticket.id]: e.target.value }))
+                                setSupplementTexts((prev) => ({
+                                  ...prev,
+                                  [ticket.id]: e.target.value,
+                                }))
                               }
-                              style={{
-                                width: "100%",
-                                padding: "10px 12px",
-                                borderRadius: "8px",
-                                border: "1px solid #cbd5e1",
-                                fontSize: "13px",
-                                boxSizing: "border-box",
-                              }}
+                              className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] p-2.5 text-xs text-[var(--text-primary)] focus:border-amber-500 focus:outline-none"
                             />
-                            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                            <div className="flex justify-end gap-2">
                               <button
                                 type="button"
-                                onClick={() => setIsSupplementOpen((prev) => ({ ...prev, [ticket.id]: false }))}
-                                style={{
-                                  padding: "6px 14px",
-                                  borderRadius: "6px",
-                                  border: "1px solid #cbd5e1",
-                                  backgroundColor: "#ffffff",
-                                  fontSize: "13px",
-                                  cursor: "pointer",
-                                }}
+                                onClick={() =>
+                                  setIsSupplementOpen((prev) => ({
+                                    ...prev,
+                                    [ticket.id]: false,
+                                  }))
+                                }
+                                className="fluent-btn-secondary text-xs"
                               >
                                 Đóng
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleSubmitSupplement(ticket.id)}
-                                style={{
-                                  padding: "6px 16px",
-                                  borderRadius: "6px",
-                                  border: "none",
-                                  backgroundColor: "#d97706",
-                                  color: "#ffffff",
-                                  fontWeight: 600,
-                                  fontSize: "13px",
-                                  cursor: "pointer",
-                                }}
+                                className="rounded-md bg-amber-600 px-3.5 py-1 font-semibold text-white transition hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600"
                               >
                                 Gửi bổ sung cho cán bộ
                               </button>
@@ -559,45 +455,40 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
 
                     {/* CSAT Satisfaction Rating for Resolved / Closed tickets */}
                     {isDone && (
-                      <div
-                        style={{
-                          backgroundColor: "#f0fdf4",
-                          border: "1.5px solid #bbf7d0",
-                          padding: "14px 18px",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: 700, color: "#166534" }}>
+                      <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 dark:border-emerald-900/60 dark:bg-emerald-950/30">
+                        <h4 className="mb-1 font-bold text-emerald-900 dark:text-emerald-200">
                           ⭐ Đánh giá mức độ hài lòng về kết quả xử lý
                         </h4>
-                        <p style={{ margin: "0 0 10px 0", fontSize: "12px", color: "#15803d" }}>
+                        <p className="mb-2.5 text-emerald-800 dark:text-emerald-400">
                           Ý kiến của bạn giúp Nhà trường không ngừng nâng cao chất lượng dịch vụ Một cửa số.
                         </p>
 
                         {isRated ? (
-                          <div style={{ color: "#15803d", fontWeight: 600, fontSize: "13px" }}>
+                          <div className="font-semibold text-emerald-700 dark:text-emerald-400">
                             ✓ Cảm ơn bạn đã gửi đánh giá! Nhà trường đã ghi nhận phản hồi của bạn.
                           </div>
                         ) : (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                              <span style={{ fontSize: "13px", fontWeight: 600, color: "#166534" }}>Chọn số sao:</span>
+                          <div className="flex flex-col gap-2.5">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-semibold text-emerald-900 dark:text-emerald-300">
+                                Chọn số sao:
+                              </span>
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <button
                                   key={star}
                                   type="button"
-                                  onClick={() => setRatings((prev) => ({ ...prev, [ticket.id]: star }))}
+                                  onClick={() =>
+                                    setRatings((prev) => ({
+                                      ...prev,
+                                      [ticket.id]: star,
+                                    }))
+                                  }
                                   aria-label={`${star} sao`}
-                                  style={{
-                                    padding: "4px 8px",
-                                    borderRadius: "6px",
-                                    border: star === currentRating ? "1px solid #16a34a" : "1px solid #cbd5e1",
-                                    backgroundColor: star <= currentRating ? "#fef08a" : "#ffffff",
-                                    cursor: "pointer",
-                                    fontSize: "13px",
-                                    fontWeight: 700,
-                                    color: "#854d0e",
-                                  }}
+                                  className={`rounded-md px-2.5 py-1 font-bold transition ${
+                                    star <= currentRating
+                                      ? "border border-amber-300 bg-amber-100 text-amber-900 dark:border-amber-700 dark:bg-amber-950/80 dark:text-amber-200"
+                                      : "border border-[var(--border-color)] bg-[var(--surface-card)] text-[var(--text-secondary)]"
+                                  }`}
                                 >
                                   ★ {star}
                                 </button>
@@ -609,32 +500,18 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
                               placeholder="Ý kiến đóng góp cải tiến chất lượng phục vụ (không bắt buộc)..."
                               value={comments[ticket.id] || ""}
                               onChange={(e) =>
-                                setComments((prev) => ({ ...prev, [ticket.id]: e.target.value }))
+                                setComments((prev) => ({
+                                  ...prev,
+                                  [ticket.id]: e.target.value,
+                                }))
                               }
-                              style={{
-                                width: "100%",
-                                padding: "8px 12px",
-                                borderRadius: "8px",
-                                border: "1px solid #cbd5e1",
-                                fontSize: "13px",
-                                boxSizing: "border-box",
-                              }}
+                              className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] p-2 text-xs text-[var(--text-primary)] focus:border-emerald-500 focus:outline-none"
                             />
 
                             <button
                               type="button"
                               onClick={() => handleSubmitFeedback(ticket.id)}
-                              style={{
-                                alignSelf: "flex-start",
-                                padding: "6px 16px",
-                                borderRadius: "6px",
-                                border: "none",
-                                backgroundColor: "#16a34a",
-                                color: "#ffffff",
-                                fontWeight: 600,
-                                fontSize: "13px",
-                                cursor: "pointer",
-                              }}
+                              className="self-start rounded-md bg-emerald-600 px-3.5 py-1.5 font-semibold text-white transition hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
                             >
                               Gửi đánh giá
                             </button>
@@ -645,14 +522,16 @@ export function TicketList({ tickets = [], onSupplementInfo, onFeedbackRating }:
 
                     {/* Ordered Public Event History (No Internal Notes) */}
                     {ticket.events && ticket.events.length > 0 && (
-                      <div style={{ borderTop: "1px dashed var(--color-slate-200, #e2e8f0)", paddingTop: "12px" }}>
-                        <h4 style={{ margin: "0 0 8px 0", fontSize: "13px", fontWeight: 700, color: "var(--color-slate-800, #1e293b)" }}>
+                      <div className="border-t border-dashed border-[var(--border-color)] pt-3">
+                        <h4 className="mb-2 font-bold text-[var(--text-primary)]">
                           Lịch sử xử lý công khai:
                         </h4>
-                        <ol style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <ol className="flex flex-col gap-1.5 pl-4 text-[var(--text-secondary)]">
                           {ticket.events.map((evt) => (
-                            <li key={evt.id} style={{ fontSize: "13px", color: "var(--color-slate-700, #334155)", lineHeight: 1.5 }}>
-                              <span style={{ fontWeight: 600, color: "var(--color-slate-900, #0f172a)" }}>{evt.timestamp}</span>
+                            <li key={evt.id} className="leading-relaxed">
+                              <span className="font-semibold text-[var(--text-primary)]">
+                                {evt.timestamp}
+                              </span>
                               {evt.actor && <span> ({evt.actor})</span>}
                               <span>: </span>
                               <span>{evt.description}</span>

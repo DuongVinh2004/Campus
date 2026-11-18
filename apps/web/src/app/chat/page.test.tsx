@@ -17,6 +17,15 @@ afterEach(() => {
 });
 
 describe("ChatPage Authentication & Session Boundary (TASK-WEB-AUTH-002)", () => {
+  it("preserves a toolbar search as an editable draft without sending automatically", async () => {
+    window.history.replaceState(null, "", "/chat?q=H%E1%BB%8Dc%20ph%C3%AD");
+    const fetcher = vi.spyOn(globalThis, "fetch");
+    render(<ChatPage />);
+    await waitFor(() => expect((screen.getByLabelText("Đặt câu hỏi") as HTMLTextAreaElement).value).toBe("Học phí"));
+    expect(fetcher).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText("Đặt câu hỏi"), { target: { value: "Học phí K67" } });
+    expect((screen.getByLabelText("Đặt câu hỏi") as HTMLTextAreaElement).value).toBe("Học phí K67");
+  });
   beforeEach(() => {
     vi.restoreAllMocks();
   });
@@ -79,7 +88,7 @@ describe("ChatPage Authentication & Session Boundary (TASK-WEB-AUTH-002)", () =>
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => ({ id: "conv-123" }),
+        json: async () => ({ id: "01923456-789a-7def-8123-456789abcdef" }),
       } as unknown as Response)
       // Stream call fails with 401
       .mockResolvedValueOnce({
@@ -99,6 +108,32 @@ describe("ChatPage Authentication & Session Boundary (TASK-WEB-AUTH-002)", () =>
     await waitFor(() => {
       expect(screen.getByText(/Phiên đăng nhập đã hết hạn/i)).toBeDefined();
     });
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(globalThis.fetch).mock.calls[1][0]).toContain("/v1/conversations/01923456-789a-7def-8123-456789abcdef/messages:stream");
+  });
+
+  it("tells the student the system is busy when admission control refuses the turn (503 + Retry-After)", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: "01923456-789a-7def-8123-456789abcdef" }),
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        headers: new Headers({ "Retry-After": "5" }),
+        json: async () => ({ code: "DEPENDENCY_UNAVAILABLE", retryable: true }),
+      } as unknown as Response);
+
+    render(<ChatPage />);
+    fireEvent.change(screen.getByLabelText(/Đặt câu hỏi/i), { target: { value: "Xin chào" } });
+    fireEvent.click(screen.getByRole("button", { name: /Gửi/i }));
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/Hệ thống đang bận, thử lại sau ít giây/i).length).toBeGreaterThan(0);
+    });
+    expect(screen.queryByText(/Phiên đăng nhập đã hết hạn/i)).toBeNull();
   });
 });
 

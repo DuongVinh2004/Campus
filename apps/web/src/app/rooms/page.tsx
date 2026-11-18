@@ -1,13 +1,17 @@
 "use client";
+import { CAMPUS_API_BASE_URL } from "@/lib/api/base-url";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { AppShell } from "../../components/AppShell";
 import { RoomBooking, type RoomSlot } from "../../features/rooms/RoomBooking";
 import { AsyncState, type AsyncStatus } from "../../components/AsyncState";
-import { CheckCircle2Icon, AlertTriangleIcon, XIcon } from "../../components/Icons";
+import { CheckCircle2, AlertTriangle, X } from "lucide-react";
 import { ApiClient, ApiClientError } from "../../lib/api/client";
+import { UnavailableStudentSurface } from "../../features/assistance/UnavailableStudentSurface";
+import { RoomFinder } from "../../features/rooms/RoomFinder";
+import { OPS_ENABLED } from "../../lib/campus-ops-api";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = CAMPUS_API_BASE_URL;
 
 interface RoomApiResponse {
   items: Array<{
@@ -28,7 +32,22 @@ interface RoomBookingApiResponse {
   time_slot?: string;
 }
 
+function OpsRoomsPage() {
+  return (
+    <AppShell activeNav="rooms">
+      <div className="campus-page space-y-6">
+        <RoomFinder />
+      </div>
+    </AppShell>
+  );
+}
+
 export default function RoomsPage() {
+  if (OPS_ENABLED) return <OpsRoomsPage />;
+  return process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true" || process.env.NEXT_PUBLIC_UNIFIED_AI === "true" ? <UnavailableStudentSurface kind="rooms" /> : <LegacyRoomsPage />;
+}
+
+function LegacyRoomsPage() {
   const [rooms, setRooms] = useState<RoomSlot[]>([]);
   const [status, setStatus] = useState<AsyncStatus>("loading");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -72,7 +91,12 @@ export default function RoomsPage() {
       setStatus("success");
     } catch (err: unknown) {
       // Fail honestly: NEVER fabricate demo rooms or fake availability!
-      if (err instanceof ApiClientError && (err.problem.code === "TIMEOUT" || err.problem.status === 0 || err.problem.status === 504)) {
+      if (
+        err instanceof ApiClientError &&
+        (err.problem.code === "TIMEOUT" ||
+          err.problem.status === 0 ||
+          err.problem.status === 504)
+      ) {
         setRooms((prev) => {
           if (prev.length > 0) {
             setStatus("stale");
@@ -125,7 +149,11 @@ export default function RoomsPage() {
         setRooms((prev) =>
           prev.map((r) =>
             r.id === roomId
-              ? { ...r, isAvailable: false, conflictReason: "Bạn đã đăng ký phòng này thành công" }
+              ? {
+                  ...r,
+                  isAvailable: false,
+                  conflictReason: "Bạn đã đăng ký phòng này thành công",
+                }
               : r
           )
         );
@@ -170,66 +198,37 @@ export default function RoomsPage() {
 
   return (
     <AppShell activeNav="rooms">
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "8px 0" }}>
-        <header style={{ marginBottom: "24px" }}>
-          <h1
-            style={{
-              fontSize: "24px",
-              fontWeight: 800,
-              margin: "0 0 6px 0",
-              color: "var(--color-slate-900, #0f172a)",
-            }}
-          >
-            Đăng ký và mượn phòng học
-          </h1>
-          <p style={{ margin: 0, fontSize: "14px", color: "var(--color-slate-500, #64748b)" }}>
-            Tra cứu phòng học trống, phòng tự học và hội trường phục vụ hoạt động sinh viên HUCE
-          </p>
+      <div className="campus-page">
+        <header className="campus-page-heading mb-6">
+          <div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-3xl">
+              Đăng ký và mượn phòng học
+            </h1>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              Tra cứu phòng học trống, phòng tự học và đăng ký mượn phòng phục vụ học nhóm, câu lạc bộ
+            </p>
+          </div>
         </header>
 
         {/* Honest Feedback Banners: Success, Result-Unknown, No-Effect Failure */}
         {bookingNotice && (
           <div
             role={bookingNotice.type === "success" ? "status" : "alert"}
-            style={{
-              padding: "14px 18px",
-              marginBottom: "20px",
-              backgroundColor:
-                bookingNotice.type === "success"
-                  ? "#f0fdf4"
-                  : bookingNotice.type === "result_unknown"
-                  ? "#fffbeb"
-                  : "#fef2f2",
-              border: `1px solid ${
-                bookingNotice.type === "success"
-                  ? "#bbf7d0"
-                  : bookingNotice.type === "result_unknown"
-                  ? "#fde68a"
-                  : "#fecaca"
-              }`,
-              borderRadius: "var(--radius-md, 8px)",
-              color:
-                bookingNotice.type === "success"
-                  ? "#15803d"
-                  : bookingNotice.type === "result_unknown"
-                  ? "#92400e"
-                  : "#991b1b",
-              fontSize: "14px",
-              fontWeight: 500,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              boxShadow: "var(--shadow-xs)",
-              lineHeight: 1.5,
-            }}
+            className={`mb-5 flex items-center justify-between gap-3 rounded-xl border p-4 text-xs font-semibold shadow-xs ${
+              bookingNotice.type === "success"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300"
+                : bookingNotice.type === "result_unknown"
+                ? "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300"
+                : "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300"
+            }`}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div className="flex items-center gap-2.5">
               {bookingNotice.type === "success" ? (
-                <CheckCircle2Icon size={18} />
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <AlertTriangleIcon size={18} />
+                <AlertTriangle className="h-4 w-4 shrink-0" />
               )}
-              <span>
+              <span className="leading-relaxed">
                 <strong>
                   {bookingNotice.type === "success"
                     ? "[✓] Thành công: "
@@ -243,18 +242,10 @@ export default function RoomsPage() {
             <button
               type="button"
               onClick={() => setBookingNotice(null)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "inherit",
-                padding: "4px",
-                display: "flex",
-                alignItems: "center",
-              }}
+              className="rounded-lg p-1 transition hover:bg-black/5 dark:hover:bg-white/10"
               aria-label="Đóng thông báo"
             >
-              <XIcon size={16} />
+              <X className="h-4 w-4" />
             </button>
           </div>
         )}

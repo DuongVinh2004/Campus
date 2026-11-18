@@ -17,7 +17,7 @@ export function Skeleton({
 }: SkeletonProps) {
   return (
     <div
-      className={`skeleton ${className}`}
+      className={`animate-pulse bg-slate-200 dark:bg-slate-700 rounded ${className}`}
       aria-hidden="true"
       style={{
         width,
@@ -32,17 +32,16 @@ export function Skeleton({
 export function SkeletonCard() {
   return (
     <div
-      className="card"
-      style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}
+      className="p-5 flex flex-col gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl"
       aria-hidden="true"
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div className="flex justify-between items-center">
         <Skeleton width="60%" height="20px" borderRadius="6px" />
         <Skeleton width="80px" height="24px" borderRadius="9999px" />
       </div>
       <Skeleton width="100%" height="14px" />
       <Skeleton width="85%" height="14px" />
-      <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
+      <div className="flex gap-2 mt-1">
         <Skeleton width="100px" height="32px" borderRadius="8px" />
         <Skeleton width="100px" height="32px" borderRadius="8px" />
       </div>
@@ -52,7 +51,7 @@ export function SkeletonCard() {
 
 export function SkeletonList({ count = 3 }: { count?: number }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }} aria-busy="true" aria-label="Đang tải dữ liệu...">
+    <div className="flex flex-col gap-4" aria-busy="true" aria-label="Đang tải dữ liệu...">
       {Array.from({ length: count }, (_, i) => (
         <SkeletonCard key={`skel-${i}`} />
       ))}

@@ -8,7 +8,9 @@ import Link from "next/link";
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { AppShell } from "../../components/AppShell";
-import { ChatPanel, type ChatMessage } from "../../features/chat/ChatPanel";
+import { type ChatMessage } from "../../features/chat/ChatPanel";
+import { type FeedbackRating } from "../../features/chat/AnswerFeedback";
+import { RouteDraftChatPanel, type DraftSendLifecycle } from "../../features/chat/route-drafts";
 import { CitationDrawer, type CitationItem } from "../../features/chat/CitationDrawer";
 import { AsyncState, type AsyncStatus } from "../../components/AsyncState";
 import { FileText } from "lucide-react";
@@ -21,15 +23,18 @@ import { assistantClientId } from "../../lib/assistant-state-service";
 import { useOptionalUnifiedAssistant } from "@/lib/unified-assistant-runtime";
 import { UnifiedAssistantWorkspace } from "@/features/assistance/UnifiedAssistantWorkspace";
 
+const BUSY_GUIDANCE = "Hệ thống đang bận, thử lại sau ít giây. Câu hỏi của bạn chưa được gửi đi.";
+
 const API_BASE_URL = CAMPUS_API_BASE_URL;
 const MULTI_AGENT = process.env.NEXT_PUBLIC_MULTI_AGENT === "true";
 const UUID7 = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-function rememberConversation(id: string | null) {
+function rememberConversation(id: string | null, mode: "push" | "replace" = "replace") {
   const url = new URL(window.location.href);
   if (id && UUID7.test(id)) url.searchParams.set("conversation_id", id);
   else url.searchParams.delete("conversation_id");
-  window.history.replaceState(window.history.state, "", url);
+  url.searchParams.delete("q");
+  if (url.href !== window.location.href) window.history[mode === "push" ? "pushState" : "replaceState"](window.history.state, "", url);
 }
 
 function citationItems(citations: StreamCitation[], conversationId?: string | null, messageId?: string | null): CitationItem[] {
@@ -54,6 +59,7 @@ function UnifiedChatPage() {
 }
 
 function ExistingChatPage() {
+  const [initialDraft, setInitialDraft] = useState("");
   const [certificateIntent, setCertificateIntent] = useState(false);
   const [certificateOpen, setCertificateOpen] = useState(false);
   const [certificateError, setCertificateError] = useState("");
@@ -66,6 +72,8 @@ function ExistingChatPage() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [historyRevision, setHistoryRevision] = useState(0);
+  const [historyTarget, setHistoryTarget] = useState<string | null | undefined>(undefined);
+  const [restoreRevision, setRestoreRevision] = useState(0);
 
   // Persistent conversation ID for the active session
   const conversationIdRef = useRef<string | null>(null);
@@ -75,15 +83,52 @@ function ExistingChatPage() {
   const citationSetsRef = useRef<Record<string, CitationItem[]>>({});
   const historyControllerRef = useRef<AbortController | null>(null);
   const historyBlockedRef = useRef(false);
+  const unlistedConversationRef = useRef(false);
   const waitingRunRef = useRef<string | null>(null);
   const [waitingClarification, setWaitingClarification] = useState(false);
 
+  /** Rates a saved answer. Only answers the server has stored (their id is the server's message id) can be rated. */
+  const submitFeedback = useCallback(async (answerId: string, rating: FeedbackRating) => {
+    const conversationId = conversationIdRef.current;
+    if (!conversationId || !UUID7.test(conversationId) || !UUID7.test(answerId)) throw new Error("Answer is not stored yet");
+    const response = await fetch(`${API_BASE_URL}/v1/conversations/${conversationId}/messages/${answerId}/feedback`, {
+      method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rating: rating === "helpful" ? "HELPFUL" : "NOT_HELPFUL", client_id: assistantClientId() }),
+    });
+    if (!response.ok) throw new Error("Feedback was not saved");
+  }, []);
+
+  const switchConversation = useCallback((id: string | null, navigate = true) => {
+    attemptRef.current = null;
+    const previousStream = controllerRef.current; controllerRef.current = null;
+    const previousHistory = historyControllerRef.current; historyControllerRef.current = null;
+    previousStream?.abort(); previousHistory?.abort();
+    historyBlockedRef.current = id !== null;
+    conversationIdRef.current = null; sequenceRef.current = 0; citationSetsRef.current = {};
+    waitingRunRef.current = null;
+    setWaitingClarification(false); setIsStreaming(false); setMessages([]); setCitations([]); setIsDrawerOpen(false);
+    setCertificateIntent(false); setCertificateError(""); setServiceIntent(null);
+    setActiveConversationId(id); setHistoryTarget(id); setRestoreRevision(value => value + 1);
+    setInitialDraft(""); setStatus(id === null ? "success" : "loading"); setErrorMessage("");
+    if (unlistedConversationRef.current) { unlistedConversationRef.current = false; setHistoryRevision(value => value + 1); }
+    if (navigate) rememberConversation(id, "push");
+  }, []);
+
   useEffect(() => {
     clearLegacyLocalToken();
-    const conversationId = new URL(window.location.href).searchParams.get("conversation_id");
-    if (!conversationId) return;
-    setActiveConversationId(conversationId);
-    historyBlockedRef.current = true;
+    const restoreLocation = () => {
+      const params = new URL(window.location.href).searchParams;
+      const id = params.get("conversation_id");
+      switchConversation(id, false);
+      if (!id) setInitialDraft(params.get("q")?.trim() || "");
+    };
+    restoreLocation(); window.addEventListener("popstate", restoreLocation);
+    return () => window.removeEventListener("popstate", restoreLocation);
+  }, [switchConversation]);
+
+  useEffect(() => {
+    if (historyTarget === undefined || historyTarget === null) return;
+    const conversationId = historyTarget;
     const controller = new AbortController();
     historyControllerRef.current = controller;
     const current = () => historyControllerRef.current === controller && !controller.signal.aborted;
@@ -137,7 +182,9 @@ function ExistingChatPage() {
             conversationIdRef.current = conversationId;
             citationSetsRef.current = sets;
             sequenceRef.current = lastSequence;
-            setMessages(restored); setCitations([]); setStatus("success"); setErrorMessage("");
+            const latestAssistant = [...restored].reverse().find(message => message.role === "assistant");
+            setMessages(restored); setCitations(latestAssistant ? sets[latestAssistant.id] || [] : []);
+            setStatus("success"); setErrorMessage("");
             historyBlockedRef.current = false;
             return;
           }
@@ -156,14 +203,14 @@ function ExistingChatPage() {
       historyControllerRef.current = null;
       controller.abort(); window.clearTimeout(deadline);
     };
-  }, []);
+  }, [historyTarget, restoreRevision]);
 
   useEffect(() => () => {
     attemptRef.current = null;
     controllerRef.current?.abort();
   }, []);
 
-  const handleSendMessage = useCallback(async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string, draft?: DraftSendLifecycle) => {
     if (!content.trim() || attemptRef.current || historyBlockedRef.current) return;
     if (SERVICE_DEMO) {
       void new ApiServiceGateway().propose(content).then(proposal => {
@@ -287,9 +334,12 @@ function ExistingChatPage() {
         const convData = await convRes.json();
         if (!current()) return;
         convId = convData.id;
+        if (!convId || !UUID7.test(convId)) throw new Error("Invalid created conversation");
+        if (draft && !draft.created(convId)) throw new Error("Private draft binding conflict");
         conversationIdRef.current = convId;
         if (convId && UUID7.test(convId)) {
           rememberConversation(convId); setActiveConversationId(convId); createdConversation = true;
+          unlistedConversationRef.current = true;
         }
       }
 
@@ -315,6 +365,7 @@ function ExistingChatPage() {
           resumedStream.accept({ id: data.message.message_id, event: "message.started", data: JSON.stringify({ conversation_id: convId, message_id: data.message.message_id }) });
           const snapshot = resumedStream.accept({ id: data.run.id, event: "message.completed", data: JSON.stringify(data.message) });
           resumedStream.finish();
+          draft?.accepted();
           waitingRunRef.current = data.run.status === "waiting_user" ? data.run.id : null;
           setWaitingClarification(data.run.status === "waiting_user");
           showSnapshot(snapshot);
@@ -347,6 +398,16 @@ function ExistingChatPage() {
         return;
       }
 
+      if (response.status === 503 && response.headers?.get("Retry-After")) {
+        // Admission control: the server refused the turn before saving anything, so nothing was sent and
+        // retrying the same question is safe.
+        setStatus("error");
+        setErrorMessage(BUSY_GUIDANCE);
+        setCitations([]);
+        showAssistant(BUSY_GUIDANCE, "failed");
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(`Máy chủ phản hồi lỗi: ${response.status}`);
       }
@@ -362,7 +423,10 @@ function ExistingChatPage() {
       const acceptFrames = (frames: ReturnType<SseParser["push"]>) => {
         for (const frame of frames) {
           if (stream!.terminal || !current()) break;
-          showSnapshot(stream!.accept(frame));
+          const snapshot = stream!.accept(frame);
+          // The API persists the user message before emitting message.started.
+          if (frame.event === "message.started") draft?.accepted();
+          showSnapshot(snapshot);
         }
       };
 
@@ -393,7 +457,7 @@ function ExistingChatPage() {
     } finally {
       controller.signal.removeEventListener("abort", stopAttempt);
       if (current()) {
-        if (createdConversation) setHistoryRevision(value => value + 1);
+        if (createdConversation) { unlistedConversationRef.current = false; setHistoryRevision(value => value + 1); }
         attemptRef.current = null;
         controllerRef.current = null;
         setIsStreaming(false);
@@ -429,7 +493,7 @@ function ExistingChatPage() {
               status={status}
               errorMessage={errorMessage || "Phiên đăng nhập không hợp lệ hoặc đã hết hạn."}
               onRetry={() => {
-                if (historyBlockedRef.current) window.location.reload();
+                if (historyBlockedRef.current) switchConversation(activeConversationId, false);
                 else { setStatus("success"); conversationIdRef.current = null; }
               }}
             />}
@@ -437,29 +501,20 @@ function ExistingChatPage() {
         )}
 
         <div className="flex-1 min-h-0 w-full h-full">
-          <ChatPanel
-            historyContent={<ConversationHistory activeId={activeConversationId} revision={historyRevision} />}
+          <RouteDraftChatPanel
+            draftId={activeConversationId || "new"}
+            initialDraft={activeConversationId ? "" : initialDraft}
+            retainUntilAcknowledged
+            disabled={historyBlockedRef.current || status === "unauthorized"}
+            historyContent={<ConversationHistory activeId={activeConversationId} revision={historyRevision} onSelect={id => switchConversation(id)} />}
             messages={messages}
             isStreaming={isStreaming}
             onSendMessage={handleSendMessage}
             onStopStreaming={() => controllerRef.current?.abort()}
             citationCount={citations.length}
             onOpenCitations={() => setIsDrawerOpen(true)}
-            onClearMessages={() => {
-              historyControllerRef.current?.abort();
-              historyControllerRef.current = null;
-              historyBlockedRef.current = false;
-              controllerRef.current?.abort();
-              setMessages([]);
-              setCitations([]);
-              citationSetsRef.current = {};
-              conversationIdRef.current = null;
-              setActiveConversationId(null);
-              waitingRunRef.current = null;
-              setWaitingClarification(false);
-              rememberConversation(null);
-              setStatus("success"); setErrorMessage("");
-            }}
+            onClearMessages={() => switchConversation(null)}
+            onFeedbackSubmit={submitFeedback}
             onCitationClick={(citationId) => {
               const selected = Object.values(citationSetsRef.current).find((items) => items.some((item) => item.id === citationId));
               if (selected) { setCitations(selected); setIsDrawerOpen(true); }

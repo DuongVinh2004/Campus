@@ -1,0 +1,151 @@
+/* Campus 24/7 — HUCE identity layer.
+   Idea: an architecture school's drawing sheet. Warm paper canvas with a faint survey grid, serif titles with
+   an ochre title-block rule, a deep teal rail, square-ish technical corners, hairline ink borders. */
+
+html:root {
+  --paper: #f3f1ea;
+  --paper-line: rgba(21, 94, 99, 0.055);
+  --ink: #17303a;
+  --ink-line: #d9d4c4;
+  --ochre-ink: #8a5f12;
+  --rail: #0e3b3f;
+  --rail-hover: rgba(255, 255, 255, 0.08);
+  --rail-active: rgba(255, 255, 255, 0.13);
+  --rail-text: #c9dedd;
+  --font-display: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Georgia, Cambria, "Times New Roman", serif;
+  --bg-page: var(--paper);
+  --color-bg-main: var(--paper);
+  --surface-canvas: var(--paper);
+  --border-color: var(--ink-line);
+  --color-border: var(--ink-line);
+}
+html.dark {
+  /* html:root above sets the light paper and ink, and it outranks tokens.css, so the dark values must be restated here. */
+  --paper: #101b22;
+  --ink: #eaf0f3;
+  --rail-text: #c2d8d6;
+  --paper-line: rgba(158, 216, 207, 0.05);
+  --ink-line: #2b414b;
+  --ochre-ink: #e3b765;
+  --rail: #0b2428;
+}
+
+/* Canvas: faint survey grid behind the content area. */
+html [data-campus-ui] .campus-content {
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+
+/* Rail (sidebar) */
+html [data-campus-ui] .campus-sidebar {
+  background: var(--rail);
+  border-right: 0;
+  color: var(--rail-text);
+}
+html [data-campus-ui] .campus-sidebar .campus-brand-title,
+html [data-campus-ui] .campus-sidebar .campus-brand-number { color: #fff; font-family: var(--font-display); font-size: 19px; font-weight: 600; letter-spacing: 0; }
+html [data-campus-ui] .campus-sidebar .campus-brand-sub { color: #8fb4b3; font-size: 11px; letter-spacing: .02em; }
+html [data-campus-ui] .campus-sidebar .campus-brand-mark { background: var(--accent-ochre); color: var(--rail); border-radius: 6px; }
+html [data-campus-ui] .campus-sidebar .campus-nav-item { color: var(--rail-text) !important; border-left: 3px solid transparent; border-radius: 4px; }
+html [data-campus-ui] .campus-sidebar .campus-nav-item:hover { background: var(--rail-hover); color: #fff !important; }
+html [data-campus-ui] .campus-sidebar .campus-nav-item.is-active { background: var(--rail-active); color: #fff !important; border-left-color: var(--accent-ochre); font-weight: 600; }
+html [data-campus-ui] .campus-sidebar .campus-nav-item svg { opacity: .85; }
+html [data-campus-ui] .campus-sidebar .campus-nav-divider { border-color: rgba(255, 255, 255, .12); }
+html [data-campus-ui] .campus-sidebar .campus-account { background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .1); color: #fff; }
+html [data-campus-ui] .campus-sidebar .campus-account * { color: inherit; }
+html [data-campus-ui] .campus-sidebar .campus-account-info span:last-child { color: #8fb4b3; }
+html [data-campus-ui] .campus-sidebar .campus-nav-collapse { color: #8fb4b3; }
+html [data-campus-ui] .campus-sidebar .campus-nav-label { color: #6f9a99; }
+
+/* Toolbar */
+html [data-campus-ui] .campus-toolbar { background: color-mix(in srgb, var(--paper) 94%, transparent); border-bottom: 1px solid var(--ink-line); backdrop-filter: blur(8px); }
+html [data-campus-ui] .campus-breadcrumb-title { font-family: var(--font-display); font-size: 15px; }
+
+/* Page title block */
+html [data-campus-ui] .campus-page-heading {
+  position: relative; padding: 4px 0 22px; margin-bottom: 28px; border-bottom: 1px solid var(--ink-line); align-items: flex-end;
+}
+html [data-campus-ui] .campus-page-heading::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 88px; height: 3px; background: var(--accent-ochre); }
+html [data-campus-ui] .campus-page-heading > div::before {
+  content: attr(data-eyebrow); display: block; margin-bottom: 8px; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ochre-ink);
+}
+html [data-campus-ui] .campus-page-heading > div:not([data-eyebrow])::before { display: none; }
+html [data-campus-ui] h1 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.012em; color: var(--ink); }
+html.dark [data-campus-ui] h1 { color: var(--text-primary); }
+html [data-campus-ui] .campus-page-heading h1 { font-size: clamp(30px, 3.2vw, 42px); line-height: 1.12; }
+html [data-campus-ui] .campus-page-heading p { margin-top: 10px; max-width: 62ch; font-size: 14.5px; color: var(--text-secondary); }
+
+/* Surfaces: sheets on paper — hairline ink border, small radius, no float. */
+html [data-campus-ui] :is(.campus-panel, .fluent-card, .campus-card) { border-radius: 6px; border-color: var(--ink-line); box-shadow: none; }
+html [data-campus-ui] :is(.fluent-btn-primary, .campus-btn-primary, .btn-primary) { border-radius: 6px; }
+html [data-campus-ui] :is(.fluent-btn-secondary, .campus-btn-secondary, .btn-secondary) { border-radius: 6px; }
+html [data-campus-ui] :is(.fluent-input, .campus-input, input:not([type=checkbox]):not([type=radio]), select, textarea) { border-radius: 6px; }
+html [data-campus-ui] h2 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.005em; }
+
+/* Small utility used by feature screens: a labelled figure (title-block cell). */
+.campus-figure { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border: 1px solid var(--ink-line); border-radius: 6px; background: var(--surface-card); min-width: 120px; }
+.campus-figure > span:first-child { font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-secondary); }
+.campus-figure > strong { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.1; color: var(--ink); }
+html.dark .campus-figure > strong { color: var(--text-primary); }
+.campus-figure > small { font-size: 12px; color: var(--text-secondary); }
+.campus-figures { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Timetable: one row per day — date block on the left, sessions on the right. */
+.campus-timetable { display: flex; flex-direction: column; border: 1px solid var(--ink-line); border-radius: 6px; background: var(--surface-card); }
+.campus-timetable-day { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 20px; padding: 16px 20px; border-top: 1px solid var(--ink-line); }
+.campus-timetable-day:first-child { border-top: 0; }
+.campus-timetable-day[data-today="true"] { background: linear-gradient(90deg, var(--color-primary-light), transparent 70%); box-shadow: inset 3px 0 0 var(--accent-ochre); }
+.campus-timetable-date { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+.campus-timetable-dow { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-secondary); }
+.campus-timetable-dom { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.1; color: var(--ink); }
+html.dark .campus-timetable-dom { color: var(--text-primary); }
+.campus-timetable-today { margin-top: 4px; padding: 1px 8px; border-radius: 3px; background: var(--accent-ochre); color: #3b2a07; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; }
+.campus-timetable-empty { align-self: center; margin: 0; font-size: 13px; color: var(--text-secondary); }
+.campus-timetable-events { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.campus-timetable-event { padding: 10px 12px 10px 14px; border: 1px solid var(--ink-line); border-left: 4px solid var(--color-primary); border-radius: 4px; background: var(--surface-card); }
+.campus-timetable-event[data-kind="EXAM"] { border-left-color: #b4452b; background: color-mix(in srgb, #b4452b 5%, var(--surface-card)); }
+.campus-timetable-event[data-kind="PERSONAL"] { border-left-color: var(--accent-ochre); }
+@media (max-width: 640px) { .campus-timetable-day { grid-template-columns: 1fr; gap: 10px; padding: 14px; } .campus-timetable-date { flex-direction: row; align-items: baseline; gap: 10px; } }
+
+/* Rooms: state is read from a top rule, like a drawing's status stamp. */
+.campus-room-card { border-top: 3px solid var(--ink-line); padding: 18px 20px; }
+.campus-room-card[data-state="free"] { border-top-color: #2f8f5b; }
+.campus-room-card[data-state="busy"] { border-top-color: #b4452b; }
+.campus-room-card[data-state="maintenance"] { border-top-color: var(--accent-ochre); }
+.campus-room-card h3 { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.25; }
+
+/* Chat welcome: a guided start, not an empty box. */
+html [data-campus-ui] .campus-chat-welcome { max-width: 820px; }
+html [data-campus-ui] .campus-chat-welcome h1 { font-size: clamp(30px, 3.4vw, 40px); }
+html [data-campus-ui] .campus-chat-welcome h1::before { content: "Trợ lý học vụ HUCE"; display: block; margin-bottom: 10px; font-family: var(--font-sans, inherit); font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ochre-ink); }
+.campus-starters { display: grid; gap: 18px; width: 100%; margin-top: 4px; }
+.campus-starter-group h2 { margin: 0 0 8px; font-family: inherit !important; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-secondary); }
+html [data-campus-ui] .campus-chat-welcome button.campus-prompt-chip { border-radius: 4px; border-color: var(--ink-line); background: var(--surface-card); color: var(--ink); min-height: 40px; padding: 8px 14px; font-size: 13.5px; }
+html [data-campus-ui] .campus-chat-welcome button.campus-prompt-chip:hover { border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary); }
+
+/* Sign-in: the same paper, rule and serif as the rest of the product. */
+.campus-login { min-height: calc(100dvh - 60px); display: grid; place-items: center; padding: 32px 16px;
+  background-color: var(--paper); color: var(--text-primary);
+  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px), linear-gradient(90deg, var(--paper-line) 1px, transparent 1px); background-size: 28px 28px; }
+.campus-login-card { width: 100%; max-width: 440px; border-radius: 6px; }
+.campus-login-brand { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 19px; font-weight: 600; color: var(--text-primary); }
+.campus-login-brand small { display: block; font: 400 11px/1.3 system-ui, sans-serif; color: var(--text-secondary); letter-spacing: .02em; }
+.campus-login-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 6px; background: var(--accent-ochre); color: var(--rail); font-weight: 700; }
+.campus-login h1 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.01em; }
+.campus-login-password { position: relative; display: block; }
+.campus-login-password input { padding-right: 64px; }
+.campus-login-reveal { position: absolute; right: 6px; top: 50%; transform: translateY(-35%); min-height: 36px; padding: 0 12px; border: 0; border-radius: 4px; background: transparent; color: var(--color-primary); font-size: 12px; font-weight: 600; cursor: pointer; }
+.campus-login-reveal:hover { background: var(--color-primary-light); }
+
+/* Phone chat: the menu button sits inside the chat header instead of taking a row of its own. */
+@media (max-width: 959px) {
+  html [data-campus-ui] .campus-workspace { position: relative; }
+  html [data-campus-ui] .campus-workspace > .campus-menu-trigger { position: absolute; top: 4px; left: 8px; margin: 0; z-index: 20; }
+  html [data-campus-ui] .campus-workspace > .campus-menu-trigger ~ * .campus-chat-header { padding-left: 60px; }
+}
+
+/* The "Đăng nhập" link in the availability banner is a button-sized target, not a hairline link. */
+.knowledge-availability-link { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 6px; }

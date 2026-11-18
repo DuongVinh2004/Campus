@@ -11,8 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/?source=pwa",
     scope: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#1d4ed8",
+    background_color: "#f3f1ea",
+    theme_color: "#0e3b3f",
     categories: ["education"],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

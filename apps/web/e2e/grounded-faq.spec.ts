@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
 import { AppShell } from "../src/components/AppShell";
 import { ChatPanel } from "../src/features/chat/ChatPanel";
 import { CitationDrawer, type CitationItem } from "../src/features/chat/CitationDrawer";
@@ -61,9 +61,10 @@ describe("Grounded FAQ Browser Journey E2E (TASK-TEST-E2E-001)", () => {
   it("completes grounded FAQ journey from query to verified citations", () => {
     render(React.createElement(GroundedFaqJourney));
 
-    // 1. Verify AppShell banner & disclaimer
-    expect(screen.getByText(/Campus 24\/7 — HUCE Demo/i)).toBeDefined();
-    expect(screen.getByText(/Dữ liệu mô phỏng/i)).toBeDefined();
+    // 1. Verify AppShell banner & official online status
+    const banner = screen.getByRole("banner");
+    expect(within(banner).getByText(/Campus 24\/7/i)).toBeDefined();
+    expect(within(banner).getByRole("search", { name: "Tìm nhanh trong Campus" })).toBeDefined();
 
     // 2. Verify conversation messages
     expect(screen.getByText(/Điều kiện xét tốt nghiệp chính quy HUCE/i)).toBeDefined();

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { AlertTriangleIcon } from "../../components/Icons";
+import { AlertTriangle, X } from "lucide-react";
 
 export type OperationalMode = "healthy" | "degraded" | "safe_mode" | "outage";
 
@@ -61,31 +61,27 @@ export function CapabilityBanner({ status, onDismiss }: CapabilityBannerProps) {
       case "unavailable":
         return {
           label: "[✕] Không khả dụng",
-          bg: "#fee2e2",
-          color: "#991b1b",
-          border: "#fca5a5",
+          badgeClass:
+            "bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800",
         };
       case "degraded":
         return {
           label: "[!] Suy giảm",
-          bg: "#fef3c7",
-          color: "#92400e",
-          border: "#fde68a",
+          badgeClass:
+            "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-800",
         };
       case "stale":
         return {
           label: "[~] Dữ liệu cũ",
-          bg: "#f1f5f9",
-          color: "#475569",
-          border: "#cbd5e1",
+          badgeClass:
+            "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
         };
       case "normal":
       default:
         return {
           label: "[•] Bình thường",
-          bg: "#ecfdf5",
-          color: "#065f46",
-          border: "#a7f3d0",
+          badgeClass:
+            "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-200 dark:border-emerald-800",
         };
     }
   };
@@ -100,66 +96,37 @@ export function CapabilityBanner({ status, onDismiss }: CapabilityBannerProps) {
       role="region"
       aria-label="Cảnh báo vận hành và chỉ số KPI"
       aria-live={isCritical ? "assertive" : "polite"}
-      style={{
-        backgroundColor: isCritical ? "#fef2f2" : "#fffbeb",
-        borderBottom: `1px solid ${isCritical ? "#fca5a5" : "#fde68a"}`,
-        color: isCritical ? "#991b1b" : "#92400e",
-        padding: "16px 24px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-        fontSize: "13px",
-      }}
+      className={`fixed right-3 top-20 z-40 w-[min(320px,calc(100vw-24px))] rounded-lg border px-2 py-1 pr-8 text-xs shadow-sm ${
+        isCritical
+          ? "border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-200"
+          : "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
+      }`}
     >
-      {/* Header and dismiss control */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 700, flexWrap: "wrap" }}>
-          <AlertTriangleIcon size={18} />
-          <span>
-            Cảnh báo vận hành hệ thống {getModeLabel(status.mode)}:
-          </span>
-          <span style={{ fontWeight: 500 }}>{status.message}</span>
+      <button type="button" onClick={handleDismiss} aria-label="Đóng thông báo" title="Đóng thông báo" style={{ minHeight: 24, minWidth: 24 }} className="absolute right-1 top-1 inline-flex h-6 w-6 items-center justify-center rounded hover:bg-black/5"><X aria-hidden="true" className="h-3.5 w-3.5" /></button>
+      <details><summary className="cursor-pointer truncate py-1" title={status.message}>{status.message}</summary><div className="max-h-40 space-y-2 overflow-y-auto pt-2">
+      {/* Details remain available on demand. */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 font-bold">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-current" />
+          <span>Cảnh báo vận hành hệ thống {getModeLabel(status.mode)}:</span>
+          <span className="font-medium">{status.message}</span>
         </div>
 
-        {status.isDismissible && (
-          <button
-            type="button"
-            onClick={handleDismiss}
-            aria-label="Đóng thông báo"
-            style={{
-              background: "transparent",
-              border: "1px solid currentColor",
-              borderRadius: "4px",
-              padding: "4px 8px",
-              fontSize: "12px",
-              color: "inherit",
-              cursor: "pointer",
-              fontWeight: 600,
-              flexShrink: 0,
-            }}
-          >
-            Đóng thông báo ✕
-          </button>
-        )}
       </div>
 
       {/* Affected services list */}
       {status.affectedServices.length > 0 && (
-        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ fontWeight: 600 }}>Dịch vụ bị ảnh hưởng:</span>
-          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-semibold">Dịch vụ bị ảnh hưởng:</span>
+          <div className="flex flex-wrap gap-1.5">
             {status.affectedServices.map((svc) => (
               <span
                 key={svc}
-                style={{
-                  backgroundColor: isCritical ? "#fee2e2" : "#fef3c7",
-                  border: `1px solid ${isCritical ? "#fca5a5" : "#fde68a"}`,
-                  color: isCritical ? "#7f1d1d" : "#78350f",
-                  padding: "2px 8px",
-                  borderRadius: "var(--radius-full, 9999px)",
-                  fontWeight: 600,
-                  fontSize: "12px",
-                }}
+                className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${
+                  isCritical
+                    ? "border-rose-300 bg-rose-100 text-rose-950 dark:border-rose-800 dark:bg-rose-900/50 dark:text-rose-200"
+                    : "border-amber-300 bg-amber-100 text-amber-950 dark:border-amber-800 dark:bg-amber-900/50 dark:text-amber-200"
+                }`}
               >
                 {svc}
               </span>
@@ -170,26 +137,16 @@ export function CapabilityBanner({ status, onDismiss }: CapabilityBannerProps) {
 
       {/* Impact and Safe Next Action details */}
       {(status.impact || status.safeNextAction) && (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "4px",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            backgroundColor: isCritical ? "rgba(254, 226, 226, 0.6)" : "rgba(254, 243, 199, 0.6)",
-            fontSize: "12px",
-          }}
-        >
+        <div className="flex flex-col gap-1 rounded-xl bg-black/5 p-3 text-xs dark:bg-white/5">
           {status.impact && (
             <div>
-              <strong style={{ color: isCritical ? "#7f1d1d" : "#78350f" }}>Ảnh hưởng thực tế: </strong>
+              <strong className="font-bold">Ảnh hưởng thực tế: </strong>
               <span>{status.impact}</span>
             </div>
           )}
           {status.safeNextAction && (
             <div>
-              <strong style={{ color: isCritical ? "#7f1d1d" : "#78350f" }}>Hành động an toàn khuyến nghị: </strong>
+              <strong className="font-bold">Hành động an toàn khuyến nghị: </strong>
               <span>{status.safeNextAction}</span>
             </div>
           )}
@@ -198,64 +155,47 @@ export function CapabilityBanner({ status, onDismiss }: CapabilityBannerProps) {
 
       {/* Operational Metrics & KPI Context */}
       {status.metrics && status.metrics.length > 0 && (
-        <div
-          style={{
-            marginTop: "4px",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "12px",
-          }}
-        >
+        <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {status.metrics.map((metric, idx) => {
             const badge = getMetricBadge(metric.status);
             return (
               <div
                 key={idx}
-                style={{
-                  backgroundColor: "#ffffff",
-                  padding: "12px 14px",
-                  borderRadius: "8px",
-                  border: "1px solid var(--color-slate-200, #e2e8f0)",
-                  color: "var(--color-slate-800, #1e293b)",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "6px",
-                }}
+                className="flex flex-col gap-1.5 rounded-xl border border-slate-200 bg-white p-3.5 text-xs text-slate-800 shadow-2xs dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontWeight: 700, fontSize: "13px" }}>{metric.name}</span>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 dark:text-slate-100">{metric.name}</span>
                   <span
-                    style={{
-                      padding: "2px 8px",
-                      borderRadius: "9999px",
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      backgroundColor: badge.bg,
-                      color: badge.color,
-                      border: `1px solid ${badge.border}`,
-                    }}
+                    className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${badge.badgeClass}`}
                   >
                     {badge.label}
                   </span>
                 </div>
 
-                <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--color-primary, #1e3a8a)" }}>
+                <div className="text-lg font-bold text-blue-700 dark:text-blue-400">
                   <span>{metric.value}</span>{" "}
-                  <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--color-slate-500, #64748b)" }}>
+                  <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
                     {metric.unit}
                   </span>
                 </div>
 
-                <div style={{ fontSize: "12px", color: "var(--color-slate-600, #475569)", display: "flex", flexDirection: "column", gap: "2px" }}>
-                  <div>Khung thời gian: <strong>{metric.timeWindow}</strong></div>
-                  <div>Độ tươi: <strong>{metric.freshness}</strong></div>
-                  <div>Nguồn: <code>{metric.source}</code></div>
+                <div className="flex flex-col gap-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                  <div>
+                    Khung thời gian: <strong className="text-slate-700 dark:text-slate-300">{metric.timeWindow}</strong>
+                  </div>
+                  <div>
+                    Độ tươi: <strong className="text-slate-700 dark:text-slate-300">{metric.freshness}</strong>
+                  </div>
+                  <div>
+                    Nguồn: <code className="rounded bg-slate-100 px-1 py-0.2 text-slate-800 dark:bg-slate-800 dark:text-slate-200">{metric.source}</code>
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
       )}
+      </div></details>
     </section>
   );
 }

@@ -1,43 +1,29 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import HomePage from "./page";
+import HomePage from "../features/home/HomeOverview";
 
 describe("HomePage Component (TASK-WEB-HOME-002)", () => {
-  it("renders priority-first student dashboard without decorative marketing grid", () => {
-    render(<HomePage />);
-
-    // Main header and simulation badge
-    expect(screen.getByRole("heading", { level: 1, name: /Không Gian Làm Việc Học Thuật & Một Cửa Số/i })).toBeDefined();
-    expect(screen.getByText(/HUCE Demo — Môi trường thử nghiệm mô phỏng không chính thức/i)).toBeDefined();
-
-    // Fast AI ask form
+  it("renders the Stitch overview and supplied academic data without mock defaults", () => {
+    render(<HomePage schedule={{ id: "fixture", courseName: "Học phần fixture", courseCode: "SYN01", room: "Phòng fixture", timeSlot: "09:00", lecturer: "Giảng viên fixture", syncTime: "Bản đọc fixture" }} tickets={[{ id: "fixture-ticket", code: "SYN-01", title: "Hồ sơ fixture", statusText: "Cần bổ sung", updatedAt: "10:00" }]} />);
+    expect(screen.getByRole("heading", { level: 1, name: "Chào bạn, hôm nay cần hỗ trợ gì?" })).toBeDefined();
     expect(screen.getByRole("search", { name: /Tìm kiếm quy chế và thủ tục học vụ/i })).toBeDefined();
-    expect(screen.getByPlaceholderText(/Hỏi Trợ lý AI về quy chế, tín chỉ, lịch thi/i)).toBeDefined();
+    expect(screen.getByRole("heading", { name: "Dịch vụ thiết yếu" })).toBeDefined();
+    expect(screen.getByText(/Học phần fixture/)).toBeDefined();
+    expect(screen.getByText(/Phòng fixture/)).toBeDefined();
+    expect(screen.getByText("Hồ sơ fixture")).toBeDefined();
+    expect(screen.getByText("Cần bổ sung")).toBeDefined();
+    expect(screen.getByRole("link", { name: /Xem toàn bộ lịch/ }).getAttribute("href")).toBe("/schedule");
+    expect(screen.getByRole("link", { name: /Xem tất cả yêu cầu/ }).getAttribute("href")).toBe("/tickets");
+    expect(screen.getByRole("link", { name: /Xin giấy xác nhận/ }).getAttribute("href")).toBe("/tickets");
+    expect(screen.getByRole("link", { name: /Tìm phòng học/ }).getAttribute("href")).toBe("/rooms");
+  });
 
-    // Primary Next Action & Time-sensitive items
-    expect(screen.getByRole("heading", { level: 2, name: /Lịch học kế tiếp/i })).toBeDefined();
-    expect(screen.getByText(/Lập trình Web nâng cao/i)).toBeDefined();
-    expect(screen.getByText(/Phòng 402-H1/i)).toBeDefined();
-    expect(screen.getByText(/Đồng bộ 07:00 hôm nay/i)).toBeDefined();
-
-    // Open tickets priority summary
-    expect(screen.getByRole("heading", { level: 2, name: /Hồ sơ một cửa đang xử lý/i })).toBeDefined();
-    expect(screen.getByText(/Cần bạn bổ sung thông tin/i)).toBeDefined();
-
-    // Deep links to core student routes
-    expect(screen.getByRole("link", { name: /Đăng nhập/i }).getAttribute("href")).toBe("/login");
-    expect(screen.getByRole("link", { name: /Xem trợ giúp/i }).getAttribute("href")).toBe("/privacy");
-    expect(screen.getByRole("link", { name: /Hỏi đáp trợ lý/i }).getAttribute("href")).toBe("/chat");
-    expect(screen.getByRole("link", { name: /Lịch học của tôi/i }).getAttribute("href")).toBe("/schedule");
-    expect(screen.getByRole("link", { name: /Yêu cầu một cửa/i }).getAttribute("href")).toBe("/tickets");
-    expect(screen.getByRole("link", { name: /Tra cứu phòng trống/i }).getAttribute("href")).toBe("/rooms");
-    expect(screen.getByRole("link", { name: /Xem toàn bộ lịch/i }).getAttribute("href")).toBe("/schedule");
-    expect(screen.getByRole("link", { name: /Xem tất cả yêu cầu/i }).getAttribute("href")).toBe("/tickets");
-
-    // Must NOT contain the old decorative 4-card feature grid title
-    expect(screen.queryByText(/Trụ cột dịch vụ số/i)).toBeNull();
-    expect(screen.queryByText(/Quy chuẩn Một cửa & Bảo đảm Học thuật/i)).toBeNull();
+  it("does not fabricate academic records when data has not been supplied", () => {
+    render(<HomePage />);
+    expect(screen.queryByText(/Lập trình Web nâng cao/)).toBeNull();
+    expect(screen.queryByText(/TK-2026-01/)).toBeNull();
+    expect(screen.getByText("Lịch học chưa được tích hợp")).toBeDefined();
   });
 
   it("handles empty or partial schedule states gracefully", () => {
@@ -47,7 +33,7 @@ describe("HomePage Component (TASK-WEB-HOME-002)", () => {
 
   it("handles empty tickets summary gracefully", () => {
     render(<HomePage searchParams={{ empty_tickets: "true" }} />);
-    expect(screen.getByText(/Không có hồ sơ nào đang chờ xử lý/i)).toBeDefined();
+    expect(screen.getByText(/Bạn chưa có hồ sơ nào/i)).toBeDefined();
   });
 });
 
@@ -59,12 +45,15 @@ describe("HomePage Component (TASK-WEB-HOME-003: Live capability truth & safety)
     expect(screen.queryByText(/Lập trình Web nâng cao/i)).toBeNull();
     expect(screen.queryByText(/Xin cấp lại thẻ sinh viên/i)).toBeNull();
 
+    // Login action shown when unauthenticated
+    expect(screen.getByRole("link", { name: /Đăng nhập để xem lịch/i }).getAttribute("href")).toBe("/login?redirect=/schedule");
+
     // Must clearly state that login is required to access personal schedule & tickets
     expect(screen.getByText(/Vui lòng đăng nhập để xem lịch học cá nhân/i)).toBeDefined();
     expect(screen.getByText(/Vui lòng đăng nhập để theo dõi hồ sơ một cửa/i)).toBeDefined();
 
     // Private actions should indicate requirement to authenticate
-    const scheduleAction = screen.getByRole("link", { name: /Lịch học của tôi/i });
+    const scheduleAction = screen.getByRole("link", { name: /Xem lịch học/i });
     expect(scheduleAction.getAttribute("href")).toContain("/login");
   });
 
@@ -76,7 +65,7 @@ describe("HomePage Component (TASK-WEB-HOME-003: Live capability truth & safety)
     );
 
     // Room lookup should be disabled
-    const roomAction = screen.getByRole("button", { name: /Tra cứu phòng trống/i });
+    const roomAction = screen.getByRole("button", { name: /Tìm phòng học/i });
     expect(roomAction.getAttribute("aria-disabled")).toBe("true");
     expect(screen.getAllByText(/Tạm ngừng/i).length).toBeGreaterThan(0);
 

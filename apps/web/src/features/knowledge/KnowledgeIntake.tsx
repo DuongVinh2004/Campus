@@ -1,6 +1,8 @@
 "use client";
 
 import React, { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { usePolling } from "@/lib/use-polling";
+import { usePreviewImages } from "./use-preview-images";
 
 type Intake = {
   id: string; filename: string; state: string; stage: string; progress: number; revision: number;
@@ -46,10 +48,9 @@ export function KnowledgeIntake({ onResolved }: { onResolved: (version: string) 
   const [selected, setSelected] = useState<Intake | null>(null);
   const [linkChoice, setLinkChoice] = useState<{ intake: Intake; candidate: DuplicateCandidate; generation: number; policy: number } | null>(null);
   const [separateChoice, setSeparateChoice] = useState<Intake | null>(null);
-  const [previewImages, setPreviewImages] = useState<Record<string, string>>({});
+  const { images: previewImages, cacheImage } = usePreviewImages();
   const [evidenceView, setEvidenceView] = useState<{ intake: string; result: EvidenceView } | null>(null);
   const [ocrViews, setOcrViews] = useState<Record<string, OcrView>>({});
-  const previewUrls = useRef<string[]>([]);
   const requestKey = useRef<string | null>(null);
   const urlKey = useRef<string | null>(null);
   const resolutionKey = useRef<string | null>(null);
@@ -62,14 +63,7 @@ export function KnowledgeIntake({ onResolved }: { onResolved: (version: string) 
     // A prior local server can still serve the rest of the administration UI.
     if (Array.isArray(body.items)) { setItems(body.items); setAvailable(true); }
   }, []);
-  useEffect(() => {
-    let alive = true;
-    const refresh = async () => { try { if (alive) await load(); } catch (e) { if (alive) setError((e as Error).message); } };
-    void refresh();
-    const timer = setInterval(() => void refresh(), 4000);
-    return () => { alive = false; clearInterval(timer); };
-  }, [load]);
-  useEffect(() => () => { previewUrls.current.forEach(url => URL.revokeObjectURL(url)); }, []);
+  usePolling(async () => { try { await load(); } catch (e) { setError((e as Error).message); } }, 4000, [load]);
 
   async function viewOcr(intakeId: string, page: number, offset = 0) {
     setBusy(true); setError("");
@@ -168,29 +162,69 @@ export function KnowledgeIntake({ onResolved }: { onResolved: (version: string) 
   }
 
   return <section className="campus-panel space-y-4" aria-label="Tiếp nhận tài liệu nền">
-    <h2 className="font-semibold">Thêm tài liệu, bổ sung thông tin sau</h2>
-    <p className="text-sm">Tải tệp trước; hệ thống xử lý nền và giữ tiến độ khi bạn rời trang. Ngày tải lên không được dùng làm ngày hiệu lực.</p>
-    {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
-    {notice && <p role="status" className="text-sm">{notice}</p>}
+    <h2 className="text-base font-semibold text-[var(--text-primary)]">Thêm tài liệu, bổ sung thông tin sau</h2>
+    <p className="text-sm text-[var(--text-secondary)]">Tải tệp trước; hệ thống xử lý nền và giữ tiến độ khi bạn rời trang. Ngày tải lên không được dùng làm ngày hiệu lực.</p>
+    {error && <p role="alert" className="text-sm text-red-800 break-words">{error}</p>}
+    {notice && <p role="status" className="text-sm text-[var(--color-primary)] break-words">{notice}</p>}
     <form onSubmit={event => void accept(event)} onChange={() => { requestKey.current = null; }}>
-      <fieldset disabled={busy || !available} className="grid gap-3 md:grid-cols-2">
-        <label>Tệp tiếp nhận PDF/TXT<input name="draft_file" type="file" accept=".pdf,.txt" required /></label>
-        <label>URL xuất xứ nếu biết<input name="draft_uri" type="url" pattern="https://.*" placeholder="https://…" className="fluent-input w-full" /></label>
-        <button className="fluent-btn-primary" type="submit">Tiếp nhận trước, xử lý nền</button>
+      <fieldset disabled={busy || !available} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label className="block text-sm font-medium text-[var(--text-primary)]">
+          Tệp tiếp nhận PDF/TXT
+          <input
+            name="draft_file"
+            type="file"
+            accept=".pdf,.txt"
+            required
+            className="mt-1.5 flex h-11 min-h-[44px] w-full min-w-0 cursor-pointer items-center rounded-[10px] border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-secondary)] file:mr-3 file:h-8 file:cursor-pointer file:rounded-lg file:border file:border-[var(--border-color)] file:bg-[var(--surface-subtle)] file:px-3 file:text-xs file:font-medium file:text-[var(--text-primary)] hover:file:bg-[var(--surface-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:border-[var(--color-primary)]"
+          />
+        </label>
+        <label className="block text-sm font-medium text-[var(--text-primary)]">
+          URL xuất xứ nếu biết
+          <input
+            name="draft_uri"
+            type="url"
+            pattern="https://.*"
+            placeholder="https://…"
+            className="fluent-input mt-1.5 flex h-11 min-h-[44px] w-full min-w-0 items-center rounded-[10px] border border-[var(--border-color)] bg-[var(--surface-card)] px-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:border-[var(--color-primary)]"
+          />
+        </label>
+        <button
+          className="fluent-btn-primary inline-flex h-11 min-h-[44px] w-full items-center justify-center rounded-[10px] bg-[var(--color-primary)] px-5 text-sm font-medium text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:col-start-1 md:w-auto justify-self-start"
+          type="submit"
+        >
+          Tiếp nhận trước, xử lý nền
+        </button>
       </fieldset>
     </form>
     <form onSubmit={event => void acceptUrl(event)} onChange={() => { urlKey.current = null; }}>
-      <fieldset disabled={busy || !available} className="grid gap-3 md:grid-cols-2">
-        <label>Hoặc URL tài liệu công khai HUCE<input name="fetch_url" type="url" pattern="https://.*" className="fluent-input w-full" required placeholder="https://…huce.edu.vn/…" /></label>
-        <button type="submit" className="fluent-btn-primary">Tiếp nhận URL và tải nền</button>
-        <p className="text-xs md:col-span-2">Hiện nhận PDF/TXT qua HTTPS thuộc HUCE. Trang có liên kết đính kèm, nguồn ngoài phạm vi hoặc yêu cầu đăng nhập sẽ cần đối chiếu.</p>
+      <fieldset disabled={busy || !available} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label className="block text-sm font-medium text-[var(--text-primary)] md:col-span-1">
+          Hoặc URL tài liệu công khai HUCE
+          <input
+            name="fetch_url"
+            type="url"
+            pattern="https://.*"
+            className="fluent-input mt-1.5 flex h-11 min-h-[44px] w-full min-w-0 items-center rounded-[10px] border border-[var(--border-color)] bg-[var(--surface-card)] px-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:border-[var(--color-primary)]"
+            required
+            placeholder="https://…huce.edu.vn/…"
+          />
+        </label>
+        <button
+          type="submit"
+          className="fluent-btn-primary inline-flex h-11 min-h-[44px] w-full items-center justify-center rounded-[10px] bg-[var(--color-primary)] px-5 text-sm font-medium text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:col-start-1 md:w-auto justify-self-start"
+        >
+          Tiếp nhận URL và tải nền
+        </button>
+        <p className="text-xs text-[var(--text-secondary)] md:col-span-2">
+          Hiện nhận PDF/TXT qua HTTPS thuộc HUCE. Trang có liên kết đính kèm, nguồn ngoài phạm vi hoặc yêu cầu đăng nhập sẽ cần đối chiếu.
+        </p>
       </fieldset>
     </form>
-    {!available && <p className="text-sm">Luồng tiếp nhận nền chưa sẵn sàng trên phiên ứng dụng này.</p>}
-    <ul className="space-y-3">{items.map(item => <li key={item.id} className="rounded-xl border p-3 space-y-2">
-      <strong>{item.filename}</strong><p className="text-sm">{item.stage === "LINKED_EXISTING" ? "Đã liên kết bằng chứng của phiên bản hiện có" : labels[item.state] || item.state} · {item.progress}%</p>
-      <p className="text-xs break-all">Mã hồ sơ: {item.id} · Công việc: {item.job_id}</p>
-      <p className="text-xs">Thời điểm tiếp nhận: {new Date(item.observed_at).toLocaleString("vi-VN")}</p>
+    {!available && <p className="text-sm text-[var(--text-secondary)]">Luồng tiếp nhận nền chưa sẵn sàng trên phiên ứng dụng này.</p>}
+    <ul className="space-y-3">{items.map(item => <li key={item.id} className="rounded-[12px] border border-[var(--border-color)] bg-[var(--surface-card)] p-4 space-y-2 min-w-0">
+      <strong className="block font-semibold text-[var(--text-primary)] break-words">{item.filename}</strong><p className="text-sm text-[var(--text-secondary)]">{item.stage === "LINKED_EXISTING" ? "Đã liên kết bằng chứng của phiên bản hiện có" : labels[item.state] || item.state} · {item.progress}%</p>
+      <p className="text-xs text-[var(--text-secondary)] break-all min-w-0">Mã hồ sơ: {item.id} · Công việc: {item.job_id}</p>
+      <p className="text-xs text-[var(--text-secondary)]">Thời điểm tiếp nhận: {new Date(item.observed_at).toLocaleString("vi-VN")}</p>
       {item.can_refresh_url && item.original_sha256 && <button disabled={busy} onClick={() => void (async () => {
         setBusy(true); setError("");
         try {
@@ -245,8 +279,7 @@ export function KnowledgeIntake({ onResolved }: { onResolved: (version: string) 
             setBusy(true); setError("");
             try {
               const response = await request(`${base}/${item.id}/pages/${page}/preview`);
-              const url = URL.createObjectURL(await response.blob()); previewUrls.current.push(url);
-              setPreviewImages(images => ({ ...images, [key]: url }));
+              cacheImage(key, await response.blob());
             } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
           })()}>Xem ảnh đối chiếu trang {page}</button>
           {previewImages[key] && <img src={previewImages[key]} alt={`Ảnh nguyên bản trang ${page}, chưa xác minh nội dung`} className="w-full rounded-xl border" />}

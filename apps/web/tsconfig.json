@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "es2017",
+    "downlevelIteration": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -11,7 +16,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -19,9 +24,65 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    ".next-stitch-20261015-03/types/**/*.ts",
+    ".next-stitch-20261015-03/dev/types/**/*.ts",
+    ".next-stitch-20261015-05/types/**/*.ts",
+    ".next-stitch-20261015-05/dev/types/**/*.ts",
+    ".next-stitch-20261015-06/types/**/*.ts",
+    ".next-stitch-20261015-06/dev/types/**/*.ts",
+    ".next-stitch-dev-20261015-01/types/**/*.ts",
+    ".next-stitch-dev-20261015-01/dev/types/**/*.ts",
+    ".next-stitch-20261015-final-01/types/**/*.ts",
+    ".next-stitch-20261015-final-01/dev/types/**/*.ts",
+    ".next-stitch-20261015-final-02/types/**/*.ts",
+    ".next-stitch-20261015-final-02/dev/types/**/*.ts",
+    ".next-stitch-20261015-final-03/types/**/*.ts",
+    ".next-stitch-20261015-final-03/dev/types/**/*.ts",
+    ".next-stitch-20261015-final-04/types/**/*.ts",
+    ".next-stitch-20261015-final-04/dev/types/**/*.ts",
+    ".next-stitch-campus-20261015-165244-183419/types/**/*.ts",
+    ".next-stitch-campus-20261015-165244-183419/dev/types/**/*.ts",
+    ".next-stitch-campus-20261015-170551-820138/types/**/*.ts",
+    ".next-stitch-campus-20261015-170551-820138/dev/types/**/*.ts",
+    ".next-stitch-campus-20261015-171354-556088/types/**/*.ts",
+    ".next-stitch-campus-20261015-171354-556088/dev/types/**/*.ts",
+    ".next-stitch-campus-20261015-182407-455024/types/**/*.ts",
+    ".next-stitch-campus-20261015-182407-455024/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-072822-819942/types/**/*.ts",
+    ".next-stitch-campus-20261020-072822-819942/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-073134-936688/types/**/*.ts",
+    ".next-stitch-campus-20261020-073134-936688/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-073850-380072/types/**/*.ts",
+    ".next-stitch-campus-20261020-073850-380072/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-074257-399694/types/**/*.ts",
+    ".next-stitch-campus-20261020-074257-399694/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-074459-122908/types/**/*.ts",
+    ".next-stitch-campus-20261020-074459-122908/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-074826-830167/types/**/*.ts",
+    ".next-stitch-campus-20261020-074826-830167/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-075824-579308/types/**/*.ts",
+    ".next-stitch-campus-20261020-075824-579308/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-080129-639198/types/**/*.ts",
+    ".next-stitch-campus-20261020-080129-639198/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-080541-801756/types/**/*.ts",
+    ".next-stitch-campus-20261020-080541-801756/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-080831-320527/types/**/*.ts",
+    ".next-stitch-campus-20261020-080831-320527/dev/types/**/*.ts",
+    ".next-stitch-campus-20261020-082351-696939/types/**/*.ts",
+    ".next-stitch-campus-20261020-082351-696939/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

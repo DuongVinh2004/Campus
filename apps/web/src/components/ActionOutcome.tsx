@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  CheckCircle2Icon,
-  AlertTriangleIcon,
-  ClockIcon,
-  XIcon,
-} from "./Icons";
+import { CheckCircle2, AlertTriangle, Clock, X } from "lucide-react";
 
 export type ActionState =
   | "pending"
@@ -44,51 +39,35 @@ export function ActionOutcome({
     return (
       <div
         role="alert"
-        style={{
-          padding: "20px 24px",
-          borderRadius: "12px",
-          backgroundColor: "#fffbeb",
-          border: "2px solid #f59e0b",
-          color: "#78350f",
-          display: "flex",
-          flexDirection: "column",
-          gap: "14px",
-        }}
+        className="p-5 sm:p-6 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-200 flex flex-col gap-3.5 shadow-sm"
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <AlertTriangleIcon size={22} />
-          <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#92400e" }}>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+          </div>
+          <h3 className="m-0 text-base font-bold text-amber-950 dark:text-amber-200">
             Kết quả chưa xác định: {actionTitle}
           </h3>
         </div>
 
-        <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.6, color: "#78350f" }}>
+        <p className="m-0 text-sm leading-relaxed text-amber-900 dark:text-amber-200">
           Yêu cầu đã được gửi tới máy chủ nhưng chưa nhận được phản hồi xác nhận chắc chắn do gián đoạn kết nối.
           Hệ thống đang bảo vệ giao dịch, vui lòng không gửi lại để tránh thao tác trùng lặp.
         </p>
 
-        <div style={{ fontSize: "12px", color: "#92400e", display: "flex", flexWrap: "wrap", gap: "16px", backgroundColor: "#fef3c7", padding: "8px 12px", borderRadius: "6px" }}>
-          <div>Mã giao dịch (Idempotency): <code>{idempotencyKey}</code></div>
+        <div className="text-xs text-amber-900 dark:text-amber-200 flex flex-wrap gap-4 bg-amber-100/60 dark:bg-amber-900/40 p-3 rounded-lg font-mono border border-amber-200/60 dark:border-amber-800/60">
+          <div>Mã giao dịch (Idempotency): <code className="bg-amber-200/80 dark:bg-amber-800/80 px-1.5 py-0.5 rounded font-bold">{idempotencyKey}</code></div>
           {correlationId && (
-            <div>Mã tham chiếu (Correlation ID): <code>{correlationId}</code></div>
+            <div>Mã tham chiếu (Correlation ID): <code className="bg-amber-200/80 dark:bg-amber-800/80 px-1.5 py-0.5 rounded font-bold">{correlationId}</code></div>
           )}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "4px" }}>
+        <div className="flex items-center gap-3 mt-1 pt-1">
           {onReconcile && (
             <button
               type="button"
               onClick={() => onReconcile(idempotencyKey)}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "6px",
-                backgroundColor: "#d97706",
-                color: "#ffffff",
-                border: "none",
-                fontWeight: 600,
-                fontSize: "13px",
-                cursor: "pointer",
-              }}
+              className="min-h-11 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors shadow-xs"
             >
               Kiểm tra đối soát trạng thái
             </button>
@@ -100,16 +79,7 @@ export function ActionOutcome({
               disabled={isUnresolved}
               title="Thao tác bị khóa trong khi đang đối soát để bảo vệ giao dịch duy nhất"
               onClick={onRetry}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "6px",
-                backgroundColor: "#ffffff",
-                color: "#9ca3af",
-                border: "1px solid #d1d5db",
-                fontWeight: 600,
-                fontSize: "13px",
-                cursor: "not-allowed",
-              }}
+              className="min-h-11 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 font-semibold text-sm cursor-not-allowed opacity-60"
             >
               Gửi lại yêu cầu
             </button>
@@ -123,25 +93,18 @@ export function ActionOutcome({
     return (
       <div
         role="status"
-        style={{
-          padding: "18px 22px",
-          borderRadius: "12px",
-          backgroundColor: "#f0fdf4",
-          border: "1px solid #86efac",
-          color: "#166534",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
+        className="p-4 sm:p-5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 text-emerald-950 dark:text-emerald-100 flex justify-between items-center gap-3 shadow-xs"
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <CheckCircle2Icon size={20} />
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-300" />
+          </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: "15px" }}>
+            <div className="font-bold text-sm sm:text-base text-emerald-950 dark:text-emerald-100">
               {state === "reconciled" ? "Đã đối soát thành công" : "Thực hiện thành công"}: {actionTitle}
             </div>
             {actionDetails && (
-              <div style={{ fontSize: "13px", marginTop: "2px", color: "#15803d" }}>
+              <div className="text-xs sm:text-sm mt-0.5 text-emerald-800 dark:text-emerald-300">
                 {actionDetails}
               </div>
             )}
@@ -152,10 +115,10 @@ export function ActionOutcome({
           <button
             type="button"
             onClick={onDismiss}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "#166534", padding: "4px" }}
+            className="min-h-9 min-w-9 flex items-center justify-center bg-transparent border-0 cursor-pointer text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 p-1.5 rounded-lg transition-colors"
             aria-label="Đóng"
           >
-            <XIcon size={16} />
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
@@ -166,41 +129,25 @@ export function ActionOutcome({
     return (
       <div
         role="alert"
-        style={{
-          padding: "18px 22px",
-          borderRadius: "12px",
-          backgroundColor: "#fef2f2",
-          border: "1px solid #fecaca",
-          color: "#991b1b",
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px",
-        }}
+        className="p-4 sm:p-5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-950 dark:text-rose-100 flex flex-col gap-2.5 shadow-xs"
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", fontWeight: 700, fontSize: "15px" }}>
-          <AlertTriangleIcon size={20} />
+        <div className="flex items-center gap-2.5 font-bold text-sm sm:text-base text-rose-950 dark:text-rose-100">
+          <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/60 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-5 h-5 text-rose-700 dark:text-rose-300" />
+          </div>
           <span>Thao tác thất bại: {actionTitle}</span>
         </div>
         {errorMessage && (
-          <p style={{ margin: 0, fontSize: "13px", color: "#7f1d1d" }}>
+          <p className="m-0 text-xs sm:text-sm text-rose-800 dark:text-rose-300 pl-10.5">
             {errorMessage}
           </p>
         )}
         {onRetry && (
-          <div style={{ marginTop: "6px" }}>
+          <div className="mt-1 pl-10.5">
             <button
               type="button"
               onClick={onRetry}
-              style={{
-                padding: "6px 14px",
-                borderRadius: "6px",
-                backgroundColor: "#dc2626",
-                color: "#ffffff",
-                border: "none",
-                fontWeight: 600,
-                fontSize: "12px",
-                cursor: "pointer",
-              }}
+              className="min-h-10 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-semibold text-xs cursor-pointer transition-colors shadow-xs"
             >
               Thử lại
             </button>
@@ -214,19 +161,12 @@ export function ActionOutcome({
   return (
     <div
       role="status"
-      style={{
-        padding: "18px 22px",
-        borderRadius: "12px",
-        backgroundColor: "#eff6ff",
-        border: "1px solid #bfdbfe",
-        color: "#1e40af",
-        display: "flex",
-        alignItems: "center",
-        gap: "10px",
-      }}
+      className="p-4 sm:p-5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-950 dark:text-blue-100 flex items-center gap-3 shadow-xs"
     >
-      <ClockIcon size={20} />
-      <div style={{ fontSize: "14px", fontWeight: 600 }}>
+      <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/60 flex items-center justify-center shrink-0">
+        <Clock className="w-5 h-5 text-blue-700 dark:text-blue-300 animate-spin" />
+      </div>
+      <div className="text-sm font-semibold">
         Đang xử lý giao dịch: {actionTitle}...
       </div>
     </div>

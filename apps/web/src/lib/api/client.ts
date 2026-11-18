@@ -27,6 +27,11 @@ export class ApiClientError extends Error {
     this.problem = problem;
     Object.setPrototypeOf(this, ApiClientError.prototype);
   }
+
+  /** HTTP status of the problem (0 for a network failure). */
+  get status(): number { return this.problem.status; }
+  /** Stable machine code of the problem, e.g. SLOT_TAKEN. */
+  get code(): string { return this.problem.code; }
 }
 
 export interface ApiClientConfig {

@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangleIcon } from "../../components/Icons";
+import { AlertTriangle, ShieldAlert, FileText, CheckCircle2, Inbox } from "lucide-react";
 
 export interface KnowledgeChunk {
   id: string;
@@ -51,8 +51,13 @@ export function KnowledgeReview({
   const isEvidenceIncomplete = document.reviewEvidenceComplete === false;
 
   const hasAuthority = !userRole || userRole === "ADMIN" || userRole === "KNOWLEDGE_MANAGER";
-  const isStaleDoc = document.isStale === true || document.freshnessStatus === "stale" || document.freshnessStatus === "expired";
-  const isQuarantined = !!document.quarantineStatus || (!!document.policyViolations && document.policyViolations.length > 0);
+  const isStaleDoc =
+    document.isStale === true ||
+    document.freshnessStatus === "stale" ||
+    document.freshnessStatus === "expired";
+  const isQuarantined =
+    !!document.quarantineStatus ||
+    (!!document.policyViolations && document.policyViolations.length > 0);
 
   const canPublish =
     document.status === "pending_review" &&
@@ -71,43 +76,25 @@ export function KnowledgeReview({
     <div
       role="region"
       aria-label="Phê duyệt văn bản tri thức"
-      style={{
-        border: "1px solid var(--color-slate-200, #e2e8f0)",
-        borderRadius: "var(--radius-lg, 14px)",
-        padding: "28px",
-        backgroundColor: "#ffffff",
-        maxWidth: "800px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "24px",
-        boxShadow: "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.04))",
-      }}
+      className="fluent-card flex max-w-3xl flex-col gap-6 rounded-[12px] border border-[var(--border-color)] bg-[var(--surface-card)] p-4 sm:p-6 shadow-xs"
     >
       {/* Quarantine Banner (AC-TASK-WEB-KNOW-003-03) */}
       {isQuarantined && (
         <div
           role="alert"
-          style={{
-            padding: "16px 20px",
-            borderRadius: "var(--radius-md, 8px)",
-            backgroundColor: "#fff1f2",
-            border: "2px solid #f43f5e",
-            color: "#9f1239",
-            fontSize: "14px",
-            lineHeight: 1.5,
-          }}
+          className="rounded-[12px] border-2 border-rose-500 bg-rose-50 p-4 text-xs leading-relaxed text-rose-950 dark:border-rose-700 dark:bg-rose-950/40 dark:text-rose-200"
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", fontWeight: 700, marginBottom: "6px" }}>
-            <AlertTriangleIcon size={20} />
+          <div className="mb-1.5 flex items-center gap-2.5 font-bold">
+            <AlertTriangle className="h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400" aria-hidden="true" />
             <span>[CÁCH LY KIỂM DUYỆT] Văn bản đang trong trạng thái cách ly</span>
           </div>
-          <p style={{ margin: "0 0 8px 0" }}>
+          <p className="mb-2">
             Văn bản đã bị cách ly do vi phạm chính sách an toàn thông tin hoặc có dấu hiệu mã độc / prompt injection. Quyền phê duyệt bị khóa toàn bộ.
           </p>
           {policyViolations.length > 0 && (
-            <ul style={{ margin: 0, paddingLeft: "20px" }}>
+            <ul className="list-disc pl-5 font-semibold space-y-0.5 break-all">
               {policyViolations.map((v, idx) => (
-                <li key={idx} style={{ fontWeight: 600 }}>{v}</li>
+                <li key={idx}>{v}</li>
               ))}
             </ul>
           )}
@@ -115,108 +102,90 @@ export function KnowledgeReview({
       )}
 
       {/* Header and Metadata */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-            <span
-              style={{
-                fontSize: "12px",
-                color: "var(--color-primary, #1e3a8a)",
-                fontWeight: 700,
-                backgroundColor: "var(--color-primary-light, #eff6ff)",
-                padding: "2px 8px",
-                borderRadius: "4px",
-              }}
-            >
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
+            <span className="rounded bg-[var(--color-primary-light)] px-2 py-0.5 text-xs font-bold text-[var(--color-primary)] break-all">
               {document.documentRef}
             </span>
-            <span style={{ fontSize: "12px", color: "var(--color-slate-500, #64748b)" }}>
+            <span className="text-xs text-[var(--text-secondary)]">
               Phiên bản: v{document.version}
             </span>
           </div>
 
-          <h2 style={{ margin: "0 0 6px 0", fontSize: "18px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+          <h2 className="mb-1.5 text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 break-words">
             {document.title}
           </h2>
 
-          <div style={{ fontSize: "13px", color: "var(--color-slate-500, #64748b)" }}>
-            Đơn vị ban hành: <strong>{document.department}</strong> • Người soạn thảo: <code>{document.authorId}</code>
+          <div className="text-xs text-[var(--text-secondary)]">
+            Đơn vị ban hành: <strong className="font-semibold text-slate-700 dark:text-slate-300 break-words">{document.department}</strong> • Người soạn thảo:{" "}
+            <code className="rounded bg-[var(--surface-subtle)] px-1 py-0.5 text-slate-800 dark:bg-slate-800 dark:text-slate-200 break-all">
+              {document.authorId}
+            </code>
           </div>
         </div>
 
         <span
-          style={{
-            padding: "4px 10px",
-            borderRadius: "9999px",
-            fontSize: "12px",
-            fontWeight: 600,
-            backgroundColor:
-              document.status === "published" ? "#ecfdf5" :
-              document.status === "draft" ? "#fef2f2" :
-              document.status === "archived" ? "#f1f5f9" :
-              "#fffbeb",
-            color:
-              document.status === "published" ? "#065f46" :
-              document.status === "draft" ? "#991b1b" :
-              document.status === "archived" ? "#475569" :
-              "#b45309",
-            border: `1px solid ${
-              document.status === "published" ? "#a7f3d0" :
-              document.status === "draft" ? "#fecaca" :
-              document.status === "archived" ? "#e2e8f0" :
-              "#fde68a"
-            }`,
-            whiteSpace: "nowrap",
-          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold whitespace-nowrap ${
+            document.status === "published"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300"
+              : document.status === "draft"
+              ? "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300"
+              : document.status === "archived"
+              ? "border-slate-200 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+              : "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300"
+          }`}
         >
-          {document.status === "published" ? "✓ Đã duyệt & Ban hành" :
-           document.status === "draft" ? "Yêu cầu sửa đổi" :
-           document.status === "archived" ? "Lưu trữ" :
-           "Chờ duyệt 4 mắt"}
+          {document.status === "published" && (
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          )}
+          {document.status === "draft" && (
+            <FileText className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          )}
+          {document.status === "archived" && (
+            <FileText className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          )}
+          {document.status === "pending_review" && (
+            <ShieldAlert className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          )}
+          <span>
+            {document.status === "published"
+              ? "✓ Đã duyệt & Ban hành"
+              : document.status === "draft"
+              ? "Yêu cầu sửa đổi"
+              : document.status === "archived"
+              ? "Lưu trữ"
+              : "Chờ duyệt 4 mắt"}
+          </span>
         </span>
       </div>
 
       {/* Immutable Provenance Information (AC-TASK-WEB-KNOW-003-03) */}
       {(document.sourceUri || document.contentHash) && (
-        <div
-          style={{
-            padding: "12px 16px",
-            backgroundColor: "#f8fafc",
-            borderRadius: "8px",
-            border: "1px solid #cbd5e1",
-            fontSize: "12px",
-            color: "#334155",
-            display: "flex",
-            flexDirection: "column",
-            gap: "4px",
-          }}
-        >
-          <div style={{ fontWeight: 700, color: "#0f172a" }}>Nguồn gốc xuất xứ (Provenance):</div>
+        <div className="flex flex-col gap-1 rounded-[12px] border border-[var(--border-color)] bg-[var(--surface-subtle)] p-3.5 text-xs text-[var(--text-secondary)]">
+          <div className="font-bold text-slate-900 dark:text-slate-100">
+            Nguồn gốc xuất xứ (Provenance):
+          </div>
           {document.sourceUri && (
-            <div>Nguồn gốc: <code style={{ wordBreak: "break-all" }}>{document.sourceUri}</code></div>
+            <div className="break-all">
+              Nguồn gốc: <code className="rounded bg-[var(--surface-card)] px-1 py-0.5 text-slate-800 dark:bg-slate-800 dark:text-slate-200 break-all">{document.sourceUri}</code>
+            </div>
           )}
           {document.contentHash && (
-            <div>Mã băm nội dung: <code>{document.contentHash}</code></div>
+            <div className="break-all">
+              Mã băm nội dung: <code className="rounded bg-[var(--surface-card)] px-1 py-0.5 text-slate-800 dark:bg-slate-800 dark:text-slate-200 break-all">{document.contentHash}</code>
+            </div>
           )}
         </div>
       )}
 
       {/* Parse and Freshness Status Banner */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "12px",
-          padding: "12px 16px",
-          backgroundColor: "var(--color-slate-50, #f8fafc)",
-          borderRadius: "8px",
-          border: "1px solid var(--color-slate-200, #e2e8f0)",
-          fontSize: "13px",
-        }}
-      >
+      <div className="grid grid-cols-1 gap-3 rounded-[12px] border border-[var(--border-color)] bg-[var(--surface-subtle)] p-3.5 text-xs text-[var(--text-secondary)] sm:grid-cols-2">
         <div>
-          <span style={{ color: "var(--color-slate-500, #64748b)", fontWeight: 500 }}>Trạng thái trích xuất: </span>
-          <strong>
+          <span className="font-medium text-[var(--text-secondary)]">
+            Trạng thái trích xuất:{" "}
+          </span>
+          <strong className="font-bold text-slate-900 dark:text-slate-100">
             {document.parseStatus === "failed"
               ? "Lỗi trích xuất cú pháp"
               : document.parseStatus === "parsed"
@@ -227,8 +196,10 @@ export function KnowledgeReview({
         </div>
 
         <div>
-          <span style={{ color: "var(--color-slate-500, #64748b)", fontWeight: 500 }}>Thời hạn & Độ tươi: </span>
-          <strong>
+          <span className="font-medium text-[var(--text-secondary)]">
+            Thời hạn & Độ tươi:{" "}
+          </span>
+          <strong className="font-bold text-slate-900 dark:text-slate-100">
             {document.effectiveFrom && document.effectiveTo
               ? `Hiệu lực: ${document.effectiveFrom} - ${document.effectiveTo}`
               : document.freshnessStatus === "fresh"
@@ -242,15 +213,7 @@ export function KnowledgeReview({
       {isStaleDoc && (
         <div
           role="alert"
-          style={{
-            padding: "12px 16px",
-            borderRadius: "var(--radius-md, 8px)",
-            backgroundColor: "#fffbeb",
-            border: "1px solid #fde68a",
-            color: "#92400e",
-            fontSize: "13px",
-            lineHeight: 1.5,
-          }}
+          className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs leading-relaxed text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200"
         >
           <strong>[XUNG ĐỘT PHIÊN BẢN]</strong> Văn bản đã bị thay đổi hoặc hết hạn (Stale). Cần cập nhật phiên bản mới trước khi thẩm định.
         </div>
@@ -260,15 +223,7 @@ export function KnowledgeReview({
       {!hasAuthority && (
         <div
           role="alert"
-          style={{
-            padding: "12px 16px",
-            borderRadius: "var(--radius-md, 8px)",
-            backgroundColor: "#fef2f2",
-            border: "1px solid #fecaca",
-            color: "#991b1b",
-            fontSize: "13px",
-            lineHeight: 1.5,
-          }}
+          className="rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs leading-relaxed text-rose-900 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-200"
         >
           <strong>[KHÔNG ĐỦ THẨM QUYỀN]</strong> Không có thẩm quyền ban hành: Vai trò hiện tại của bạn không được phép phê duyệt hoặc ban hành văn bản tri thức.
         </div>
@@ -278,47 +233,28 @@ export function KnowledgeReview({
       {isAuthor && (
         <div
           role="alert"
-          style={{
-            padding: "12px 16px",
-            borderRadius: "var(--radius-md, 8px)",
-            backgroundColor: "#fef2f2",
-            border: "1px solid #fecaca",
-            color: "#991b1b",
-            fontSize: "13px",
-            lineHeight: 1.5,
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
+          className="flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs leading-relaxed text-rose-900 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-200"
         >
-          <div style={{ flexShrink: 0 }}>
-            <AlertTriangleIcon size={18} />
-          </div>
-          <span>Quy tắc 4 mắt: Tác giả không thể tự phê duyệt tài liệu do chính mình soạn thảo. Cần một cán bộ khác thẩm định và ban hành.</span>
+          <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
+          <span>
+            Quy tắc 4 mắt: Tác giả không thể tự phê duyệt tài liệu do chính mình soạn thảo. Cần một cán bộ khác thẩm định và ban hành.
+          </span>
         </div>
       )}
 
       {isEvidenceIncomplete && (
         <div
           role="alert"
-          style={{
-            padding: "12px 16px",
-            borderRadius: "var(--radius-md, 8px)",
-            backgroundColor: "#fffbeb",
-            border: "1px solid #fde68a",
-            color: "#92400e",
-            fontSize: "13px",
-            lineHeight: 1.5,
-          }}
+          className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs leading-relaxed text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200"
         >
-          <div style={{ fontWeight: 700, marginBottom: "4px" }}>
+          <div className="mb-1 font-bold">
             [CẢNH BÁO] Chưa đủ bằng chứng thẩm định
           </div>
-          <p style={{ margin: "0 0 6px 0" }}>
+          <p className="mb-1.5">
             Tài liệu này chưa có đầy đủ bằng chứng đối chiếu hoặc kiểm định chất lượng (eval). Nút xuất bản bị khóa để bảo đảm an toàn dữ liệu.
           </p>
           {warnings.length > 0 && (
-            <ul style={{ margin: 0, paddingLeft: "20px" }}>
+            <ul className="list-disc pl-5 font-medium space-y-0.5">
               {warnings.map((w, idx) => (
                 <li key={idx}>{w}</li>
               ))}
@@ -330,116 +266,51 @@ export function KnowledgeReview({
       {isParseFailed && (
         <div
           role="alert"
-          style={{
-            padding: "12px 16px",
-            borderRadius: "var(--radius-md, 8px)",
-            backgroundColor: "#fef2f2",
-            border: "1px solid #fecaca",
-            color: "#991b1b",
-            fontSize: "13px",
-            lineHeight: 1.5,
-          }}
+          className="rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs leading-relaxed text-rose-900 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-200"
         >
-          <div style={{ fontWeight: 700 }}>[NGHIÊM TRỌNG] Lỗi trích xuất cú pháp</div>
-          <div>Không thể thẩm định hoặc xuất bản tài liệu do tệp nguồn gặp lỗi bóc tách văn bản. Vui lòng tải lên lại hoặc chỉnh sửa tệp nguồn.</div>
+          <div className="font-bold">[NGHIÊM TRỌNG] Lỗi trích xuất cú pháp</div>
+          <div>
+            Không thể thẩm định hoặc xuất bản tài liệu do tệp nguồn gặp lỗi bóc tách văn bản. Vui lòng tải lên lại hoặc chỉnh sửa tệp nguồn.
+          </div>
         </div>
       )}
 
       {/* Source to Chunks Hierarchy */}
       <div>
-        <h3
-          style={{
-            margin: "0 0 12px 0",
-            fontSize: "14px",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-            color: "var(--color-slate-700, #334155)",
-          }}
-        >
+        <h3 className="mb-3 text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
           Phân đoạn văn bản & Định vị trích dẫn (Chunks & Locators)
         </h3>
 
         {chunks.length === 0 ? (
-          <div
-            style={{
-              padding: "20px",
-              textAlign: "center",
-              backgroundColor: "var(--color-slate-50, #f8fafc)",
-              borderRadius: "8px",
-              border: "1px dashed var(--color-slate-300, #cbd5e1)",
-              color: "var(--color-slate-500, #64748b)",
-              fontSize: "13px",
-            }}
-          >
-            Chưa có đoạn trích xuất nào được ghi nhận.
+          <div className="campus-empty-state rounded-[12px] border border-dashed border-[var(--border-color)] bg-[var(--surface-card)]">
+            <Inbox aria-hidden="true" />
+            <p>Chưa có đoạn trích xuất nào được ghi nhận.</p>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div className="flex flex-col gap-3">
             {chunks.map((chunk) => (
               <div
                 key={chunk.id}
                 tabIndex={0}
-                style={{
-                  padding: "14px 16px",
-                  borderRadius: "8px",
-                  border: "1px solid var(--color-slate-200, #e2e8f0)",
-                  backgroundColor: "#ffffff",
-                  fontSize: "13px",
-                }}
+                className="rounded-[12px] border border-[var(--border-color)] bg-[var(--surface-card)] p-4 text-xs transition hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-primary)] focus-visible:outline-offset-2"
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "8px",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontWeight: 700,
-                      color: "var(--color-primary, #1e3a8a)",
-                      backgroundColor: "var(--color-slate-100, #f1f5f9)",
-                      padding: "2px 8px",
-                      borderRadius: "4px",
-                      fontSize: "12px",
-                    }}
-                  >
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                  <span className="rounded bg-[var(--color-primary-light)] px-2 py-0.5 font-bold text-[var(--color-primary)] break-all">
                     {chunk.locator}
                   </span>
                   {chunk.wordCount !== undefined && (
-                    <span style={{ fontSize: "11px", color: "var(--color-slate-400, #94a3b8)" }}>
+                    <span className="text-[11px] text-[var(--text-secondary)]">
                       {chunk.wordCount} từ
                     </span>
                   )}
                 </div>
 
-                <p
-                  style={{
-                    margin: 0,
-                    color: "var(--color-slate-800, #1e293b)",
-                    lineHeight: 1.6,
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
+                <p className="leading-relaxed text-slate-800 whitespace-pre-wrap break-words dark:text-slate-200">
                   {chunk.content}
                 </p>
 
                 {chunk.warnings && chunk.warnings.length > 0 && (
-                  <div
-                    style={{
-                      marginTop: "10px",
-                      padding: "6px 10px",
-                      borderRadius: "4px",
-                      backgroundColor: "#fffbeb",
-                      border: "1px solid #fde68a",
-                      fontSize: "12px",
-                      color: "#92400e",
-                    }}
-                  >
+                  <div className="mt-2.5 rounded-lg border border-amber-200 bg-amber-50 p-2 text-xs text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200 break-words">
                     <strong>[CẢNH BÁO]:</strong> {chunk.warnings.join(", ")}
                   </div>
                 )}
@@ -450,22 +321,11 @@ export function KnowledgeReview({
       </div>
 
       {/* Action footer */}
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "8px" }}>
+      <div className="mt-2 flex flex-wrap items-center justify-end gap-3">
         <button
           type="button"
           onClick={() => onReject?.(document.id)}
-          style={{
-            padding: "9px 18px",
-            borderRadius: "var(--radius-sm, 6px)",
-            border: "1px solid var(--color-slate-300, #cbd5e1)",
-            backgroundColor: "#ffffff",
-            fontWeight: 600,
-            fontSize: "13px",
-            color: "var(--color-slate-700, #334155)",
-            cursor: "pointer",
-            transition: "var(--transition-fast, 150ms ease)",
-            minHeight: "40px",
-          }}
+          className="fluent-btn-secondary inline-flex min-h-[44px] items-center justify-center rounded-[10px] px-4 py-2 text-xs font-medium focus-visible:outline-2 focus-visible:outline-[var(--color-primary)] focus-visible:outline-offset-2 transition-colors"
         >
           Yêu cầu sửa đổi
         </button>
@@ -492,19 +352,11 @@ export function KnowledgeReview({
               ? "Lỗi trích xuất cú pháp"
               : "Chưa đủ điều kiện ban hành"
           }
-          style={{
-            padding: "9px 22px",
-            borderRadius: "var(--radius-sm, 6px)",
-            border: "none",
-            backgroundColor: canPublish ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-200, #e2e8f0)",
-            color: canPublish ? "#ffffff" : "var(--color-slate-500, #64748b)",
-            fontWeight: 600,
-            fontSize: "13px",
-            cursor: canPublish ? "pointer" : "not-allowed",
-            boxShadow: canPublish ? "var(--shadow-xs)" : "none",
-            transition: "var(--transition-fast, 150ms ease)",
-            minHeight: "40px",
-          }}
+          className={`inline-flex min-h-[44px] items-center justify-center rounded-[10px] px-5 py-2 text-xs font-semibold shadow-xs transition focus-visible:outline-2 focus-visible:outline-[var(--color-primary)] focus-visible:outline-offset-2 ${
+            canPublish
+              ? "fluent-btn-primary cursor-pointer"
+              : "cursor-not-allowed border border-[var(--border-color)] bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+          }`}
         >
           Phê duyệt ban hành
         </button>

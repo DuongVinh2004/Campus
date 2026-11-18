@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AlertTriangleIcon, ClockIcon } from "../../components/Icons";
+import { AlertTriangle, Clock } from "lucide-react";
 
 export interface ActionParameter {
   label: string;
@@ -62,59 +62,37 @@ export function ActionConfirmation({
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(15, 23, 42, 0.5)",
-        backdropFilter: "blur(3px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 2000,
-        padding: "16px",
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs animate-in fade-in duration-150"
     >
-      <div
-        style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "var(--radius-lg, 14px)",
-          maxWidth: "540px",
-          width: "100%",
-          padding: "28px",
-          boxShadow: "var(--shadow-modal, 0 20px 25px -5px rgba(0, 0, 0, 0.15))",
-          border: "1px solid var(--color-slate-200, #e2e8f0)",
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-        }}
-      >
+      <div className="flex w-full max-w-lg flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900 sm:p-7">
         {/* Header */}
         <div>
-          <h2 id="confirm-dialog-title" style={{ margin: "0 0 6px 0", fontSize: "18px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+          <h2
+            id="confirm-dialog-title"
+            className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100"
+          >
             {action.title}
           </h2>
-          <p style={{ margin: 0, fontSize: "13px", color: "var(--color-slate-500, #64748b)" }}>
-            Đối tượng tác động: <strong>{action.targetEntity}</strong>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            Đối tượng tác động:{" "}
+            <strong className="text-slate-800 dark:text-slate-200">{action.targetEntity}</strong>
           </p>
         </div>
 
         {/* Immutable Parameters Preview */}
-        <div
-          style={{
-            backgroundColor: "var(--color-slate-50, #f8fafc)",
-            border: "1px solid var(--color-slate-200, #e2e8f0)",
-            borderRadius: "var(--radius-md, 8px)",
-            padding: "16px",
-          }}
-        >
-          <p style={{ margin: "0 0 10px 0", fontSize: "13px", fontWeight: 700, color: "var(--color-slate-800, #1e293b)" }}>
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-xs dark:border-slate-800 dark:bg-slate-850/60">
+          <p className="mb-2.5 font-bold text-slate-800 dark:text-slate-200">
             Chi tiết tham số:
           </p>
-          <dl style={{ margin: 0, display: "grid", gridTemplateColumns: "140px 1fr", rowGap: "8px", fontSize: "13px" }}>
+          <dl className="grid grid-cols-[140px_1fr] gap-y-2">
             {action.parameters.map((param, idx) => (
               <React.Fragment key={idx}>
-                <dt style={{ color: "var(--color-slate-500, #64748b)", fontWeight: 500 }}>{param.label}:</dt>
-                <dd style={{ margin: 0, fontWeight: 600, color: "var(--color-slate-900, #0f172a)" }}>{param.value}</dd>
+                <dt className="font-medium text-slate-500 dark:text-slate-400">
+                  {param.label}:
+                </dt>
+                <dd className="m-0 font-semibold text-slate-900 dark:text-slate-100">
+                  {param.value}
+                </dd>
               </React.Fragment>
             ))}
           </dl>
@@ -123,45 +101,31 @@ export function ActionConfirmation({
         {/* Expiration Countdown Warning */}
         <div
           aria-live="polite"
-          style={{
-            padding: "10px 14px",
-            borderRadius: "var(--radius-sm, 6px)",
-            fontSize: "13px",
-            backgroundColor: isExpired ? "#fef2f2" : "#fffbeb",
-            color: isExpired ? "#b91c1c" : "#b45309",
-            border: `1px solid ${isExpired ? "#fecaca" : "#fde68a"}`,
-            fontWeight: 500,
-          }}
+          className={`rounded-xl border p-3 text-xs font-medium ${
+            isExpired
+              ? "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300"
+              : "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200"
+          }`}
         >
           {isExpired ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <AlertTriangleIcon size={16} />
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-rose-600 dark:text-rose-400" />
               <span>Phiên xác nhận đã hết hạn. Vui lòng đóng và thao tác lại.</span>
             </div>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <ClockIcon size={16} />
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-amber-700 dark:text-amber-400" />
               <span>Thời gian xác nhận còn lại: {secondsLeft} giây</span>
             </div>
           )}
         </div>
 
         {/* Actions */}
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "4px" }}>
+        <div className="mt-1 flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            style={{
-              padding: "10px 18px",
-              borderRadius: "var(--radius-sm, 6px)",
-              border: "1px solid var(--color-slate-300, #cbd5e1)",
-              backgroundColor: "#ffffff",
-              color: "var(--color-slate-700, #334155)",
-              fontWeight: 600,
-              fontSize: "13px",
-              cursor: "pointer",
-              transition: "var(--transition-fast, 150ms ease)",
-            }}
+            className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 cursor-pointer"
           >
             Hủy bỏ
           </button>
@@ -169,18 +133,11 @@ export function ActionConfirmation({
             type="button"
             onClick={() => onConfirm(action.actionId)}
             disabled={isExpired}
-            style={{
-              padding: "10px 22px",
-              borderRadius: "var(--radius-sm, 6px)",
-              border: "none",
-              backgroundColor: isExpired ? "var(--color-slate-300, #cbd5e1)" : "var(--color-primary, #1e3a8a)",
-              color: isExpired ? "var(--color-slate-500, #64748b)" : "#ffffff",
-              fontWeight: 600,
-              fontSize: "13px",
-              cursor: isExpired ? "not-allowed" : "pointer",
-              boxShadow: isExpired ? "none" : "var(--shadow-sm)",
-              transition: "var(--transition-fast, 150ms ease)",
-            }}
+            className={`min-h-11 rounded-lg px-5 py-2 text-sm font-semibold shadow-xs transition ${
+              isExpired
+                ? "cursor-not-allowed border border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500 opacity-60"
+                : "cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
+            }`}
           >
             Xác nhận thực hiện
           </button>
@@ -189,4 +146,3 @@ export function ActionConfirmation({
     </div>
   );
 }
-

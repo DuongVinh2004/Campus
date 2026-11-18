@@ -6,6 +6,14 @@ import { OwnerLogin } from "./OwnerLogin";
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("cookie session login", () => {
+  it.each([401, 403, 429, 404, 503])("distinguishes credential, rate limit and service failures (%s)", async status => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status }));
+    render(<OwnerLogin />);
+    fireEvent.submit(screen.getByRole("button", { name: "Đăng nhập" }).closest("form")!);
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toContain(status === 401 || status === 403 ? "mật khẩu không hợp lệ"
+      : status === 429 ? "tạm thời bị giới hạn" : "Dịch vụ đăng nhập chưa sẵn sàng");
+  });
   it.each([
     ["STUDENT", "", "/chat"],
     ["KNOWLEDGE_ADMIN", "", "/knowledge/sources"],

@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": ["next-env.d.ts", "src/app/knowledge/policy-graph/page.tsx", "src/features/knowledge/PolicyGraphReview.tsx"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
+}
