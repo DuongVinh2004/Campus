@@ -1,0 +1,18 @@
+{"id":"lk-01","doc":"hoc-phi-lien-ket","kind":"major_present","question":"Học phí ngành An ninh mạng hệ liên kết 2+2 một năm là bao nhiêu?","expected":"answer","required":["38.500.000"],"forbidden":["36.000.000","42.000.000"]}
+{"id":"lk-02","doc":"hoc-phi-lien-ket","kind":"major_present","question":"Khoa học dữ liệu liên kết 3+1 đóng bao nhiêu tiền một năm?","expected":"answer","required":["42.000.000"],"forbidden":["36.000.000"]}
+{"id":"lk-03","doc":"hoc-phi-lien-ket","kind":"major_present","question":"Học phí ngành Robot và trí tuệ nhân tạo ứng dụng là bao nhiêu?","expected":"answer","required":["45.000.000"],"forbidden":["36.000.000","38.500.000"]}
+{"id":"lk-04","doc":"hoc-phi-lien-ket","kind":"prose","question":"Khóa K72 đóng học phí mỗi học kỳ bằng bao nhiêu phần trăm học phí năm?","expected":"answer","required":["55%"],"forbidden":[]}
+{"id":"lk-05","doc":"hoc-phi-lien-ket","kind":"deadline","question":"Hạn nộp học phí học kỳ 1 là ngày nào?","expected":"answer","required":["15/09/2027"],"forbidden":[]}
+{"id":"lk-06","doc":"hoc-phi-lien-ket","kind":"abstain_scope","question":"Học phí ngành Kế toán hệ liên kết 2+2 là bao nhiêu?","expected":"abstain","required":[],"forbidden":["36.000.000","38.500.000"]}
+{"id":"lh-01","doc":"lich-hoc-bu","kind":"table_row","question":"Lớp Giải tích 1 K70 học bù thứ mấy, phòng nào?","expected":"answer","required":["Thứ Hai","A1-301"],"forbidden":["B3-110"]}
+{"id":"lh-02","doc":"lich-hoc-bu","kind":"table_row","question":"Ai dạy học bù môn Lập trình căn bản?","expected":"answer","required":["Ngô Quang Minh"],"forbidden":[]}
+{"id":"lh-03","doc":"lich-hoc-bu","kind":"table_row","question":"Cơ học kết cấu K69 học bù tiết mấy?","expected":"answer","required":["12-13"],"forbidden":[]}
+{"id":"lh-04","doc":"lich-hoc-bu","kind":"deadline","question":"Hạn đăng ký học bù là khi nào?","expected":"answer","required":["25/10/2027"],"forbidden":[]}
+{"id":"lh-05","doc":"lich-hoc-bu","kind":"prose","question":"Vắng mấy buổi học bù thì không được công nhận?","expected":"answer","required":["2 buổi"],"forbidden":[]}
+{"id":"lh-06","doc":"lich-hoc-bu","kind":"row_scope_excluded","question":"Lớp Vật lý đại cương K71 học bù khi nào?","expected":"abstain","required":[],"forbidden":["Thứ Ba"]}
+{"id":"mg-01","doc":"chinh-sach-mien-giam","kind":"prose","question":"Sinh viên hộ cận nghèo được giảm bao nhiêu phần trăm học phí?","expected":"answer","required":["70%"],"forbidden":["100%"]}
+{"id":"mg-02","doc":"chinh-sach-mien-giam","kind":"prose","question":"Con của người có công được miễn bao nhiêu học phí?","expected":"answer","required":["100%"],"forbidden":[]}
+{"id":"mg-03","doc":"chinh-sach-mien-giam","kind":"prose","question":"Hồ sơ miễn giảm học phí nộp trong bao lâu?","expected":"answer","required":["30 ngày"],"forbidden":[]}
+{"id":"mg-04","doc":"chinh-sach-mien-giam","kind":"prose","question":"Học phần học lại có được giảm học phí không?","expected":"answer","required":["không áp dụng"],"forbidden":[]}
+{"id":"mg-05","doc":"chinh-sach-mien-giam","kind":"prose","question":"Sinh viên thuộc nhiều đối tượng thì được giảm thế nào?","expected":"answer","required":["cao nhất"],"forbidden":[]}
+{"id":"mg-06","doc":"chinh-sach-mien-giam","kind":"dimension_absent","question":"Học phí ngành Luật K70 được giảm bao nhiêu nếu có anh chị em cùng học?","expected":"answer","required":["10%"],"forbidden":[]}

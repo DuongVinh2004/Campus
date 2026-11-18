@@ -1,0 +1,12 @@
+LỊCH HỌC BÙ HỌC KỲ 1 NĂM HỌC 2027-2028 (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)
+
+Học bù được tổ chức vào các buổi tối trong tuần 12 và tuần 13 của học kỳ. Sinh viên đăng ký học bù trên cổng thông tin trước ngày 25/10/2027.
+
+Lớp học phần | Khóa | Giảng viên | Thứ | Tiết | Phòng
+Giải tích 1 | K70 | TS. Lê Văn An | Thứ Hai | Tiết 12-13 | A1-301
+Vật lý đại cương | K70 | ThS. Phạm Thu Hà | Thứ Ba | Tiết 12-13 | A1-305
+Lập trình căn bản | K71 | TS. Ngô Quang Minh | Thứ Tư | Tiết 12-14 | H2-202
+Cơ học kết cấu | K69 | PGS. Trần Đức Thành | Thứ Năm | Tiết 12-13 | B3-110
+
+Lưu ý
+Sinh viên vắng quá 2 buổi học bù sẽ không được công nhận kết quả học bù. Mỗi buổi học bù không thu thêm học phí.

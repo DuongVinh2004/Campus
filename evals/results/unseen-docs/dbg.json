@@ -1,0 +1,84 @@
+{
+ "summary": {
+  "total": 6,
+  "good": 6,
+  "good_rate": 1.0,
+  "classes": {
+   "correct_stop": 1,
+   "helpful": 5
+  },
+  "by_kind": {
+   "abstain_scope": {
+    "correct_stop": 1
+   },
+   "dimension_absent": {
+    "helpful": 3
+   },
+   "major_present": {
+    "helpful": 2
+   }
+  }
+ },
+ "results": [
+  {
+   "id": "hb-08",
+   "kind": "abstain_scope",
+   "expected": "abstain",
+   "outcome": "refuse",
+   "text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "reason": "no_source",
+   "scored_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.\nQUYẾT ĐỊNH 1127/QĐ-ĐHXDHN (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)",
+   "class": "correct_stop"
+  },
+  {
+   "id": "hp-02",
+   "kind": "dimension_absent",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Năm học 2027-2028, chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ.\nNăm học 2027-2028, chương trình tiên tiến áp dụng từ K69 có mức học phí 785.000 đồng/tín chỉ.\nHọc phần thực hành, thí nghiệm của khóa K70 ngành Trí tuệ nhân tạo được thu 650.000 đồng/tín chỉ.\nChương trình đào tạo: Chương trình Kỹ sư chất lượng cao; Khóa áp dụng: Từ K68; Mức học phí (đồng)/tín chỉ: 548.000.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Năm học 2027-2028, chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ.\nNăm học 2027-2028, chương trình tiên tiến áp dụng từ K69 có mức học phí 785.000 đồng/tín chỉ.\nHọc phần thực hành, thí nghiệm của khóa K70 ngành Trí tuệ nhân tạo được thu 650.000 đồng/tín chỉ.\nChương trình đào tạo: Chương trình Kỹ sư chất lượng cao; Khóa áp dụng: Từ K68; Mức học phí (đồng)/tín chỉ: 548.000.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-03",
+   "kind": "dimension_absent",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ năm học 2027-2028.\nHọc phần thực hành, thí nghiệm của khóa K70 ngành Quản lý đô thị và công trình được thu 600.000 đồng/tín chỉ.\nChương trình đào tạo: Chương trình Kỹ sư chất lượng cao; Khóa áp dụng: Từ K68; Mức học phí (đồng)/tín chỉ: 548.000.\nChương trình đào tạo: Chương trình liên thông; Khóa áp dụng: K66 đến K68; Mức học phí (đồng)/tín chỉ: 575.000.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ năm học 2027-2028.\nHọc phần thực hành, thí nghiệm của khóa K70 ngành Quản lý đô thị và công trình được thu 600.000 đồng/tín chỉ.\nChương trình đào tạo: Chương trình Kỹ sư chất lượng cao; Khóa áp dụng: Từ K68; Mức học phí (đồng)/tín chỉ: 548.000.\nChương trình đào tạo: Chương trình liên thông; Khóa áp dụng: K66 đến K68; Mức học phí (đồng)/tín chỉ: 575.000.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-04",
+   "kind": "major_present",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Học phần thực hành, thí nghiệm của khóa K70 ngành Kỹ thuật cấp thoát nước có mức học phí thực hành 595.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Học phần thực hành, thí nghiệm của khóa K70 ngành Kỹ thuật cấp thoát nước có mức học phí thực hành 595.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-05",
+   "kind": "major_present",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Học phần thực hành, thí nghiệm của khóa K70 ngành Trí tuệ nhân tạo có mức học phí thực hành 650.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Học phần thực hành, thí nghiệm của khóa K70 ngành Trí tuệ nhân tạo có mức học phí thực hành 650.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.\nK70\nK69\nK68\nK66",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-13",
+   "kind": "dimension_absent",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Năm học 2027-2028, chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ.\nChương trình đào tạo: Chương trình tiên tiến; Khóa áp dụng: Từ K69; Mức học phí (đồng)/tín chỉ: 785.000.\nChương trình đào tạo: Chương trình Kỹ sư chất lượng cao; Khóa áp dụng: Từ K68; Mức học phí (đồng)/tín chỉ: 548.000.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "reason": null,
+   "scored_text": "Năm học 2027-2028, chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ.\nChương trình đào tạo: Chương trình tiên tiến; Khóa áp dụng: Từ K69; Mức học phí (đồng)/tín chỉ: 785.000.\nChương trình đào tạo: Chương trình Kỹ sư chất lượng cao; Khóa áp dụng: Từ K68; Mức học phí (đồng)/tín chỉ: 548.000.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "class": "helpful"
+  }
+ ]
+}
