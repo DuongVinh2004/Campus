@@ -34,7 +34,7 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(STATIC_CACHE)
-      .then((cache) => Promise.all(PRECACHE.map((path) => cache.add(path).catch(() => undefined))))
+      .then((cache) => cache.addAll(PRECACHE).catch(() => Promise.all(PRECACHE.map((path) => cache.add(path).catch(() => undefined)))))
       .then(() => self.skipWaiting()),
   );
 });
