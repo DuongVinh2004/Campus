@@ -30,7 +30,13 @@ function isStorable(response) {
 }
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));
+  // One missing file must not stop the worker from installing: keep what can be fetched, skip the rest.
+  event.waitUntil(
+    caches
+      .open(STATIC_CACHE)
+      .then((cache) => Promise.all(PRECACHE.map((path) => cache.add(path).catch(() => undefined))))
+      .then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener("activate", (event) => {

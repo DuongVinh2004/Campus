@@ -25,6 +25,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "scripts"), str(ROOT / "services/api/src")
     str(ROOT / ".tooling/knowledge-platform-20261023/site-packages")]
 from campus247.infrastructure.knowledge.storage import FileKnowledgeStorage, ReadThroughKnowledgeStorage, checked_path
 from knowledge_parser_runtime import resolve_parser_python
+from runtime_routes import api_path_allowed, is_served_path, not_found_response
 
 STATE = checked_path(ROOT / "infra/local/knowledge-platform-20261023", ROOT)
 PGROOT = checked_path(ROOT / ".tooling/knowledge-postgres-20261023/pgsql", ROOT)
@@ -713,9 +714,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         import re as _re
         if _re.fullmatch(r"/v1/tickets/preview|/v1/tickets/[^/]+/confirm|/v1/handovers(/.*)?|/v1/staff/handovers", path):
             return JSONResponse({"detail":"Chức năng này chưa kết nối dữ liệu vận hành."}, status_code=404)
-        if path.startswith("/v1/") and not (path.startswith(("/v1/knowledge/", "/v1/conversations", "/v1/privacy/", "/v1/assistant/", "/v1/student-preparations", "/v1/learning/",
-                "/v1/rooms", "/v1/tickets", "/v1/students/me/schedule", "/v1/staff/tickets", "/v1/notifications", "/v1/admin/overview"))
-                or path in {"/v1/users/me", "/v1/auth/logout"}):
+        if path.startswith("/v1/") and not api_path_allowed(path):
             return JSONResponse({"detail":"Chức năng này chưa kết nối dữ liệu vận hành."}, status_code=404)
         if path in {"/v1/auth/demo-session", "/v1/knowledge/platform/local-session"}:
             return JSONResponse({"detail":"Đăng nhập thử không được dùng trong phiên vận hành."}, status_code=404)
@@ -731,9 +730,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
             if page_path in {"", "knowledge"}:
                 from starlette.responses import RedirectResponse
                 return RedirectResponse("/chat" if not page_path else "/knowledge/sources")
-            if (not (page_path in {"", "chat", "login", "knowledge/sources", "knowledge", "services", "tickets", "schedule", "rooms", "privacy", "staff", "notifications", "admin"}
-                     or page_path == "learning" or page_path.startswith(("learning/", "_next/", "images/", "fonts/"))) or ".." in page_path or "\\" in page_path):
-                raise HTTPException(404)
+            if not is_served_path(page_path):
+                return not_found_response(request)
             return await proxy_frontend(page_path, request, frontend_port)
     return app
 
