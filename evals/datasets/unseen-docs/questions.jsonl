@@ -1,0 +1,47 @@
+{"id":"hp-01","doc":"hoc-phi-2027-2028","kind":"table_row","question":"Học phí chương trình đại trà K69 năm học 2027-2028 là bao nhiêu mỗi tín chỉ?","expected":"answer","required":["610.000"],"forbidden":["785.000","575.000"]}
+{"id":"hp-02","doc":"hoc-phi-2027-2028","kind":"dimension_absent","question":"Học phí ngành Trí tuệ nhân tạo K69 là bao nhiêu mỗi tín chỉ?","expected":"answer","required":["610.000","785.000","548.000"],"forbidden":["575.000"]}
+{"id":"hp-03","doc":"hoc-phi-2027-2028","kind":"dimension_absent","question":"hoc phi tin chi k68 nganh quan ly do thi va cong trinh bao nhieu","expected":"answer","required":["610.000","548.000","575.000"],"forbidden":["785.000"]}
+{"id":"hp-04","doc":"hoc-phi-2027-2028","kind":"major_present","question":"Học phí thực hành ngành Kỹ thuật cấp thoát nước K70 là bao nhiêu một tín chỉ?","expected":"answer","required":["595.000"],"forbidden":["590.000","600.000","650.000"]}
+{"id":"hp-05","doc":"hoc-phi-2027-2028","kind":"major_present","question":"Ngành Trí tuệ nhân tạo đóng học phí thực hành bao nhiêu?","expected":"answer","required":["650.000"],"forbidden":["590.000","600.000","595.000"]}
+{"id":"hp-06","doc":"hoc-phi-2027-2028","kind":"row_scope_excluded","question":"Học phí chương trình tiên tiến K68 bao nhiêu?","expected":"abstain","required":[],"forbidden":["785.000"]}
+{"id":"hp-07","doc":"hoc-phi-2027-2028","kind":"table_row","question":"hoc phi chuong trinh tien tien k70","expected":"answer","required":["785.000"],"forbidden":["610.000"]}
+{"id":"hp-08","doc":"hoc-phi-2027-2028","kind":"prose","question":"Học lại phải đóng bao nhiêu phần trăm học phí?","expected":"answer","required":["120%"],"forbidden":[]}
+{"id":"hp-09","doc":"hoc-phi-2027-2028","kind":"deadline","question":"Hạn nộp học phí học kỳ 2 năm học 2027-2028 là ngày nào?","expected":"answer","required":["28/02/2028"],"forbidden":["30/09/2027"]}
+{"id":"hp-10","doc":"hoc-phi-2027-2028","kind":"prose","question":"Nộp học phí muộn bị phạt thế nào?","expected":"answer","required":["50.000"],"forbidden":[]}
+{"id":"hp-11","doc":"hoc-phi-2027-2028","kind":"contact","question":"Email phòng tài chính kế toán là gì?","expected":"answer","required":["taichinh@kiemthu-huce.example"],"forbidden":[]}
+{"id":"hp-12","doc":"hoc-phi-2027-2028","kind":"table_row","question":"Học phí Kỹ sư chất lượng cao khóa K69 mỗi tín chỉ?","expected":"answer","required":["548.000"],"forbidden":["610.000","785.000"]}
+{"id":"hp-13","doc":"hoc-phi-2027-2028","kind":"dimension_absent","question":"Học phí ngành Kiến trúc K70 năm học 2027-2028 là bao nhiêu một tín chỉ?","expected":"answer","required":["610.000","785.000","548.000"],"forbidden":["575.000"]}
+{"id":"ktx-01","doc":"noi-quy-ky-tuc-xa","kind":"table_row","question":"Giá phòng 6 người ở ký túc xá một tháng là bao nhiêu?","expected":"answer","required":["450.000"],"forbidden":["700.000","350.000"]}
+{"id":"ktx-02","doc":"noi-quy-ky-tuc-xa","kind":"deadline","question":"Hạn đăng ký ở ký túc xá là ngày nào?","expected":"answer","required":["15/08/2027"],"forbidden":[]}
+{"id":"ktx-03","doc":"noi-quy-ky-tuc-xa","kind":"prose","question":"Tiền đặt cọc khi nhận phòng ký túc xá là bao nhiêu?","expected":"answer","required":["500.000"],"forbidden":[]}
+{"id":"ktx-04","doc":"noi-quy-ky-tuc-xa","kind":"prose","question":"Mấy giờ thì cổng ký túc xá đóng?","expected":"answer","required":["23"],"forbidden":[]}
+{"id":"ktx-05","doc":"noi-quy-ky-tuc-xa","kind":"prose","question":"Khách đến thăm được vào ký túc xá đến mấy giờ?","expected":"answer","required":["21"],"forbidden":[]}
+{"id":"ktx-06","doc":"noi-quy-ky-tuc-xa","kind":"prose","question":"Vi phạm nội quy ký túc xá lần thứ ba bị xử lý thế nào?","expected":"answer","required":["buộc ra khỏi ký túc xá"],"forbidden":[]}
+{"id":"ktx-07","doc":"noi-quy-ky-tuc-xa","kind":"prose","question":"Sinh viên diện chính sách được giảm bao nhiêu tiền phòng?","expected":"answer","required":["30%"],"forbidden":[]}
+{"id":"ktx-08","doc":"noi-quy-ky-tuc-xa","kind":"prose","question":"Có được nấu ăn bằng bếp điện trong phòng không?","expected":"answer","required":["bếp điện"],"forbidden":[]}
+{"id":"ktx-09","doc":"noi-quy-ky-tuc-xa","kind":"abstain_missing","question":"Ký túc xá có wifi miễn phí không?","expected":"abstain","required":[],"forbidden":[]}
+{"id":"hb-01","doc":"thong-bao-hoc-bong-2027","kind":"prose","question":"Điểm rèn luyện tối thiểu để xét học bổng khuyến khích học tập là bao nhiêu?","expected":"answer","required":["80"],"forbidden":[]}
+{"id":"hb-02","doc":"thong-bao-hoc-bong-2027","kind":"table_row","question":"Học bổng loại Giỏi mỗi kỳ là bao nhiêu tiền?","expected":"answer","required":["6.000.000"],"forbidden":["8.000.000","4.000.000"]}
+{"id":"hb-03","doc":"thong-bao-hoc-bong-2027","kind":"inference","question":"Sinh viên điểm trung bình 3,7 nhận học bổng loại nào và bao nhiêu?","expected":"answer","required":["8.000.000"],"forbidden":[]}
+{"id":"hb-04","doc":"thong-bao-hoc-bong-2027","kind":"deadline","question":"Hạn nộp hồ sơ xét học bổng khuyến khích học tập là khi nào?","expected":"answer","required":["15/10/2027"],"forbidden":["20/11/2027"]}
+{"id":"hb-05","doc":"thong-bao-hoc-bong-2027","kind":"prose","question":"Học bổng Công ty ABC dành cho ngành nào và bao nhiêu tiền?","expected":"answer","required":["Trí tuệ nhân tạo","10.000.000"],"forbidden":[]}
+{"id":"hb-06","doc":"thong-bao-hoc-bong-2027","kind":"prose","question":"Hồ sơ xin học bổng gồm những giấy tờ gì?","expected":"answer","required":["bảng điểm"],"forbidden":[]}
+{"id":"hb-07","doc":"thong-bao-hoc-bong-2027","kind":"prose","question":"Nộp hồ sơ học bổng ở đâu?","expected":"answer","required":["Phòng Công tác sinh viên"],"forbidden":[]}
+{"id":"hb-08","doc":"thong-bao-hoc-bong-2027","kind":"abstain_scope","question":"Học bổng của Công ty ABC cho ngành Kỹ thuật cấp thoát nước là bao nhiêu?","expected":"abstain","required":[],"forbidden":["10.000.000"]}
+{"id":"lt-01","doc":"lich-thi-hoc-ky-1-2027","kind":"table_row","question":"Lịch thi môn Cơ sở dữ liệu K68 là ngày nào?","expected":"answer","required":["05/12/2027"],"forbidden":["06/12/2027"]}
+{"id":"lt-02","doc":"lich-thi-hoc-ky-1-2027","kind":"table_row","question":"Cơ sở dữ liệu K69 thi phòng nào?","expected":"answer","required":["A2-203"],"forbidden":["A2-201"]}
+{"id":"lt-03","doc":"lich-thi-hoc-ky-1-2027","kind":"table_row","question":"Môn Mạng máy tính thi lúc mấy giờ?","expected":"answer","required":["13:30"],"forbidden":[]}
+{"id":"lt-04","doc":"lich-thi-hoc-ky-1-2027","kind":"table_row","question":"Xác suất thống kê K70 thi ngày nào, phòng nào?","expected":"answer","required":["08/12/2027","A2-402"],"forbidden":[]}
+{"id":"lt-05","doc":"lich-thi-hoc-ky-1-2027","kind":"table_row","question":"Lịch thi Trí tuệ nhân tạo cơ bản K69?","expected":"answer","required":["10/12/2027"],"forbidden":[]}
+{"id":"lt-06","doc":"lich-thi-hoc-ky-1-2027","kind":"prose","question":"Vào muộn bao nhiêu phút thì không được vào phòng thi?","expected":"answer","required":["15 phút"],"forbidden":[]}
+{"id":"lt-07","doc":"lich-thi-hoc-ky-1-2027","kind":"prose","question":"Sinh viên mang điện thoại vào phòng thi thì sao?","expected":"answer","required":["đình chỉ"],"forbidden":[]}
+{"id":"lt-08","doc":"lich-thi-hoc-ky-1-2027","kind":"row_scope_excluded","question":"Lịch thi môn Mạng máy tính K70?","expected":"abstain","required":[],"forbidden":["07/12/2027"]}
+{"id":"lt-09","doc":"lich-thi-hoc-ky-1-2027","kind":"table_row","question":"Lịch thi Cấp thoát nước đô thị ngày nào?","expected":"answer","required":["12/12/2027"],"forbidden":[]}
+{"id":"bl-01","doc":"huong-dan-bao-luu","kind":"prose","question":"Thời gian bảo lưu tối đa là bao lâu?","expected":"answer","required":["2 học kỳ"],"forbidden":[]}
+{"id":"bl-02","doc":"huong-dan-bao-luu","kind":"prose","question":"Lệ phí xét hồ sơ bảo lưu là bao nhiêu?","expected":"answer","required":["200.000"],"forbidden":[]}
+{"id":"bl-03","doc":"huong-dan-bao-luu","kind":"deadline","question":"Hạn nộp đơn bảo lưu học kỳ 2 năm học 2027-2028?","expected":"answer","required":["10/01/2028"],"forbidden":[]}
+{"id":"bl-04","doc":"huong-dan-bao-luu","kind":"prose","question":"Nộp đơn bảo lưu ở đâu?","expected":"answer","required":["A1-105"],"forbidden":[]}
+{"id":"bl-05","doc":"huong-dan-bao-luu","kind":"prose","question":"Sau bao lâu thì có kết quả xét bảo lưu?","expected":"answer","required":["7 ngày"],"forbidden":[]}
+{"id":"bl-06","doc":"huong-dan-bao-luu","kind":"prose","question":"Tổng thời gian học tại trường tối đa bao nhiêu năm?","expected":"answer","required":["6 năm"],"forbidden":[]}
+{"id":"bl-07","doc":"huong-dan-bao-luu","kind":"prose","question":"Sinh viên mới nhập học có được bảo lưu ngay không?","expected":"answer","required":["1 học kỳ"],"forbidden":[]}
+{"id":"oos-01","doc":"huong-dan-bao-luu","kind":"out_of_scope","question":"Hôm nay thời tiết Hà Nội thế nào?","expected":"oos","required":[],"forbidden":[]}
