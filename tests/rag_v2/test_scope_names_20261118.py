@@ -49,15 +49,15 @@ def test_a_name_missing_from_the_sources_is_found_and_cut_out_of_the_query():
 
 
 @pytest.mark.asyncio
-async def test_a_table_not_split_by_the_named_major_is_answered_row_by_row_without_a_model():
+async def test_a_table_not_split_by_the_named_major_is_answered_row_by_row_where_the_model_would_refuse():
     first = tabular(FEE_TABLE, "c" * 16)
     second = tabular(FEE_TABLE.replace("610.000", "785.000").replace("Chương trình đại trà", "Chương trình tiên tiến").replace("K68 đến K70", "Từ K69"), "e" * 16)
     gone = tabular(FEE_TABLE.replace("610.000", "575.000").replace("K68 đến K70", "K66"), "f" * 16)
-    gateway = FakeGateway()
+    gateway = FakeGateway(drafts=[[]])   # the model finds nothing it can state
     service = RagV2Service((), Vocabulary.from_units([unit(PROSE, uid="a" * 16)]))
     result = await service.answer("Học phí ngành Trí tuệ nhân tạo K69 là bao nhiêu mỗi tín chỉ?", (), gateway=gateway,
                                   index=UnitIndex([first, second, gone]), reranker=Reranker(), embed=None)
-    assert result.kind == "partial" and not gateway.requests
+    assert result.kind == "partial"
     assert "610.000" in result.text and "785.000" in result.text and "575.000" not in result.text   # K66 is another cohort
     assert "Chương trình đào tạo: Chương trình đại trà" in result.text
     assert "không nêu riêng cho trí tuệ nhân tạo" in result.preface and "không phân theo trí tuệ nhân tạo" in result.preface

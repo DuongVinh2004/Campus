@@ -7,6 +7,7 @@ import unicodedata
 from collections.abc import Mapping
 
 from campus247.rag_v2.generation.contacts import restore
+from campus247.rag_v2.scope_ranges import covers
 from campus247.rag_v2.types import Statement, StatementVerdict, Unit
 
 REASON_CODES = frozenset({
@@ -147,8 +148,11 @@ def _scope_mismatch(text: str, units: list[Unit]) -> bool:
     # A statement may combine several cited units ("K64 dùng A1 và K65 dùng B2"): each value it names
     # must be declared by at least one cited unit that declares that kind of scope at all.
     declared_cohorts = {_fold(c).replace("khoa", "k").replace(" ", "") for unit in units for c in unit.scope.cohorts}
-    if declared_cohorts and not cohorts <= declared_cohorts:
-        return True
+    if declared_cohorts:
+        # A cohort inside a range the cited text itself states ("K70 trở về trước") is declared by that text.
+        undeclared = {c for c in cohorts - declared_cohorts if not any(covers(unit.text, c) for unit in units)}
+        if undeclared:
+            return True
     declared_years = {_fold(y).replace("/", "-").replace(" ", "") for unit in units for y in unit.scope.academic_years}
     if declared_years:
         if any(f"{start}-{end}" not in declared_years for start, end in years):
@@ -165,6 +169,21 @@ def _scope_mismatch(text: str, units: list[Unit]) -> bool:
                for name in named_programs):
             return True
     return False
+
+
+def program_mismatch(asked_program: str | None, units: list[Unit]) -> bool:
+    """The question names a programme ("kinh tế xây dựng") and the cited text is positively about another one.
+
+    Curriculum rows carry no programme in their declared scope, so a row of "Kỹ thuật xây dựng / Xây dựng DD&CN"
+    could answer a question about "Kinh tế xây dựng". It is only a conflict when the cited units name some other
+    known programme and never the one asked about; text that names none of them is left to the other checks.
+    """
+    from campus247.rag_v2.understanding.analyze import _PROGRAMS, contains
+    if not asked_program or asked_program not in {code for code, _ in _PROGRAMS}:
+        return False
+    text = _fold(" ".join(f"{unit.doc_title} {unit.text}" for unit in units))
+    mentioned = {code for code, names in _PROGRAMS if any(contains(text, name) for name in names)}
+    return asked_program not in mentioned and bool(mentioned)
 
 
 STRICT_SOURCE_CHARS = 600
@@ -197,9 +216,37 @@ def _polarity_mismatch(statement: str, source: str) -> bool:
     that follow a negator of the row ("khong duoc nghi" -> "duoc nghi") without that negator.
     """
     patterns = (NEGATIVE, EXCEPTION)
-    if len(source) <= STRICT_SOURCE_CHARS and any(
-            sorted(p.findall(statement)) != sorted(p.findall(_supporting_sentences(statement, source)))
-            for p in patterns):
+    raw_source = source  # sentence boundaries are read from the original punctuation
+    # A colon, dash or comma between a negator and the word it governs ("Cấm: mang nước uống") changes nothing.
+    def plain(text: str) -> str:
+        return re.sub(r"\s+", " ", re.sub(r"[^\w\s]+", " ", text))
+
+    statement, source = plain(statement), plain(source)
+
+    def strict_mismatch(p) -> bool:
+        supporting_text = plain(_supporting_sentences(statement, raw_source))
+        stated, supporting = Counter(p.findall(statement)), Counter(p.findall(supporting_text))
+        if stated == supporting:
+            return False
+        if supporting - stated:
+            return True  # a negator or exception of the supporting text was dropped
+        # The statement spans clauses ("...; hoặc quá 4 lần không liên tiếp ...") that the sentence split put
+        # apart: an extra negator is fine when the same negator and the word after it stand in the row.
+        for match in p.finditer(statement):
+            tail = re.match(r"(?:\s+\w+){1,3}", statement[match.end():])
+            first = re.match(r"\s+\w+", statement[match.end():])
+            if not tail or not first or not re.search(
+                    r"(?<!\w)" + re.escape(match.group()) + re.escape(first.group()) + r"(?!\w)", source):
+                return True
+            # The negator and its first object word stand in the row. Reject only a flip: the statement's own
+            # words are stated in the row without that negator ("được bảo lưu" vs "không được rút").
+            plain_tail = r"(?<!\w)" + re.escape(tail.group().strip()) + r"(?!\w)"
+            negated_tail = r"(?<!\w)" + re.escape(match.group() + tail.group()) + r"(?!\w)"
+            if re.search(plain_tail, source) and not re.search(negated_tail, source):
+                return True
+        return False
+
+    if len(source) <= STRICT_SOURCE_CHARS and any(strict_mismatch(p) for p in patterns):
         return True
     if any(Counter(p.findall(statement)) - Counter(p.findall(source)) for p in patterns):
         return True
@@ -216,9 +263,18 @@ def _polarity_mismatch(statement: str, source: str) -> bool:
             if not tail or len(tail.group(1).split()) < 3:
                 continue
             phrase = tail.group(1).strip()
-            for hit in re.finditer(r"(?<!\w)" + re.escape(phrase) + r"(?!\w)", statement):
-                before = [re.sub(r"\W+", "", w) for w in statement[:hit.start()].rstrip().split()[-1:]] or [""]
-                if not pattern.fullmatch(before[0]) and before[0] not in {"ngoai", "chi"}:
+            phrase_re = r"(?<!\w)" + re.escape(phrase) + r"(?!\w)"
+
+            def negated_before(text: str, start: int) -> bool:
+                before = [re.sub(r"\W+", "", w) for w in text[:start].rstrip().split()[-1:]] or [""]
+                return bool(pattern.fullmatch(before[0])) or before[0] in {"ngoai", "chi"}
+
+            # "2 lần liên tiếp đối với" and "4 lần không liên tiếp đối với" share the words after the negator: if
+            # the row also states them without a negator, the statement is not dropping that negation.
+            if any(not negated_before(source, hit.start()) for hit in re.finditer(phrase_re, source)):
+                continue
+            for hit in re.finditer(phrase_re, statement):
+                if not negated_before(statement, hit.start()):
                     return True
     return False
 
@@ -255,7 +311,11 @@ def check_statement(stmt: Statement, units_by_id: Mapping[str, Unit]) -> Stateme
     claimed_semesters = _semesters(text)
     if source_semesters and not claimed_semesters <= source_semesters:
         reasons.append("NUMBER_NOT_IN_SOURCE")
-    if _polarity_mismatch(_fold(text), _fold(source)):
+    # The document title is a label, not a statement about what the cited text says: a title such as "... (không phải văn bản chính thức)"
+    # must not count as a negator of every sentence taken from the document.
+    polarity_source = "\n".join(unit.text.replace(unit.doc_title, " ", 1) if unit.doc_title else unit.text for unit in units)
+    # Never stricter than before: a statement fails only when it fails against the full text and also without the title.
+    if _polarity_mismatch(_fold(text), _fold(source)) and _polarity_mismatch(_fold(text), _fold(polarity_source)):
         reasons.append("NEGATION_MISMATCH")
     if _scope_mismatch(text, units):
         reasons.append("SCOPE_MISMATCH")

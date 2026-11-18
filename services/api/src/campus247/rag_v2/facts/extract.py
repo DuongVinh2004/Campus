@@ -5,10 +5,14 @@ import re
 from collections.abc import Iterable
 from hashlib import sha256
 
-from campus247.rag_v2.ingest.units import context_text, source_text
+from dataclasses import replace
+
+from campus247.rag_v2.ingest.units import context_text, extract_scope, source_text
 from campus247.rag_v2.ingest.tables import cells as table_cells, inherited_cells
 from campus247.rag_v2.types import Fact, Unit
 
+# A column that holds an amount of money: named as a fee, a price or a rate, or declared in a currency.
+_MONEY_HEADER = r"học phí|mức thu|đơn giá|lệ phí|giá|mức phí|\(đồng\)|\(vnđ\)|\(vnd\)"
 _MONEY = re.compile(r"(?<![\d.])\d{1,3}(?:[.,]\d{3})+(?![\d.])")
 _EMAIL = re.compile(r"(?<![\w.+-])[\w.+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}?(?=(?i:Website|Email|Hotline|Fax)\s*:|[^\w-]|$)")
 _DATE = re.compile(r"\b(?:[0-3]?\d\s*[/.-]\s*[01]?\d\s*[/.-]\s*20\d{2}|(?:ngày\s+)?[0-3]?\d\s+tháng\s+[01]?\d\s+năm\s+20\d{2})\b", re.IGNORECASE)
@@ -26,8 +30,11 @@ def extract_facts(units: Iterable[Unit]) -> list[Fact]:
                 return
             attributes = attributes or {}
             key = sha256(f"{unit.unit_id}|{kind}|{subject}|{value}|{quote}|{sorted(attributes.items())}".encode()).hexdigest()[:16]
-            facts[key] = Fact(key, kind, subject, value, unit.unit_id, quote,
-                              unit.scope, attributes)
+            # A fee row applies to the cohorts the row itself names ("K71: 17.000.000" is not a K70 fee), not to every cohort the unit's
+            # surroundings mention.
+            row_cohorts = extract_scope(quote).cohorts if kind == "fee" else ()
+            scope = replace(unit.scope, cohorts=row_cohorts) if row_cohorts else unit.scope
+            facts[key] = Fact(key, kind, subject, value, unit.unit_id, quote, scope, attributes)
 
         def contact(value, quote, position, kind, *, body=body, unit=unit, add=add):
             begin = max(0, position - 250)
@@ -53,16 +60,18 @@ def extract_facts(units: Iterable[Unit]) -> list[Fact]:
             # in fee waivers, percentages or curriculum credits as tuition amounts.
             if unit.kind == "table_row" and "|" in line:
                 cells = table_cells(quote)
-                headers = next((l for l in context.splitlines() if "|" in l and re.search(r"học phí|mức thu|đơn giá", l, re.IGNORECASE)), "")
+                headers = next((l for l in context.splitlines() if "|" in l and re.search(_MONEY_HEADER, l, re.IGNORECASE)), "")
                 column_names = table_cells(headers)
-                fee_columns = [i for i, c in enumerate(column_names) if re.search(r"học phí|mức thu|đơn giá", c, re.IGNORECASE)]
-                label_columns = [i for i, c in enumerate(column_names) if re.search(r"chương trình|ngành|tên", c, re.IGNORECASE)]
+                fee_columns = [i for i, c in enumerate(column_names) if re.search(_MONEY_HEADER, c, re.IGNORECASE)]
+                label_columns = [i for i, c in enumerate(column_names) if re.search(r"chương trình|ngành|tên|loại|hạng", c, re.IGNORECASE)]
                 for i in fee_columns if len(cells) == len(column_names) and len(label_columns) == 1 else ():
                     # A header may explicitly name both credit conventions;
                     # preserve that full declaration rather than read the row.
                     name = column_names[i].casefold()
                     basis_value = ("ĐVHT" if "đvht" in name else "tín chỉ" if "tín chỉ" in name
-                                   else "năm" if re.search(r"(?:/|mỗi|theo|hàng)\s*năm\b", name) else "")
+                                   else "năm" if re.search(r"(?:/|mỗi|theo|hàng)\s*năm\b", name)
+                                   else "tháng" if re.search(r"(?:/|mỗi|theo|hàng)\s*tháng\b", name)
+                                   else "học kỳ" if re.search(r"(?:/|mỗi|theo|hàng)\s*(?:học kỳ|kỳ)\b", name) else "")
                     inherited = inherited_cells(context)
                     subject = cells[label_columns[0]] or inherited.get(str(label_columns[0]), "")
                     if _MONEY.fullmatch(cells[i]) and basis_value and subject:

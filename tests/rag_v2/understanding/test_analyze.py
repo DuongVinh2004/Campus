@@ -60,7 +60,9 @@ def test_fee_amount_needs_answer_changing_scope():
     u = analyze("Học phí bao nhiêu?", ())
     assert set(u.required_slots) == {"cohort|academic_year", "program"}
     assert set(u.missing_slots) == set(u.required_slots)
-    assert "khóa hoặc năm học" in u.clarify_prompt
+    # Policy (2026-11-14): the fee table is public, so the question is answered per scope and the server asks
+    # afterwards, instead of blocking the user with a question first.
+    assert u.clarify_prompt is None and "khóa hoặc năm học" in u.ask_back
     u = analyze("Học phí K65 bao nhiêu?", ())
     assert u.missing_slots == ("program",)
 
@@ -70,7 +72,7 @@ def test_deadline_needs_period(question):
     u = analyze(question, ())
     assert u.question_type == "deadline"
     assert u.missing_slots == ("semester|academic_year",)
-    assert "học kỳ hoặc năm học" in u.clarify_prompt
+    assert u.clarify_prompt is None and "học kỳ hoặc năm học" in u.ask_back
 
 
 @pytest.mark.parametrize("period", ["HK1", "kỳ 2", "năm học 26-27"])
@@ -170,8 +172,9 @@ def test_degree_level_or_a_named_decision_is_enough_scope_for_a_fee_question(que
     assert analyze(question, ()).clarify_prompt is None
 
 
-def test_fee_question_without_any_scope_still_asks_back():
-    assert analyze("Học phí bao nhiêu một tín chỉ?", ()).clarify_prompt
+def test_fee_question_without_any_scope_is_answered_then_asks_back():
+    u = analyze("Học phí bao nhiêu một tín chỉ?", ())
+    assert u.clarify_prompt is None and u.ask_back and set(u.missing_slots) == {"cohort|academic_year", "program"}
 
 
 def test_several_named_cohorts_or_programmes_are_not_filtered_by_the_first_one():
@@ -183,3 +186,4 @@ def test_several_named_cohorts_or_programmes_are_not_filtered_by_the_first_one()
     assert programs.cohort == "K70" and programs.program is None and not programs.missing_slots
     single = analyze("Học phí K70 CNTT bao nhiêu?", ())
     assert single.cohort == "K70" and single.program == "7480201"
+

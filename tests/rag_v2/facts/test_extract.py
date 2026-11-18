@@ -122,3 +122,21 @@ def test_amount_without_fee_unit_and_dates_without_deadline_cues_are_skipped():
     row = {"chunk_id": "c", "document_id": "d", "version_id": "v", "doc_title": "Tài liệu", "doc_family": "khac",
            "text": "Ngày 10/06/2026 ban hành quyết định.\nHọc bổng 10.000.000 đồng/sinh viên.\nMã số: 02438696397.\nMật khẩu có @ # !"}
     assert extract_facts(build_units([row])) == []
+
+
+def test_a_fee_row_carries_only_the_cohorts_it_names_and_money_columns_are_found_by_what_they_hold():
+    from campus247.rag_v2.facts.extract import extract_facts
+    from campus247.rag_v2.types import Scope, Unit
+
+    def row(uid, text, header, scope):
+        return Unit(uid, (f"c{uid}",), "d", "v", "Quyết định", "khac", "table_row", "p", 1,
+                    f"⟦RAG_V2_CONTEXT⟧\nQuyết định\n{header}\n⟦RAG_V2_SOURCE⟧\n{text}", scope=scope)
+
+    rooms = row("a" * 16, "Phòng 6 người | 6 | 450.000", "Loại phòng | Số người | Giá phòng (đồng)/tháng", Scope())
+    fee = next(f for f in extract_facts([rooms]) if f.value == "450.000")
+    assert fee.kind == "fee" and fee.attributes["basis"] == "tháng" and fee.subject == "Phòng 6 người"
+    k70 = Unit("b" * 16, ("cb",), "d", "v", "Quyết định", "khac", "page", "p", 1,
+               "⟦RAG_V2_CONTEXT⟧\nQuyết định\nHọc phí phụ thu, K70 trở về trước và K71\n⟦RAG_V2_SOURCE⟧\n- K71: 17.000.000 đ/năm",
+               scope=Scope(cohorts=("K70", "K71")))
+    surcharge = next(f for f in extract_facts([k70]) if f.kind == "fee")
+    assert surcharge.scope.cohorts == ("K71",)

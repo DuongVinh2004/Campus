@@ -46,6 +46,16 @@ def sibling_rows(seeds: list[Unit], index: Any) -> dict[tuple[str, str], list[Un
     return tables
 
 
+def rows_of_chunks(chunk_ids: set[str], index: Any) -> list[Unit]:
+    """The table-row units that were cut from the given source chunks (the chunks the generator read)."""
+    found = []
+    for unit_id in index.all_ids():
+        unit = index.get(unit_id)
+        if unit is not None and _is_row(unit) and chunk_ids.intersection(unit.chunk_ids):
+            found.append(unit)
+    return found
+
+
 def row_pairs(unit: Unit) -> list[tuple[str, str]]:
     """(column, cell) pairs of the row, skipping the running number and empty cells."""
     names = table_cells(header_line(unit))
@@ -70,16 +80,24 @@ def answer_rows(u: Any, tables: dict[tuple[str, str], list[Unit]], seed_ids: lis
     and has rows applying to the cohort and year asked. Empty when no table qualifies."""
     if not u.scope_terms:
         return [], []
+    if any(carries_term(rows, u.scope_terms) for rows in tables.values()):
+        return [], []  # some table found IS written along that name: the normal path answers from its matching row
+    return general_rows(u, tables, seed_ids)
+
+
+def general_rows(u: Any, tables: dict[tuple[str, str], list[Unit]], seed_ids: list[str]) -> tuple[list[Unit], list[Statement]]:
+    """Like answer_rows, but for the first table that does not carry the name even when another table does: the rows of a general
+    table that complete a general answer the normal path only partly wrote."""
     order = []
     for unit_id in seed_ids:
         for key, rows in tables.items():
             if any(row.unit_id == unit_id for row in rows) and key not in order:
                 order.append(key)
     probe = replace(u, program=None)
-    if any(carries_term(rows, u.scope_terms) for rows in tables.values()):
-        return [], []  # some table found IS written along that name: the normal path answers from its matching row
     for key in order:
         rows = tables[key]
+        if carries_term(rows, u.scope_terms):
+            continue
         applying = [row for row in rows if (u.cohort or u.academic_year) and scope_allows(probe, row)
                     and (not u.cohort or row.scope.cohorts or re.search(r"\bK\d{2}\b", source_text(row)))
                     and row_sentence(row)]

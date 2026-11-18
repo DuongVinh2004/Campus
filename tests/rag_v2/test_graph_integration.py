@@ -97,7 +97,7 @@ async def test_partial_note_is_rendered_once_and_no_invalid_claim_escapes():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(("question", "response_class", "code"), [
-    ("Học phí bao nhiêu?", "clarification_request", "RAG_V2_CLARIFY"),
+    ("Cách tính điểm đó?", "clarification_request", "RAG_V2_CLARIFY"),
     ("Thời tiết hôm nay?", "safe_refusal", "RAG_V2_REFUSE_OUT_OF_SCOPE")])
 async def test_early_v2_outcomes_skip_sources(question, response_class, code):
     stack = setup()
@@ -271,7 +271,8 @@ async def test_factory_initializes_binding_once_and_reuses_it_for_turns(monkeypa
     monkeypatch.setattr(rag_v2, "load_rag_v2", load)
     settings = Settings(_env_file=None, rag_engine="v2", rag_v2_index_dir=Path(__file__).resolve().parent)
     app = create_app(runtime_settings=settings, llm_gateway=stack.gateway)
-    assert app.state.rag_v2_node is stack.node and len(loads) == 1
+    # The loaded node is held by a swappable proxy (hot reload); the node itself is the one the loader returned.
+    assert app.state.rag_v2_node.current is stack.node and len(loads) == 1
     for _ in range(2):
         state = await stack.workflow.arun(stack.turn, retrieval_context=context())
         assert state.terminal == Terminal.ANSWERED

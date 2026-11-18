@@ -33,6 +33,8 @@ _NO_SUBJECT_WORDS = ("la gi nao the sao ai dau o bao nhieu may khi luc co khong 
                    "kia cai viec chuyen lam nhu mot nhung cac rat qua chut nua roi se phai nen tu den vi tai "
                    "bi ma neu thu tuc quy dinh thong tin van de huong dan noi dung truong huce sinh vien nha")
 _NO_SUBJECT = set(_NO_SUBJECT_WORDS.split())
+SLOT_PHRASES = {"cohort|academic_year": "khóa hoặc năm học", "program": "ngành, hệ hoặc chương trình đào tạo",
+                "semester|academic_year": "học kỳ hoặc năm học"}
 _SUGGEST = "Bạn muốn hỏi về học phí, học bổng, đăng ký học phần, bảo lưu, tốt nghiệp hay ký túc xá?"
 _EXEMPTION_OBJECTS = ("hoc phi", "thi", "hoc phan", "mon hoc", "ngoai ngu", "gdtc", "gdqp",
                       "giao duc the chat", "giao duc quoc phong", "nghia vu", "le phi")
@@ -56,19 +58,35 @@ def program_key(value: str) -> str:
     return text
 
 
+_NOT_A_CLASS_CODE = frozenset({"tc", "tin", "tiet", "sv", "sinh", "mon", "hp", "lop", "diem", "phut", "gio", "ngay",
+                               "thang", "nam", "ky", "buoi", "tuan", "dong", "trieu", "nghin"})
+
+
+def _cohorts(text: str) -> list[str]:
+    """Cohort numbers named as "K71", "K71CD" or by a class code such as "71CS" / "66XD1" (a number then letters)."""
+    found = [m[1] for m in re.finditer(r"\bk\s*(\d{2,3})(?=[a-z]|\b)", text)]
+    for m in re.finditer(r"\b(\d{2})([a-z]{2,})\d?\b", text):
+        if 55 <= int(m[1]) <= 80 and m[2] not in _NOT_A_CLASS_CODE:
+            found.append(m[1])
+    return found
+
+
 def _many(text: str):
     """Whether the question names more than one cohort, year or programme ("so sánh K70 và K71")."""
-    cohorts = set(re.findall(r"\bk\s*(\d{2,3})\b", text))
+    cohorts = set(_cohorts(text))
+    # "K70 trở xuống" / "từ K69 trở đi" name a range, not one cohort: it must not filter to that single cohort.
+    ranged = bool(re.search(r"\bk\s*\d{2,3}\s*(?:tro xuong|tro ve truoc|ve truoc|va truoc|tro len|tro di|tro ve sau|va sau)\b", text))
     years = set(re.findall(r"\b20\d{2}-20\d{2}\b", text))
     programs = {code for code, names in _PROGRAMS if any(contains(text, name) for name in names)}
     programs |= set(re.findall(r"\b7\d{6}\b", text))
-    return len(cohorts) > 1, len(years) > 1, len(programs) > 1
+    return len(cohorts) > 1 or ranged, len(years) > 1, len(programs) > 1
 
 
 def _scope(text: str):
     many_cohort, many_year, many_program = _many(text)
     # Several named values are not a filter: keeping only the first would silently drop the others' sources.
-    cohort = None if many_cohort else re.search(r"\bk\s*(\d{2,3})\b", text)
+    cohort_numbers = [] if many_cohort else _cohorts(text)
+    cohort = [None, cohort_numbers[0]] if cohort_numbers else None
     year = None if many_year else re.search(r"\b20\d{2}-20\d{2}\b", text)
     program = None if many_program else next((code for code, names in _PROGRAMS if any(contains(text, name) for name in names)), None)
     if program is None and not many_program:
@@ -78,7 +96,7 @@ def _scope(text: str):
     return ("K" + cohort[1] if cohort else None, program, year[0] if year else None)
 
 
-def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
+def analyze(question: str, history_turns: Sequence[str] = (), vocabulary=None) -> Understanding:
     query = normalize_query(question)
     text = fold(query)
     # "miễn phí" (free of charge) is not an exemption question.
@@ -107,7 +125,11 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
             semester = semester or bool(re.search(r"\bhoc ky\s*(?:[123]|i{1,3})\b", fold(prior.search_query)))
             break
 
-    unnamed_exemption = exemption and not _exemption_object(query)
+    # Ask what is exempted only when "miễn" is nearly the whole question ("em được miễn không?"). A question that
+    # carries its own subject ("hồ sơ miễn giảm kỳ này nộp ở đâu", "tín chỉ tích lũy có tính môn được miễn không")
+    # is answerable from the sources even though no exemption kind is named.
+    others = [w for w in re.findall(r"\w+", text) if w not in _NO_SUBJECT and w not in {"mien", "giam"}]
+    unnamed_exemption = exemption and not _exemption_object(query) and len(others) <= 2
 
     foreign_school = bool(re.search(
         r"\b(?:bach khoa|ngoai thuong|kinh te quoc dan|fpt|vinuni|hust|hcmut|harvard|stanford)\b", text)
@@ -122,7 +144,7 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
     # "quy chế của trường khác" names no school, but "học tại trường khác" inside a rule question is ordinary.
     other_school = other_school or bool(re.search(r"(?:^|\bcua )(?:truong|dai hoc) khac\b", text))
     out = ((foreign_school or other_school) and not own_school) or any(contains(text, p) for p in (
-        "thoi tiet", "du bao mua", "gia bitcoin", "ty gia", "ket qua bong da", "nau an", "tu vi"))
+        "thoi tiet", "du bao mua", "gia bitcoin", "ty gia", "ket qua bong da", "tu vi"))
     qtype = "lookup"
     if out:
         qtype = "oos"
@@ -164,16 +186,21 @@ def analyze(question: str, history_turns: Sequence[str] = ()) -> Understanding:
     subject = [w for w in re.findall(r"\w+", text) if w not in _NO_SUBJECT]
     # "Cách tính điểm đó?" with no earlier turn: the pronoun points at nothing we can see.
     dangling = (not topics and not history_turns and len(subject) <= 4 and not re.search(r"\d", text)
-                and bool(re.search(r"\b(?:do|nay|kia|no)\b", text)))
+                # "tự do" (freedom) is not the pointer "đó"; any other "cái này / điểm đó / nó" is.
+                and bool(re.search(r"\b(?:do|nay|kia|no)\b", re.sub(r"\btu do\b", " ", text))))
     unclear = dangling or not topics and (not subject or (len(subject) == 1 and subject[0] in {"diem", "thi", "hoc", "phi", "lop", "mon"})
                               or (len(subject) <= 2 and not re.search(r"\d", text)))
     if not out and unnamed_exemption:
         qtype, prompt = "unclear", "Bạn muốn hỏi điều kiện miễn học phí, miễn thi, miễn học phần, ngoại ngữ hay giáo dục thể chất?"
     elif not out and qtype != "smalltalk" and unclear:
         qtype, prompt = "unclear", "Câu hỏi chưa rõ nội dung. " + _SUGGEST
-    elif missing:
-        labels = {"cohort|academic_year": "khóa hoặc năm học", "program": "ngành, hệ hoặc chương trình đào tạo",
-                  "semester|academic_year": "học kỳ hoặc năm học"}
-        prompt = "Bạn cho biết " + " và ".join(labels[s] for s in missing) + " để tra đúng mức hoặc thời hạn áp dụng."
+    ask_back = None
+    if missing and not prompt:
+        # Answer first from whatever the sources hold per scope, then invite the user to narrow it down.
+        # Blocking here made "học phí bao nhiêu?" a dead end although the fee table is public.
+        ask_back = ("Mức này phụ thuộc vào " + " và ".join(SLOT_PHRASES[s] for s in missing) +
+                    ". Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.")
+    from campus247.rag_v2.vocabulary import EMPTY
     return Understanding(question, query, topics, cohort, program, year, qtype,
-                         tuple(required), tuple(missing), prompt, out)
+                         tuple(required), tuple(missing), prompt, out, ask_back,
+                         scope_terms=(vocabulary or EMPTY).terms_in(question))

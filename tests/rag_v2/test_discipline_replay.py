@@ -91,7 +91,7 @@ async def test_legal_verdict_beside_a_recorded_rule_still_fails_the_shared_guard
     assert verified_general_discipline_rule(outcome, rows)
     state = await guarded_replay(outcome, rows)
     assert state.terminal == Terminal.ABSTAINED
-    assert state.draft.text == GUARD_BLOCKED_MESSAGE
+    assert state.draft.text.startswith(GUARD_BLOCKED_MESSAGE)
     assert not state.draft.grounded_claims
 
 

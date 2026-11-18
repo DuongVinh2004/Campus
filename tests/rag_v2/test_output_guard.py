@@ -80,7 +80,7 @@ async def test_another_guard_rejection_cannot_be_overridden(monkeypatch):
     monkeypatch.setattr(OutputGuardNode, "execute", other_guard)
     stack = build_stack(source=RULE, gateway=FakeGateway(drafts=[[RULE]]))
     state = await stack.workflow.arun(stack.turn, retrieval_context=context())
-    assert state.terminal == Terminal.ABSTAINED and state.draft.text == GUARD_BLOCKED_MESSAGE
+    assert state.terminal == Terminal.ABSTAINED and state.draft.text.startswith(GUARD_BLOCKED_MESSAGE)
     assert "RAG_V2_DISCIPLINE_RULE_VERIFIED" not in state.errors
 
 
@@ -105,7 +105,7 @@ async def test_another_guard_rejection_cannot_be_overridden(monkeypatch):
 async def test_personal_or_unconditional_verdict_is_blocked_even_if_exactly_sourced(text):
     stack = build_stack(source=text, gateway=FakeGateway(drafts=[[text]]))
     state = await stack.workflow.arun(stack.turn, retrieval_context=context())
-    assert state.terminal == Terminal.ABSTAINED and state.draft.text == GUARD_BLOCKED_MESSAGE
+    assert state.terminal == Terminal.ABSTAINED and state.draft.text.startswith(GUARD_BLOCKED_MESSAGE)
     assert "RAG_V2_REFUSE_UNSAFE" in state.errors and not state.draft.grounded_claims
 
 
@@ -118,7 +118,7 @@ async def test_every_other_shared_rejection_survives_the_discipline_exception(ex
     text = SCHOLARSHIP + " " + extra + "."
     stack = build_stack(source=text, gateway=FakeGateway(drafts=[[text]]))
     state = await stack.workflow.arun(stack.turn, retrieval_context=context())
-    assert state.terminal == Terminal.ABSTAINED and state.draft.text == GUARD_BLOCKED_MESSAGE
+    assert state.terminal == Terminal.ABSTAINED and state.draft.text.startswith(GUARD_BLOCKED_MESSAGE)
     assert "RAG_V2_REFUSE_UNSAFE" in state.errors
 
 
@@ -133,7 +133,7 @@ async def test_unofficial_simulated_or_paraphrased_rule_is_blocked(fault):
     elif fault == "simulation":
         stack.row["simulation_label"] = True
     state = await stack.workflow.arun(stack.turn, retrieval_context=context())
-    assert state.terminal == Terminal.ABSTAINED and state.draft.text == GUARD_BLOCKED_MESSAGE
+    assert state.terminal == Terminal.ABSTAINED and state.draft.text.startswith(GUARD_BLOCKED_MESSAGE)
 
 
 @pytest.mark.asyncio

@@ -17,6 +17,9 @@ from campus247.rag_v2.observability.trace import TurnTrace, emit
 from campus247.rag_v2.outcome.compose import TIMEOUT_HINT, TIMEOUT_MESSAGE, TOPIC_CHIPS, build_outcome
 from campus247.rag_v2.outcome.guidance import related_documents, scope_chips
 from campus247.rag_v2.retrieval.hybrid import retrieve, scope_allows
+from campus247.rag_v2.scope_terms import missing_terms, without_terms
+from campus247.rag_v2.table_rows import answer_rows, general_rows, row_pairs, rows_of_chunks, sibling_rows
+from campus247.rag_v2.vocabulary import EMPTY as EMPTY_VOCABULARY
 from campus247.rag_v2.verification.venue import venue_conflict
 from campus247.rag_v2.types import Fact, Outcome, Statement
 from campus247.rag_v2.understanding.analyze import analyze, contains, program_key
@@ -55,6 +58,41 @@ def scope_difference_note(asked, units) -> str:
     where = " và ".join(actual) if actual else "một phạm vi khác với câu hỏi"
     return (f"Mình chưa có văn bản áp dụng cho {' và '.join(wanted)}. Thông tin dưới đây thuộc văn bản áp dụng cho {where}; "
             "bạn nên đối chiếu lại trước khi dùng cho trường hợp của mình.")
+
+
+async def _verify_scoped(gateway, passed, units, u, vocabulary, *, deadline_ms):
+    """Semantic check per statement, against the question as the sources can answer it.
+
+    The check asks whether a statement answers what was asked. A name in the question that the statement's own sources do not carry
+    ("ngành X" against a fee table by programme) can never be matched by any sentence of them, so it is left out of the question for
+    that statement; the caller tells the person. A statement whose sources do carry every name is judged against the full question.
+    Returns the verdicts in the order of `passed` (None when a check is unavailable) and, per statement index, the names it lacks.
+    """
+    lacking_by, groups = {}, {}
+    for i, statement in enumerate(passed):
+        lacking = missing_terms(u.scope_terms, [units[ref] for ref in statement.unit_ids], vocabulary) if u.scope_terms else []
+        if lacking and vocabulary.terms_in(statement.text):
+            # The statement names other majors itself, so it is about those and not a general rule: it must face the full question.
+            lacking = []
+        lacking_by[i] = tuple(lacking)
+        query = without_terms(u.search_query, lacking)[0] if lacking else u.search_query
+        groups.setdefault(query, []).append(i)
+    runs = await asyncio.gather(*(verify_semantic(gateway, [passed[i] for i in idx], units, query, deadline_ms=deadline_ms)
+                                  for query, idx in groups.items()))
+    verdicts = [None] * len(passed)
+    for (query, idx), run in zip(groups.items(), runs):
+        if run is None:
+            return None, lacking_by
+        for i, verdict in zip(idx, run):
+            verdicts[i] = verdict
+    return verdicts, lacking_by
+
+
+def _not_split_by_note(u, terms) -> str:
+    shown = without_terms(u.search_query, terms)[1] or list(terms)
+    names = ", ".join(shown)
+    return (f"Các nguồn mình tìm được không nêu riêng cho {names}: thông tin dưới đây là quy định chung trong nguồn, "
+            f"không phân theo {names}.")
 
 
 def _uncovered(facets, facet_of, verdicts, supported=None):
@@ -155,8 +193,10 @@ class RagV2Service:
     monotonic end time. The retained generation gateway permits at most 5 s/call.
     """
 
-    def __init__(self, facts: tuple[Fact, ...] = ()):
+    def __init__(self, facts: tuple[Fact, ...] = (), vocabulary=None):
         self.facts = tuple(facts)
+        # Scope names (majors and their initialisms) read from the documents of the loaded index.
+        self.vocabulary = vocabulary or EMPTY_VOCABULARY
 
     def _declined(self, u, draft, units=()) -> Outcome:
         """The model decided the sources cannot answer: ask back, or refuse with a typed reason."""
@@ -175,7 +215,7 @@ class RagV2Service:
                      embed, deadline_s=22.0, revalidate=None) -> Outcome:
         started = monotonic()
         trace = TurnTrace()
-        u = analyze(question, history_turns)
+        u = analyze(question, history_turns, self.vocabulary)
         trace.latency_ms["understanding"] = (monotonic() - started) * 1000
 
         async def validate(units):
@@ -259,6 +299,45 @@ class RagV2Service:
                         if retry.candidates:
                             retrieval, relaxed = retry, u
                             break
+                if u.scope_terms and relaxed is None:
+                    # The name the question uses pulls the sources that mention it, which are not always the sources that answer
+                    # (a fee table by programme versus a note about one major). Look once more without the name and keep both,
+                    # the named ones first.
+                    stripped = without_terms(u.search_query, u.scope_terms)[0]
+                    if stripped and stripped != u.search_query:
+                        second = await retrieve(replace(u, search_query=stripped, scope_terms=()), index, reranker,
+                                                rerank_deadline_s=0, final_limit=12)
+                        merged = list(retrieval.candidates[:7])
+                        seen = {c.unit_id for c in merged}
+                        merged += [c for c in second.candidates if c.unit_id not in seen][:5]
+                        retrieval = replace(retrieval, candidates=tuple(merged))
+                table_fallback = None
+
+                async def done(outcome, units_):
+                    if table_fallback is not None and outcome.kind == "refuse":
+                        return await finish(*table_fallback)
+                    return await finish(outcome, units_)
+
+                if u.scope_terms:
+                    # A table not written along the name the question uses: its rows for the cohort and year asked are the answer.
+                    seed_ids = [c.unit_id for c in retrieval.candidates]
+                    seeds = [unit for unit_id in seed_ids if (unit := index.get(unit_id)) is not None]
+                    tables = sibling_rows(seeds, index)
+                    rows, row_statements = answer_rows(u, tables, seed_ids)
+                    if rows:
+                        row_units = {row.unit_id: row for row in rows}
+                        verdicts = [check_statement(statement, row_units) for statement in row_statements]
+                        for i, verdict in enumerate(verdicts):
+                            if not verdict.passed:
+                                trace.statement_rejections[i] = verdict.reasons
+                        trace.candidate_count = len(row_units)
+                        trace.latency_ms["facts"] = (monotonic() - phase) * 1000
+                        result = build_outcome(u, verdicts, row_units, semantic_required=False,
+                                               scope_note=_not_split_by_note(u, u.scope_terms))
+                        if result.kind != "refuse":
+                            # Kept as the answer of last resort: the normal path reads the whole question (a qualifier such as
+                            # "một năm" or "thực hành") and answers first; the rows are shown only where it would have refused.
+                            table_fallback = (result, row_units)
                 trace.latency_ms["retrieval"] = (monotonic() - phase) * 1000
                 trace.candidate_count = len(retrieval.candidates)
                 trace.rerank_scores = [c.rerank_score for c in retrieval.candidates if c.rerank_score is not None]
@@ -293,7 +372,8 @@ class RagV2Service:
                     try:
                         draft = await generate_draft(_GenerationGateway(gateway, reasons),
                             u.search_query, u, list(units.values()), deadline_ms=milliseconds,
-                            max_output_tokens=1000 if repair else 900, focus=focus, relaxed=relaxed is not None, repair=repair)
+                            max_output_tokens=1000 if repair else 900, focus=focus, relaxed=relaxed is not None, repair=repair,
+                            scope_names=u.scope_terms)
                         statements = list(draft.statements)
                     except TimeoutError:
                         if carry is not None:
@@ -314,7 +394,7 @@ class RagV2Service:
                             verdicts, facet_of, facets = carry
                             break
                         trace.latency_ms["generation"] = (monotonic() - phase) * 1000
-                        return await finish(self._declined(u, draft, units.values()), units)
+                        return await done(self._declined(u, draft, units.values()), units)
                     malformed = draft.malformed
                     if malformed and not attempt and generation_end - monotonic() >= 3.0:
                         # Unparseable output (a cut-off or mangled JSON) is a provider fault that is usually gone on
@@ -355,10 +435,11 @@ class RagV2Service:
                     if malformed:
                         # Unparseable model output is a provider fault, not missing evidence.
                         return await finish(build_outcome(u, infra_error=True))
-                    return await finish(build_outcome(u, verdicts, units,
+                    return await done(build_outcome(u, verdicts, units,
                         suggestions=related_documents(list(units.values()))), units)
                 phase = monotonic()
                 semantic = None
+                lacking_by = {}
                 # L1: when every accepted statement is an exact excerpt of a cited source and the scope was not relaxed,
                 # the model-based check is skipped ("on") or only compared with the code decision ("shadow").
                 skip_mode = verbatim_mode()
@@ -373,7 +454,7 @@ class RagV2Service:
                     # checks above have already passed, so a second look is cheaper than an error.
                     await validate(units)
                     try:
-                        semantic = await verify_semantic(_GenerationGateway(gateway), passed, units, u.search_query,
+                        semantic, lacking_by = await _verify_scoped(_GenerationGateway(gateway), passed, units, u, self.vocabulary,
                             deadline_ms=max(1, int(budget(3.5, reserve=0.5 if attempt == 0 else 0) * 1000)))
                     except TimeoutError:
                         semantic = None
@@ -401,7 +482,28 @@ class RagV2Service:
                         for ref in verdict.statement.unit_ids]
                 chips = scope_chips(u.missing_slots, used) if u.missing_slots else ()
                 note = scope_difference_note(relaxed, used) if relaxed is not None else None
-                return await finish(build_outcome(u, verdicts, units, semantic_results=aligned,
+                # Names in the question that the sources behind the accepted statements do not carry: say so, in the person's own words.
+                accepted = [ok for verdict, ok in zip(verdicts, aligned) if verdict.passed]
+                unmatched = [t for i, ok in enumerate(accepted) if ok for t in lacking_by.get(i, ())]
+                if unmatched:
+                    note = " ".join(filter(None, (_not_split_by_note(u, tuple(dict.fromkeys(unmatched))), note)))
+                accepted_text = [v.statement.text for v, ok in zip(verdicts, aligned) if v.passed and ok]
+                if u.scope_terms and any(not any(t in fold(text) for t in u.scope_terms) for text in accepted_text):
+                    # An answer that rests on a table not written along the name is complete only with every row that applies to the
+                    # cohort and year: add the ones the model left out (checked like any other statement).
+                    cited = {chunk for v, ok in zip(verdicts, aligned) if v.passed and ok
+                             for ref in v.statement.unit_ids for chunk in units[ref].chunk_ids}
+                    seeds = rows_of_chunks(cited, index)
+                    general = general_rows(u, sibling_rows(seeds, index), [seed.unit_id for seed in seeds])
+                    said = " ".join(accepted_text)
+                    extra = [(row, sentence) for row, sentence in zip(*general)
+                             if not any(cell in said for _, cell in row_pairs(row) if re.search(r"\d{3}", cell))]
+                    if extra:
+                        extra_units = {row.unit_id: row for row, _ in extra}
+                        units = {**units, **extra_units}
+                        verdicts = [*verdicts, *(check_statement(sentence, units) for _, sentence in extra)]
+                        aligned = [*aligned, *(True for _ in extra)]
+                return await done(build_outcome(u, verdicts, units, semantic_results=aligned,
                     coverage=0.9 if missing else 1.0, missing_parts=missing, suggestions=chips,
                     scope_note=note), units)
         except Exception as exc:  # noqa: BLE001 -- port failures must become content-free typed outcomes

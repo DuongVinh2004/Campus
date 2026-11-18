@@ -104,7 +104,7 @@ async def test_partial_keeps_only_verified_statement_without_regenerating():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(("question", "kind", "reason"), [
-    ("Học phí bao nhiêu?", "clarify", None), ("Thời tiết hôm nay?", "refuse", "out_of_scope")])
+    ("Thời tiết hôm nay?", "refuse", "out_of_scope"), ("Cách tính điểm đó?", "clarify", None)])
 async def test_early_outcomes_never_retrieve_or_generate(question, kind, reason):
     gateway, index, reranker = FakeGateway(), UnitIndex(), Reranker()
     result = await answer(question=question, gateway=gateway, index=index, reranker=reranker)
@@ -399,3 +399,77 @@ async def test_clarify_question_with_a_link_or_address_is_replaced_by_a_fixed_qu
 async def test_unknown_or_missing_decision_is_treated_as_answer_and_verified_as_before():
     assert (await answer(gateway=Deciding("whatever"))).kind == "refuse"      # empty statements, nothing verified
     assert (await answer(gateway=FakeGateway())).kind == "answer"            # legacy output without a decision
+
+
+@pytest.mark.asyncio
+async def test_malformed_model_output_is_retried_once_before_a_transient_error():
+    class Garbled(FakeGateway):
+        async def generate(self, request):
+            if request.request_id == "rag_v2_generation" and not getattr(self, "tried", False):
+                self.tried = True
+                return await _garbled_response(self, request)
+            return await super().generate(request)
+
+    gateway = Garbled(drafts=[[TEXT]])
+    result = await answer(gateway=gateway)
+    assert result.kind == "answer" and sum(r.request_id == "rag_v2_generation" for r in gateway.requests) == 2
+
+
+async def _garbled_response(gateway, request):
+    gateway.requests.append(request)
+    from campus247.ports.llm import LlmResponse, LlmResponseStatus
+    return LlmResponse(status=LlmResponseStatus.COMPLETED, provider_id="fake", model_id="fake", output_text='{"statements": [{"text": ')
+
+
+def test_a_programme_named_in_the_question_must_not_be_answered_from_another_programmes_plan():
+    from campus247.rag_v2.verification.deterministic import program_mismatch
+    other = unit("Chương trình ngành Kỹ thuật xây dựng, chuyên ngành Xây dựng Dân dụng và Công nghiệp có tổng 180TC.")
+    same = unit("Chương trình ngành Kinh tế xây dựng có tổng 190TC.")
+    silent = unit("Tổng: 190TC (không tính học phần giáo dục thể chất).")
+    assert program_mismatch("7580301", [other])                 # asked Kinh tế xây dựng, text is about Kỹ thuật xây dựng
+    assert not program_mismatch("7580301", [same])
+    assert not program_mismatch("7580301", [other, same])
+    assert not program_mismatch("7580301", [silent])            # names no programme: left to the other checks
+    assert not program_mismatch(None, [other])
+
+
+@pytest.mark.asyncio
+async def test_the_malformed_retry_carries_a_format_reminder():
+    class Garbled(FakeGateway):
+        async def generate(self, request):
+            if request.request_id == "rag_v2_generation" and not getattr(self, "tried", False):
+                self.tried = True
+                self.requests.append(request)
+                return LlmResponse(LlmResponseStatus.COMPLETED, "fake", "fake", structured_output={"decision": "answer"},
+                                   output_text=json.dumps({"decision": "answer"}))
+            return await super().generate(request)
+
+    gateway = Garbled(drafts=[[TEXT]])
+    result = await answer(gateway=gateway)
+    generations = [r for r in gateway.requests if r.request_id == "rag_v2_generation"]
+    assert result.kind == "answer" and len(generations) == 2
+    assert "format_reminder" not in "".join(i["content"] for i in generations[0].input_items)
+    assert "format_reminder" in "".join(i["content"] for i in generations[1].input_items)
+
+
+@pytest.mark.asyncio
+async def test_oversized_source_sets_are_trimmed_to_fit_the_provider_input_bound():
+    from campus247.rag_v2.generation.generate import PROVIDER_INPUT_BUDGET_BYTES, generate_draft
+    from campus247.rag_v2.understanding.analyze import analyze
+
+    big = [unit("Mục " + str(i) + " " + "Học phần có tên rất dài. " * 400, uid=f"{i:016x}") for i in range(12)]
+    captured = []
+
+    class Capture(FakeGateway):
+        async def generate(self, request):
+            captured.append(request)
+            return await super().generate(request)
+
+    await generate_draft(Capture(), QUESTION, analyze(QUESTION, ()), big, deadline_ms=5000, max_output_tokens=900)
+    request = captured[0]
+    sources = json.loads("".join(i["content"] for i in request.input_items))["sources"]
+    size = sum(len(i["content"].encode()) for i in request.input_items) + len(request.system_instructions.encode())
+    assert 1 <= len(sources) < 12                 # lowest-ranked sources were left out
+    assert size < 28_000 - 512                    # and the request is within the gateway's input bound
+    assert sources[0]["label"] == "[U1]"          # the best-ranked source is kept
+
