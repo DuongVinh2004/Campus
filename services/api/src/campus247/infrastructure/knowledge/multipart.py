@@ -5,6 +5,7 @@ Uncommitted files remain available for reconciliation, including failed uploads.
 """
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import os
 from types import SimpleNamespace
@@ -104,7 +105,14 @@ async def parse_upload(request, storage):
         parser.finalize()
         if not state["done"] or not state["artifact"] or state["fields"] != {b"file", b"metadata"}:
             raise PlatformError(422, "INCOMPLETE_MULTIPART", "Upload chưa đầy đủ; có thể thử lại cùng mã yêu cầu.")
-        return state["upload"], state["artifact"], bytes(state["metadata"])
+        artifact = state["artifact"]
+        # The file is on disk and its type is checked; no original is accepted before the malware scan has passed. A rejected or
+        # unscanned file raises here, so the caller never registers it (the bytes stay on disk for inspection, as for any failure).
+        scan = getattr(storage, "scan_original", None)
+        evidence = await scan(storage.path(state["identifier"])) if scan is not None else None
+        if evidence:
+            artifact = dataclasses.replace(artifact, scan=evidence)
+        return state["upload"], artifact, bytes(state["metadata"])
     finally:
         if state["file"]:
             state["file"].close()

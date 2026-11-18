@@ -511,7 +511,9 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_quality_recording
     from campus247.presentation.knowledge_quality import create_quality_router
     quality_store = AnswerQualityStore(STATE / "answer-quality.sqlite3")
-    attach_quality_recording(app.state.feedback_service, quality_store)
+    feedback = getattr(app.state, "feedback_service", None)  # absent in the rehearsal/learning-only apps: nothing to record then
+    if feedback is not None:
+        attach_quality_recording(feedback, quality_store)
     app.include_router(create_quality_router(quality_store, freshness_service))
 
     # Sign in with the university account: only when the owner supplied a provider configuration (CAMPUS247_OIDC_CONFIG).

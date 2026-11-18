@@ -129,8 +129,8 @@ def test_proxy_allows_build_assets(operational, monkeypatch, path):
     assert calls == ["http://127.0.0.1:3015/"+path]
 
 
-# "admin" and "staff" are real pages now (they are in the proxy allow-list); only unknown pages stay blocked.
-@pytest.mark.parametrize("path", ["fonts/%2e%2e/secret", "fonts/a..woff2", "fonts/a%5Cb.woff2", "memory"])
+# Every page under apps/web/src/app is served now (scripts/runtime_routes.py); only unknown pages and unsafe paths stay blocked.
+@pytest.mark.parametrize("path", ["fonts/%2e%2e/secret", "fonts/a..woff2", "fonts/a%5Cb.woff2", "khong-co-trang-nay", "knowledge/khong-co"])
 def test_proxy_rejects_traversal_and_additional_pages(operational, monkeypatch, path):
     monkeypatch.setattr(httpx, "AsyncClient", lambda **k: pytest.fail("Blocked path was forwarded"))
     with TestClient(operational[0]) as client:
@@ -392,7 +392,8 @@ def test_campus_passes_complete_v2_runtime_options_without_external_environment(
         runpy.run_path(str(ROOT / "scripts/campus.py"), run_name="__main__")
     assert result.value.code == 0
     args, kwargs = calls[0]
-    assert args[4:] == ["scripts/knowledge_platform_runtime.py", command, "--defer-worker",
+    # The ingestion worker runs with the main runtime, so uploaded documents are processed.
+    assert args[4:] == ["scripts/knowledge_platform_runtime.py", command,
         "--engine", "v2", "--rag-v2-index", "data/rag_v2_index/embedded2"]
     assert kwargs["cwd"] == ROOT
     assert len(calls) == 1
