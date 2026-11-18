@@ -25,7 +25,7 @@ Cơ chế đã làm (đều không gắn với tài liệu hay chủ đề cụ 
 - `facts/extract.py`: phạm vi theo từng dòng; nhận cột tiền theo tên cột và đơn vị.
 
 ## Việc còn lại, theo thứ tự
-1. Chủ hệ thống xem ngưỡng của bộ chặn đầu ra về kỷ luật (họ Q1-0053, câu mẫu tốt nghiệp giỏi): chặn nhầm quy định chung về xếp loại tốt nghiệp.
+1. ĐÃ XỬ LÝ (2026-11-19 đêm): bộ chặn kỷ luật (`rag_v2/discipline.py`) từ chối nhầm quy định chung "hạng tốt nghiệp bị giảm một mức nếu sinh viên đã bị kỷ luật ...". Nguyên nhân đo được (log `rag_v2_discipline_rule_rejected reason=word_not_in_source`): phép kiểm "mọi từ của câu phải có trong dòng nguồn" gặp từ "quyết" của chuỗi tham chiếu "Theo Quyết định 1486" (tên văn bản nằm ở tiêu đề, không ở dòng nguồn) và trạng từ "cũng"; ngoài ra "Theo Quyết" đầu câu bị coi là tên người (`named_subject`). Sửa hẹp: bỏ chuỗi tham chiếu có số (`theo|căn cứ|tại` + loại văn bản + số) khỏi phép kiểm từ, thêm "cũng/đều" vào từ nối, bỏ từ nối đầu câu khỏi nhận diện tên người. Vẫn chặn: từ hậu quả bịa ("đình chỉ"), câu nhắm vào một người ("Em đã bị kỷ luật ..."), tên riêng; câu hỏi "Bạn Nguyễn Văn An đã bị kỷ luật chưa?" vẫn bị từ chối. Test: `tests/rag_v2/test_discipline_wording_20261119.py`; `tests/rag_v2` 753 đạt. Họ Q1-0053 hết `dead_end` (chạy lại 6 câu: 3 helpful, 3 incomplete, 0 dead_end); câu mẫu "Điều kiện xếp loại tốt nghiệp giỏi" nay trả lời.
 2. Mở rộng bộ giữ lại khi có thêm loại tài liệu (PDF quét, bảng nhiều tầng tiêu đề, văn bản nhiều điều khoản); mỗi lần chỉ chạy một lần, không chỉnh theo từng câu.
 3. Commit các sửa trong tệp `rag_v2` cũ (xem mục D của `NEXT_SESSION_PROMPT_20261118.md`).
 
