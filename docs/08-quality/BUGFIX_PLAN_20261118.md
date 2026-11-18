@@ -201,6 +201,36 @@ Git: làm trên nhánh `fix/qa-20261118-bugs` (đã có commit A1). Mỗi WP m�
 - **Sửa mã RAG (WP9 bước 2) và phát hành thử tài liệu (WP11.2)**: memory dự án ghi "không đổi RAG khi chưa hỏi". Yêu cầu ngày 2026-11-18 "sửa triệt để toàn bộ lỗi" bao gồm lỗi này. Khi thực thi, nêu kết quả chẩn đoán bước 1 và cách sửa đề xuất trong một câu hỏi duy nhất, rồi làm tiếp các gói khác trong lúc chờ.
 - Phạm vi khác (giai đoạn cloud, VPS, chi phí) không thuộc kế hoạch này.
 
-## 6. Lỗi phát sinh khi thực thi
+## 6. Lỗi phát sinh khi thực thi (đã xử lý trong lượt 2026-11-18)
 
-(Ghi thêm tại đây: mã, hiện tượng, nguyên nhân gốc, gói xử lý, trạng thái.)
+| Mã | Hiện tượng | Nguyên nhân gốc | Trạng thái |
+|---|---|---|---|
+| N1 | Tải tài liệu lên không bao giờ qua bộ quét virus (tệp EICAR trả 202) | `parse_upload` (streaming) không gọi `storage.scan_original`; chỉ `receive`/`copy_original` có gọi | Đã sửa, `multipart.py`; test `tests/knowledge_platform/test_upload_scan.py` (4). Trên máy này Windows Defender chặn chính tệp EICAR trên đĩa nên bộ quét báo "không sẵn sàng" và API từ chối (đúng hướng fail-closed, nhưng chờ ~30 s) |
+| N2 | Mọi trang không bao giờ "yên" (network idle) | (a) banner kho gọi API mỗi 5 s trên mọi trang (WP8); (b) `fetch('/v1/users/me')` trong `KnowledgeAvailability` không đọc body nên kết nối treo | Đã sửa cả hai |
+| N3 | `tests/operations`: 28 lỗi `KeyError: feedback_service` | `scripts/knowledge_platform.py` gọi `attach_quality_recording(app.state.feedback_service…)` ở mọi app, kể cả app diễn tập không có dịch vụ đó | Đã sửa (bỏ qua khi không có); còn 0 lỗi |
+| N4 | Test proxy cũ khẳng định `/memory` bị chặn | Giả định cũ trước khi có `runtime_routes` | Đã cập nhật test |
+| N5 | Đồ thị quy chế (`/knowledge/policy-graph`) không có API trong runtime vận hành | Router `/v1/policy-graph` chỉ được nối trong bootstrap cũ (`app.py`, `certificate_demo.py`), không có trong `knowledge_platform.py` | Chưa nối (cần dịch vụ, kho và gateway riêng, là một tính năng chứ không phải sửa lỗi). Trang nay báo đúng nguyên nhân thay vì bảo người dùng đăng nhập lại; cổng nghiệm thu cho phép đúng một lỗi 404 này |
+| N6 | Mẫu `/chat` "Điều kiện xếp loại tốt nghiệp giỏi" bị từ chối, nhưng "…là gì?" thì trả lời đúng | Độ nhạy theo cách hỏi của bước kiểm chứng; xem WP9 | Chưa sửa (đang chờ quyết định, mục 5) |
+| N7 | Trang Phòng học gọi `/v1/rooms/{id}/availability` một lần cho từng phòng (34 request mỗi lần tải) | N+1 trong `RoomFinder.tsx` | Chưa sửa; ghi nhận để làm gói riêng (một endpoint trả khả dụng theo lô) |
+| N8 | Giới hạn tốc độ 429 làm các lượt chạy nghiệm thu liên tiếp thất bại | Giới hạn mỗi tài khoản theo phút | Không phải lỗi; cổng nghiệm thu tự chờ 60 s trước luồng đặt phòng |
+
+## 7. Kết quả thực thi
+
+Nhánh `fix/qa-20261118-bugs`. Commit: `579e6b7` (múi giờ), `ab56b0d` (WP1), `cc81a84` (quét tải lên, nhãn hồ sơ, nhật ký, test, cổng nghiệm thu).
+
+| Gói | Kết quả |
+|---|---|
+| WP1 đường đi runtime | Xong, kiểm trên 8015: 4 trang, `/sw.js`, manifest, icon, `/v1/admin/operations/status` đều 200; 404 dễ đọc |
+| WP2 giao diện tối | Xong: `ThemeProvider` độc lập với kho dữ liệu; có nút ở header chat; token tối của lớp identity |
+| WP3 đánh giá chat | Xong: nút hiện cho câu trả lời đã lưu, ghi nhận HTTP 201 (id UUIDv7) |
+| WP4 hồ sơ một cửa | Xong: trả lời không chọn trạng thái → "Đang xử lý"; mất nút "Nhận xử lý"; nhãn tiếng Việt; không còn mã thô |
+| WP5 đặt phòng | Xong: khung mặc định là mốc 30 phút tiếp theo; giờ giữ chỗ đọc được |
+| WP6 form | Xong cho Thêm tài liệu và Thêm sự kiện: thông báo ngay trong trang |
+| WP7 giao diện | Xong: đăng nhập, thanh trên đục, chữ kỹ thuật, nhật ký quản trị, manifest, header chat mobile. "Dải trắng dưới hộp thoại" là báo động giả: lớp phủ phủ kín, chỉ khung hộp thoại cao 828/860 px |
+| WP8 truy vấn định kỳ | Xong: `usePolling` dừng khi tab ẩn; banner 60 s |
+| WP9 RAG | Mới chẩn đoán (xem dưới); chưa đổi mã |
+| WP10 học liệu theo lớp | Chưa kiểm được trên giao diện thật: runtime chưa có tài khoản giảng viên và lớp học; `learning_local_setup.py` dựng một runtime riêng biệt chứ không gán lớp cho `student-local`. Các bài test của module (tests/learning_entry) vẫn đạt |
+| WP11 tải tệp | TXT sạch: 202 trong 68 ms qua bộ quét; từ chối nhiễm độc được chứng minh bằng test với bộ quét giả và `INSTREAM` trực tiếp vào clamd (`Eicar-Test-Signature FOUND`); chưa chứng minh được cả đường API bằng EICAR thật vì Defender chặn tệp. Chưa chạy phát hành thử (đổi chỉ mục) |
+| WP12 cổng nghiệm thu | `node scripts/qa/web_acceptance.mjs`: trang 429/429 đạt, luồng 32/32 đạt (3 vai × desktop + mobile, sáng + tối) |
+
+Chẩn đoán WP9. Câu "Học phí ngành CNTT K67 là bao nhiêu mỗi tín chỉ?": nguồn là bảng học phí Quyết định 924 (năm 2026–2027) với hai hàng K67: "Chương trình Cử nhân… K65 đến K68: 592.500" và "Kỹ sư chất lượng cao, từ K67: 533.000". Bảng không ghi ngành CNTT thuộc chương trình nào, nên bộ chấm ngữ nghĩa loại phát biểu (`SEMANTIC_UNSUPPORTED`) và hệ thống trả "chưa xác minh được phát biểu" chứ không hỏi lại chương trình. Đề xuất sửa (cần chủ hệ thống đồng ý vì chạm RAG): khi nguồn khớp nhiều hàng chương trình và câu hỏi không nêu chương trình, trả lời bằng câu hỏi làm rõ nêu cả hai mức kèm trích dẫn (như bước "làm rõ phạm vi" đã có), thay vì từ chối chung; thêm bộ câu hỏi này vào `evals/datasets/rag-v2/`. Mọi vết `rerank_scores: []` trong trace chưa được điều tra (cần đọc `retrieval/`).

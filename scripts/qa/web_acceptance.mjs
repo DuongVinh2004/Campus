@@ -369,6 +369,8 @@ if (ONLY === "all" || ONLY === "flows") {
   await step("login errors", loginErrors);
   await step("theme", themeFlow);
   await step("chat", chatFlow);
+  // The API limits each account's requests per minute (429); the chat flow above uses most of it, so let the window pass.
+  await new Promise((resolve) => setTimeout(resolve, 60000));
   await step("rooms", roomsFlow);
   await step("schedule", scheduleFlow);
   await step("tickets", ticketFlow);
