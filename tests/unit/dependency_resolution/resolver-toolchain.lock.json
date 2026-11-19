@@ -1,0 +1,12 @@
+{
+  "tool": "uv",
+  "version": "0.12.22",
+  "license_expression": "MIT OR Apache-2.0",
+  "metadata_source": "https://pypi.org/pypi/uv/0.12.22/json",
+  "artifact": {
+    "filename": "uv-0.12.22-py3-none-win_amd64.whl",
+    "url": "https://files.pythonhosted.org/packages/c0/a4/2cc0b670ac86d2cce4758126f06cc44a821a7d289e1cc73bbb485d77f135/uv-0.12.22-py3-none-win_amd64.whl",
+    "sha256": "1c45b1e544901b9eef14806ad964cd1aca49338748e3d8030e41c4aed8b17b00",
+    "size": 18114353
+  }
+}

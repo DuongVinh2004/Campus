@@ -1,0 +1,4 @@
+# Only task-created resolver artifacts; preserve them, never cleanup/reset.
+.tools/
+.resolve-tmp/
+.resolution-candidate/

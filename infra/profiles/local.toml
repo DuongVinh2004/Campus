@@ -33,3 +33,5 @@ frontend_mb = 200
 api_worker_mb = 870
 worker_mb = 300
 gateway_mb = 150
+# ClamAV daemon (learning-module upload scanning): measured 960 MB resident, 972 MB peak on 2026-11-17.
+scanner_mb = 1000

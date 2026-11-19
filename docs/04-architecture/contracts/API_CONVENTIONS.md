@@ -1,13 +1,26 @@
 ---
 document_id: "DOC-API-002"
-version: "1.0.0"
+version: "1.1.1"
 status: "reviewed"
 owner: "API Architect"
 approvers: ["Solution Architect", "Security Lead", "Frontend Lead"]
-last_updated: "2026-09-21"
+last_updated: "2026-10-12"
 ---
 
 # API conventions V1
+
+## Citation source read (API-CONV-005, local implementation authority DEC-023)
+
+`GET /v1/conversations/{conversation_id}/messages/{message_id}/citations/{citation_id}/source`
+resolves source/version/chunk only from an immutable validated final in the actor's
+unexpired own conversation. The saved citation does not grant access: current
+trusted scope, actor grants, publication, applicability and simulation policy MUST
+be checked before returning the original cited chunk. Verify checksum, locator,
+metadata and saved quote; conceal absent/denied resources with 404. Missing policy
+or storage dependencies fail closed with 503. Responses are bounded, allowlisted,
+plain text, `Cache-Control: no-store`; decisions are audited without tokens or text.
+This read performs no inference, message mutation, arbitrary URI fetch or admin
+knowledge access. It exposes the cited chunk, not a full-document representation.
 
 ## 1. Protocol và representation
 
@@ -120,6 +133,51 @@ V1 chat response MAY use Server-Sent Events at `POST /v1/conversations/{conversa
 - Streaming errors after headers are emitted use `message.failed` with safe problem object; pre-stream errors use HTTP problem response.
 
 OpenAPI documents the stream media type at skeleton level; exact AI response semantics belong to AI package.
+
+### 8.1 Approved payload binding — P-CONTRACT-STREAM-001
+
+Direct human approval ngày 2026-10-04 trong chat triển khai: “phê duyệt”, sau
+proposal P-CONTRACT-STREAM-001. Decision record:
+`docs/00-governance/CHAT_STREAM_CONTRACT_DECISION_20261004.md`.
+`contracts/json-schema/chat/stream-event.schema.json` defines the parsed
+`{id, event, data}` envelope; wire `data` is JSON, bounded by an SSE blank line.
+
+- `message.started.data = {conversation_id, message_id}`. The server reserves
+  this assistant UUIDv7; completion and the immutable saved message use it.
+- `message.delta.data = {seq, delta}`. Sequence is a positive integer increasing
+  within this attempt. Clients ignore duplicates/reordered deltas and event IDs;
+  they never enable citations, actions or feedback based on provisional text.
+- `citation.added.data = {message_id, citation}`. A stream citation is
+  `{turn_citation_id, citation}`: turn ID matches `CIT-<sequence>` used in claims,
+  nested `citation` follows the existing UUIDv7 API citation schema. These are
+  distinct identity domains, joined by an immutable server-generated mapping.
+  Do not invent missing source/version/locator/status metadata.
+- `message.completed.data = {conversation_id, message_id, status,
+  response_class, content, citations}`. `status` is
+  `answered | abstained | completed | cancelled | handed_over`, preserving the
+  validated graph outcome. `response_class` follows PRD section 6.1. `content`
+  replaces the entire provisional text. `citations` is the authoritative final
+  array of stream citations; rejected/abstained content has no grounded citations.
+  Persist only the validated final text and the same immutable ID/mapping.
+- `message.failed.data` is directly the existing safe problem object, without a
+  custom wrapper. `safe_failure`, missing/invalid graph output and unexpected
+  exceptions never become completed/answered. No raw exception, stack, provider
+  body or guard rejection pattern appears in the payload. Retryability requires
+  proof that a retry cannot duplicate side effects; clients do not retry silently.
+- Unknown fields are ignored. Unknown event/status/class, malformed JSON,
+  wrong message binding and EOF without a terminal produce explicit UNKNOWN or
+  failed UI behavior, withdraw provisional text/citations and record only a safe
+  telemetry code. CR/LF/CRLF, fragmented UTF-8, comments and multiline `data`
+  must be decoded by event boundary, not individual network chunks/data lines.
+- After a terminal, ignore duplicate terminal delivery; do not overwrite the
+  saved result with trailing data. Cancellation/disconnect before validation or
+  persistence does not commit partial assistant text. No graph regeneration on
+  stream resume; unsupported resume is a pre-stream problem with an alternate
+  transcript GET link, rather than a second execution.
+
+This binding does not change authentication, authorization, evidence thresholds,
+RAG retrieval/model behavior or database migrations. Runtime/storage promotion
+still requires its own evidence and approval.
 
 ## 9. Caching
 

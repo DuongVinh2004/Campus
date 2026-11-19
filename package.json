@@ -4,8 +4,9 @@
   "private": true,
   "packageManager": "pnpm@9.12.0",
   "scripts": {
-    "dev": "pnpm --filter web dev",
-    "build": "pnpm --filter web build",
+    "dev": "infra\\local\\rag-fixture\\.venv\\Scripts\\python.exe -B scripts/campus.py start",
+    "start": "infra\\local\\rag-fixture\\.venv\\Scripts\\python.exe -B scripts/campus.py start",
+    "build": "infra\\local\\rag-fixture\\.venv\\Scripts\\python.exe -B scripts/campus.py build",
     "lint": "pnpm --filter web lint",
     "test": "pnpm --filter web test"
   },

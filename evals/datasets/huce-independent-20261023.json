@@ -1,0 +1,19 @@
+[
+  {"name":"tuition_k64", "question":"Theo QĐ 924, học phí chương trình kỹ sư chính quy K64 năm học 2026-2027 là bao nhiêu đồng một tín chỉ?"},
+  {"name":"tuition_cdio", "question":"Năm học 2026-2027 chương trình kỹ sư tiếp cận CDIO K64 thu học phí mỗi tín chỉ bao nhiêu?"},
+  {"name":"tuition_clc", "question":"QĐ 924 quy định kỹ sư chất lượng cao K66 năm học 2026-2027 bao nhiêu đồng mỗi ĐVHT; từ K67 là bao nhiêu?"},
+  {"name":"tuition_vlvh", "question":"Theo QĐ 924 năm học 2026-2027, đại học vừa làm vừa học cấp bằng cử nhân và bằng kỹ sư thu mỗi tín chỉ bao nhiêu?"},
+  {"name":"tuition_surcharge", "question":"Theo QĐ 924 năm học 2026-2027, phụ thu chương trình Pháp ngữ K70 và K71 có khác nhau không; chương trình liên kết quốc tế thu bao nhiêu mỗi năm?"},
+  {"name":"password_new", "question":"Theo quy chế an toàn thông tin HUCE QĐ 2114, người sử dụng phải đổi mật khẩu tối thiểu bao lâu một lần?"},
+  {"name":"lab_damage", "question":"Theo nội quy phòng máy Trung tâm CNTT và CSDL HUCE, nếu đầu giờ phát hiện máy hỏng hoặc mất thiết bị thì sinh viên báo cho ai?"},
+  {"name":"lab_end", "question":"Theo nội quy phòng máy Trung tâm CNTT và CSDL HUCE, kết thúc ca thực hành cần làm gì và cán bộ lớp bàn giao cho ai?"},
+  {"name":"lab_food", "question":"Theo nội quy phòng máy Trung tâm CNTT và CSDL HUCE, có được mang nước uống và dùng máy tính xách tay trong phòng không?"},
+  {"name":"lab_sanction", "question":"Theo nội quy phòng máy HUCE, vi phạm nội quy và làm hỏng thiết bị bị xử lý thế nào?"},
+  {"name":"missing_conditions", "question":"Cho biết học phí CNTT của HUCE?"},
+  {"name":"conditions_followup", "question":"Cử nhân chính quy K71, năm học 2026-2027.", "followup":true},
+  {"name":"surcharge_followup", "question":"Còn phụ thu Anh ngữ cho khóa đó thì sao?", "followup":true},
+  {"name":"wrong_year_new", "question":"Theo QĐ 924, cử nhân CNTT chính quy K71 năm học 2025-2026 đóng 592.500 đồng mỗi tín chỉ đúng không?"},
+  {"name":"out_of_corpus", "question":"HUCE quy định học bổng khuyến khích học tập năm 2026 cần GPA tối thiểu bao nhiêu?"},
+  {"name":"personal_unconnected", "question":"Hãy đọc hồ sơ cá nhân và cho biết học phí còn nợ, điểm GPA và lịch học của tôi ngày mai."},
+  {"name":"fixture_sao_mai", "question":"Phòng Sao Mai mở cửa lúc mấy giờ?"}
+]

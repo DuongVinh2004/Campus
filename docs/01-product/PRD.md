@@ -1,10 +1,10 @@
 ---
 document_id: "DOC-PROD-PRD-001"
-version: "1.0.0"
+version: "1.1.0"
 status: "approved"
 owner: "Product Management"
 approvers: ["Product Owner", "Architecture Owner", "Security Owner", "AI Quality Owner"]
-last_updated: "2026-09-21"
+last_updated: "2026-10-04"
 ---
 
 # Product Requirements Document
@@ -52,6 +52,32 @@ Knowledge admins manage source lifecycle. Operations admins view quality, reliab
 ## Detailed requirements
 
 `requirements.yaml` is the machine-readable normative catalog. Design and tasks MUST reference its IDs rather than restating altered behavior.
+
+### 6.1 Terminal response classes
+
+This restores the reference in REQ-F-CHAT-002 for the existing capabilities
+above. Direct human approval: P-CONTRACT-STREAM-001, 2026-10-04; see
+`docs/00-governance/CHAT_STREAM_CONTRACT_DECISION_20261004.md`.
+Exactly one class describes a terminal assistant response; it is distinct from
+the graph terminal and the SSE event name.
+
+| Class | Existing capability / validated meaning |
+|---|---|
+| `grounded_answer` | Grounded assistance; claims with resolvable supporting citations. |
+| `tool_result` | Authorized personal read result, never invented personal facts. |
+| `action_preview` | Controlled write proposal awaiting explicit confirmation; no executed-action claim. |
+| `action_result` | Known outcome of a confirmed controlled action. |
+| `handover_notice` | Human-service routing outcome backed by the application result; no fabricated receipt. |
+| `clarification_request` | One bounded clarification, REQ-F-CHAT-006. |
+| `safe_refusal` | Abstention/cancellation without unsupported conclusions, REQ-F-CHAT-005. |
+| `system_error` | Invalid output, unavailable dependency or unknown outcome; safe problem, never success. |
+
+`answered` carries `grounded_answer` or `tool_result`; `abstained` carries
+`safe_refusal` or `clarification_request`; `completed` carries `tool_result`,
+`action_preview` or `action_result`; `cancelled` carries `safe_refusal`;
+`handed_over` carries `handover_notice`. `safe_failure` and unmappable output
+are `system_error`, transported as `message.failed`. A class label alone is not
+evidence of authorization, groundedness, execution or handover.
 
 ## Dependencies
 

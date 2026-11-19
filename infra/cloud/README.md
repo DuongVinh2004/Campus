@@ -81,6 +81,26 @@ The gateway writes two small files per provider call and the model server two or
 `infra/cloud/compact_ledgers.py` archives old records into one tar.gz per day, verified byte for byte before an original is removed
 (dry run by default; never run it on the local evidence set). Service logs rotate weekly (`logrotate.conf`).
 
+## Malware scanning
+
+Every uploaded or crawled file is scanned before it is registered (`docs/04-architecture/MALWARE_SCANNING_DESIGN_20261117.md`).
+`install.sh` installs the Ubuntu `clamav-daemon` and `clamav-freshclam`, replaces `/etc/clamav/clamd.conf` with
+`infra/cloud/clamav/clamd.conf` (Unix socket `/run/clamav/clamd.ctl`, no TCP listener; the distribution file is kept as
+`clamd.conf.distribution`), downloads the signatures **before** starting the daemon, and adds a drop-in limiting it to 1.5 GB.
+The API unit wants and starts after `clamav-daemon`, joins the `clamav` group and sets `CAMPUS247_SCANNER_SOCKET`;
+with `CAMPUS247_PROFILE=cloud` it refuses to start without a scanner. Without a verdict (daemon down, signatures older than
+72 hours) uploads are refused with 503 and nothing is registered; chat is unaffected.
+Check: `infra/cloud/wait_scanner.sh`, `systemctl status clamav-daemon clamav-freshclam`, and the `learning-scanner` entry of `/health/ready`.
+Budget about 1 GB of RAM for the daemon (measured 960-973 MB on Windows and Ubuntu).
+
+Acceptance on the VM (the numbers the design document still lists as unmeasured): with the whole stack up run
+`sudo infra/cloud/verify_scanner.sh /opt/campus247 10`. It checks the units, the socket mode, that clamd has no TCP listener,
+that a clean file passes and EICAR is rejected as the API user, that clamd stays under 1500 MB and at least 1000 MB
+(`MIN_AVAILABLE_MB`) remains available for the rest of the stack, then soaks the daemon for the given minutes with a signature
+reload every minute (`scripts/scanner_soak.py`, memory trend and errors) and finally checks `upload-scanner` in `/health/ready`.
+It prints every measurement; put them into the design document. Longer runs: `scripts/scanner_soak.py --hours 72 --reload-every 120 --socket /run/clamav/clamd.ctl`
+(on Windows: omit `--socket`, the daemon is on 127.0.0.1:33100). Tested end to end in an Ubuntu 24.04 systemd container with a stand-in API.
+
 ## Safety notes
 
 - API, gateway, models and Postgres bind to loopback only; the firewall allows 22 and 443.

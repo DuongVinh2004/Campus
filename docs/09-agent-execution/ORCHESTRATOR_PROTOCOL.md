@@ -1,30 +1,32 @@
 ---
 document_id: "DOC-AGENT-002"
-version: "1.0.0"
+version: "1.1.0"
 status: "reviewed"
 owner: "Agentic Delivery Architecture"
 approvers: ["Engineering Lead", "Release Owner"]
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 ---
 
 # Orchestrator protocol
+
+[DEC-023](../00-governance/LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md) resolves additional execution approvals for assigned local/synthetic work. Use that standing human decision in context packs; do not create a per-task/package human checkpoint from older metadata.
 
 ## Scheduling loop
 
 1. Validate catalog, index, DAG, external reference registry and requirement/AC binding catalog.
 2. Reconcile task status from the authoritative evidence store.
 3. Compute candidates whose dependencies are `accepted`.
-4. Remove candidates blocked by source status, approval, environment or open-question gates.
+4. Remove candidates blocked by missing technical source/dependency evidence, environment or substantive open questions. Resolve local execution-approval classifications with DEC-023.
 5. Resolve each candidate's path patterns and conflict keys.
 6. Select up to four mutually disjoint tasks, preferring critical-path and P0 work.
 7. Acquire leases for task ID, paths and conflict keys.
 8. Resolve direct and/or canonical requirement/AC bindings, add the exact product source sections to the bounded context pack, then dispatch one task per executor.
-9. On result, verify schema, scope, commands and evidence independently.
+9. On result, verify schema, scope, commands and evidence; delegated executor review is permitted by DEC-022/DEC-023.
 10. Mark `accepted`, request changes, or block; release leases in all terminal cases.
 
 ## State ownership
 
-Only the orchestrator or authorized human may move `reviewed -> ready`, `verification -> accepted`, or grant a waiver. Executors may propose `in_progress`, `verification`, `blocked` or `failed` through task output.
+Under DEC-023, the authorized executor may record local technical readiness and acceptance with source/dependency/verification evidence. This does not permit inventing evidence or waiving a failed technical criterion. Outside the delegation, state ownership remains with the orchestrator or authorized human.
 
 ## Context pack
 

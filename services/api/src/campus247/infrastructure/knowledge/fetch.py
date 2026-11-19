@@ -111,7 +111,7 @@ class PublicDocumentFetcher:
                                 raise PlatformError(409, "SOURCE_304_WITHOUT_BINDING", "Phản hồi không đổi chưa có binding của đúng nguồn.")
                             storage.read(previous_artifact)  # Recheck after the network wait.
                             artifact = StoredArtifact(**{name: str(previous_artifact[name]) if name == "id" else previous_artifact[name]
-                                for name in StoredArtifact.__dataclass_fields__})
+                                for name in StoredArtifact.__dataclass_fields__ if name != "scan"})
                             return artifact, {**previous_acquisition, "hops": hops, "observed_at": datetime.now(UTC).isoformat(),
                                 "not_modified": True, "reused_original_sha256": artifact.sha256,
                                 "previous_acquisition_sha256": digest(previous_acquisition), "source_verified": False,

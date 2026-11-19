@@ -33,6 +33,7 @@ from campus247.application.learning.page_feedback import (
     LearningPageFeedback,
     feedback_clock,
 )
+from campus247.application.learning.scan_lifecycle import QUARANTINED, LearningScanLifecycle
 from campus247.application.learning.version_changes import LearningVersionChanges
 from campus247.domain.learning import LearningError, require
 from campus247.domain.shared.values import generate_uuid7
@@ -68,7 +69,7 @@ def reserved_upload_bytes(uploads, offering):
                if row["offering_id"] == offering and not row.get("reservation_released"))
 
 
-class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedback, LearningVersionChanges, LearningExitTickets, LearningIdeaCards, LearningAccessibleText):
+class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplanation, LearningPageFeedback, LearningVersionChanges, LearningExitTickets, LearningIdeaCards, LearningAccessibleText):
     def __init__(self, repository, blob_store, *, tenant_id, signing_key, scanner=None, directory=None, ai_gateway=None, ai_verifier=None, ai_source_hashes=(), optimize_pdf=False, pptx_converter=None, page_feedback_offerings=(), page_explanations_available=True, version_change_offerings=(), exit_ticket_offerings=(), idea_card_offerings=(), accessible_text_offerings=(), accessible_text_ocr_paused_offerings=(), accessible_text_pipeline=None, accessible_text_byte_quota=12 * 1024**3):
         require(bool(signing_key) and bool(tenant_id), 503, "LEARNING_UNAVAILABLE", "Chưa cấu hình học liệu.")
         self.repository, self.blobs, self.tenant_id = repository, blob_store, tenant_id
@@ -154,10 +155,11 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
     def dto_version(self, s, actor, version):
         version, material, offering, member = self.version(s, actor, version["id"])
         ocr_available = (offering["id"] in self.accessible_text_offerings and version["processing_state"] == "READY"
-                         and version["publication_state"] != "RETRACTED"
+                         and version["publication_state"] not in {"RETRACTED", QUARANTINED}
                          and version.get("source_media_type", PDF_MEDIA_TYPE) == PDF_MEDIA_TYPE)
         result = {k: copy.deepcopy(v) for k, v in version.items() if k not in {
             "storage_key", "sha256", "byte_size", "uploaded_by", "view_blob_id", "idea_source_epoch", "accessible_text_release_id",
+            "scan_receipts", "scan_quarantine",
         }}
         result.update(version_id=version["id"], title=material["title"], offering_id=offering["id"],
             current_published_version_id=material["current_published_version_id"],
@@ -289,6 +291,7 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
             if kind in {"version", "content", "reader_state"}:
                 version, material, offering, member = self.version(s, actor, target)
                 if kind == "content":
+                    require(version["publication_state"] != QUARANTINED, 423, "FILE_QUARANTINED", "Tệp đang bị cách ly vì chưa vượt qua kiểm tra an toàn.")
                     require(version["processing_state"] == "READY", 409, "FILE_NOT_READY", "Tệp chưa sẵn sàng.")
                     if params.get("download"):
                         require(offering["download_allowed"], 403, "DOWNLOAD_DISABLED", "Lớp chưa bật tải bản gốc.")
@@ -652,6 +655,8 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
             if action == "publish":
                 require(version["processing_state"] == "READY", 409, "FILE_NOT_READY", "Tài liệu chưa vượt qua kiểm tra.")
                 require(version["publication_state"] != "PUBLISHED", 409, "INVALID_STATE", "Phiên bản này đã được công bố.")
+                require(version["publication_state"] != QUARANTINED, 409, "FILE_QUARANTINED", "Tệp đang bị cách ly nên không thể công bố. Hãy tải bản mới.")
+                require(self.scan_is_current(version), 503, "SCAN_NOT_CURRENT", "Đang cập nhật kiểm tra an toàn cho tệp; hãy thử lại sau ít phút.")
                 if change_revision is not None:
                     self.release_change_set(s, version, material, change_revision)
                 if p.get("scheduled_at"):
@@ -871,11 +876,17 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
         record("learning.upload_job", duration_ms=round((time.perf_counter() - started) * 1000),
             result="ready", file_type=format_name, attempt=attempt)
 
+    @staticmethod
+    def scan_evidence(receipts):
+        """Receipts of the scans that cleared this version (none for scanners that return no receipt)."""
+        rows = [receipt.as_dict() if hasattr(receipt, "as_dict") else dict(receipt) for receipt in receipts if receipt]
+        return {"scan_receipts": rows} if rows else {}
+
     async def _inspect_version(self, storage_key, source_type=PDF_MEDIA_TYPE, source_sha256=None):
         async with asyncio.timeout(PROCESSING_TIMEOUT_SECONDS):
             if source_sha256:
                 await self.blobs.verify(storage_key, source_sha256, self.blobs.path(storage_key).stat().st_size)
-            await self.scanner.scan(self.blobs.path(storage_key))
+            receipts = [await self.scanner.scan(self.blobs.path(storage_key))]
             if source_type == PPTX_MEDIA_TYPE:
                 require(self.pptx_available, 503, 'PPTX_CONVERTER_UNAVAILABLE', 'Chuyển đổi PowerPoint chưa được cấu hình an toàn.')
                 try:
@@ -894,16 +905,18 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
                 except (ValueError, TypeError, AttributeError):
                     raise LearningError(503, 'RENDITION_ID_INVALID', 'Chưa xác minh được mã bản xem.') from None
                 blob = await self.blobs.import_pdf(Path(rendition.pdf_path), expected_sha256=rendition.pdf_sha256, expected_size=rendition.pdf_bytes)
-                await self.scanner.scan(self.blobs.path(blob['storage_key']))
+                receipts.append(await self.scanner.scan(self.blobs.path(blob['storage_key'])))
                 info = await self.blobs.inspect(blob['storage_key'])
                 require(info['page_count'] == rendition.slide_count, 422, 'PPTX_SLIDE_COUNT_MISMATCH', 'Số trang bản xem không khớp số slide nguồn.')
-                info.update(converter_version=rendition.converter_version, converter_sha256=rendition.converter_sha256)
+                info.update(converter_version=rendition.converter_version, converter_sha256=rendition.converter_sha256,
+                            **self.scan_evidence(receipts))
                 return info, blob | {'optimized': True, 'rendition_id': rendition_id}
             info = await self.blobs.inspect(storage_key)
             view_info = await self.blobs.web_view(storage_key) if self.optimize_pdf else {'optimized': False, 'reason': 'NOT_CONFIGURED'}
             if view_info.get('optimized'):
-                await self.scanner.scan(self.blobs.path(view_info['storage_key']))
+                receipts.append(await self.scanner.scan(self.blobs.path(view_info['storage_key'])))
                 await self.blobs.verify(view_info['storage_key'], view_info['sha256'], view_info['byte_size'])
+            info.update(self.scan_evidence(receipts))
             return info, view_info
 
     async def abort(self, actor, upload_id, still_valid=None):
@@ -957,6 +970,8 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
                 if member is None or candidate is None or offering["status"] != "ACTIVE" or material["visibility"] != "VISIBLE":
                     version.update(publication_state="DRAFT", schedule_error="AUTHORITY_UNAVAILABLE", scheduled_at=None)
                     continue
+                if version["processing_state"] == "READY" and not self.scan_is_current(version):
+                    continue  # the daily re-scan refreshes it; publishing on a days-old verdict is not allowed
                 if version["processing_state"] == "READY":
                     change_revision = version.pop("scheduled_change_set_revision", None)
                     pinned_current = version.pop("scheduled_change_current", None)
@@ -974,3 +989,6 @@ class LearningService(LearningExtensions, LearningExplanation, LearningPageFeedb
                     published += 1
         if published:
             record("learning.publication", count=published, mode="scheduled")
+        outcome = await self.rescan_due()
+        if outcome["scanned"] or outcome["quarantined"]:
+            record("learning.rescan", **outcome)

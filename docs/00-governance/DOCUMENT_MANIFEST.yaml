@@ -1,9 +1,9 @@
 document_id: "DOC-GOV-MANIFEST-001"
-version: "2.1.0"
+version: "2.2.0"
 status: "reviewed"
 owner: "Documentation Chief Editor"
 approvers: []
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 schema_version: "2.0"
 project: "campus247"
 inventory_basis: "filesystem inventory observed 2026-09-22"
@@ -23,6 +23,8 @@ domains:
       - {path: "docs/00-governance/ASSUMPTIONS_AND_OPEN_QUESTIONS.md", document_id: "DOC-GOV-ASSUMPTIONS-001", status: approved, canonical: true, owner: "Documentation Chief Editor", purpose: "Planning assumptions and launch-blocking open questions."}
       - {path: "docs/00-governance/CROSS_REVIEW_CHECKLIST.md", document_id: "DOC-GOV-REVIEW-001", status: approved, canonical: true, owner: "Documentation Chief Editor", purpose: "Cross-domain review checklist."}
       - {path: "docs/00-governance/DECISION_REGISTER.md", document_id: "DOC-GOV-DECISIONS-001", status: approved, canonical: true, owner: "Product and Architecture Governance", purpose: "Accepted decision record register."}
+      - {path: "docs/00-governance/RAG_ACCEPTANCE_AUTHORITY_DECISION_20261006.md", document_id: "DOC-GOV-RAG-AUTHORITY-20261006", status: approved, canonical: true, owner: "Human project owner in the current conversation", purpose: "Direct human M1-M3 synthetic-scope decision removing artifact/acceptance signatures and independent review; authorizes evidence-based configuration selection."}
+      - {path: "docs/00-governance/LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md", document_id: "DOC-GOV-LOCAL-AUTHORITY-20261007", status: approved, canonical: true, owner: "Human workspace owner in the current conversation", purpose: "DEC-023: standing human authority removes additional agent execution approvals for assigned local/synthetic engineering across the repository; preserves technical evidence and data boundaries."}
       - {path: "docs/00-governance/DOCUMENT_CONTROL.md", document_id: "DOC-GOV-CONTROL-001", status: approved, canonical: true, owner: "Documentation Chief Editor", purpose: "Document lifecycle, precedence, and change control."}
       - {path: "docs/00-governance/DOCUMENT_MANIFEST.yaml", document_id: "DOC-GOV-MANIFEST-001", status: reviewed, canonical: true, owner: "Documentation Chief Editor", purpose: "Filesystem-backed documentation inventory."}
       - {path: "docs/00-governance/GLOSSARY.md", document_id: "DOC-GOV-GLOSSARY-001", status: approved, canonical: true, owner: "Documentation Chief Editor", purpose: "Shared terminology."}
@@ -43,12 +45,12 @@ domains:
       - {path: "docs/01-product/PERSONAS_AND_ROLES.md", document_id: "DOC-PROD-PERSONA-001", status: approved, canonical: true, owner: "Product Management", purpose: "Personas and roles."}
       - {path: "docs/01-product/USE_CASE_CATALOG.md", document_id: "DOC-PROD-UC-001", status: approved, canonical: true, owner: "Product Management", purpose: "Use-case catalog."}
       - {path: "docs/01-product/KPI_CATALOG.md", document_id: "DOC-PROD-KPI-001", status: approved, canonical: true, owner: "Product Analytics", purpose: "KPI catalog."}
-      - {path: "docs/01-product/SCOPE_AND_ROADMAP.md", document_id: "DOC-PROD-SCOPE-001", status: approved, canonical: true, owner: "Product Management", purpose: "Scope and roadmap."}
+      - {path: "archive/legacy-plans-20261013/docs/01-product/SCOPE_AND_ROADMAP.md", document_id: "DOC-PROD-SCOPE-001", status: approved, canonical: true, owner: "Product Management", purpose: "Scope and roadmap."}
       - {path: "docs/01-product/COMMERCIAL_BUSINESS_CASE.md", document_id: "DOC-PROD-002", status: reviewed, canonical: false, owner: "Product Lead", purpose: "Commercial business-case view."}
       - {path: "docs/01-product/SCOPE_AND_NON_GOALS.md", document_id: "DOC-PROD-003", status: reviewed, canonical: true, owner: "Product Manager", purpose: "Scope boundaries and non-goals."}
       - {path: "docs/01-product/FUNCTIONAL_REQUIREMENTS.md", document_id: "DOC-PROD-008", status: reviewed, canonical: false, owner: "Product Manager", purpose: "Human-readable functional-requirement view."}
       - {path: "docs/01-product/NON_FUNCTIONAL_REQUIREMENTS.md", document_id: "DOC-PROD-009", status: reviewed, canonical: false, owner: "Product Manager", purpose: "Human-readable non-functional-requirement view."}
-      - {path: "docs/01-product/CAPABILITY_ROADMAP.md", document_id: "DOC-PROD-010", status: reviewed, canonical: true, owner: "Product Lead", purpose: "Capability sequencing."}
+      - {path: "archive/legacy-plans-20261013/docs/01-product/CAPABILITY_ROADMAP.md", document_id: "DOC-PROD-010", status: reviewed, canonical: true, owner: "Product Lead", purpose: "Capability sequencing."}
       - {path: "docs/01-product/requirements.yaml", document_id: "DOC-PROD-012", status: reviewed, canonical: true, owner: "Product Manager", purpose: "Canonical catalog of 125 requirements and acceptance criteria."}
       - {path: "docs/01-product/REQUIREMENT_DEPENDENCY_MAP.md", document_id: "DOC-PROD-013", status: reviewed, canonical: true, owner: "Product Requirements Recovery Lead", purpose: "Requirement dependency map."}
 

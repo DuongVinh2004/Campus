@@ -23,6 +23,26 @@ class ExecutionInProgressError(Exception):
     pass
 
 
+class ScopedSpecialistExecutor:
+    """Server-selected read/prepare adapter with strict input/output and guards.
+
+    It receives no action coordinator, confirmation token or business dispatcher.
+    Revalidation runs on every call and again before returning a result.
+    """
+    def __init__(self, registry, *, authorize):
+        self.registry, self.authorize = registry, authorize
+
+    def execute(self, tool_id, candidate, input_contract, output_contract, handler):
+        tool = self.registry.get_tool(tool_id)
+        if tool.is_write or tool.requires_confirmation:
+            raise PermissionError("SPECIALIST_WRITE_TOOL_DENIED")
+        value = input_contract.model_validate(candidate)
+        self.authorize(tool_id, value)
+        output = output_contract.model_validate(handler(value))
+        self.authorize(tool_id, value)
+        return output
+
+
 class ExecutionOutcomeStatus(StrEnum):
     SUCCEEDED = "succeeded"
     FAILED_NO_EFFECT = "failed_no_effect"

@@ -28,7 +28,8 @@ def load_module(name: str, path: Path):
 
 
 @pytest.fixture
-def db_conn():
+def db_conn(monkeypatch):
+    monkeypatch.setenv("ENVIRONMENT", "test")
     engine = create_engine("sqlite:///:memory:", echo=False)
     mod1 = load_module("migration_0001", MIGRATION_0001)
     mod2 = load_module("migration_0002", MIGRATION_0002)
@@ -92,3 +93,11 @@ def test_lexical_search_no_match_returns_empty(db_conn) -> None:
     adapter = LexicalSearchAdapter()
     candidates = adapter.search(db_conn, query="xây cầu đường cao tốc không tồn tại")
     assert candidates == []
+
+
+@pytest.mark.parametrize("environment", ["development", "staging", "production", "testing", ""])
+def test_sqlite_helper_is_unavailable_outside_explicit_test_profile(db_conn, monkeypatch, environment):
+    from campus247.application.retrieval.filters import RetrievalFilterError
+    monkeypatch.setenv("ENVIRONMENT", environment)
+    with pytest.raises(RetrievalFilterError, match="explicit test"):
+        LexicalSearchAdapter().search(db_conn, query="học phí")

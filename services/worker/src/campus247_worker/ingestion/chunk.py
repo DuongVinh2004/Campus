@@ -36,18 +36,10 @@ class SemanticChunker:
         self._max_chars = max_chars
         self._overlap_chars = overlap_chars
 
-    def _split_text_by_window(self, text: str) -> list[str]:
-        if len(text) <= self._max_chars:
-            return [text]
-        step = max(1, self._max_chars - self._overlap_chars)
-        parts: list[str] = []
-        for i in range(0, len(text), step):
-            part = text[i : i + self._max_chars]
-            if part.strip():
-                parts.append(part.strip())
-            if i + self._max_chars >= len(text):
-                break
-        return parts
+    def _split_text_by_window(self, text: str) -> list[tuple[str, int]]:
+        from campus247.application.retrieval.structure import structured_spans
+        return [(span.text, span.start) for span in structured_spans(
+            text, max_chars=self._max_chars, overlap_chars=self._overlap_chars)]
 
     def chunk(self, doc: ParsedDocument, document_version_id: str) -> tuple[ChunkRecord, ...]:
         if not doc.sections or not doc.canonical_text:
@@ -57,14 +49,16 @@ class SemanticChunker:
         chunk_idx = 0
 
         for sec in doc.sections:
+            if doc.canonical_text[sec.char_start:sec.char_end] != sec.content:
+                raise ValueError("Section character locator does not match canonical content")
             text = sec.content.strip()
             if not text:
                 continue
 
             windows = self._split_text_by_window(text)
-            sec_offset = sec.char_start
+            content_start = sec.char_start + len(sec.content) - len(sec.content.lstrip())
 
-            for win in windows:
+            for win, window_offset in windows:
                 cid = _deterministic_uuid7(f"{document_version_id}-chunk-{chunk_idx}")
                 c_hash = f"sha256:{hashlib.sha256(win.encode('utf-8')).hexdigest()}"
                 chunks.append(
@@ -75,12 +69,11 @@ class SemanticChunker:
                         chunk_index=chunk_idx,
                         content=win,
                         text_sha256=c_hash,
-                        char_start=sec_offset,
-                        char_end=sec_offset + len(win),
+                        char_start=content_start + window_offset,
+                        char_end=content_start + window_offset + len(win),
                         metadata=dict(doc.metadata),
                     )
                 )
                 chunk_idx += 1
-                sec_offset += max(1, len(win) - self._overlap_chars)
 
         return tuple(chunks)

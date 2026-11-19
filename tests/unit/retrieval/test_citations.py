@@ -18,6 +18,7 @@ def test_citation_bundle_build_and_resolve() -> None:
             "chunk_id": "chunk_101",
             "source_id": "src_1",
             "document_version_id": "ver_1",
+            "source_status": "SYNTHETIC",
             "title": "Quy chế Học phí HUCE",
             "issuer": "Phòng Đào tạo",
             "canonical_uri": "https://demo.huce.example/policy/hoc-phi",
@@ -48,3 +49,9 @@ def test_citation_bundle_build_and_resolve() -> None:
 def test_citation_bundle_resolve_unknown_returns_none() -> None:
     bundle = CitationBundle.build([])
     assert bundle.resolve("CIT-999") is None
+
+
+@pytest.mark.parametrize("metadata", [{}, {"source_status": "CURRENT"}, {"simulation_label": False}])
+def test_citation_bundle_does_not_invent_simulation_metadata(metadata) -> None:
+    bundle = CitationBundle.build([{"content_text": "Nguồn công khai", **metadata}])
+    assert bundle.resolve("CIT-001").simulation_label is False

@@ -96,6 +96,7 @@ def process_inventory(frontend=FRONTEND):
         "Get-CimInstance Win32_Process | Where-Object { "
         "($_.Name -eq 'python.exe' -and $_.CommandLine -like '*knowledge_platform.py*') "
         "-or ($_.Name -eq 'python.exe' -and $_.CommandLine -like '*gateway_sidecar.py*') "
+        "-or ($_.Name -eq 'python.exe' -and $_.CommandLine -like '*clamd_service.py*') "
         f"-or ($_.Name -eq 'node.exe' -and $_.CommandLine -like '*{frontend}*') "
         "} | Select-Object ProcessId,CommandLine | ConvertTo-Json -Compress"
     )
@@ -118,6 +119,9 @@ def matching_processes(rows, kind, frontend=FRONTEND):
         elif kind == "gateway":
             script = str(ROOT / "scripts/gateway_sidecar.py").replace("\\", "/").casefold()
             matches = any(word in {script, "scripts/gateway_sidecar.py"} for word in words) and "serve" in words
+        elif kind == "scanner":
+            script = str(ROOT / "scripts/clamd_service.py").replace("\\", "/").casefold()
+            matches = any(word in {script, "scripts/clamd_service.py"} for word in words) and "serve" in words
         else:
             script = str(ROOT / "scripts/knowledge_platform.py").replace("\\", "/").casefold()
             matches = any(word in {script, "scripts/knowledge_platform.py"} for word in words)
@@ -271,6 +275,33 @@ def gateway_ready(port):
     return True
 
 
+SCANNER_PORT = 33100
+LEARNING_CLAMD_CONFIG = ROOT / "infra/local/learning-materials-20261104-01/config-clamd-20261117.json"
+
+
+def learning_config_path():
+    """The learning configuration the API will load: the operator's override or the ClamAV-daemon configuration."""
+    override = os.environ.get("CAMPUS_LEARNING_CONFIG")
+    return Path(override) if override else LEARNING_CLAMD_CONFIG
+
+
+def scanner_wanted():
+    """The ClamAV daemon is part of the runtime unless the operator switches it off (CAMPUS_SCANNER_ENABLED=false).
+
+    Learning uploads and knowledge uploads (including crawled files) both depend on it and fail closed without it.
+    """
+    return os.environ.get("CAMPUS_SCANNER_ENABLED", "true").lower() != "false"
+
+
+def scanner_ready():
+    """The daemon answers PING; a stale database is reported by /health/ready, it does not stop the launch."""
+    with socket.create_connection(("127.0.0.1", SCANNER_PORT), timeout=2) as probe:
+        probe.sendall(b"zPING\0")
+        if probe.recv(16).strip(b"\0\n ") != b"PONG":
+            raise RuntimeError("Scanner daemon not ready")
+    return True
+
+
 def frontend_ready():
     response = httpx.get("http://127.0.0.1:3015/login", trust_env=False, timeout=3)
     response.raise_for_status()
@@ -302,6 +333,7 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
     model_identity()
     rows = process_inventory(frontend)
     commands = {
+        **({"scanner": ["scripts/clamd_service.py", "serve"]} if scanner_wanted() else {}),
         "frontend": ["scripts/knowledge_platform_frontend.py", "serve", "--name", frontend, "--port", "3015"],
         "gateway": ["scripts/gateway_sidecar.py", "serve", "--port", str(profile.gateway_port),
                     "--concurrency", str(profile.provider_concurrency), "--daily-usd-cap", profile.daily_usd_cap,
@@ -342,7 +374,7 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
         report["queue"] = asyncio.run(queue_state())
         for kind, command in commands.items():
             existing = matching_processes(rows, kind, frontend)
-            port = {"frontend": 3015, "api": 8015, "gateway": profile.gateway_port}.get(kind)
+            port = {"frontend": 3015, "api": 8015, "gateway": profile.gateway_port, "scanner": SCANNER_PORT}.get(kind)
             if port is not None and listening(port) and not existing:
                 raise RuntimeError(f"Port {port} belongs to an unrecognized process; listener preserved")
             process = None
@@ -351,7 +383,15 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
             else:
                 with checked_path(scope / (kind + ".log"), ROOT).open("xb") as log:
                     environment = os.environ.copy()
+                    if scanner_wanted() and kind in {"api", "worker"}:
+                        environment.update(CAMPUS247_SCANNER_PORT=str(SCANNER_PORT))
+                    if kind == "worker":
+                        # The automatic publication step needs to know which index the runtime started with.
+                        environment.update(CAMPUS247_RAG_V2_INDEX=str(index))
                     if kind == "api":
+                        environment.update(CAMPUS247_PROFILE=profile.name)
+                        if scanner_wanted() and "CAMPUS_LEARNING_CONFIG" not in environment:
+                            environment.update(CAMPUS_LEARNING_CONFIG=str(learning_config_path()))
                         environment.update(CAMPUS247_RAG_ENGINE=engine, CAMPUS247_RAG_V2_INDEX=str(index),
                                            CAMPUS247_CHAT_MAX_IN_FLIGHT=str(profile.max_in_flight_per_worker),
                                            CAMPUS247_RATE_LIMIT_STORE="postgres",
@@ -367,7 +407,9 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
                         stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, creationflags=HIDDEN,
                         env=environment)
                 report["started"][kind] = process.pid
-            if kind == "frontend":
+            if kind == "scanner":
+                report["scanner"] = wait_for(process, scanner_ready, seconds=180)
+            elif kind == "frontend":
                 wait_for(process, frontend_ready)
             elif kind == "gateway":
                 wait_for(process, lambda: gateway_ready(profile.gateway_port), seconds=120)

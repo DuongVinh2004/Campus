@@ -32,15 +32,26 @@ class LocalOwnerIdentityAdapter:
             raise ValueError("Login rate limited")
         self._attempts.append(now)
         value = self.directory()
-        actual = hashlib.scrypt(password.encode(), salt=bytes.fromhex(value["salt"]), n=16384, r=8, p=1).hex()
-        if not (hmac.compare_digest(username, value["username"]) and hmac.compare_digest(actual, value["password_hash"])):
-            raise ValueError("Invalid credentials")
-        self._attempts.clear()
-        return self.mint_token(value["owner_id"])
+
+        def matches(entry):
+            actual = hashlib.scrypt(password.encode(), salt=bytes.fromhex(entry["salt"]), n=16384, r=8, p=1).hex()
+            return hmac.compare_digest(username, entry["username"]) and hmac.compare_digest(actual, entry["password_hash"])
+        if matches(value):
+            self._attempts.clear()
+            return self.mint_token(value["owner_id"])
+        # Contributors are provisioned by the owner in the same identity file (scripts/provision_knowledge_contributor.py).
+        for entry in value.get("contributors", []):
+            if matches(entry):
+                self._attempts.clear()
+                return self.mint_token(entry["id"])
+        raise ValueError("Invalid credentials")
+
+    def _principals(self, value):
+        return {value["owner_id"], value["agent_id"], *(entry["id"] for entry in value.get("contributors", []))}
 
     def mint_token(self, subject, ttl_seconds=3600):
         value = self.directory()
-        if subject not in {value["owner_id"], value["agent_id"]}:
+        if subject not in self._principals(value):
             raise ValueError("Unknown local principal")
         now = int(datetime.now(UTC).timestamp())
         payload = {"sub": subject, "iss": ISSUER, "tenant": self.tenant, "iat": now,
@@ -59,10 +70,14 @@ class LocalOwnerIdentityAdapter:
         now = int(datetime.now(UTC).timestamp())
         if (claims["iss"] != ISSUER or claims["tenant"] != self.tenant or claims["exp"] <= now
             or claims["iat"] > now or claims["exp"] - claims["iat"] > 3600
-            or claims["sub"] not in {value["owner_id"], value["agent_id"]}):
+            or claims["sub"] not in self._principals(value)):
             raise ValueError("Invalid local session")
         agent = claims["sub"] == value["agent_id"]
+        contributor = next((entry for entry in value.get("contributors", []) if entry["id"] == claims["sub"]), None)
+        roles = (IdentityRole.KNOWLEDGE_CONTRIBUTOR,) if contributor else (IdentityRole.KNOWLEDGE_ADMIN,)
+        name = (contributor.get("display_name") or "Người đóng góp tri thức" if contributor
+                else "Agent kỹ thuật (tự động)" if agent else "Quản trị tri thức — chủ hệ thống chỉ định")
         return IdentityContext(claims["sub"], "local:" + claims["sub"], ISSUER,
-            (IdentityRole.KNOWLEDGE_ADMIN,), "Agent kỹ thuật (tự động)" if agent else "Quản trị tri thức — chủ hệ thống chỉ định",
+            roles, name,
             datetime.fromtimestamp(claims["iat"], UTC), datetime.fromtimestamp(claims["exp"], UTC),
             tenant_id=self.tenant, session_id=claims["jti"], is_synthetic=False, faculty_code="FIT")

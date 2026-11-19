@@ -1,0 +1,8 @@
+[
+  {"name":"short_usb", "question":"Theo nội quy phòng máy HUCE, muốn cắm USB cần ai cho phép?"},
+  {"name":"short_cn", "question":"Học phí cử nhân chính quy K71 năm học 2026-2027 là bao nhiêu đồng/tín chỉ?"},
+  {"name":"lab_sanction", "question":"Theo nội quy phòng máy HUCE, vi phạm nội quy và làm hỏng thiết bị bị xử lý thế nào?"},
+  {"name":"missing_conditions", "question":"Cho biết học phí CNTT của HUCE?"},
+  {"name":"conditions_followup", "question":"Cử nhân chính quy K71, năm học 2026-2027.", "followup":true},
+  {"name":"surcharge_followup", "question":"Còn phụ thu Anh ngữ cho khóa đó thì sao?", "followup":true}
+]

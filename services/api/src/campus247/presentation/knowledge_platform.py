@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from typing import Literal
 from urllib.parse import quote
 from uuid import UUID
 
@@ -27,7 +28,41 @@ class SearchPreviewInput(BaseModel):
     query: str = Field(min_length=3, max_length=2000)
 
 
-def create_knowledge_platform_router(platform, runtime, context_factory, upload_parser=None):
+class DocumentNote(BaseModel):
+    note: str | None = Field(default=None, max_length=2000)
+
+
+class DocumentRejection(BaseModel):
+    note: str = Field(min_length=5, max_length=2000)
+
+
+class CrawlSourceBody(BaseModel):
+    name: str = Field(min_length=3, max_length=160)
+    seed_urls: list[str] = Field(min_length=1, max_length=20)
+    kind: Literal["LIST", "SITEMAP", "PAGE"] = "LIST"
+    include: list[str] = Field(default_factory=list, max_length=30)
+    exclude: list[str] = Field(default_factory=list, max_length=30)
+    max_depth: int = Field(default=2, ge=0, le=4)
+    max_pages: int = Field(default=200, ge=1, le=1000)
+    interval_hours: int = Field(default=24, ge=1, le=720)
+    owner_unit: str = Field(min_length=2, max_length=160)
+    mode: Literal["REVIEW", "DIRECT"] = "REVIEW"
+
+
+class CrawlSourcePatch(BaseModel):
+    active: bool | None = None
+    ingest_enabled: bool | None = None
+    mode: Literal["REVIEW", "DIRECT"] | None = None
+    interval_hours: int | None = Field(default=None, ge=1, le=720)
+    max_pages: int | None = Field(default=None, ge=1, le=1000)
+    max_depth: int | None = Field(default=None, ge=0, le=4)
+
+
+class CrawlRunRequest(BaseModel):
+    dry_run: bool = True
+
+
+def create_knowledge_platform_router(platform, runtime, context_factory, upload_parser=None, auto_publication=None, crawl_service=None):
     async def parse_upload(request, storage):
         # The multipart adapter is injected by bootstrap; presentation never imports infrastructure.
         if upload_parser is None:
@@ -41,9 +76,17 @@ def create_knowledge_platform_router(platform, runtime, context_factory, upload_
     schedules = KnowledgeSchedules(platform)
     platform.schedules = schedules
 
-    def actor(request):
+    auto = auto_publication  # built by bootstrap; presentation never imports infrastructure
+
+    def pipeline():
+        if auto is None:
+            raise PlatformError(503, "AUTO_PUBLICATION_NOT_CONFIGURED", "Chưa cấu hình luồng tự động thêm tài liệu.")
+        return auto
+
+    def actor(request, level="admin"):
         identity = get_current_identity(request)
-        platform.admin(identity)
+        # "contributor" also admits administrators; every other route stays administrator-only.
+        (platform.contributor if level == "contributor" else platform.admin)(identity)
         if request.method not in {"GET","HEAD"}:
             origin=request.headers.get("origin")
             if origin is not None and origin.rstrip("/") != str(request.base_url).rstrip("/"):
@@ -100,6 +143,71 @@ def create_knowledge_platform_router(platform, runtime, context_factory, upload_
             raise HTTPException(422, "Multipart/metadata không hợp lệ; kiểm định dạng, phạm vi và ngày hiệu lực.") from None
         result = await platform.upload(identity, body, file, request_key, artifact=artifact)
         return JSONResponse(result, status_code=202, headers={"Cache-Control": "no-store"})
+
+    @router.post("/v1/knowledge/platform/documents", status_code=202,
+        openapi_extra={"requestBody": {"required": True, "content": {"multipart/form-data": {
+            "schema": {"type": "object", "required": ["file", "metadata"], "properties": {
+                "file": {"type": "string", "format": "binary"},
+                "metadata": {"type": "string", "description": "IntakeMetadata JSON plus publish_directly and attested"}}}}}}})
+    async def submit_document(request: Request):
+        """One entry for every adding role; the pipeline does the rest (see application/knowledge/auto_publication.py)."""
+        identity, request_key = actor(request, "contributor"), key(request)
+        try:
+            file, artifact, raw = await parse_upload(request, platform.storage)
+            fields = json.loads(raw)
+            direct, attested = bool(fields.pop("publish_directly", False)), bool(fields.pop("attested", False))
+            body = IntakeMetadata.model_validate(fields)
+        except PlatformError:
+            raise
+        except (ValidationError, UnicodeError, ValueError, AttributeError):
+            raise HTTPException(422, "Thông tin tài liệu không hợp lệ; kiểm tra tên, đơn vị ban hành, URI https:// và ngày hiệu lực.") from None
+        result = await pipeline().submit(identity, file, body, request_key, publish_directly=direct, attested=attested, artifact=artifact)
+        return JSONResponse(result, status_code=202, headers={"Cache-Control": "no-store"})
+
+    @router.get("/v1/knowledge/platform/documents")
+    async def list_documents(request: Request):
+        return JSONResponse(await pipeline().listing(actor(request, "contributor")), headers={"Cache-Control": "no-store"})
+
+    @router.post("/v1/knowledge/platform/documents/{version_id}/approve")
+    async def approve_document(version_id: UUID, body: DocumentNote, request: Request):
+        return JSONResponse(await pipeline().approve(actor(request), str(version_id), body.note), headers={"Cache-Control": "no-store"})
+
+    @router.post("/v1/knowledge/platform/documents/{version_id}/reject")
+    async def reject_document(version_id: UUID, body: DocumentRejection, request: Request):
+        return JSONResponse(await pipeline().reject(actor(request), str(version_id), body.note), headers={"Cache-Control": "no-store"})
+
+    @router.post("/v1/knowledge/platform/documents/{version_id}/revoke")
+    async def revoke_document(version_id: UUID, body: DocumentRejection, request: Request):
+        return JSONResponse(await pipeline().revoke(actor(request), str(version_id), body.note), headers={"Cache-Control": "no-store"})
+
+    @router.post("/v1/knowledge/platform/documents/{version_id}/retry")
+    async def retry_document(version_id: UUID, request: Request):
+        return JSONResponse(await pipeline().retry(actor(request), str(version_id)), headers={"Cache-Control": "no-store"})
+
+    def crawler():
+        if crawl_service is None:
+            raise PlatformError(503, "CRAWL_NOT_CONFIGURED", "Chưa cấu hình nguồn tự động.")
+        return crawl_service
+
+    @router.get("/v1/knowledge/platform/crawl-sources")
+    async def list_crawl_sources(request: Request):
+        return JSONResponse(await crawler().list_sources(actor(request)), headers={"Cache-Control": "no-store"})
+
+    @router.post("/v1/knowledge/platform/crawl-sources", status_code=201)
+    async def create_crawl_source(body: CrawlSourceBody, request: Request):
+        return JSONResponse(await crawler().create_source(actor(request), body.model_dump()), status_code=201, headers={"Cache-Control": "no-store"})
+
+    @router.post("/v1/knowledge/platform/crawl-sources/{source_id}/settings")
+    async def update_crawl_source(source_id: UUID, body: CrawlSourcePatch, request: Request):
+        return JSONResponse(await crawler().update_source(actor(request), source_id, body.model_dump(exclude_none=True)), headers={"Cache-Control": "no-store"})
+
+    @router.post("/v1/knowledge/platform/crawl-sources/{source_id}/run", status_code=202)
+    async def run_crawl_source(source_id: UUID, body: CrawlRunRequest, request: Request):
+        return JSONResponse(await crawler().request_run(actor(request), source_id, dry_run=body.dry_run), status_code=202, headers={"Cache-Control": "no-store"})
+
+    @router.get("/v1/knowledge/platform/crawl-sources/{source_id}/runs")
+    async def crawl_runs(source_id: UUID, request: Request):
+        return JSONResponse(await crawler().runs(actor(request), source_id), headers={"Cache-Control": "no-store"})
 
     @router.get("/v1/knowledge/platform/versions/{version_id}/original")
     async def original(version_id: UUID, request: Request):

@@ -206,6 +206,7 @@ def route_intent_node(
 
     chosen_route: Route | None = None
     search_question = None
+    clean_question = None
 
     if gateway is not None or _response is not None:
         try:
@@ -215,6 +216,11 @@ def route_intent_node(
                 data = json.loads(resp.output_text)
                 from campus247.application.knowledge.question_scope import restored_search_question
                 search_question = restored_search_question(state.request.query, data.get("search_question"))
+                proposed_clean = data.get("clean_question")
+                if isinstance(proposed_clean, str):
+                    from campus247.rag_v2.understanding.messy import safe_clean
+                    proposed_clean = " ".join(proposed_clean.split())
+                    clean_question = proposed_clean if safe_clean(state.request.query, proposed_clean) else None
                 r_val = str(data.get("route", "")).lower()
                 for r in Route:
                     if r.value == r_val:
@@ -269,7 +275,8 @@ def route_intent_node(
     return dataclasses.replace(
         state,
         route=chosen_route,
-        tool_flow=dataclasses.replace(state.tool_flow or ToolFlowState(), search_question=search_question),
+        tool_flow=dataclasses.replace(state.tool_flow or ToolFlowState(), search_question=search_question,
+                                      clean_question=clean_question),
         step_count=state.step_count + 1,
     )
 
@@ -389,9 +396,13 @@ def classifier_request(state: AgentState) -> LlmRequest:
         model_profile="default",
         system_instructions='Bạn là bộ phân loại an toàn cho Campus 24/7. Chỉ trả JSON ngắn: '
             '{"severity":"normal|high|critical","is_crisis":false,"confidence":0.9}. '
-            'Câu hỏi học vụ thông thường là normal. Tra cứu quy định, thủ tục, hồ sơ, mức miễn/giảm '
+            'Câu hỏi học vụ thông thường là normal. Hỏi chính sách, hồ sơ, giấy tờ cho sinh viên khuyết tật, '
+            'hoàn cảnh khó khăn hoặc sức khỏe (như Trạm Y tế, bảo hiểm y tế) cũng là normal. Tra cứu quy định, thủ tục, hồ sơ, mức miễn/giảm '
             'học phí hoặc hậu quả vi phạm phòng thi là normal, kể cả khi người hỏi dùng ngôi em/tôi. '
             'Không coi từ miễn giảm, kỷ luật hay phòng thi tự nó là tình huống nguy hiểm. '
+            'Hỏi cách phòng tránh hoặc kiểm tra lừa đảo mạo danh, an toàn tài khoản, độ dài và cách đặt mật khẩu theo '
+            'hướng dẫn của nhà trường (kể cả khi kể tình huống giả định như "có người nhắn nhờ chuyển tiền") là normal; '
+            'chỉ high khi người hỏi nói mình đã bị lừa, bị lộ tài khoản hoặc đã mất tiền. '
             'Người hỏi xem lịch học, lịch thi hay thời khóa biểu của chính mình là normal. '
             'high dành cho sự cố an toàn, xâm hại, bảo mật hoặc yêu cầu xử lý hồ sơ cá nhân; '
             'critical dành cho nguy hiểm tức thời, tự hại, bạo lực hay cấp cứu. '
@@ -414,6 +425,15 @@ def intent_request(state: AgentState) -> LlmRequest:
         system_instructions='Phân loại ý định cho Campus 24/7 (HUCE). Chỉ trả JSON {"route":"grounded_faq"}. '
             'Nếu câu hỏi tiếng Việt hoàn toàn không dấu, thêm search_question là chính câu hỏi được khôi phục dấu tiếng Việt. '
             'Giữ nguyên mọi từ, số, mã, điều kiện và thứ tự; không dịch, thêm/bớt từ, tóm tắt hoặc trả lời. '
+            'Nếu câu hỏi gõ lộn xộn (sai chính tả hoặc telex, viết tắt như sv/hp/đk/hk/qđ/tb/ctđt/mk, thiếu dấu một phần, '
+            'dài dòng nhiều lời đệm, cảm xúc, chuyện cá nhân), thêm clean_question: MỘT câu hỏi rõ ràng tiếng Việt chuẩn có dấu, '
+            'viết rõ từ viết tắt thông dụng, bỏ lời chào/từ đệm/cảm xúc, giữ đủ các ý hỏi (nhiều ý ngăn bằng dấu chấm phẩy). '
+            'Tuyệt đối giữ nguyên mọi số, mã, khóa (K67), năm học, ngành, tên và số hiệu văn bản, mọi phủ định; '
+            'không đổi cách viết số, không thêm thông tin, không trả lời. Câu đã rõ thì bỏ trường clean_question. '
+            'Hỏi thông tin về hồ sơ, giấy tờ cần nộp, địa điểm, thời hạn, điều kiện, chính sách (kể cả chính sách cho sinh viên '
+            'khuyết tật hay hoàn cảnh khó khăn) dù nhắc "nộp hồ sơ" hay "em muốn" vẫn là grounded_faq; '
+            'sensitive_case chỉ khi có dấu hiệu nguy hiểm, tự hại, bạo lực hoặc xâm hại. '
+            'Hỏi cách nhận biết, kiểm tra hay phòng tránh lừa đảo và an toàn mật khẩu là grounded_faq. '
             'route thuộc grounded_faq, personal_schedule, ticket_create, document_request, room_booking, '
             'human_handover, sensitive_case, unsupported. Hỏi thủ tục, điều kiện, quy chế, cách làm, '
             'quy định chung về đình chỉ/xử lý vi phạm theo nội quy là grounded_faq. '
@@ -428,7 +448,7 @@ def intent_request(state: AgentState) -> LlmRequest:
             'thành yêu cầu thực hiện hồ sơ hoặc chuyển chuyên viên. human_handover cần yêu cầu gặp/chuyển '
             'người hỗ trợ rõ ràng trong lượt hiện tại.',
         input_items=({"role": "user", "content": content},),
-        max_output_tokens=100, deadline_ms=5000)
+        max_output_tokens=300, deadline_ms=5000)
 
 
 def history_block(state: AgentState) -> PromptBlock | None:

@@ -6,9 +6,12 @@ import base64
 import hashlib
 import hmac
 import json
+import re
 import sqlite3
+import unicodedata
 from datetime import UTC, date, datetime
 from typing import Any, Literal
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Path, Request
@@ -242,6 +245,16 @@ def parse(action, raw):
         require(value["reason"].strip() and all(item["description"].strip() for item in value["items"]),
                 422, "INVALID_BODY", "Mô tả thay đổi phải có nội dung.")
     return value
+
+
+def content_disposition(download, title, extension):
+    """Name the saved file after the material, with an ASCII fallback for old clients."""
+    cleaned = re.sub(r'[\x00-\x1f\x7f"\\/:*?<>|;]+', " ", str(title or ""))
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" .")[:120] or "lecture"
+    ascii_name = unicodedata.normalize("NFKD", cleaned.replace("đ", "d").replace("Đ", "D")).encode("ascii", "ignore").decode()
+    ascii_name = re.sub(r"[^A-Za-z0-9 ._()-]+", "", ascii_name).strip(" .") or "lecture"
+    return (f"{'attachment' if download else 'inline'}; filename=\"{ascii_name}.{extension}\"; "
+            f"filename*=UTF-8''{quote(cleaned + '.' + extension, safe='')}")
 
 
 class LearningRoute(APIRoute):
@@ -478,7 +491,7 @@ def create_learning_router(service):
         selection = select_bytes(row["byte_size"], request.headers.get("Range"), method=request.method, if_range=request.headers.get("If-Range"), etag=etag)
         media_type = row.get('content_type', 'application/pdf')
         extension = 'pdf' if media_type == 'application/pdf' else 'pptx'
-        headers = {"Content-Type": media_type, "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff", "Accept-Ranges": "bytes", "ETag": etag, "Content-Length": str(selection.length), "Content-Disposition": ('attachment' if download else 'inline') + '; filename="lecture.' + extension + '"'}
+        headers = {"Content-Type": media_type, "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff", "Accept-Ranges": "bytes", "ETag": etag, "Content-Length": str(selection.length), "Content-Disposition": content_disposition(download, row.get("title"), extension)}
         if selection.content_range:
             headers["Content-Range"] = selection.content_range
         if request.method == "HEAD" or selection.status == 416:

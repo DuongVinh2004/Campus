@@ -38,6 +38,21 @@ def create_worker() -> WorkerProcess:
 
 
 def main() -> None:
-    """Worker CLI entrypoint."""
-    worker = create_worker()
-    worker.start()
+    """Run the durable knowledge queue against its explicitly configured local DB."""
+    import asyncio
+    import runpy
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[4]
+    entrypoint = root / "scripts/knowledge_platform.py"
+    if not entrypoint.is_file() or entrypoint.resolve().parent != root / "scripts":
+        raise RuntimeError("Explicit knowledge worker composition missing")
+    composition = runpy.run_path(str(entrypoint), run_name="knowledge_worker_composition")
+    try:
+        asyncio.run(composition["work"]())
+    except KeyboardInterrupt:
+        logger.info("Durable knowledge worker stopped; committed checkpoints retained")
+
+
+if __name__ == "__main__":
+    main()

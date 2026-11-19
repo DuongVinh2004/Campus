@@ -44,18 +44,35 @@ def is_human_handover_request(query: str) -> bool:
 
 
 def is_other_person_data_request(query: str) -> bool:
+    """Whether the message asks for another person's private record.
+
+    The private term and a reference to someone else must sit together, and a possessive ("điểm thi của em") means
+    the student's own data. Rambling messages that merely mention a teacher or a friend elsewhere are not refused.
+    """
     from campus247.application.conversation.followup import normalized_question
     text = normalized_question(query)
-    private = bool(re.search(r"\b(?:bang diem|diem trung binh|diem thi|ho so (?:ca nhan|ky luat|cua)|bi ky luat|"
-                             r"ky luat canh cao|lich su ky luat|so dien thoai|dia chi nha)\b", text))
-    other = bool(re.search(r"\b(?:sinh vien (?:khac|ma|co ma|ten)|ban (?:em|toi|minh)|"
-                           r"thay|co giao|giang vien|chu nhiem|nguoi khac)\b", text)
-                 or re.search(r"\b(?i:bạn|ban|sinh viên|sinh vien)\s+[A-ZĐ][a-zà-ỹ]+\s+[A-ZĐ][a-zà-ỹ]+", query))
+    private_hits = list(re.finditer(r"\b(?:bang diem|diem trung binh|diem thi|ho so (?:ca nhan|ky luat|cua)|bi ky luat|"
+                                    r"ky luat canh cao|lich su ky luat|so dien thoai|dia chi nha)\b", text))
+    if not private_hits:
+        return False
+    someone = r"(?:sinh vien (?:khac|ma|co ma|ten)|ban (?:em|toi|minh)|thay|co giao|giang vien|chu nhiem|nguoi khac)"
+    named = bool(re.search(r"\b(?i:bạn|ban|sinh viên|sinh vien)\s+[A-ZĐ][a-zà-ỹ]+\s+[A-ZĐ][a-zà-ỹ]+", query))
+    near_other = False
+    for hit in private_hits:
+        # "<record> của <someone else>" or "<someone else>'s <record>" within a few words, never across a sentence.
+        after = text[hit.end():hit.end() + 34]
+        before = text[max(0, hit.start() - 48):hit.start()]
+        owner = (re.search(r"^[^,.;?!]{0,8}?\b(?:cua|cho|ma)\s+(?:cac\s+)?" + someone + r"\b", after)
+                 or re.search(r"\b" + someone + r"\b[^,.;?!]{0,34}$", before))
+        own = re.search(r"^\s*(?:cua )?(?:toi|em|minh)\b", after)
+        if (named or owner) and not own:
+            near_other = True
+            break
     # General rules about who may read a record do not disclose that record.
     general = any(marker in text for marker in ("quy dinh", "quy che", "thu tuc", "dieu kien"))
     lookup = bool(re.search(r"\b(?:xem|tra cuu|cho biet|cung cap)\b.{0,50}\b(?:bang diem|ho so|diem thi)\b|"
                             r"\b(?:sinh vien (?:ma|co ma|ten)|bi ky luat (?:vi|bao))\b", text))
-    return private and other and (not general or lookup)
+    return near_other and (not general or lookup)
 
 
 class IntentRouterNode:

@@ -9,7 +9,7 @@ from campus247.domain.shared.values import ErrorCode, ProblemDetails, generate_u
 from campus247.ports.identity import IdentityContext
 
 
-from campus247.application.identity.session_service import get_session_service, SessionService
+from campus247.application.identity.session_service import get_session_service, SessionService, RevocationStoreError
 
 
 class IdentityMiddleware(BaseHTTPMiddleware):
@@ -27,18 +27,29 @@ class IdentityMiddleware(BaseHTTPMiddleware):
             token = request.cookies["auth_token"]
 
         identity: IdentityContext | None = None
-        session_svc = self._session_service or get_session_service()
+        def revalidate_identity():
+            session_svc = getattr(request.app.state, "current_session_service", None)
+            if session_svc is None:
+                session_svc = self._session_service if self._session_service is not None else get_session_service()
+            if not token or session_svc.is_revoked(token):
+                raise ValueError("Current session unavailable")
+            return self._adapter.resolve_token(token)
         if token:
             # Revocation boundary: Revoked sessions fail closed immediately
-            if session_svc.is_revoked(token):
+            try:
+                identity = revalidate_identity()
+            except RevocationStoreError:
+                from campus247.presentation.errors import create_problem_details
+                response = create_problem_details(request=request,status=503,code="DEPENDENCY_UNAVAILABLE",
+                    title="Không thể kiểm tra phiên",detail="Session storage chưa sẵn sàng; quyền truy cập chưa được xác nhận.")
+                response.headers["Cache-Control"] = "no-store"
+                return response
+            except Exception:
                 identity = None
-            else:
-                try:
-                    identity = self._adapter.resolve_token(token)
-                except Exception:
-                    identity = None
 
         request.state.identity = identity
+        # Request-local closure only: never serialized in run/task state.
+        request.state.revalidate_identity = revalidate_identity
         return await call_next(request)
 
 

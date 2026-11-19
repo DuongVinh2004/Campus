@@ -39,7 +39,7 @@ class ToolRegistry:
     """Registry of authorized typed tools and validator for tool candidate arguments."""
 
     def __init__(self, tools: dict[str, ToolDefinition]) -> None:
-        self._tools = tools
+        self._tools = dict(tools)
         self._breaker_failures: dict[str, int] = {k: 0 for k in tools}
         self._breaker_tripped: dict[str, bool] = {k: False for k in tools}
 
@@ -174,3 +174,20 @@ class ToolRegistry:
                 )
 
         return dict(arguments)
+
+    @classmethod
+    def specialist_reads(cls):
+        return cls({name: ToolDefinition(name, name, "Scoped server read/prepare", False, False)
+                    for name in ("search_knowledge", "search_policy_relations", "read_source", "inspect_evidence")})
+
+    def authorize_specialist(self, tool_id, task, binding, current_binding, capabilities):
+        tool = self.get_tool(tool_id)
+        if (tool.is_write or tool.requires_confirmation or tool_id not in task.tools or
+                tool_id not in capabilities or task.binding is None or
+                task.binding.scope != binding or current_binding != binding):
+            raise ToolValidationError("SPECIALIST_SCOPE_OR_CAPABILITY_CHANGED")
+        allowed = {"read_source", "inspect_evidence"}
+        if task.role == "research":
+            allowed |= {"search_knowledge", "search_policy_relations"}
+        if tool_id not in allowed:
+            raise ToolValidationError("SPECIALIST_TOOL_DENIED")

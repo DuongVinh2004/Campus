@@ -73,6 +73,16 @@ _PROMPT_INJECTION_RULE = re.compile(
 )
 
 
+# Requests to print, reveal or ignore the assistant's own instructions. "huong dan he thong" alone can be a legitimate
+# phrase ("hướng dẫn hệ thống đăng ký"), so it only counts next to a verb that asks for the hidden text.
+_EXFILTRATION_RULE = re.compile(
+    r"(?:\b(?:in|hien\s*thi|cho\s*(?:\w+\s+)?xem|tiet\s*lo|doc\s*lai|liet\s*ke|show|print|reveal|repeat)\b.{0,30}"
+    r"\b(?:chi\s*dan\s*he\s*thong|chi\s*thi\s*he\s*thong|prompt\s*he\s*thong|system\s*(?:prompt|instructions?)|"
+    r"lenh\s*he\s*thong|hidden\s*instructions?)\b"
+    r"|\bbo\s*qua\s*(?:cac\s*)?(?:huong\s*dan|quy\s*tac|chi\s*dan|chi\s*thi|lenh)\s*(?:truoc|ben\s*tren|o\s*tren)\b.{0,60}"
+    r"\b(?:chi\s*dan|huong\s*dan|prompt|lenh|quy\s*tac)\s*he\s*thong\b)")
+
+
 def _normalize(text: str) -> str:
     decomposed = unicodedata.normalize("NFD", text.lower().replace("đ", "d"))
     without_marks = "".join(char for char in decomposed if unicodedata.category(char) != "Mn")
@@ -101,22 +111,30 @@ def _generic_public_rule_question(query_text: str, text: str) -> bool:
 
 
 def _public_waiver_deadline_reference(query_text: str, text: str) -> bool:
-    if "?" not in query_text:
+    # Students seldom type "?"; an interrogative word makes it a read question just as well.
+    if "?" not in query_text and not re.search(
+            r"\b(?:nao|bao gio|o dau|may gio|the nao|ra sao|bao lau|hom nao|ngay may)\b", text):
         return False
-    if not any(term in text for term in ("han nop ho so", "thoi han nop", "thoi gian tiep nhan ho so")):
+    if not any(term in text for term in ("han nop", "han cuoi", "han chot", "thoi han nop", "thoi gian tiep nhan",
+                                         "noi nop", "nop o dau", "nop tai", "nop ho so")):
         return False
-    # The question must be bounded to a numbered notice or an explicit school year; a
-    # bare "thông báo miễn giảm" stays protected. It no longer has to start with "thông báo".
+    # The question must name which notice it means: a numbered notice, a school year, or a term/year reference
+    # ("học kỳ 1", "kỳ này", "năm nay"). A bare "hồ sơ miễn giảm học phí hạn nộp?" stays protected.
     if not (re.search(r"\bthong bao(?:\s+so)?\s+\d{1,6}\b", text)
-            or re.search(r"\b20\d{2}\s*[-–/]\s*20\d{2}\b", text)):
+            or re.search(r"\b20\d{2}\s*[-–/]\s*20\d{2}\b", text)
+            or re.search(r"\b(?:hoc ky|hk|ky)\s*(?:1|2|i|ii|nay|truoc|sau|nay)\b|\bnam (?:nay|hoc|ngoai)\b", text)):
         return False
+    # The signals below keep every question about the speaker's own case, refunds, debt or extensions protected.
     # Other money signals (refund, debt, unaffordable fees) are never excused by a deadline.
     if re.search(r"\b(?:hoan\s*tien|no\s*hoc\s*phi|tang\s*hoc\s*phi|khong\s*du\s*tien)\b", text):
         return False
-    if re.search(r"\b(?:toi|em|minh|ban|mssv|ma sinh vien|sv\d+|ho so cua|sinh vien ten|"
-                 r"gia han|ngoai le|tre han|qua han|duoc mien|xin mien)\b", text):
+    # "em/tôi" is only how a student addresses the assistant; questions about the speaker's own case stay protected.
+    if re.search(r"\b(?:mssv|ma sinh vien|sv\d+|ho so cua|sinh vien ten|gia han|ngoai le|tre han|qua han|"
+                 r"duoc mien|xin mien|cua (?:toi|em|minh)|(?:toi|em|minh) (?:co duoc|co thuoc|xin|dang no|bi no|muon xin))\b", text):
         return False
-    if re.search(r"\b[A-ZĐ][a-zà-ỹ]+(?:\s+[A-ZĐ][a-zà-ỹ]+)+\b", query_text):
+    # Place names ("Hồ Chí Minh") look like personal names to the capitalised-run test; they are not.
+    without_places = re.sub(r"(?i)(?:phân hiệu|thành phố)?\s*hồ chí minh|hà nội|phân hiệu|thành phố", " ", query_text)
+    if re.search(r"\b[A-ZĐ][a-zà-ỹ]+(?:\s+[A-ZĐ][a-zà-ỹ]+)+\b", without_places):
         return False
     return not bool(_PROMPT_INJECTION_RULE.search(text))
 
@@ -167,7 +185,15 @@ def evaluate_deterministic_safety(query_text: str) -> SafetyDecision:
             return _decision(SafetySeverity.CRITICAL, reason, crisis=True)
 
     for reason, pattern in _HIGH_RULES:
-        if re.search(pattern, text):
+        match = re.search(pattern, text)
+        if match:
+            if (reason == "privacy_or_security_incident" and match.group(0).startswith("lo ")
+                    and "lộ" not in query_text.lower() and re.search(r"[à-ỹ]", query_text.lower())):
+                continue  # "lo mật khẩu" typed with diacritics is "worry about", not "leaked" (lộ)
+            if (reason == "privacy_or_security_incident" and match.group(0).startswith("lo ")
+                    and re.search(r"\b(?:de|so|nguy co|co the|neu|tranh|ngan|phong|chong)\s+(?:bi\s+)?$",
+                                  text[max(0, match.start() - 16):match.start()])):
+                continue  # a hypothetical ("dễ bị lộ mật khẩu"), not an incident that already happened
             if (reason in {"financial_impact", "disciplinary_or_legal", "academic_rights_impact"}
                     and is_public_policy_question(query_text)):
                 continue
@@ -178,6 +204,10 @@ def evaluate_deterministic_safety(query_text: str) -> SafetyDecision:
                 # high-priority rules continue below; critical rules ran first.
                 continue
             return _decision(SafetySeverity.HIGH, reason)
+
+    if _EXFILTRATION_RULE.search(text):
+        # Asking the assistant to print or reveal its own instructions is never excused by a real question next to it.
+        return _decision(SafetySeverity.HIGH, "prompt_injection_signal")
 
     if _PROMPT_INJECTION_RULE.search(text):
         benign_academic_context = any(

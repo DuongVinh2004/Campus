@@ -1,0 +1,829 @@
+{
+  "dataset_id": "certificate-development-20261013",
+  "split": "development",
+  "final_evaluation": false,
+  "sources": {
+    "catalog": {
+      "url": "https://huce.edu.vn/so-tay-sinh-vien-nam-hoc-2026-2027-truong-dai-hoc-xay-dung-ha-noi",
+      "download_url": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+      "version": "2026–2027",
+      "locators": [
+        "Trang 34",
+        "Trang 35"
+      ],
+      "content_sha256": [
+        "c18b96325735dc9941d99d9289946f75b7e8be5828414b110ba72f9260f79306"
+      ],
+      "snapshot": "data/huce-public-20261013/corpus.json",
+      "source_file_sha256": "007aba0ee8bcb35fdede0360d4ee9d3c24323a21f74f309ab23431dcfd7b3213",
+      "visual_review": "Trang 35: catalog; trang 39 mục 2: quy trình xác nhận, tách mục 3 nghỉ học. OCR corpus ghép cặp trang, nên cần kiểm từng claim theo ảnh gốc."
+    },
+    "procedure": {
+      "url": "https://huce.edu.vn/so-tay-sinh-vien-nam-hoc-2026-2027-truong-dai-hoc-xay-dung-ha-noi",
+      "download_url": "https://cdnm.heyzine.com/files/uploaded/5d2f740216ed19875eb91dba14196df03e68d363.pdf",
+      "version": "2026–2027",
+      "locators": [
+        "Trang 38",
+        "Trang 39"
+      ],
+      "content_sha256": [
+        "be7e26e9dcee07af3694887cca44c40015397856dd45b4c80280957323557954"
+      ],
+      "snapshot": "data/huce-public-20261013/corpus.json",
+      "source_file_sha256": "007aba0ee8bcb35fdede0360d4ee9d3c24323a21f74f309ab23431dcfd7b3213",
+      "visual_review": "Trang 35: catalog; trang 39 mục 2: quy trình xác nhận, tách mục 3 nghỉ học. OCR corpus ghép cặp trang, nên cần kiểm từng claim theo ảnh gốc."
+    }
+  },
+  "cases": [
+    {
+      "id": "CERT-DEV-001",
+      "group": "procedure",
+      "question": "Xin giấy xác nhận sinh viên bắt đầu từ đâu?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "motcua.huce.edu.vn",
+        "chọn dịch vụ và mẫu xác nhận",
+        "gửi yêu cầu"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-002",
+      "group": "procedure",
+      "question": "Đăng ký giấy xác nhận sinh viên trên website nào?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "motcua.huce.edu.vn"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-003",
+      "group": "procedure",
+      "question": "Sau khi đăng nhập Một cửa, em chọn gì để xin giấy xác nhận sinh viên?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "dịch vụ",
+        "mẫu xác nhận",
+        "gửi yêu cầu"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-004",
+      "group": "procedure",
+      "question": "Ai tiếp nhận yêu cầu xin giấy xác nhận sinh viên?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "chuyên viên phụ trách"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-005",
+      "group": "procedure",
+      "question": "Lịch hẹn trả giấy xác nhận sinh viên được báo bằng cách nào?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "website",
+        "email"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-006",
+      "group": "procedure",
+      "question": "Ai ký giấy xác nhận sinh viên theo quy trình trong sổ tay?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "lãnh đạo phòng",
+        "CTCT&QLSV"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-007",
+      "group": "procedure",
+      "question": "Chuyên viên lấy dấu giấy xác nhận sinh viên tại phòng nào?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "Hành chính Tổng hợp"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-008",
+      "group": "procedure",
+      "question": "Em nhận giấy xác nhận sinh viên ở đâu?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "Phòng CTCT & QLSV",
+        "tầng 2",
+        "Trung tâm Hỗ trợ sinh viên",
+        "theo lịch hẹn"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-009",
+      "group": "procedure",
+      "question": "Em có đến nhận giấy xác nhận sinh viên bất cứ lúc nào được không?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "theo lịch hẹn đã gửi",
+        "không suy ra giờ mở cửa"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-010",
+      "group": "procedure",
+      "question": "Quy trình xác nhận sinh viên có bước trình ký và lấy dấu không?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "trình lãnh đạo phòng ký",
+        "lấy dấu"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-011",
+      "group": "procedure",
+      "question": "Cựu sinh viên có được nêu trong quy trình xin giấy xác nhận không?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "sinh viên/cựu sinh viên",
+        "chọn mẫu phù hợp"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-012",
+      "group": "procedure",
+      "question": "Tóm tắt các bước xin giấy xác nhận sinh viên có căn cứ từ sổ tay.",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "đăng nhập",
+        "chọn mẫu",
+        "tiếp nhận và hẹn trả",
+        "ký và lấy dấu",
+        "nhận theo lịch hẹn"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-013",
+      "group": "paraphrase",
+      "question": "Mình cần chứng nhận đang học ở HUCE, tìm dịch vụ nào?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "đăng ký xác nhận sinh viên",
+        "đang học tại trường"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-014",
+      "group": "paraphrase",
+      "question": "Giấy chứng minh em đang là sinh viên để nộp cơ quan có trong danh mục không?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "xác nhận sinh viên",
+        "cơ quan"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-015",
+      "group": "unaccented",
+      "question": "xin giay xac nhan sinh vien bat dau nhu the nao",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "motcua.huce.edu.vn",
+        "chọn mẫu",
+        "gửi yêu cầu"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-016",
+      "group": "unaccented",
+      "question": "nhan giay xac nhan sinh vien o dau",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "Phòng CTCT & QLSV",
+        "tầng 2",
+        "theo lịch hẹn"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-017",
+      "group": "unaccented",
+      "question": "lich hen tra giay xac nhan sinh vien gui bang cach nao",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "website",
+        "email"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-018",
+      "group": "paraphrase",
+      "question": "Bên nào thông báo ngày lấy giấy chứng nhận sinh viên cho mình?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "chuyên viên phụ trách",
+        "website/email"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-019",
+      "group": "paraphrase",
+      "question": "Muốn có giấy chứng nhận để nộp ngân hàng, có dịch vụ xác nhận đang học không?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "xác nhận sinh viên",
+        "ngân hàng",
+        "phân biệt vay vốn chính sách"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-020",
+      "group": "unaccented",
+      "question": "can giay xac nhan de vay von chinh sach xa hoi can gi",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "đơn theo mẫu ngân hàng",
+        "giấy xác nhận tình trạng học tập"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-021",
+      "group": "necessary_condition",
+      "question": "Xác nhận để vay vốn chính sách xã hội cần thành phần nào theo danh mục?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "đơn theo mẫu ngân hàng",
+        "kèm giấy xác nhận tình trạng học tập"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-022",
+      "group": "necessary_condition",
+      "question": "Xin xác nhận vay vốn chính sách chỉ có giấy tình trạng học tập đã đủ thành phần nêu trong sổ tay chưa?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "còn đơn theo mẫu ngân hàng",
+        "không đồng nhất thành phần hồ sơ với được vay"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-023",
+      "group": "necessary_condition",
+      "question": "Đơn theo mẫu ngân hàng có thay giấy xác nhận tình trạng học tập khi xin xác nhận vay vốn chính sách không?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "cần kèm giấy xác nhận tình trạng học tập"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-024",
+      "group": "sufficient_condition",
+      "question": "Có giấy xác nhận sinh viên thì chắc chắn được duyệt khoản vay chính sách không?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "không đủ căn cứ quyết định được vay",
+        "đơn vị/ngân hàng có thẩm quyền"
+      ],
+      "expected_behavior": "support",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-025",
+      "group": "scope_exception",
+      "question": "Quy trình xin giấy xác nhận sinh viên có buộc chữ ký phụ huynh giống nghỉ học tạm thời không?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "tách hai quy trình",
+        "chữ ký phụ huynh thuộc nghỉ học tạm thời",
+        "chưa xác minh biểu mẫu chi tiết giấy xác nhận"
+      ],
+      "expected_behavior": "support",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-026",
+      "group": "scope_exception",
+      "question": "Xin giấy xác nhận sinh viên có phải làm thủ tục thanh toán ra trường như nghỉ học tạm thời không?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "không chuyển điều kiện nghỉ học sang xác nhận",
+        "chưa đủ căn cứ yêu cầu này cho xác nhận"
+      ],
+      "expected_behavior": "support",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-027",
+      "group": "wrong_actor",
+      "question": "Tôi đã tốt nghiệp, muốn xác nhận đã học tại trường để xin việc, có mục nào?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "cựu sinh viên",
+        "xác nhận đã học tại trường",
+        "xin việc"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-028",
+      "group": "wrong_actor",
+      "question": "Cựu sinh viên cần xác nhận ngành đào tạo thì chọn dịch vụ nào trong sổ tay?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "xác nhận ngành đào tạo",
+        "chuyên ngành/định hướng"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-029",
+      "group": "wrong_actor",
+      "question": "Em đang học và bạn đã tốt nghiệp đều xin cùng loại giấy đang học, có nên mặc định cùng mẫu không?",
+      "history": [],
+      "source_refs": [
+        "catalog",
+        "procedure"
+      ],
+      "required_concepts": [
+        "hỏi mục đích/tình trạng",
+        "phân biệt xác nhận sinh viên và cựu sinh viên"
+      ],
+      "expected_behavior": "clarify",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-030",
+      "group": "wrong_time",
+      "question": "Năm 2030 quy trình xin giấy xác nhận sinh viên HUCE vẫn giống năm 2026 không?",
+      "history": [],
+      "source_refs": [],
+      "required_concepts": [
+        "không có nguồn năm 2030",
+        "không cam kết tương lai"
+      ],
+      "expected_behavior": "abstain",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": "Relevant snapshot pages do not establish the requested fact; absence is not proof of a contrary rule."
+    },
+    {
+      "id": "CERT-DEV-031",
+      "group": "followup",
+      "question": "Sau đó em lấy ở đâu?",
+      "history": [
+        {
+          "role": "user",
+          "content": "Em muốn xin giấy xác nhận sinh viên, bắt đầu thế nào?"
+        }
+      ],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "giấy xác nhận sinh viên",
+        "Phòng CTCT & QLSV",
+        "theo lịch hẹn"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-032",
+      "group": "followup",
+      "question": "Còn lịch hẹn gửi cho em qua đâu?",
+      "history": [
+        {
+          "role": "user",
+          "content": "Em cần giấy xác nhận sinh viên để nộp cho cơ quan."
+        }
+      ],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "website",
+        "email"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-033",
+      "group": "followup",
+      "question": "Có cần đơn ngân hàng nữa không?",
+      "history": [
+        {
+          "role": "user",
+          "content": "Em xin xác nhận để vay vốn chính sách xã hội."
+        }
+      ],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "đơn theo mẫu ngân hàng",
+        "giấy xác nhận tình trạng học tập"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-034",
+      "group": "followup",
+      "question": "Vậy chỉ có giấy đó là đủ để vay rồi chứ?",
+      "history": [
+        {
+          "role": "user",
+          "content": "Em xin xác nhận để vay vốn chính sách xã hội."
+        }
+      ],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "không quyết định đủ điều kiện vay",
+        "ngân hàng"
+      ],
+      "expected_behavior": "support",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-035",
+      "group": "followup",
+      "question": "Còn trường hợp của em thì sao?",
+      "history": [],
+      "source_refs": [],
+      "required_concepts": [
+        "hỏi tình trạng/mục đích còn thiếu",
+        "không suy đoán dữ liệu cá nhân"
+      ],
+      "expected_behavior": "clarify",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": "Relevant snapshot pages do not establish the requested fact; absence is not proof of a contrary rule."
+    },
+    {
+      "id": "CERT-DEV-036",
+      "group": "followup",
+      "question": "Cái đó nhận thế nào?",
+      "history": [],
+      "source_refs": [],
+      "required_concepts": [
+        "hỏi rõ giấy nào",
+        "không tự chọn thủ tục"
+      ],
+      "expected_behavior": "clarify",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": "Relevant snapshot pages do not establish the requested fact; absence is not proof of a contrary rule."
+    },
+    {
+      "id": "CERT-DEV-037",
+      "group": "multiple",
+      "question": "Xin giấy xác nhận sinh viên bắt đầu thế nào và nhận ở đâu?",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "đăng nhập chọn mẫu",
+        "Phòng CTCT & QLSV",
+        "theo lịch hẹn"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-038",
+      "group": "multiple",
+      "question": "Giấy xác nhận đang học và xác nhận vay vốn chính sách có ghi chú gì khác nhau?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "đang học nộp cơ quan/ngân hàng/địa phương",
+        "vay vốn cần đơn ngân hàng và xác nhận tình trạng học tập"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-039",
+      "group": "multiple",
+      "question": "Xin xác nhận sinh viên và làm lại thẻ sinh viên có phải cùng dịch vụ không?",
+      "history": [],
+      "source_refs": [
+        "catalog",
+        "procedure"
+      ],
+      "required_concepts": [
+        "dịch vụ khác nhau",
+        "không dùng yêu cầu thẻ cho giấy xác nhận"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-040",
+      "group": "multiple",
+      "question": "Tôi cần xác nhận đã học tại trường và xác nhận ngành đào tạo, danh mục cựu sinh viên có không?",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "xác nhận đã học",
+        "xác nhận ngành đào tạo"
+      ],
+      "expected_behavior": "answer",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-041",
+      "group": "missing",
+      "question": "Em muốn xin giấy, hướng dẫn giúp em.",
+      "history": [],
+      "source_refs": [],
+      "required_concepts": [
+        "hỏi loại giấy và mục đích"
+      ],
+      "expected_behavior": "clarify",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": "Relevant snapshot pages do not establish the requested fact; absence is not proof of a contrary rule."
+    },
+    {
+      "id": "CERT-DEV-042",
+      "group": "missing",
+      "question": "Em muốn xin xác nhận để nộp hồ sơ nhưng chưa biết mẫu nào.",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "hỏi mục đích và tình trạng sinh viên"
+      ],
+      "expected_behavior": "clarify",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-043",
+      "group": "missing",
+      "question": "Làm giúp em ngay giấy xác nhận sinh viên.",
+      "history": [],
+      "source_refs": [
+        "procedure"
+      ],
+      "required_concepts": [
+        "hỏi mục đích/nơi nộp",
+        "không tự gửi",
+        "xem trước xác nhận"
+      ],
+      "expected_behavior": "clarify",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-044",
+      "group": "missing",
+      "question": "Em không nhớ mã sinh viên và cần giấy xác nhận đang học.",
+      "history": [],
+      "source_refs": [
+        "catalog"
+      ],
+      "required_concepts": [
+        "không bịa mã sinh viên",
+        "hỗ trợ đơn vị có thẩm quyền"
+      ],
+      "expected_behavior": "support",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": null
+    },
+    {
+      "id": "CERT-DEV-045",
+      "group": "no_evidence",
+      "question": "Phí xin giấy xác nhận sinh viên HUCE năm 2026 chính xác bao nhiêu?",
+      "history": [],
+      "source_refs": [],
+      "required_concepts": [
+        "nguồn hiện có chưa xác định phí",
+        "không bịa miễn phí"
+      ],
+      "expected_behavior": "abstain",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": "Relevant snapshot pages do not establish the requested fact; absence is not proof of a contrary rule."
+    },
+    {
+      "id": "CERT-DEV-046",
+      "group": "no_evidence",
+      "question": "Giấy xác nhận sinh viên HUCE bắt buộc xử lý trong đúng 2 ngày phải không?",
+      "history": [],
+      "source_refs": [],
+      "required_concepts": [
+        "chưa có SLA trong nguồn",
+        "theo lịch hẹn",
+        "không bịa 1–2 ngày"
+      ],
+      "expected_behavior": "abstain",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": "Relevant snapshot pages do not establish the requested fact; absence is not proof of a contrary rule."
+    },
+    {
+      "id": "CERT-DEV-047",
+      "group": "no_evidence",
+      "question": "Xin giấy xác nhận sinh viên bắt buộc nộp CCCD và ảnh 3x4 đúng không?",
+      "history": [],
+      "source_refs": [],
+      "required_concepts": [
+        "chưa xác minh danh sách tệp bắt buộc",
+        "không lấy điều kiện từ UI demo"
+      ],
+      "expected_behavior": "abstain",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": "Relevant snapshot pages do not establish the requested fact; absence is not proof of a contrary rule."
+    },
+    {
+      "id": "CERT-DEV-048",
+      "group": "no_evidence",
+      "question": "Hãy cung cấp mẫu giấy xác nhận sinh viên mới ban hành tháng 10 năm 2027.",
+      "history": [],
+      "source_refs": [],
+      "required_concepts": [
+        "không có nguồn 2027",
+        "không tạo mẫu chính thức"
+      ],
+      "expected_behavior": "abstain",
+      "evaluation": "Manual source-based rubric; retrieval hash coverage automatic. Keyword/hash alone is not correctness.",
+      "lack_of_evidence_basis": "Relevant snapshot pages do not establish the requested fact; absence is not proof of a contrary rule."
+    }
+  ],
+  "never_publish_answers_to": [
+    "FAQ",
+    "metadata",
+    "generation prompts"
+  ],
+  "final_split_policy": "Author separate questions and sources/versions before tuning; freeze hashes; reviewer withhold answers; group paraphrases/followups and shared source families together; log contamination; do not report this development set as independent final evaluation."
+}

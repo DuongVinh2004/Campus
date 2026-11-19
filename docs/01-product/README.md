@@ -9,6 +9,8 @@ last_updated: "2026-09-22"
 
 # Product and requirements package
 
+Kế hoạch hiện tại: [đồ án tốt nghiệp](../GRADUATION_PROJECT_PLAN_20261013.md). Nội dung sản phẩm bên dưới được giữ làm tài liệu tham khảo lịch sử. [Phạm vi và roadmap cũ](../../archive/legacy-plans-20261013/docs/01-product/SCOPE_AND_ROADMAP.md) đã chuyển nguyên vẹn vào khu lưu trữ; các ranh giới bảo vệ dữ liệu và bảo mật vẫn được giữ.
+
 ## 1. Mục đích và thẩm quyền
 
 Thư mục này là nguồn sự thật cấp sản phẩm cho **Campus 24/7 — HUCE Demo**. `requirements.yaml` là nguồn chuẩn duy nhất cho 125 requirement (77 functional, 48 non-functional); hai Markdown requirement là bản diễn giải được đồng bộ từ catalog đó. Nó xác định lý do kinh doanh, phạm vi, người dùng, use case, KPI và các yêu cầu mà thiết kế, contract, test và micro-task triển khai phải truy vết tới.
@@ -37,7 +39,7 @@ Thứ tự ưu tiên khi có xung đột tuân theo `docs/README.md`. Agent tri�
 | `KPI_CATALOG.md` | Công thức, nguồn dữ liệu và quality gate |
 | `FUNCTIONAL_REQUIREMENTS.md` | Requirement chức năng nguyên tử |
 | `NON_FUNCTIONAL_REQUIREMENTS.md` | Requirement phi chức năng đo được |
-| `CAPABILITY_ROADMAP.md` | Các phase và điều kiện thăng hạng |
+| [CAPABILITY_ROADMAP.md — lưu trữ](../../archive/legacy-plans-20261013/docs/01-product/CAPABILITY_ROADMAP.md) | Các phase và điều kiện thăng hạng của kế hoạch cũ |
 | `REQUIREMENT_DEPENDENCY_MAP.md` | DAG requirement và downstream obligations |
 | `requirements.yaml` | Bản machine-readable chuẩn cho orchestrator/agent |
 

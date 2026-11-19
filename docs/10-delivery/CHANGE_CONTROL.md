@@ -1,13 +1,15 @@
 ---
 document_id: "DOC-DEL-007"
-version: "1.0.0"
+version: "1.1.0"
 status: "reviewed"
 owner: "Change Management Lead"
 approvers: ["Product Owner", "Architecture Lead", "Security Lead", "Release Owner"]
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 ---
 
 # Change control
+
+[DEC-023](../00-governance/LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md) replaces additional role/task/package approvals for assigned local/synthetic engineering. The executor performs the affected technical assessments, records versions/targets/evidence and proceeds. Role approvals below are baseline responsibility metadata, not repeated human execution checkpoints in this scope.
 
 ## 1. Principle
 
@@ -25,7 +27,7 @@ Every behavior-affecting change is intentional, traceable, reviewed, tested and 
 | C5 Platform/cost | datastore, queue, provider, region, public surface, paid dependency | ARCH + OPS + SEC + FIN; ADR/capacity/cost/rollback |
 | C6 Emergency containment | disable/safe mode/rollback to stop active harm | authorized incident roles; audit; post-change verify/retrospective |
 
-When uncertain, classify higher. A change can carry multiple classes; all approvals apply.
+When uncertain, classify higher and perform every affected technical assessment. Multiple classes do not add human checkpoints for work covered by DEC-023.
 
 ## 3. Change request contract
 
@@ -61,7 +63,7 @@ Unknown impact is not an empty field; use `unknown` and block approval.
 2. Classify and identify authoritative IDs/artifacts.
 3. Assess product, architecture, contract/data, security/privacy, AI, operations, cost, test and rollback impacts.
 4. Resolve conflicts/create prerequisite requirement/ADR/contract tasks.
-5. Obtain approvals per class.
+5. Record DEC-023 authority and affected technical assessments for delegated local work; use separate external authority only when the operation lies outside that scope.
 6. Decompose into disjoint ready micro-tasks and update dependency DAG.
 7. Implement and verify against unchanged approved oracle.
 8. Assemble candidate, run affected + regression gates, execute authorized rollout.
@@ -85,7 +87,7 @@ Every C2–C5 assessment answers:
 
 ## 6. Protected changes
 
-The following cannot be bundled as routine implementation: requirement priority/acceptance change, ADR status, auth/security/privacy policy, AI hard threshold/gold critical label, new dependency/provider/service, destructive migration, real data/secret, paid resource, production deploy, deletion/reset/force-push. They require exact human authorization defined by governance; agent stops before mutation.
+Necessary local dependency, contract/architecture, synthetic auth/grant, fixture-guard, runtime and index changes proceed under DEC-023 with impact/version/technical evidence. Requirements, threshold/gold oracles are not rewritten to hide failure. Destructive migration/recovery, real data, new external expenditure, production deployment and deletion/reset/force-push remain outside local delegation.
 
 ## 7. Emergency change
 

@@ -1,0 +1,132 @@
+{
+ "revision": "near-domain-absent-20261028",
+ "purpose": "School-vocabulary questions about facilities and services that the served corpus does not contain (each distinctive term returned zero matches in the served chunks). Stress test for the reranker relevance gate.",
+ "limitations": [
+  "Authored by the coding agent; absence checked by keyword search of the distinctive term only, not by reading the corpus.",
+  "No gold section; expected disposition is abstention or clarification.",
+  "oos-near_domain_absent2-05 (phòng y tế) was removed: the corpus has a 'Trạm y tế Trường' that answers it, so the absence check by keyword was wrong. The case is kept in answerable_corrections."
+ ],
+ "cases": [
+  {
+   "case_id": "oos-near_domain_absent2-01",
+   "kind": "near_domain_absent2",
+   "question": "Sinh viên có được nuôi thú cưng trong ký túc xá không?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-02",
+   "kind": "near_domain_absent2",
+   "question": "Học bổng Chính phủ Nhật Bản MEXT cần điều kiện gì?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-03",
+   "kind": "near_domain_absent2",
+   "question": "Căng tin của trường mở cửa lúc mấy giờ?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-04",
+   "kind": "near_domain_absent2",
+   "question": "Giá gửi xe máy cho sinh viên mỗi tháng là bao nhiêu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-06",
+   "kind": "near_domain_absent2",
+   "question": "Sinh viên có được mang laptop vào phòng thi không?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-07",
+   "kind": "near_domain_absent2",
+   "question": "Tiền ăn mỗi tháng của sinh viên ở ký túc xá là bao nhiêu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-08",
+   "kind": "near_domain_absent2",
+   "question": "Sinh viên đi làm thêm có phải báo với nhà trường không?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-09",
+   "kind": "near_domain_absent2",
+   "question": "Câu lạc bộ bóng rổ của trường tập vào ngày nào?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-10",
+   "kind": "near_domain_absent2",
+   "question": "Trường có cho sinh viên thuê xe đạp không?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-11",
+   "kind": "near_domain_absent2",
+   "question": "Phòng gym của ký túc xá mở cửa mấy giờ?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-12",
+   "kind": "near_domain_absent2",
+   "question": "Tiền điện ở ký túc xá tính theo giá nào?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-13",
+   "kind": "near_domain_absent2",
+   "question": "Sinh viên có được hoàn học phí khi nghỉ học giữa kỳ không?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-14",
+   "kind": "near_domain_absent2",
+   "question": "Đăng ký làm gia sư cho sinh viên khóa dưới thế nào?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-15",
+   "kind": "near_domain_absent2",
+   "question": "Học phí khóa học bơi ở hồ bơi của trường là bao nhiêu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-16",
+   "kind": "near_domain_absent2",
+   "question": "Máy lạnh trong phòng học bật từ mấy giờ?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-17",
+   "kind": "near_domain_absent2",
+   "question": "Hợp đồng lao động của sinh viên thực tập có bắt buộc không?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-18",
+   "kind": "near_domain_absent2",
+   "question": "Trường có tổ chức giải đá bóng sinh viên năm nay không?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-19",
+   "kind": "near_domain_absent2",
+   "question": "Thủ tục xin bằng lái xe cho sinh viên của trường là gì?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent2-20",
+   "kind": "near_domain_absent2",
+   "question": "Giờ mở cửa phòng karaoke của ký túc xá là mấy giờ?",
+   "expect": "abstain_or_clarify"
+  }
+ ],
+ "answerable_corrections": [
+  {
+   "case_id": "oos-near_domain_absent2-05",
+   "question": "Phòng y tế của trường ở đâu và có khám bệnh miễn phí không?",
+   "reason": "Answerable from the served corpus (Trạm y tế: sơ cấp cứu, khám bệnh, cấp thuốc; 100% chi phí)."
+  }
+ ]
+}

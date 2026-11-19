@@ -220,3 +220,61 @@ def test_backup_keeps_the_reservation_records_of_unsettled_attempts(tmp_path, mo
     names = {relative.name for _, relative in backup_tool.ledger_files(root)}
     assert {"provider-00003-reservation.json", "provider-00004-reservation.json"} <= names   # old but still pending
     assert "provider-00011-result.json" in names and "provider-00005-reservation.json" not in names
+
+
+def test_api_unit_wires_the_packaged_scanner_through_a_group_and_the_shared_environment_names():
+    api = render()["campus247-api.service"]
+    assert "clamav-daemon.service" in api.split("[Service]")[0]  # ordered after it and wants it, but does not require it
+    assert "Requires=campus247-gateway.service" in api and "Requires=clamav-daemon" not in api
+    assert "SupplementaryGroups=clamav" in api and "CAMPUS247_PROFILE=cloud" in api
+    assert "CAMPUS_LEARNING_ENABLED=false" in api
+    # The names in the unit are exactly the ones the application reads, and the cloud profile refuses to run without them.
+    sys.path.insert(0, str(ROOT / "services/api/src"))
+    from campus247.bootstrap.scanner import scanner_from_environment
+    environ = dict(line.removeprefix("Environment=").split("=", 1) for line in api.splitlines() if line.startswith("Environment="))
+    scanner = scanner_from_environment(environ)
+    assert scanner.socket_path == "/run/clamav/clamd.ctl" and scanner.max_database_age.total_seconds() == 72 * 3600
+    environ.pop("CAMPUS247_SCANNER_SOCKET")
+    with pytest.raises(ValueError, match="cloud profile requires"):
+        scanner_from_environment(environ)
+
+
+def test_clamd_kit_is_socket_only_bounded_and_matches_the_client_limits():
+    conf = (ROOT / "infra/cloud/clamav/clamd.conf").read_text(encoding="utf-8")
+    assert "LocalSocket /run/clamav/clamd.ctl" in conf and "LocalSocketMode 660" in conf and "LocalSocketGroup clamav" in conf
+    assert "TCPSocket" not in conf and "TCPAddr" not in conf
+    for line in ("AlertExceedsMax yes", "ConcurrentDatabaseReload no", "MaxRecursion 16", "StreamMaxLength 105M", "MaxFileSize 100M"):
+        assert line in conf
+    sys.path.insert(0, str(ROOT / "services/api/src"))
+    from campus247.infrastructure.scanning.clamd import ClamdScanner
+    assert ClamdScanner(socket_path="/x").max_bytes <= 100 * 1024**2  # the client never sends more than clamd will take
+    override = (ROOT / "infra/cloud/clamav/clamav-daemon.override.conf").read_text(encoding="utf-8")
+    assert "MemoryMax=1500M" in override and "Restart=always" in override
+    # The local and cloud profiles budget the daemon's measured ~960 MB.
+    assert load_profile("cloud").scanner_mb >= 960 and load_profile("local").scanner_mb >= 960
+
+
+def test_install_gets_signatures_before_starting_clamd_and_never_opens_a_scanner_port():
+    install = (ROOT / "infra/cloud/install.sh").read_text(encoding="utf-8")
+    assert "clamav-daemon clamav-freshclam" in install
+    assert install.index("freshclam --quiet") < install.index("systemctl enable --now clamav-freshclam clamav-daemon")
+    assert "/etc/clamav/clamd.conf.distribution" in install  # the distribution file is kept before it is replaced
+    assert "ufw allow 3310" not in install and "ufw allow 33100" not in install
+    ready = (ROOT / "infra/cloud/wait_scanner.sh").read_text(encoding="utf-8")
+    assert "AF_UNIX" in ready and "PONG" in ready
+
+
+def test_every_shell_script_and_linux_config_in_the_kit_uses_unix_line_endings():
+    """A CRLF in a script fails on the VM with `bash\r: No such file or directory`; git normalizes on commit, a copied tree does not."""
+    for path in sorted((ROOT / "infra/cloud").rglob("*")):
+        if path.is_file() and path.suffix in {".sh", ".conf", ".service", ".timer"}:
+            assert b"\r" not in path.read_bytes(), f"{path.relative_to(ROOT)} has CRLF line endings"
+
+
+def test_the_vm_acceptance_script_exists_and_measures_what_the_design_left_open():
+    script = (ROOT / "infra/cloud/verify_scanner.sh").read_text(encoding="utf-8")
+    for needle in ("MemAvailable", "scanner_soak.py", "--reload-every", "upload-scanner", "EICAR", "no TCP listener", "MIN_AVAILABLE_MB"):
+        assert needle in script, needle
+    assert (ROOT / "scripts/scanner_soak.py").is_file()
+    readme = (ROOT / "infra/cloud/README.md").read_text(encoding="utf-8")
+    assert "verify_scanner.sh" in readme

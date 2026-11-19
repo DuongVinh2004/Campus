@@ -68,7 +68,10 @@ class SessionService:
 
         if not already_revoked:
             try:
-                self._store.revoke(safe_hash)
+                if callable(getattr(self._store,"record_revocation",None)):
+                    self._store.record_revocation(safe_hash,reason=reason,actor_id=actor_id)
+                else:
+                    self._store.revoke(safe_hash)
             except Exception as exc:
                 raise RevocationStoreError(f"Failed to record session revocation: {exc}") from exc
 

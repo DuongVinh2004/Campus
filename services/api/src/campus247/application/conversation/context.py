@@ -36,6 +36,9 @@ class BoundedContextBuilder:
     """Constructs bounded conversation context window with summary and untrusted labeling."""
 
     def __init__(self, max_turns: int = 5, max_chars: int = 4000) -> None:
+        for name, value in (("max_turns", max_turns), ("max_chars", max_chars)):
+            if type(value) is not int or value <= 0:
+                raise ValueError(f"{name} must be a positive integer")
         self._max_turns = max_turns
         self._max_chars = max_chars
 
@@ -60,7 +63,7 @@ class BoundedContextBuilder:
         # Enforce character budget by dropping oldest if necessary
         while recent_turns:
             total_chars = sum(len(t.content) for t in recent_turns)
-            if total_chars <= self._max_chars or len(recent_turns) == 1:
+            if total_chars <= self._max_chars:
                 break
             recent_turns.pop(0)
 

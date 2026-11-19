@@ -29,6 +29,17 @@ class KnowledgePlatform:
             or not any(actor.has_role(r) for r in (IdentityRole.KNOWLEDGE_ADMIN, IdentityRole.SYSTEM_ADMIN))):
             raise PlatformError(403, "KNOWLEDGE_FORBIDDEN", "Cần phiên quản trị tri thức đúng tenant.")
 
+    @staticmethod
+    def is_admin(actor):
+        return any(actor.has_role(r) for r in (IdentityRole.KNOWLEDGE_ADMIN, IdentityRole.SYSTEM_ADMIN))
+
+    def contributor(self, actor):
+        """May add documents: administrators and contributors of this tenant, in a live session."""
+        if (not actor.is_active or actor.expires_at <= datetime.now(UTC)
+            or actor.tenant_id != self.repo.tenant or not actor.session_id
+            or not (self.is_admin(actor) or actor.has_role(IdentityRole.KNOWLEDGE_CONTRIBUTOR))):
+            raise PlatformError(403, "KNOWLEDGE_FORBIDDEN", "Cần quyền thêm tài liệu đúng tenant.")
+
     def reader(self, actor):
         if (not actor.is_active or actor.expires_at <= datetime.now(UTC)
             or actor.tenant_id != self.repo.tenant or not actor.session_id
@@ -36,9 +47,14 @@ class KnowledgePlatform:
             raise PlatformError(403, "KNOWLEDGE_FORBIDDEN", "Cần phiên đọc tri thức đúng tenant.")
 
     async def upload(self, actor, metadata: IntakeMetadata, upload, key: str, *, artifact=None, _connection=None):
-        self.admin(actor)
+        self.contributor(actor)  # administrators and contributors; every other command stays administrator-only
         if not key or len(key) > 128:
             raise PlatformError(422, "IDEMPOTENCY_REQUIRED", "Cần mã yêu cầu upload.")
+        if getattr(self, "operational", False) and not metadata.canonical_uri.startswith("https://"):
+            # state() hides and _eligible() refuses non-https sources in an operational session; refuse up front
+            # instead of accepting a document the admin could never see or publish.
+            raise PlatformError(422, "OPERATIONAL_SOURCE_URI_REQUIRED",
+                                "Phiên vận hành chỉ nhận URI nguồn bắt đầu bằng https://. URI urn: chỉ dùng cho kiểm thử cục bộ.")
         filename = upload.filename or ""
         if filename != PurePath(filename).name or any(c in filename for c in "\\/\r\n\x00") or len(filename) > 200:
             raise PlatformError(422, "INVALID_FILENAME", "Tên tệp không hợp lệ.")
@@ -100,7 +116,8 @@ class KnowledgePlatform:
             result = {"source_id": source_id, "version_id": version_id, "job_id": job_id,
                       "state": "QUEUED", "original_sha256": artifact.sha256, "is_replay": False}
             await self.repo.audit(conn, actor.subject_id, "knowledge.upload", version_id,
-                                  {"sha256": artifact.sha256, "job_id": job_id})
+                                  {"sha256": artifact.sha256, "job_id": job_id,
+                                   **({"scan": artifact.scan} if getattr(artifact, "scan", None) else {})})
             await self.repo.outbox(conn, "knowledge.upload.accepted", version_id, result)
             await self.repo.remember(conn, actor.subject_id, "upload:" + key, fingerprint, result)
             return result

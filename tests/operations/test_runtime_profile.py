@@ -33,6 +33,7 @@ frontend_mb = 20
 api_worker_mb = 30
 worker_mb = 40
 gateway_mb = 7
+scanner_mb = 11
 """
 
 
@@ -63,6 +64,7 @@ def test_good_profile_loads(tmp_path):
     profile = rp.load_profile("t", write(tmp_path, GOOD))
     assert profile.required_mb(["api", "postgres"]) == 100 + 30 * 1 + 10
     assert profile.required_mb(["gateway"]) == 107
+    assert profile.required_mb(["scanner"]) == 111
     assert (profile.gateway_port, profile.daily_usd_cap, profile.daily_call_cap) == (8025, "2.50", 100)
 
 
@@ -90,6 +92,11 @@ def test_loader_is_strict(tmp_path, mutation):
 def test_profile_name_cannot_escape_the_profile_directory(name):
     with pytest.raises(rp.ProfileError):
         rp.load_profile(name)
+
+
+def test_scanner_memory_is_budgeted_in_both_real_profiles():
+    for name in ("local", "cloud"):
+        assert rp.load_profile(name).scanner_mb == 1000
 
 
 def test_memory_check_refuses_when_components_do_not_fit(tmp_path):

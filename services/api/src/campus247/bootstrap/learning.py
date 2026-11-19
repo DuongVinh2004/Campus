@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 from uuid import UUID
 
@@ -134,12 +135,17 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
             database_dir=scanner_paths["scanner_database_dir"],
             temporary_dir=scanner_paths["scanner_temporary_dir"],
             cvd_certs_dir=scanner_paths["scanner_cvd_certs_dir"])
+    elif scanner_mode == "clamd":
+        scanner = _clamd_scanner(config)
     elif scanner_mode == "fixture":
         scanner = FixtureHashScanner(hashes)
     elif scanner_mode == "unavailable":
         scanner = UnavailableScanner()
     else:
         raise ValueError("Unknown learning scanner mode")
+    if os.environ.get("CAMPUS247_PROFILE") == "cloud" and scanner_mode != "clamd":
+        # A test scanner (hash allow-list) or the per-file command must never be what protects a production host.
+        raise ValueError("The cloud profile requires scanner_mode 'clamd' for the learning module")
     service = LearningService(repository, blob_store, tenant_id=tenant_id,
         signing_key=directory["signing_key"], scanner=scanner, directory=adapter.public_directory,
         ai_source_hashes=ai_hashes, optimize_pdf=optimize_pdf, page_feedback_offerings=feedback_offerings,
@@ -159,6 +165,33 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
     if accessible_text_offerings and (ocr := config.get("accessible_text_runtime")) is not None:
         service.accessible_text_pipeline = configure_learning_ocr(ocr, workspace=workspace, blob_root=paths["blob_directory"])
     return service, adapter
+
+
+def _clamd_scanner(config):
+    """A ClamAV daemon on loopback or a Unix socket; stale signatures make the scanner refuse, never pass."""
+    from datetime import timedelta
+
+    from campus247.infrastructure.learning.blob import PortScannerAdapter
+    from campus247.infrastructure.scanning.clamd import ClamdScanner
+
+    port, socket_path = config.get("scanner_port"), config.get("scanner_socket")
+    hours = config.get("scanner_max_database_age_hours", 72)
+    limit = config.get("scanner_max_bytes", 100 * 1024**2)
+    retry = config.get("scanner_retry_seconds", 75)
+    if type(hours) is not int or not 1 <= hours <= 720 or type(limit) is not int or not 1 <= limit <= 1024**3:
+        raise ValueError("Invalid scanner freshness or size limit")
+    if type(retry) is not int or not 0 <= retry <= 600:
+        raise ValueError("scanner_retry_seconds must be 0-600")
+    if port is not None and (type(port) is not int or socket_path is not None):
+        raise ValueError("Configure exactly one of scanner_port or scanner_socket")
+    if socket_path is not None and (not isinstance(socket_path, str) or not socket_path.startswith("/")):
+        raise ValueError("scanner_socket must be an absolute Unix socket path")
+    from campus247.application.learning.telemetry import record
+
+    return PortScannerAdapter(ClamdScanner(
+        host=config.get("scanner_host", "127.0.0.1") if port is not None else None, port=port, socket_path=socket_path,
+        max_database_age=timedelta(hours=hours), max_bytes=limit, retry_window=float(retry),
+        observer=lambda event: record("learning.scan_clamd", **{k: v for k, v in event.items() if v is not None})))
 
 
 def configure_learning_ocr(config, *, workspace, blob_root):

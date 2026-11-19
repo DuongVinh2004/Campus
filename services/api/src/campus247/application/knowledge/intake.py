@@ -336,7 +336,7 @@ class KnowledgeIntake:
             artifact = await conn.fetchrow("SELECT * FROM knowledge_artifact WHERE id=$1 AND tenant_id=$2", original_id, self.repo.tenant)
             if not artifact or artifact["media_type"] not in {"application/pdf", "text/plain"}:
                 raise PlatformError(422, "LINKED_ORIGINAL_REQUIRED", "Cần tệp PDF/TXT gốc; trang HTML hoặc tệp đính kèm chưa được xác minh.")
-            saved = StoredArtifact(**{k: str(artifact[k]) if k == "id" else artifact[k] for k in StoredArtifact.__dataclass_fields__})
+            saved = StoredArtifact(**{k: str(artifact[k]) if k == "id" else artifact[k] for k in StoredArtifact.__dataclass_fields__ if k != "scan"})
             filename = row["filename"] if row["original_id"] else row["filename"] + (".pdf" if artifact["media_type"] == "application/pdf" else ".txt")
             result = await self.platform.upload(actor, metadata, SimpleNamespace(filename=filename, content_type=artifact["media_type"]),
                 "intake-" + str(intake_id), artifact=saved, _connection=conn)

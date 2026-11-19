@@ -1,10 +1,10 @@
 ---
 document_id: "DOC-GOV-DECISIONS-001"
-version: "1.0.0"
+version: "1.2.0"
 status: "approved"
 owner: "Product and Architecture Governance"
 approvers: ["Product Owner", "Architecture Owner", "Security Owner"]
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 ---
 
 # Decision register
@@ -32,5 +32,7 @@ Status values: `accepted`, `proposed`, `superseded`, `rejected`.
 | DEC-017 | accepted | Documentation is the implementation source of truth. | Gemini 3.8 Flash receives only reviewed atomic tasks that reference approved requirements and contracts. It may not rewrite its own source requirements. |
 | DEC-018 | accepted | Atomic tasks default to one objective, one layer, 1-3 product files and about 150 added lines. | Tasks may exceed the guideline only through a reviewed exception. Database, backend, frontend and infrastructure changes remain separate tasks. |
 | DEC-019 | accepted | Implementation agents may work continuously and up to four tasks may run in parallel when write scopes are disjoint. | A task starts only after every dependency is `accepted`; the orchestrator owns task selection and conflict prevention. |
-| DEC-020 | accepted | Sensitive actions require human approval. | Requirement/contract changes, unapproved dependencies, auth/security changes, destructive migrations, real secrets, paid services, production deployment and destructive Git/filesystem actions MUST stop. |
+| DEC-020 | accepted | Sensitive actions outside standing delegation require human authority. | [DEC-023](LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md) supersedes per-step approval for assigned local/synthetic engineering. Production/real-data/destructive boundaries remain outside that delegation. |
 | DEC-021 | accepted | Documentation is created locally first with no automatic commit or push. | Git commit, push and PR creation require a later explicit user request. |
+| DEC-022 | accepted | For current synthetic M1-M3 acceptance, the human owner removes artifact/acceptance signatures and independent review, accepts primary accountability and delegates technical execution; configurations may change on comparative evidence. | Direct human decision 2026-10-06; [exact scope and controls](RAG_ACCEPTANCE_AUTHORITY_DECISION_20261006.md). Preserve evidence and verify remaining technical gates; no production or destructive authority is inferred. |
+| DEC-023 | accepted | The human removes additional execution-approval checkpoints throughout this repository for assigned local/synthetic work and delegates necessary engineering and technical review. | Direct human instructions 2026-10-07; [standing authority and scope](LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md). Resolve older task/package approval fields against this decision and continue without reapproval; preserve data, history and actual technical verification. |

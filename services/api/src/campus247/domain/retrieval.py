@@ -19,6 +19,8 @@ class RetrievalBranchStatus(StrEnum):
 
 
 def _required(value: str, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a string")
     normalized = value.strip()
     if not normalized:
         raise ValueError(f"{field_name} is required")
@@ -26,6 +28,8 @@ def _required(value: str, field_name: str) -> str:
 
 
 def _normalized_scope(values: frozenset[str], field_name: str) -> frozenset[str]:
+    if not isinstance(values, frozenset) or any(not isinstance(value, str) for value in values):
+        raise ValueError(f"{field_name} must be a frozenset of strings")
     normalized = frozenset(value.strip() for value in values if value.strip())
     if not normalized:
         raise ValueError(f"{field_name} must not be empty")
@@ -41,6 +45,10 @@ class RetrievalQuery:
     def __post_init__(self) -> None:
         object.__setattr__(self, "text", _required(self.text, "text"))
         object.__setattr__(self, "locale", _required(self.locale, "locale"))
+        if not isinstance(self.exact_identifiers, tuple) or any(
+            not isinstance(identifier, str) for identifier in self.exact_identifiers
+        ):
+            raise ValueError("exact_identifiers must be a tuple of strings")
         object.__setattr__(
             self,
             "exact_identifiers",
@@ -77,9 +85,13 @@ class RetrievalContext:
     trace_id: str
 
     def __post_init__(self) -> None:
+        if not isinstance(self.authorized_scope, AuthorizedScope):
+            raise ValueError("typed authorized scope is required")
+        if not isinstance(self.simulation_policy, SimulationPolicy):
+            raise ValueError("typed simulation policy is required")
         object.__setattr__(self, "locale", _required(self.locale, "locale"))
         object.__setattr__(self, "trace_id", _required(self.trace_id, "trace_id"))
-        if self.effective_at.tzinfo is None or self.effective_at.utcoffset() is None:
+        if not isinstance(self.effective_at, datetime) or self.effective_at.tzinfo is None or self.effective_at.utcoffset() is None:
             raise ValueError("effective_at must be timezone-aware")
         object.__setattr__(self, "effective_at", self.effective_at.astimezone(timezone.utc))
 
@@ -103,23 +115,33 @@ class RetrievalContext:
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> RetrievalContext:
-        scope = value["authorized_scope"]
-        effective_at = datetime.fromisoformat(str(value["effective_at"]).replace("Z", "+00:00"))
-        return cls(
-            authorized_scope=AuthorizedScope(
-                tenant_id=str(scope["tenant_id"]),
-                campus_id=str(scope["campus_id"]),
-                actor_id=str(scope["actor_id"]),
-                roles=frozenset(scope["roles"]),
-                audiences=frozenset(scope["audiences"]),
-                faculty_codes=frozenset(scope["faculty_codes"]),
-                program_codes=frozenset(scope["program_codes"]),
-            ),
-            locale=str(value["locale"]),
-            effective_at=effective_at,
-            simulation_policy=SimulationPolicy(value["simulation_policy"]),
-            trace_id=str(value["trace_id"]),
-        )
+        """Round-trip trusted context; this does not authenticate client claims."""
+        try:
+            keys = {"authorized_scope", "locale", "effective_at", "simulation_policy", "trace_id"}
+            scope_keys = {"tenant_id", "campus_id", "actor_id", "roles", "audiences", "faculty_codes", "program_codes"}
+            if not isinstance(value, dict) or set(value) != keys:
+                raise ValueError
+            scope = value["authorized_scope"]
+            if not isinstance(scope, dict) or set(scope) != scope_keys:
+                raise ValueError
+            scopes = {}
+            for name in ("roles", "audiences", "faculty_codes", "program_codes"):
+                if not isinstance(scope[name], list) or any(not isinstance(item, str) for item in scope[name]):
+                    raise ValueError
+                scopes[name] = frozenset(scope[name])
+            if not isinstance(value["effective_at"], str):
+                raise ValueError
+            return cls(
+                authorized_scope=AuthorizedScope(
+                    tenant_id=scope["tenant_id"], campus_id=scope["campus_id"], actor_id=scope["actor_id"], **scopes,
+                ),
+                locale=value["locale"],
+                effective_at=datetime.fromisoformat(value["effective_at"].replace("Z", "+00:00")),
+                simulation_policy=SimulationPolicy(value["simulation_policy"]),
+                trace_id=value["trace_id"],
+            )
+        except (KeyError, TypeError, ValueError):
+            raise ValueError("invalid serialized retrieval context") from None
 
 
 @dataclass(frozen=True)
@@ -143,6 +165,10 @@ class RetrievalCandidate:
     vector_rank: int | None = None
     fused_score: float | None = None
     rerank_score: float | None = None
+    # Unknown provenance stays unknown for legacy internal callers. Public
+    # citation conversion requires both fields and fails closed when absent.
+    version_label: str | None = None
+    source_status: str | None = None
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -162,6 +188,12 @@ class RetrievalCandidate:
             raise ValueError("page_start must be positive")
         if self.page_end is not None and (self.page_start is None or self.page_end < self.page_start):
             raise ValueError("page_end requires page_start and must not precede it")
+        if self.version_label is not None:
+            object.__setattr__(self, "version_label", _required(self.version_label, "version_label"))
+        if self.source_status is not None and self.source_status not in {
+            "CURRENT", "SUPERSEDED", "EXPIRED", "SYNTHETIC",
+        }:
+            raise ValueError("known citation source_status required")
 
 
 @dataclass(frozen=True)

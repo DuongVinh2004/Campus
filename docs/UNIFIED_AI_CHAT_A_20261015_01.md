@@ -1,0 +1,28 @@
+# Prompt chat A — UNI-031–038 và tích hợp source
+
+Tiếp tục Campus24/7 tại `C:\Users\Duong Vinh\Vinh`. Người dùng đã yêu cầu mở ba chat và thực hiện ngay. Bạn là **chat A**, chủ source nghiệp vụ và đầu mối nối các module chung. Không tạo chat/subagent khác.
+
+Đọc và áp dụng `docs/UNIFIED_AI_PARALLEL_20261015_01.md` đầy đủ, AGENTS.md hiện tại, SESSION12, backlog và các phần031–038/acceptance trong implementation plan. Safety policy trực tiếp của người dùng nằm trong điều phối chung và vẫn bắt buộc. Tài liệu cũ chỉ tham khảo; không dựng lại approval workflow. Đọc source trước khi chọn exact files. Snapshot dispatch chỉ là preimage/hash reference, không coi đó là runtime đầy đủ.
+
+**Mục tiêu:** triển khai đầy đủ source UNI-031–038, nối consumers thực, gom backend/contracts/TypeScript/build, giữ mọi dữ liệu. Không làm memory/subscriptions/notification implementation thuộc B hoặc sửa test/evidence/backlog do C sở hữu.
+
+1. **031:** structured draft kết quả gồm facts/reasons/outcome; exact case/student/recipient/source/rule/template/version; phân biệt internal/public; officer review bắt buộc; prepare/preview không thực hiện nghiệp vụ, confirm qua executor/business transaction có audit/idempotency/receipt/readback; stale/transfer/revoke/CAS phải bị chặn và giữ nháp. Không suy eligibility/mẫu chính thức từ synthetic/public snapshot.
+2. **032:** staff intent gắn đúng hồ sơ/action đang chọn và shared runtime; phủ queue/detail/checklist/editor/error/admin theo inventory, mức supported/manual/unavailable trung thực. Không đọc DOM/unsaved private form hoặc copy toàn bộ hồ sơ vào model context; không model business-write bypass.
+3. **033:** supplement item IDs/criterion/source/reason/accepted format, public request cán bộ review/confirm; checklist sinh viên, đáp ứng map đúng item, provenance/version và delta recheck. Không tự gửi yêu cầu hoặc tự từ chối do đọc nguồn lỗi.
+4. **034:** handover summary done/open/evidence/next action, chọn thông tin public/internal, preview/confirm và reauthorize target queue/assignee/current session/version; receipt durable/restart/readback. Không hứa SLA hoặc tự chuyển quyền chưa được cấp.
+5. **035:** cùng business state/version/events cho student/staff, projections theo quyền; source/revoke/assignment đổi phải invalidate/refetch đúng phần. Không gộp memory/private notes giữa actors. Công bố contract/event hook cho B ngay khi có mốc này.
+6. **036:** controlled batch exact target list/versions/individual payloads, prepare/check/confirm; per-item authorize, outcomes partial/uncertain và read receipts trước retry; không replay cả batch hoặc reset dữ liệu để retry.
+7. **037:** queue ready/waiting/blocked, priority có căn cứ, source-bound deadline, giải thích routing; không auto assignment, đổi queue position hoặc giả confidence/SLA.
+8. **038:** scoped/minimized aggregations phân biệt active/student wait/unit wait/system time, supplement/transfer/reopen/age/blockers; không biến unobserved timing thành metric thật, không log raw PII.
+
+Thực hiện theo dependency031→032/033→034→035→036/037→038. Công bố handoffs031/033/035 sớm bằng JSON immutable có entry points/contracts/files/hashes/test commands/exit/evidence/limitations tại `stream-a/handoffs/`, số attempt mới mỗi lượt. B có thể bắt đầu039/040 độc lập,041/042 chờ các mốc của bạn; C chuẩn bị kiểm chứng trong lúc bạn coding.
+
+Bạn là **người duy nhất sửa shared wiring/contracts/state models/bootstrap/runtime/navigation/repository schema chung**, theo ownership trong tài liệu điều phối. B sở hữu module memory/tracking mới, worker mới, AssistantSettingsCenter và privacy page; không sửa chồng. Đọc `stream-b/integration-requests/` ở các mốc làm việc, nối registrar/API/UI/context/business event consumers thật vào composition thích hợp, hoặc fail closed nếu dependency chưa đủ. Ghi exact integration acknowledgement/API readback vào `stream-a/integration-acks/` để B kiểm lại. Đây là phối hợp kỹ thuật, không cần human approval thường lệ.
+
+Trước mutation: canonical root/path, Git status, đọc current file, preimages. Tạo namespace riêng `infra/local/unified-ai-parallel-20261015-01/stream-a/` exclusive-create; giữ tests mới trong `tests/unified_workflow13a/`, scripts mới prefix `unified_parallel_a_`, report riêng `docs/UNIFIED_AI_PARALLEL_A_20261015_01.md`. Không sửa master backlog; bàn giao status cho C. Không overwrite artifacts/source của chat khác; không tự sửa lockfile hoặc migration đang do luồng khác sở hữu.
+
+Code cả nhóm trước rồi gom checks phù hợp; mốc bàn giao có thể có checks hẹp để B/C consume. Test exact scopes, source/template/version drift, wrong recipient, stale review/preview, assignment/revoke, idempotency/CAS, partial batch/restart/readback và event/projection consistency bằng fixture mới. TypeScript/production build trên fresh snapshot với guard nguyên byte. Không UI/component/DOM/browser/Playwright/E2E/visual/mobile tests. Lỗi deadline50ms nền phải giữ và phân loại trung thực, không nới assertion/timeout hoặc sửa protected budget controls.
+
+Không delete/cleanup/reset/discard, paid/provider/production calls, commit/push/deploy hoặc stop/restart/reload serving runtime. Retained DB chỉ đọc, all-table/row digest trước/sau; fixtures/init/migration/corruption chỉ trên DB mới. Giữ logs lỗi/reruns và count latest unique cases; không cộng số lịch sử hoặc suy runtime từ SESSION12.
+
+Sau coding, ghi final handoff/hashes, giữ source ổn định cho C tạo final snapshot; nếu sửa lỗi C phát hiện, tạo revision handoff mới. Chỉ implemented phần đã nối và có evidence; full UI/institutional/production acceptance pending. Kết thúc bằng báo cáo tiếng Việt ngắn, links source/report/evidence/handoffs và giới hạn còn lại. Bắt đầu ngay bằng đọc source/preflight và triển khai031, không dừng ở kế hoạch.

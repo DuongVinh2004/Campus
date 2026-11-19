@@ -1,0 +1,626 @@
+{
+ "purpose": "form-style seed questions with machine-verified gold; used to derive natural messy variants",
+ "seeds": [
+  {
+   "case_id": "R2-A1-0045",
+   "family": "ctdt",
+   "expected": "answer",
+   "question": "Ở nhánh Đường B1 của K71CD, học phần Hệ thống giao thông thông minh có mã gì và bao nhiêu tín chỉ?",
+   "required_facts": [
+    "160470",
+    "2"
+   ],
+   "forbidden_facts": [
+    "120332"
+   ],
+   "gold_quotes": [
+    "160470 - 2\nHệ thống GT thông minh"
+   ]
+  },
+  {
+   "case_id": "R2-A1-0053",
+   "family": "ctdt",
+   "expected": "answer",
+   "question": "Theo CTĐT Kỹ thuật điều khiển và tự động hóa K71KAE, Tính toán khoa học với Python có mã học phần nào và mấy tín chỉ?",
+   "required_facts": [
+    "608830",
+    "3"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "608830 – 3\nTính toán khoa học \nvới Python"
+   ]
+  },
+  {
+   "case_id": "R2-Q1-0041",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Theo Quy chế 1486, với chương trình cử nhân, cảnh báo học tập vượt mốc bao nhiêu lần liên tiếp hoặc không liên tiếp sẽ dẫn đến buộc thôi học?",
+   "required_facts": [
+    "vượt quá 2 lần liên\ntiếp",
+    "quá 4 lần không liên tiếp",
+    "chương trình đào tạo trình độ cử nhân"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "a) Số lần cảnh báo học tập hoặc mức cảnh báo học tập vượt quá 2 lần liên\ntiếp; hoặc quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   ]
+  },
+  {
+   "case_id": "R2-A0-0141",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Theo Quyết định 94 ngày 13/01/2026 áp dụng từ K70, các học phần ngoại ngữ của chương trình chuẩn và của lớp Anh ngữ, Pháp ngữ được tính bao nhiêu tín chỉ tương ứng?",
+   "required_facts": [
+    "8 tín chỉ",
+    "18 TC"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "1. Học phần tiếng Anh là môn học bắt buộc trong chương trình đào tạo của sinh viên hệ chính quy. Thời lượng các học phần tiếng Anh được tính tương đương 8 tín chỉ (TC).",
+    "1. Học phần tiếng Anh, tiếng Pháp là môn học bắt buộc tương ứng trong chương trình đào tạo của sinh viên các lớp Anh ngữ, Pháp ngữ. Thời lượng các học phần tiếng Anh, tiếng Pháp được tính tương đương "
+   ]
+  },
+  {
+   "case_id": "R2-Q1-0053",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Theo Quy chế 1486, điểm tích lũy thuộc khoảng nào được loại giỏi, và hạng tốt nghiệp giỏi bị hạ một mức trong những trường hợp nào?",
+   "required_facts": [
+    "Từ 3,2 đến cận 3,6",
+    "giảm\nđi một mức",
+    "vượt quá 5%",
+    "kỷ luật từ mức cảnh cáo trở lên"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Từ 3,2 đến cận 3,6: Giỏi;",
+    "loại xuất sắc và giỏi sẽ bị giảm\nđi một mức nếu thuộc một trong các trường hợp sau:\n\na) Khối lượng của các học phần phải học lại vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình;\n\nb) "
+   ]
+  },
+  {
+   "case_id": "R2-Q1-0033",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Theo Quy chế 1486, B+ ứng với khoảng điểm học phần nào và được đổi thành bao nhiêu trên thang điểm 4?",
+   "required_facts": [
+    "B+: từ 8,0 đến 8,4",
+    "B+ tương ứng với 3,5"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "A: từ 8,5 đến 10;\nB+: từ 8,0 đến 8,4;\nB: từ 7,0 đến 7,9;",
+    "A tương ứng với 4,0;\nB+ tương ứng với 3,5;\nB tương ứng với 3,0;"
+   ]
+  },
+  {
+   "case_id": "R2-Q1-0085",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Theo Quyết định 94/2026, với sinh viên K70 hệ chính quy, tổng thời lượng tiếng Anh của chương trình chuẩn khác lớp Anh ngữ bao nhiêu tín chỉ?",
+   "required_facts": [
+    "8 tín chỉ (TC)",
+    "18 TC"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "1. Học phần tiếng Anh là môn học bắt buộc trong chương trình đào tạo của sinh viên hệ chính quy. Thời lượng các học phần tiếng Anh được tính tương đương 8 tín chỉ (TC).",
+    "1. Học phần tiếng Anh, tiếng Pháp là môn học bắt buộc tương ứng trong chương trình đào tạo của sinh viên các lớp Anh ngữ, Pháp ngữ. Thời lượng các học phần tiếng Anh, tiếng Pháp được tính tương đương "
+   ]
+  },
+  {
+   "case_id": "R2-Q1-0021",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Theo Quy chế 1486, khối lượng đăng ký trong một học kỳ được giới hạn tối thiểu và tối đa thế nào so với khối lượng trung bình theo kế hoạch chuẩn?",
+   "required_facts": [
+    "không ít hơn 2/3",
+    "không vượt quá 3/2",
+    "khối lượng trung bình một học kỳ"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "a) Khối lượng tối thiểu không ít hơn 2/3 khối lượng trung bình một học kỳ\ntheo kế hoạch học tập chuẩn;\n\nb) Khối lượng tối đa không vượt quá 3/2 khối lượng trung bình một học kỳ\ntheo kế hoạch học tập c"
+   ]
+  },
+  {
+   "case_id": "R2-A3-0145",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Quy định về phân loại đầu vào, chương trình học và chuẩn ngoại ngữ cho sinh viên đại học chính quy được ban hành theo quyết định số nào, ngày nào năm 2026?",
+   "required_facts": [
+    "94/QĐ-ĐHXDHN",
+    "13 tháng 01 năm 2026"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Quyết định Số 94/QĐ-ĐHXDHN ngày 13 tháng 01 năm 2026 của Trường Đại học Xây dựng Hà Nội"
+   ]
+  },
+  {
+   "case_id": "R2-Q1-0025",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Theo Quy chế 1486, chính quy và vừa làm vừa học được học trực tuyến tối đa bao nhiêu phần chương trình, và khi có thiên tai hoặc dịch bệnh phức tạp thì áp dụng hướng dẫn nào?",
+   "required_facts": [
+    "tối đa 30%",
+    "thiên tai, dịch bệnh phức tạp",
+    "hướng dẫn của Bộ Giáo dục và Đào tạo"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "b) Đối với đào tạo theo hình thức chính quy và vừa làm vừa học, tối đa 30%\ntổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến.\nTrong trường hợp thiên tai, dịch bệnh phức t"
+   ]
+  },
+  {
+   "case_id": "R2-Q1-0005",
+   "family": "quy_che",
+   "expected": "answer",
+   "question": "Theo Quy chế 1486, nếu trượt học phần bắt buộc hoặc học phần tự chọn thì em có những cách học bù nào?",
+   "required_facts": [
+    "học phần tương đương",
+    "học phần thay thế nếu học phần đó không còn được giảng dạy",
+    "học phần tự chọn khác"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "c) Sinh viên không đạt một học phần bắt buộc sẽ phải học lại học phần đó\nhoặc học một học phần tương đương theo quy định trong chương trình đào tạo,\nhoặc học một học phần thay thế nếu học phần đó khôn",
+    "d) Sinh viên không đạt một học phần tự chọn sẽ phải học lại học phần đó\nhoặc có thể chọn học một học phần tự chọn khác theo quy định trong chương trình\nđào tạo."
+   ]
+  },
+  {
+   "case_id": "R2-Q2-0029",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Em hết thời gian nghỉ học tạm thời, muốn nhập học lại thì nộp đơn ở đâu, cần xác nhận gì của địa phương và bao lâu nhận quyết định?",
+   "required_facts": [
+    "Ô số 3 phòng \nCTCT&QLSV",
+    "xác nhận của chính quyền địa \nphương",
+    "không \nvi phạm pháp luật",
+    "01 tuần"
+   ],
+   "forbidden_facts": [
+    "10 ngày làm việc"
+   ],
+   "gold_quotes": [
+    "- Đúng thời gian ghi trong quyết định nghỉ học tạm \nthời, sinh viên nộp đơn xin nhập học trở lại theo \nmẫu cho chuyên viên phụ trách tại Ô số 3 phòng \nCTCT&QLSV.",
+    "- Đơn phải có xác nhận của chính quyền địa \nphương trong thời gian nghỉ học sinh viên không \nvi phạm pháp luật.",
+    "- Sinh viên nhận quyết định (dạng file scan .pdf) \nsau 01 tuần kể từ khi nộp đơn."
+   ]
+  },
+  {
+   "case_id": "R2-Q2-0045",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Em tự đánh giá điểm rèn luyện trên trang nào, và điểm này được dùng để xét những việc gì?",
+   "required_facts": [
+    "sinhvien.huce.edu.vn",
+    "xét duyệt học \nbổng",
+    "xét khen thưởng - kỷ \nluật",
+    "xét thôi học, ngừng học, \nxét lưu trú ký túc xá"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "- Sinh viên đăng nhập vào trang website: \nsinhvien.huce.edu.vn để tự đánh giá",
+    "Kết quả đánh giá điểm rèn \nluyện của sinh viên được sử \ndụng trong việc xét duyệt học \nbổng, xét khen thưởng - kỷ \nluật, xét thôi học, ngừng học, \nxét lưu trú ký túc xá."
+   ]
+  },
+  {
+   "case_id": "R2-A2-0145",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Theo Sổ tay sinh viên 2026–2027, mật khẩu an toàn nên dài bao nhiêu và gồm những loại ký tự nào?",
+   "required_facts": [
+    "dài hơn 8 ký tự",
+    "chữ hoa, chữ thường, số và ký tự \nđặc biệt"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Mật \nkhẩu nên dài hơn 8 ký tự và bao gồm ca chữ hoa, chữ thường, số và ký tự \nđặc biệt."
+   ]
+  },
+  {
+   "case_id": "R2-A2-0149",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Theo Sổ tay sinh viên 2026–2027, thẻ sinh viên được cấp khi nào và phải đeo trong những hoạt động nào ở trường?",
+   "required_facts": [
+    "sau khi nhập học",
+    "khi học tập và tham gia các hoạt động ở Trường"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Cấp thẻ sinh viên \nsau khi nhập học",
+    "3. Đeo thẻ sinh viên khi học tập và tham gia các hoạt động ở Trường"
+   ]
+  },
+  {
+   "case_id": "R2-Q2-0057",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Đến Trạm Y tế trường khám có phải mang thẻ BHYT không, và nếu cần khám hoặc chuyển viện theo BHYT thì em phải bắt đầu ở đâu?",
+   "required_facts": [
+    "Không cần xuất trình thẻ Bảo hiểm y tế (BHYT)",
+    "Không thực hiện viết giấy chuyển viện",
+    "nơi đăng ký KCB ban đầu",
+    "ghi trên thẻ BHYT"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "• Không cần xuất trình thẻ Bảo hiểm y tế (BHYT) khi khám chữa bệnh;\n• Không thực hiện viết giấy chuyển viện đối với KCB theo BHYT;",
+    "• Nếu cần KCB và chuyển viện theo BHYT thì cán bộ và sinh viên bắt đầu đến từ nơi đăng ký KCB ban đầu được \nghi trên thẻ BHYT của mình để được hưởng chế độ BHYT"
+   ]
+  },
+  {
+   "case_id": "R2-Q2-0061",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Lần đầu đến khám ở Trạm Y tế trường, tại bước tiếp đón em phải cung cấp những thông tin gì?",
+   "required_facts": [
+    "họ tên, năm sinh, Khoa/Phòng/Ban/Lớp sinh viên",
+    "lý do khám"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "B1 | TIẾP ĐÓN & LẤY THÔNG TIN HÀNH CHÍNH\n• Người thực hiện: Y sĩ, Điều dưỡng viên.\n• Lấy thông tin về họ tên, năm sinh, Khoa/Phòng/Ban/Lớp sinh viên\n• Ghi nhận lý do khám."
+   ]
+  },
+  {
+   "case_id": "R2-Q2-0085",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Theo sổ tay, mật khẩu tài khoản nên dài bao nhiêu, gồm những loại ký tự nào và có nên dùng chung cho nhiều tài khoản không?",
+   "required_facts": [
+    "dài hơn 8 ký tự",
+    "chữ hoa, chữ thường, số và ký tự \nđặc biệt",
+    "không nên sử dụng",
+    "giống nhau cho nhiều tài khoản khác nhau"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Mật \nkhẩu nên dài hơn 8 ký tự và bao gồm ca chữ hoa, chữ thường, số và ký tự \nđặc biệt. Nên đổi mật khẩu thường xuyên và không nên sử dụng mật khâu \ngiống nhau cho nhiều tài khoản khác nhau."
+   ]
+  },
+  {
+   "case_id": "R2-Q2-0037",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Làm thủ tục thanh toán ra trường thì em có cần trả hết sách thư viện và đóng đủ học phí không?",
+   "required_facts": [
+    "Trả \nsách thư viện",
+    "thanh toán đầy đủ học phí"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Sinh viên phải hoàn tất các công việc như: Trả \nsách thư viện, thanh toán đầy đủ học phí…"
+   ]
+  },
+  {
+   "case_id": "R2-Q2-0081",
+   "family": "so_tay",
+   "expected": "answer",
+   "question": "Có tài khoản người thân nhắn qua mạng xã hội nhờ chuyển tiền gấp, em nên xác minh bằng cách nào trước khi chuyển?",
+   "required_facts": [
+    "điện thoại thông thường",
+    "gặp mặt trực tiếp"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "• KHÔNG chuyển tiền theo yêu cầu của người quen biết trên mạng xã hội; nếu là người thân, quen phải xác \nthực thông tin qua điện thoại thông thường hoặc gặp mặt trực tiếp"
+   ]
+  },
+  {
+   "case_id": "R2-A3-0045",
+   "family": "hoc_phi",
+   "expected": "answer",
+   "question": "Thông báo tiếp nhận hồ sơ miễn, giảm học phí học kỳ I năm học 2026–2027 còn nêu những loại hỗ trợ học tập nào?",
+   "required_facts": [
+    "hỗ trợ chi phí học tập",
+    "hỗ trợ học tập"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "V/v tiếp nhận hồ sơ đề nghị hưởng chính sách miễn, giảm học phí, hỗ trợ chi phí học tập, hỗ trợ học tập học kỳ I năm học 2026-2027"
+   ]
+  },
+  {
+   "case_id": "R2-A2-0061",
+   "family": "hoc_phi",
+   "expected": "answer",
+   "question": "Theo thông báo 338 cho học kỳ I năm học 2026–2027, hồ sơ minh chứng của sinh viên khuyết tật phải nộp lại hằng kỳ không, và trường hợp nào làm thay đổi quy định đó?",
+   "required_facts": [
+    "01 lần",
+    "kết thúc khóa học",
+    "có văn bản hướng dẫn mới\ncủa chính phủ"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Ghi chú: Sinh viên chỉ cần nộp hồ sơ\nminh chứng 01 lần cho đến khi\nkết thúc khóa học hoặc cho đến\nkhi có văn bản hướng dẫn mới\ncủa chính phủ."
+   ]
+  },
+  {
+   "case_id": "R2-A1-0061",
+   "family": "hoc_phi",
+   "expected": "answer",
+   "question": "Theo Thông báo 338 về học kỳ I năm học 2026-2027, sinh viên khuyết tật cần nộp những giấy tờ nào để xin miễn học phí và hạn cuối tiếp nhận hồ sơ là ngày nào?",
+   "required_facts": [
+    "Đơn đề nghị miễn, giảm học phí",
+    "Giấy xác nhận khuyết tật",
+    "20/10/2026"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "1.2 Sinh viên là người khuyết tật \n1. Đơn đề nghị miễn, giảm học phí (Theo \nmẫu) \n2. Giấy xác nhận khuyết tật.",
+    "Từ ngày 29/9/2026 đến hết ngày 20/10/2026."
+   ]
+  },
+  {
+   "case_id": "R2-A2-0057",
+   "family": "hoc_phi",
+   "expected": "answer",
+   "question": "Theo thông báo 338 về học kỳ I năm học 2026–2027, sinh viên khuyết tật cần giấy tờ gì để miễn học phí và hạn cuối nộp là ngày nào?",
+   "required_facts": [
+    "Đơn đề nghị miễn, giảm học phí",
+    "Giấy xác nhận khuyết tật.",
+    "20/10/2026"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Hồ sơ cần nộp: 1. Đơn đề nghị miễn, giảm học phí (Theo\nmẫu)\n2. Giấy xác nhận khuyết tật.",
+    "- Từ ngày 29/9/2026 đến hết ngày 20/10/2026."
+   ]
+  },
+  {
+   "case_id": "R2-A1-0065",
+   "family": "hoc_phi",
+   "expected": "answer",
+   "question": "Theo Thông báo 338 cho học kỳ I năm học 2026-2027, địa điểm nộp hồ sơ tại Hà Nội và tại Phân hiệu Thành phố Hồ Chí Minh khác nhau thế nào?",
+   "required_facts": [
+    "Tầng 2",
+    "Tòa nhà Trung tâm Hỗ trợ Sinh viên",
+    "Phòng Công tác Sinh viên – Học sinh",
+    "Tòa nhà D"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "- Tại Trường Đại học Xây dựng Hà Nội: Phòng Công tác sinh viên, Tầng 2, \nTòa nhà Trung tâm Hỗ trợ Sinh viên. \n- Tại Phân hiệu Thành phố Hồ Chí Minh: Phòng Công tác Sinh viên – Học sinh \nvà Thư viện, T"
+   ]
+  },
+  {
+   "case_id": "R2-A3-0109",
+   "family": "khac",
+   "expected": "answer",
+   "question": "Theo chương trình Khoa học máy tính 71CS, Học máy được xếp học kỳ nào, học phần tiên quyết có tên và mã gì?",
+   "required_facts": [
+    "Học kỳ 6",
+    "608825",
+    "Nhập môn trí tuệ"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "71CS\nHọc kỳ 6\n418802 - 2\nTư tưởng Hồ Chí\nMinh\n\n362401– 3\nKhoa học quản lý,\nquản trị\n\n607715 - 4\nPhát triển ứng dụng\nphía máy chủ\n\n608816 - 3\nKhai phá dữ liệu\n\n608807 - 3\nHọc máy",
+    "71CS\nHọc phần tiên quyết:\n608825 - 3\nNhập môn trí tuệ\nnhân tạo\n→\n608807 - 3\nHọc máy"
+   ]
+  },
+  {
+   "case_id": "R2-A0-0077",
+   "family": "khac",
+   "expected": "answer",
+   "question": "Theo hướng dẫn tải Office 365 bằng tài khoản trường cấp, sau khi đăng nhập em bấm mục nào để tải bộ cài?",
+   "required_facts": [
+    "Install apps",
+    "Microsoft 365 apps"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Bước 4: Ấn Install apps và chọn Microsoft 365 apps."
+   ]
+  },
+  {
+   "case_id": "R2-A3-0097",
+   "family": "khac",
+   "expected": "answer",
+   "question": "Danh mục tự chọn K70KAE ghi tổng mấy tín chỉ, và môn Hệ thống vi cơ điện tử (MEMS) có mã cùng số tín chỉ gì?",
+   "required_facts": [
+    "4",
+    "250401",
+    "2"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Các học phần tự chọn (4TC)\n250401- 2\nHệ thống vi cơ điện tử (MEMS)"
+   ]
+  },
+  {
+   "case_id": "R2-A0-0085",
+   "family": "khac",
+   "expected": "answer",
+   "question": "Theo kế hoạch Kiến trúc cảnh quan K69KDCQC, tổng khối lượng học là bao nhiêu tín chỉ và đã loại trừ những học phần nào?",
+   "required_facts": [
+    "180 TC",
+    "Giáo dục thể chất",
+    "Giáo dục quốc phòng",
+    "Tiếng Anh nâng cao"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Tổng: 180 TC (không tính HP Giáo dục thể chất, Giáo dục quốc phòng và Tiếng Anh nâng cao)"
+   ]
+  },
+  {
+   "case_id": "R2-A3-0089",
+   "family": "khac",
+   "expected": "answer",
+   "question": "Theo kế hoạch Kỹ thuật công trình thủy áp dụng từ K67, tổng số tín chỉ là bao nhiêu và có tính GDTC, GDQP không?",
+   "required_facts": [
+    "185",
+    "Không tính",
+    "GDTC, GDQP"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "185 Tín chỉ (Không tính Học phần GDTC, GDQP)"
+   ]
+  },
+  {
+   "case_id": "R2-A0-0105",
+   "family": "khac",
+   "expected": "answer",
+   "question": "Theo kế hoạch cử nhân Quản lý dự án K69, thực tập và khóa luận tốt nghiệp lần lượt có bao nhiêu tín chỉ?",
+   "required_facts": [
+    "511380 – 3",
+    "511381 – 7"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "511380 – 3 \nThực tập",
+    "511381 – 7 \nKhóa luận tốt nghiệp"
+   ]
+  },
+  {
+   "case_id": "R2-A0-0109",
+   "family": "khac",
+   "expected": "answer",
+   "question": "Trong kế hoạch Công nghệ kỹ thuật xây dựng từ K71XCT, nhánh tự chọn 2 có những học phần nào?",
+   "required_facts": [
+    "Xây dựng bền vững",
+    "Logistic trong xây",
+    "Bảo trì công trình",
+    "Công nghệ quan trắc"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Nhánh 2 020318 – 2 \nXây dựng bền vững\n170301 – 2 \nLogistic trong xây \ndựng \n020315 – 2 \nBảo trì công trình\n090301 – 2 \nCông nghệ quan trắc \nmôi trường"
+   ]
+  },
+  {
+   "case_id": "R2-A0-0073",
+   "family": "khac",
+   "expected": "answer",
+   "question": "Theo hướng dẫn tải Office 365 bằng tài khoản trường cấp, em vào trang nào trước và sau khi nhập tài khoản thì bấm nút gì?",
+   "required_facts": [
+    "https://office.com",
+    "Next"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Bước 1:Truy cập trang https://office.com, ấn Sign in.\nBước 2: Nhập tài khoản Microsoft Office 365 được cung cấp và ấn Next."
+   ]
+  },
+  {
+   "case_id": "R2-A1-0149",
+   "family": "thong_bao",
+   "expected": "answer",
+   "question": "Theo thông báo thi tiếng Anh đợt tháng 10/2026, quy trình đăng ký và nộp lệ phí gồm những bước, mốc thời gian và mức phí nào; hết hạn có được đăng ký bổ sung không?",
+   "required_facts": [
+    "13/10/2026 đến hết ngày 18/10/2026",
+    "150.000đ",
+    "19/10/2026 đến 15h00 ngày \n21/10/2026",
+    "không giải quyết \nđăng ký bổ sung"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "Bước 1: Đăng ký qua mạng tại địa chỉ: https://tienganh.huce.edu.vn từ ngày \n13/10/2026 đến hết ngày 18/10/2026.",
+    "Bước 2: Nộp lệ phí thi 150.000đ từ ngày 19/10/2026 đến 15h00 ngày \n21/10/2026 vào tài khoản liên kết với ngân hàng BIDV của mỗi sinh viên.",
+    "Hết thời hạn đăng ký và nộp lệ phí phòng Quản lý đào tạo sẽ không giải quyết \nđăng ký bổ sung."
+   ]
+  },
+  {
+   "case_id": "R2-A3-0149",
+   "family": "thong_bao",
+   "expected": "answer",
+   "question": "Theo thông báo số 2 FIT_CMA2026, hội nghị diễn ra ngày nào, phiên khai mạc bắt đầu và kết thúc lúc mấy giờ, ở đâu?",
+   "required_facts": [
+    "06/10/2026",
+    "07h30",
+    "08h30",
+    "Hội trường tầng 2 – Nhà Thư viện"
+   ],
+   "forbidden_facts": [
+    "Phòng 605"
+   ],
+   "gold_quotes": [
+    "1. Thời gian: Ngày 06/10/2026.\n2. Địa điểm và chương trình:\nPhiên khai mạc: từ 07h30 đến 08h30, tại Hội trường tầng 2 – Nhà Thư viện."
+   ]
+  },
+  {
+   "case_id": "R2-Q1-0109",
+   "family": "thong_bao",
+   "expected": "answer",
+   "question": "Đợt thi đánh giá tiếng Anh tháng 10/2026 kiểm tra nghe và đọc bằng hình thức nào, tổng thời gian bao nhiêu và chia cho từng kỹ năng ra sao?",
+   "required_facts": [
+    "trắc nghiệm khách quan \ntrên máy tính",
+    "120 phút",
+    "45 phút kỹ năng nghe",
+    "75 phút kỹ năng đọc"
+   ],
+   "forbidden_facts": [],
+   "gold_quotes": [
+    "- Kỹ năng nghe, kỹ năng đọc: kiểm tra theo hình thức trắc nghiệm khách quan \ntrên máy tính. \n - Thời gian làm bài 120 phút (45 phút kỹ năng nghe, 75 phút kỹ năng đọc)."
+   ]
+  },
+  {
+   "case_id": "R2-N-0031",
+   "family": "mo_ho",
+   "expected": "clarify",
+   "question": "Em có được không?",
+   "required_facts": [],
+   "forbidden_facts": [],
+   "gold_quotes": []
+  },
+  {
+   "case_id": "R2-N-0051",
+   "family": "mo_ho",
+   "expected": "clarify",
+   "question": "Lịch ấy có thay đổi không?",
+   "required_facts": [],
+   "forbidden_facts": [],
+   "gold_quotes": []
+  },
+  {
+   "case_id": "R2-N-0043",
+   "family": "mo_ho",
+   "expected": "clarify",
+   "question": "Bên nào giải quyết việc này?",
+   "required_facts": [],
+   "forbidden_facts": [],
+   "gold_quotes": []
+  },
+  {
+   "case_id": "R2-N-0039",
+   "family": "mo_ho",
+   "expected": "clarify",
+   "question": "Trường hợp của em thì sao?",
+   "required_facts": [],
+   "forbidden_facts": [],
+   "gold_quotes": []
+  },
+  {
+   "case_id": "R2-N-0029",
+   "family": "ngoai_pham_vi",
+   "expected": "abstain",
+   "question": "Tôi cần tìm phòng khám thú y gần HUCE để tiêm phòng cho mèo.",
+   "required_facts": [],
+   "forbidden_facts": [],
+   "gold_quotes": []
+  },
+  {
+   "case_id": "R2-N-0017",
+   "family": "ngoai_pham_vi",
+   "expected": "abstain",
+   "question": "Tôi muốn biết thủ tục cấp đổi hộ chiếu phổ thông.",
+   "required_facts": [],
+   "forbidden_facts": [],
+   "gold_quotes": []
+  },
+  {
+   "case_id": "R2-N-0025",
+   "family": "ngoai_pham_vi",
+   "expected": "abstain",
+   "question": "Quán ăn gần HUCE nào nhận giao cơm cho gia đình vào tối Chủ nhật?",
+   "required_facts": [],
+   "forbidden_facts": [],
+   "gold_quotes": []
+  }
+ ]
+}

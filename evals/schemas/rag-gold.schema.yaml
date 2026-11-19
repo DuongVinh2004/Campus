@@ -1,0 +1,78 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://campus247.example/schemas/evals/rag-gold.schema.yaml"
+title: "Campus 24/7 RAG gold case with resolved evidence"
+type: object
+additionalProperties: false
+required: [case, gold]
+properties:
+  case: {$ref: "eval-case.schema.yaml"}
+  gold:
+    type: object
+    additionalProperties: false
+    required: [domain, scenario_family, paraphrase_family, authorized_context, relevant_chunks, citations, negative_labels, source_snapshot_hash]
+    properties:
+      domain: {$ref: "#/$defs/identifier"}
+      scenario_family: {$ref: "#/$defs/identifier"}
+      paraphrase_family: {$ref: "#/$defs/identifier"}
+      authorized_context: {$ref: "#/$defs/context"}
+      relevant_chunks:
+        type: array
+        uniqueItems: true
+        items: {$ref: "#/$defs/evidence"}
+      citations:
+        type: array
+        uniqueItems: true
+        items: {$ref: "#/$defs/evidence"}
+      negative_labels:
+        type: array
+        uniqueItems: true
+        items: {$ref: "#/$defs/identifier"}
+      source_snapshot_hash: {type: string, pattern: "^sha256:[0-9a-f]{64}$"}
+$defs:
+  identifier: {type: string, minLength: 1, pattern: '^\S(?:.*\S)?$'}
+  scope_values:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items: {$ref: "#/$defs/identifier"}
+  context:
+    type: object
+    additionalProperties: false
+    required: [authorized_scope, locale, effective_at, simulation_policy, trace_id]
+    properties:
+      locale: {const: "vi-VN"}
+      effective_at: {type: string, format: date-time}
+      simulation_policy: {enum: [DENY, ALLOW_LABELED]}
+      trace_id: {type: string, pattern: "^[0-9a-f]{32}$", not: {const: "00000000000000000000000000000000"}}
+      authorized_scope:
+        type: object
+        additionalProperties: false
+        required: [tenant_id, campus_id, actor_id, roles, audiences, faculty_codes, program_codes]
+        properties:
+          tenant_id: {$ref: "#/$defs/identifier"}
+          campus_id: {$ref: "#/$defs/identifier"}
+          actor_id: {$ref: "#/$defs/identifier"}
+          roles:
+            type: array
+            minItems: 1
+            uniqueItems: true
+            items: {enum: [STUDENT, SUPPORT_OFFICER, KNOWLEDGE_ADMIN, SYSTEM_ADMIN]}
+          audiences: {$ref: "#/$defs/scope_values"}
+          faculty_codes: {$ref: "#/$defs/scope_values"}
+          program_codes: {$ref: "#/$defs/scope_values"}
+  evidence:
+    type: object
+    additionalProperties: false
+    required: [fixture_ref, source_id, document_version_id, chunk_id, section_path, page_start, page_end, quote_span_hash]
+    properties:
+      fixture_ref: {type: string, pattern: "^fixture://knowledge/[a-z0-9._/-]+$"}
+      source_id: {$ref: "#/$defs/identifier"}
+      document_version_id: {$ref: "#/$defs/identifier"}
+      chunk_id: {$ref: "#/$defs/identifier"}
+      section_path:
+        type: array
+        minItems: 1
+        items: {$ref: "#/$defs/identifier"}
+      page_start: {type: [integer, "null"], minimum: 1}
+      page_end: {type: [integer, "null"], minimum: 1}
+      quote_span_hash: {type: string, pattern: "^sha256:[0-9a-f]{64}$"}

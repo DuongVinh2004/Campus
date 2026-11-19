@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from pathlib import Path
 import sys
+from unittest.mock import patch
 import pytest
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -10,7 +11,13 @@ WORKER_SRC = ROOT / "services" / "worker" / "src"
 if str(WORKER_SRC) not in sys.path:
     sys.path.insert(0, str(WORKER_SRC))
 
-from campus247_worker.ingestion.embed_fake import DeterministicEmbeddingAdapter
+with patch.dict("os.environ", {"ENVIRONMENT": "test"}):
+    from campus247_worker.ingestion.embed_fake import DeterministicEmbeddingAdapter
+
+
+@pytest.fixture(autouse=True)
+def explicit_test_profile(monkeypatch):
+    monkeypatch.setenv("ENVIRONMENT", "test")
 
 
 def test_embed_text_deterministic_and_normalized() -> None:

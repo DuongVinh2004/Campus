@@ -43,12 +43,13 @@ Khi phân vân, coi việc đó là cốt lõi và Claude tự làm.
 ## Quy trình
 
 1. **Chia việc.** Mỗi job là một việc nhỏ, có danh sách file được ghi rõ ràng. Các job song song không được ghi trùng file.
-2. **Viết brief ngắn** theo [references/brief-template.md](references/brief-template.md). Đưa file qua `--context`, không dán nội dung vào brief. Nêu tiêu chí nghiệm thu đo được.
+2. **Viết brief ngắn** theo [references/brief-template.md](references/brief-template.md). `worker.py` tự nối danh sách [lỗi worker hay mắc](references/worker-pitfalls.md) vào system prompt của mọi job và bắt worker rà từng điểm trước khi trả lời; không cần dán lại vào brief. Đưa file qua `--context`, không dán nội dung vào brief. Nêu tiêu chí nghiệm thu đo được.
 3. **Giao việc** bằng `worker.py` (một job) hoặc `fanout.py` (nhiều job). Chỉ in bản tóm tắt; output đầy đủ nằm trong thư mục run.
 4. **Đọc kết quả guard.**
    - `guard_blocked`: đọc lý do, không sửa chính sách. Gửi lời sửa bằng `--followup RUN --brief-text "sửa đúng lỗi X"`: worker nhận lại cả cuộc hội thoại cùng các phát hiện của guard, nên brief sửa chỉ cần 1 câu.
    - `question`/`blocked`: trả lời qua `--followup`, hoặc Claude tự làm.
    - Một job ghi nhiều file mà chỉ vài file đạt: áp dụng riêng file đạt bằng `apply RUN --only path`.
+   - **Lỗi mà guard không bắt** (tsc, vitest hay mắt thường mới thấy): thêm một mục vào [references/worker-pitfalls.md](references/worker-pitfalls.md) ngay sau khi sửa, để các lần giao sau không lặp lại.
 5. **Duyệt theo mức rủi ro** ([references/review.md](references/review.md)). Chỉ đọc diff cần đọc (`guard.py diff RUN --path P`), không đọc lại cả file.
 6. **Áp dụng** bằng `guard.py apply RUN`. Không chép tay output của worker vào repo.
 7. **Kiểm tra** theo skill `campus247` (tsc, vitest file liên quan, trình duyệt nếu là UI). Lỗi nhỏ thì Claude sửa thẳng; lỗi lớn thì `guard.py revert RUN` rồi giao lại hoặc tự làm.

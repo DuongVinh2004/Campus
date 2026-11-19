@@ -64,13 +64,19 @@ WantedBy=multi-user.target
 """,
         "campus247-api.service": f"""[Unit]
 Description=Campus 24/7 API ({profile.api_workers} workers)
-After=network.target postgresql@17-campus247.service campus247-models.service campus247-gateway.service
+After=network.target postgresql@17-campus247.service campus247-models.service campus247-gateway.service clamav-daemon.service
 Requires=campus247-gateway.service
-Wants=campus247-models.service
+# Without the scanner the API still starts (chat does not need it) but every upload is refused: they fail closed.
+Wants=campus247-models.service clamav-daemon.service
 {common}
 Environment=CAMPUS247_RAG_ENGINE=v2
-# The learning-materials module scans uploads with a Windows ClamAV build that is not ported to Linux yet.
+# The learning-materials module stays off here: its OCR and PowerPoint sandboxes are Windows/WSL builds and which data
+# goes to the cloud is an open owner decision. Knowledge uploads and crawled files ARE scanned by the packaged clamd.
 Environment=CAMPUS_LEARNING_ENABLED=false
+Environment=CAMPUS247_PROFILE={profile.name}
+Environment=CAMPUS247_SCANNER_SOCKET=/run/clamav/clamd.ctl
+Environment=CAMPUS247_SCANNER_MAX_DATABASE_AGE_HOURS=72
+SupplementaryGroups=clamav
 Environment=CAMPUS247_RAG_V2_INDEX={root}/data/rag_v2_index/embedded2
 Environment=CAMPUS247_CHAT_MAX_IN_FLIGHT={profile.max_in_flight_per_worker}
 Environment=CAMPUS247_RATE_LIMIT_STORE=postgres

@@ -28,7 +28,7 @@ log() { printf '\n== %s\n' "$*"; }
 log "system packages (PostgreSQL from the official PGDG repository: Ubuntu 24.04 itself ships 16)"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y -qq ca-certificates curl rsync tar xz-utils gnupg ufw logrotate python3-venv caddy
+apt-get install -y -qq ca-certificates curl rsync tar xz-utils gnupg ufw logrotate python3-venv caddy clamav-daemon clamav-freshclam
 if [ ! -f /etc/apt/sources.list.d/pgdg.list ]; then
   . /etc/os-release
   install -d /usr/share/postgresql-common/pgdg
@@ -144,6 +144,21 @@ if [ "$SKIP_SERVICES" != 1 ]; then
   [ -f /etc/campus247/alerts.env ] || install -m 0640 -g "$RUN_USER" "$ROOT/infra/cloud/alerts.env.example" /etc/campus247/alerts.env
   systemctl daemon-reload
   systemctl enable --now campus247-watchdog.timer >/dev/null
+fi
+
+log "ClamAV daemon (malware scan of every uploaded or crawled file; signatures refreshed by clamav-freshclam)"
+[ -f /etc/clamav/clamd.conf.distribution ] || cp -p /etc/clamav/clamd.conf /etc/clamav/clamd.conf.distribution
+install -m 0644 "$ROOT/infra/cloud/clamav/clamd.conf" /etc/clamav/clamd.conf
+install -d /etc/systemd/system/clamav-daemon.service.d
+install -m 0644 "$ROOT/infra/cloud/clamav/clamav-daemon.override.conf" /etc/systemd/system/clamav-daemon.service.d/campus247.conf
+chmod 0755 "$ROOT/infra/cloud/wait_scanner.sh"
+if [ "$SKIP_SERVICES" != 1 ]; then
+  systemctl daemon-reload
+  # A first signature download is needed before clamd can start; freshclam also notifies clamd after every update.
+  systemctl stop clamav-freshclam >/dev/null 2>&1 || true
+  freshclam --quiet || echo "freshclam could not download signatures now; uploads stay refused until it does"
+  systemctl enable --now clamav-freshclam clamav-daemon >/dev/null
+  "$ROOT/infra/cloud/wait_scanner.sh" /run/clamav/clamd.ctl 180 || echo "clamd is not answering yet: check journalctl -u clamav-daemon"
 fi
 
 log "HTTPS proxy and firewall (only 22 and 443 are reachable)"

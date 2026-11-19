@@ -15,6 +15,9 @@ if str(API_SRC) not in sys.path:
 import asyncpg
 from sqlalchemy import text as sa_text
 
+from campus247.application.retrieval.filters import CompiledRetrievalFilter, RetrievalFilterCompiler, RetrievalFilterError
+from campus247.application.retrieval.profile import load_retrieval_profile
+from campus247.domain.retrieval import RetrievalContext
 from campus247.ports.retrieval import ChunkResult
 
 
@@ -68,9 +71,12 @@ class LexicalSearchAdapter:
         self,
         db_pool: asyncpg.Pool | asyncpg.Connection | None = None,
         database_url: str | None = None,
+        *,
+        filter_compiler: RetrievalFilterCompiler | None = None,
     ) -> None:
         self._db_pool = db_pool
         self._database_url = database_url
+        self._filter_compiler = filter_compiler
 
     def search(
         self,
@@ -87,9 +93,13 @@ class LexicalSearchAdapter:
         query_text = args[0] if args else kwargs.get("query_text", kwargs.get("query", ""))
         top_k = args[1] if len(args) > 1 else kwargs.get("top_k", kwargs.get("limit", 30))
         conn = kwargs.get("conn")
-        return self._search_async(query_text, top_k, conn=conn)
+        return self._search_async(query_text, top_k, conn=conn, context=kwargs.get("context"))
 
     def _search_sqlite_sync(self, conn: Any, query: str, limit: int = 30) -> list[RetrievalCandidate]:
+        # This historical synthetic scorer is not a production SQL fallback.
+        if (os.getenv("ENVIRONMENT") != "test"
+                or getattr(getattr(conn, "dialect", None), "name", None) != "sqlite"):
+            raise RetrievalFilterError("SQLite lexical helper requires explicit test profile")
         cleaned = query.strip()
         if not cleaned:
             return []
@@ -141,27 +151,35 @@ class LexicalSearchAdapter:
         query_text: str,
         top_k: int = 30,
         conn: asyncpg.Connection | None = None,
+        *,
+        context: RetrievalContext | None = None,
     ) -> list[ChunkResult]:
+        if not isinstance(self._filter_compiler, RetrievalFilterCompiler):
+            raise RetrievalFilterError("trusted filter compiler required")
+        predicate = self._filter_compiler.compile(context)
+        if type(top_k) is not int or not 1 <= top_k <= load_retrieval_profile().lexical_k:
+            raise RetrievalFilterError("lexical limit outside approved profile")
         cleaned = query_text.strip()
         if not cleaned:
             return []
 
         if conn is not None:
-            return await self._execute_db_search(conn, cleaned, top_k)
+            return await self._execute_db_search(conn, cleaned, top_k, predicate)
 
         target_pool = self._db_pool
         if target_pool is not None:
             if hasattr(target_pool, "acquire"):
                 async with target_pool.acquire() as pooled_conn:
-                    return await self._execute_db_search(pooled_conn, cleaned, top_k)
+                    return await self._execute_db_search(pooled_conn, cleaned, top_k, predicate)
             else:
-                return await self._execute_db_search(target_pool, cleaned, top_k)
+                return await self._execute_db_search(target_pool, cleaned, top_k, predicate)
 
-        raw_url = self._database_url or load_database_url()
-        conn_url = normalize_asyncpg_url(raw_url)
+        if not self._database_url:
+            raise RetrievalFilterError("explicit lexical database binding required")
+        conn_url = normalize_asyncpg_url(self._database_url)
         temp_conn = await asyncpg.connect(conn_url)
         try:
-            return await self._execute_db_search(temp_conn, cleaned, top_k)
+            return await self._execute_db_search(temp_conn, cleaned, top_k, predicate)
         finally:
             await temp_conn.close()
 
@@ -170,6 +188,7 @@ class LexicalSearchAdapter:
         conn: asyncpg.Connection,
         query_text: str,
         top_k: int,
+        predicate: CompiledRetrievalFilter,
     ) -> list[ChunkResult]:
         rows = await conn.fetch(
             """
@@ -181,22 +200,22 @@ class LexicalSearchAdapter:
                 ts_rank_cd(c.content_tsv, plainto_tsquery('simple', $1)) AS rank_score
             FROM knowledge_chunk c
             JOIN document_version v ON c.document_version_id = v.id
-            LEFT JOIN knowledge_source s ON v.knowledge_source_id = s.id
-            WHERE v.status = 'PUBLISHED'
+            JOIN knowledge_source s ON v.knowledge_source_id = s.id
+            WHERE """ + predicate.asyncpg_sql + """
               AND c.content_tsv @@ plainto_tsquery('simple', $1)
             ORDER BY rank_score DESC
             LIMIT $2
             """,
             query_text,
             top_k,
+            *predicate.values,
         )
 
         if not rows:
             words = [w.lower() for w in re.findall(r"\w+", query_text) if len(w) > 1]
             if words:
                 or_query = " | ".join(words)
-                try:
-                    rows = await conn.fetch(
+                rows = await conn.fetch(
                         """
                         SELECT
                             c.id,
@@ -206,17 +225,16 @@ class LexicalSearchAdapter:
                             ts_rank_cd(c.content_tsv, to_tsquery('simple', $1)) AS rank_score
                         FROM knowledge_chunk c
                         JOIN document_version v ON c.document_version_id = v.id
-                        LEFT JOIN knowledge_source s ON v.knowledge_source_id = s.id
-                        WHERE v.status = 'PUBLISHED'
+                        JOIN knowledge_source s ON v.knowledge_source_id = s.id
+                        WHERE """ + predicate.asyncpg_sql + """
                           AND c.content_tsv @@ to_tsquery('simple', $1)
                         ORDER BY rank_score DESC
                         LIMIT $2
                         """,
                         or_query,
                         top_k,
+                        *predicate.values,
                     )
-                except Exception:
-                    pass
         return [
             ChunkResult(
                 chunk_id=str(r["id"]),

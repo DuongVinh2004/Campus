@@ -38,6 +38,19 @@ CONTRACT = """You are a WORKER in a supervised software pipeline. A lead enginee
 7. Output ONLY the required format below. No greeting, no preamble, no closing remarks.
 """
 
+PITFALLS_FILE = Path(__file__).resolve().parent.parent / "references" / "worker-pitfalls.md"
+
+
+def pitfalls_block() -> str:
+    """Known worker mistakes, injected into every job so each worker reads them before answering."""
+    try:
+        text = PITFALLS_FILE.read_text(encoding="utf-8").split("<!-- END-WORKER-VISIBLE -->", 1)[0].strip()
+    except OSError:
+        return ""
+    return ("\nKNOWN WORKER MISTAKES. Each one really happened in earlier jobs. Read them all and check your answer "
+            "against every point before you output it:\n" + text + "\n")
+
+
 FORMATS = {
     "text": "OUTPUT FORMAT: concise Markdown answer. Prefer bullet points and `path:line` citations. At most {words} words unless the brief says otherwise.",
     "json": "OUTPUT FORMAT: a single valid JSON value only (no Markdown fences, no comments), matching the schema in the brief.{quotes}",
@@ -250,7 +263,7 @@ def run_job(job: dict, cfg: dict | None = None, quiet: bool = False) -> dict:
 
     fmt = FORMATS[mode].format(words=job.get("words", 400), allow=", ".join(allow) or "(none)",
                                quotes=QUOTES_RULE if job.get("verify_quotes") else "")
-    system = CONTRACT + "\n" + fmt
+    system = CONTRACT + pitfalls_block() + "\n" + fmt
     if prev:
         # Follow-up: same conversation, plus the supervisor's correction and the guard findings.
         messages = json.loads((prev / "messages.json").read_text(encoding="utf-8"))

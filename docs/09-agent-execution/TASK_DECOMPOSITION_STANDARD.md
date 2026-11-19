@@ -1,10 +1,10 @@
 ---
 document_id: "DOC-AGENT-003"
-version: "1.0.0"
+version: "1.1.0"
 status: "reviewed"
 owner: "Agentic Delivery Architecture"
 approvers: ["Architecture Owner", "Quality Owner"]
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 ---
 
 # Task decomposition standard
@@ -40,7 +40,7 @@ Split when work spans layers, bounded contexts, more than three product files, u
 
 ## Approval classification
 
-`human_approval_required` is true only for sensitive boundaries listed in `AGENTS.md`. Ordinary application code remains false even when important. A task with approval true states one or more exact `approval_reasons`; an ordinary task must use an empty list.
+`human_approval_required` and `approval_reasons` retain their historical/schema classification. For assigned local/synthetic work, [DEC-023](../00-governance/LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md) satisfies the execution-authority requirement without a per-task human checkpoint. Preserve existing task files and flags; record DEC-023 in the execution evidence. Do not turn classification alone into a new permission request.
 
 ## Recovery
 

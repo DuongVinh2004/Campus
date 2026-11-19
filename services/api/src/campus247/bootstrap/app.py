@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import Any
@@ -101,9 +102,25 @@ async def lifespan(app: FastAPI):
         from campus247.bootstrap.rag_v2 import start_rag_v2_warmup
         warmup = app.state.rag_v2_warmup_task = start_rag_v2_warmup(
             app.state.rag_v2_node, knowledge_runtime, app.state.retrieval_context_factory)
+    reloader_task = None
+    reload_args = getattr(app.state, "rag_v2_reload", None)
+    if (reload_args is not None and warmup is not None and os.environ.get("CAMPUS247_RAG_V2_HOT_RELOAD", "1") != "0"
+            and hasattr(knowledge_runtime, "repo")):
+        import asyncio
+        from campus247.bootstrap.rag_v2 import RagV2IndexReloader
+        from campus247.infrastructure.knowledge.auto_publication_store import AutoPublicationStore
+        reloader = RagV2IndexReloader(app.state.rag_v2_node, context_factory=app.state.retrieval_context_factory,
+            store=AutoPublicationStore(knowledge_runtime.repo), instance_id=f"{knowledge_runtime.instance_id}:{os.getpid()}", **reload_args)
+        reloader_task = app.state.rag_v2_reloader_task = asyncio.create_task(reloader.run(), name="rag-v2-index-reloader")
     try:
         yield
     finally:
+        if reloader_task is not None:
+            import asyncio
+            from contextlib import suppress
+            reloader_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await reloader_task
         if warmup is not None:
             import asyncio
             from contextlib import suppress
@@ -418,9 +435,12 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
         llm_gateway = create_llm_gateway(settings=settings)
     if settings.rag_engine == "v2":
         if rag_v2_node is None:
-            from campus247.bootstrap.rag_v2 import load_rag_v2
-            rag_v2_node = load_rag_v2(settings, gateway=llm_gateway, knowledge_runtime=knowledge_runtime,
-                inventory_reader=getattr(knowledge_runtime, "rag_v2_inventory", None))
+            from campus247.bootstrap.rag_v2 import SwappableRagNode, load_rag_v2
+            rag_v2_node = SwappableRagNode(load_rag_v2(settings, gateway=llm_gateway, knowledge_runtime=knowledge_runtime,
+                inventory_reader=getattr(knowledge_runtime, "rag_v2_inventory", None)))
+            # What the background reloader needs to build a replacement node with the same loader.
+            app.state.rag_v2_reload = {"settings": settings, "gateway": llm_gateway, "knowledge_runtime": knowledge_runtime,
+                "inventory_reader": getattr(knowledge_runtime, "rag_v2_inventory", None)}
         app.state.rag_v2_node = rag_v2_node
         app.state.retrieval_context_factory = retrieval_context_factory
     vec_adapter = VectorSearchAdapter()
@@ -612,8 +632,15 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
             return create_current_context(turn, actor)
         app.state.knowledge_runtime = knowledge_runtime
         from campus247.infrastructure.knowledge.multipart import parse_upload
+        from campus247.application.knowledge.auto_publication import AutoPublicationService
+        from campus247.infrastructure.knowledge.auto_publication_store import AutoPublicationStore
+        from campus247.application.knowledge.crawl.service import CrawlService
+        from campus247.infrastructure.knowledge.crawl_fetch import PublicPageFetcher
+        from campus247.infrastructure.knowledge.crawl_store import CrawlStore
+        auto_publication = AutoPublicationService(knowledge_runtime.platform, AutoPublicationStore(knowledge_runtime.platform.repo))
         app.include_router(create_knowledge_platform_router(knowledge_runtime.platform, knowledge_runtime, platform_context,
-            upload_parser=parse_upload))
+            upload_parser=parse_upload, auto_publication=auto_publication,
+            crawl_service=CrawlService(knowledge_runtime.platform, auto_publication, CrawlStore(knowledge_runtime.platform.repo), PublicPageFetcher())))
     else:
         app.include_router(knowledge.create_knowledge_router(sources=sources_store, versions=versions_store))
 

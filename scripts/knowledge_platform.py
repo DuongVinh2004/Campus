@@ -302,6 +302,8 @@ async def components(*, rehearsal=None, learning_rehearsal=None):
               else rehearsal_bundle_paths(rehearsal))
     storage = (FileKnowledgeStorage(ROOT, bundle["artifacts"]) if bundle else
         ReadThroughKnowledgeStorage(ROOT, STATE / "rehearsals" / value["database"] / "artifacts", STATE / "artifacts") if rehearsal else FileKnowledgeStorage(ROOT, STATE / "artifacts"))
+    from campus247.bootstrap.scanner import scanner_from_environment
+    storage.scanner = scanner_from_environment()  # every original is scanned before it is registered (None: not configured)
     platform = KnowledgePlatform(repository, storage, ConfirmationTokenService(settings.CONFIRMATION_SIGNING_KEY))
     # Several API processes: share the agent write-flow's signing key (derived for that purpose only) and its previews.
     from campus247.agent.tools.write_flow import configure_shared_state
@@ -329,9 +331,32 @@ async def work(once=False, *, rehearsal=None, heartbeat_file=None):
     worker = KnowledgeIngestionWorker(platform.repo, platform.storage, runtime.embedding, owner="worker-" + str(uuid4()),
         parser_python=parser_python, platform=platform,
         ocr_adapter=LocalOcrAdapter(platform.storage,node=NODE,package_root=NODE.parents[1] / "package.json"))
+    from campus247.agent.guardrails.prompt_injection import PromptInjectionDetector
+    from campus247.agent.prompts.composer import TrustDomain
+    from campus247.application.knowledge.auto_publication import AutoPublicationService
+    from campus247.infrastructure.knowledge.auto_publication_store import AutoPublicationStore
+    from campus247.infrastructure.knowledge.index_builder import SubprocessIndexBuilder
+    detector = PromptInjectionDetector()
+    auto = AutoPublicationService(platform, AutoPublicationStore(platform.repo),
+        scan_text=lambda text: detector.scan(text, TrustDomain.RETRIEVED_EVIDENCE).is_injection,
+        index_builder=SubprocessIndexBuilder(ROOT),
+        baseline_index=ROOT / os.environ.get("CAMPUS247_RAG_V2_INDEX", "data/rag_v2_index/embedded2"))
+    from campus247.application.knowledge.crawl.service import CrawlService
+    from campus247.infrastructure.knowledge.crawl_fetch import PublicPageFetcher
+    from campus247.infrastructure.knowledge.crawl_store import CrawlStore
+    crawl = CrawlService(platform, auto, CrawlStore(platform.repo), PublicPageFetcher())
+
+    class Ticks:
+        """One entry for everything the ingestion loop does between jobs; a failing part never stops the others."""
+        async def tick(self):
+            for part in (auto, crawl):
+                try:
+                    await part.tick()
+                except Exception:  # noqa: BLE001
+                    pass
     try:
         await serve_worker(worker, rehearsal_connection(rehearsal)["database"] if rehearsal else DB_NAME,
-            heartbeat_file, once=once)
+            heartbeat_file, once=once, auto=None if rehearsal else Ticks())
     finally:
         await pool.close()
 
@@ -532,7 +557,14 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                                               OidcAccountStore(STATE / "oidc.sqlite3"), oidc_sessions))
 
     @app.get("/health/entry", include_in_schema=False)
-    def entry_health():
+    async def entry_health():
+        scanner_state = None
+        probe = getattr(getattr(learning_service, "scanner", None), "health", None)
+        if probe is not None:
+            try:
+                scanner_state = await asyncio.wait_for(probe(), timeout=2.0)
+            except Exception:
+                scanner_state = {"up": False}
         return {"entry_url": f"http://127.0.0.1:{api_port}", "api_same_origin": True,
             "authentication": "password_local", "knowledge": "current_release",
             "student_services": "owned_local_preparations", "university_connected": False,
@@ -540,7 +572,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
             "shared_history": True, "shared_actor_storage": True,
             "learning": {"configured": learning_service is not None,
                 "worker": getattr(app.state, "learning_worker_status", "starting" if learning_service else "disabled"),
-                "last_success_at": getattr(app.state, "learning_worker_last_success", None)}}
+                "last_success_at": getattr(app.state, "learning_worker_last_success", None),
+                "scanner": scanner_state}}
 
     @asynccontextmanager
     async def owned_lifespan(application):

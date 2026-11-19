@@ -9,6 +9,8 @@ last_updated: "2026-09-22"
 
 # Delivery and release package
 
+Kế hoạch triển khai hiện tại: [đồ án tốt nghiệp](../GRADUATION_PROJECT_PLAN_20261013.md). Gói delivery bên dưới được giữ làm tham khảo lịch sử; vị trí của sáu kế hoạch đã chuyển nằm trong [bảng lưu trữ và phục hồi](../../archive/legacy-plans-20261013/README.md). Tài liệu rollback, bảo mật và bằng chứng vận hành được giữ nguyên.
+
 ## 1. Mục đích
 
 Gói này quy định cách chuyển executable specification của Campus 24/7 thành các increment có thể kiểm chứng, release candidate bất biến và quyết định promotion fail-closed. Kế hoạch là capability-gated, không hứa ngày. Mọi trạng thái triển khai hiện tại là `planned`; không tài liệu nào tuyên bố hệ thống đã build, deploy hoặc được HUCE phê duyệt.
@@ -25,7 +27,7 @@ Gói này quy định cách chuyển executable specification của Campus 24/7 
 
 | File | Nội dung |
 |---|---|
-| `DELIVERY_PLAN.md` | Delivery model, workstream, dependency và execution wave |
+| [DELIVERY_PLAN.md — lưu trữ](../../archive/legacy-plans-20261013/docs/10-delivery/DELIVERY_PLAN.md) | Delivery model, workstream, dependency và execution wave cũ |
 | `PHASE_AND_MILESTONE_GATES.md` | Foundation/MVP/Pilot/Production entry-exit gates |
 | `DEFINITION_OF_READY_DONE.md` | DoR/DoD cho task, increment, RC và phase |
 | `RELEASE_STRATEGY.md` | Artifact, version, environment, rollout và promotion strategy |
@@ -33,7 +35,7 @@ Gói này quy định cách chuyển executable specification của Campus 24/7 
 | `RACI.md` | Quyền quyết định và trách nhiệm |
 | `CHANGE_CONTROL.md` | Phân loại, impact, approval và emergency change |
 | `LAUNCH_AND_ROLLBACK_PLAN.md` | Go/no-go, execution, abort/rollback/recovery |
-| `POST_LAUNCH_OPERATING_PLAN.md` | Verification, hypercare, incident/problem và review |
+| [POST_LAUNCH_OPERATING_PLAN.md — lưu trữ](../../archive/legacy-plans-20261013/docs/10-delivery/POST_LAUNCH_OPERATING_PLAN.md) | Verification, hypercare, incident/problem và review của kế hoạch cũ |
 
 ## 4. Stable IDs
 

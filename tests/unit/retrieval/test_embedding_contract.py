@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from pathlib import Path
 import sys
+from unittest.mock import patch
 
 import pytest
 
@@ -22,7 +23,8 @@ from campus247.ports.embedding import (
     validate_embedding_inputs,
     validate_embedding_vector,
 )
-from campus247_worker.ingestion.embed_fake import DeterministicEmbeddingAdapter
+with patch.dict("os.environ", {"ENVIRONMENT": "test"}):
+    from campus247_worker.ingestion.embed_fake import DeterministicEmbeddingAdapter
 
 
 def profile() -> EmbeddingProfile:
@@ -34,7 +36,9 @@ def profile() -> EmbeddingProfile:
     )
 
 
-def test_fake_adapter_satisfies_shared_port_for_query_and_documents() -> None:
+def test_fake_adapter_satisfies_shared_port_for_query_and_documents(monkeypatch) -> None:
+    # Contract evidence only, never a semantic quality or release evaluation.
+    monkeypatch.setenv("ENVIRONMENT", "test")
     adapter: EmbeddingPort = DeterministicEmbeddingAdapter(dimension=8, batch_limit=2)
 
     query = adapter.embed_query("học phí")
@@ -43,6 +47,7 @@ def test_fake_adapter_satisfies_shared_port_for_query_and_documents() -> None:
     assert query.dimension == adapter.profile.dimension == 8
     assert len(documents.vectors) == 2
     assert documents.model_revision == query.model_revision
+    assert query.model_id == documents.model_id == "test-only/deterministic-fake"
     assert all(math.isclose(sum(x * x for x in item.values), 1.0, abs_tol=1e-3) for item in documents.vectors)
 
 

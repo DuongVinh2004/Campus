@@ -1,0 +1,477 @@
+{
+ "revision": "natural-questions-gold-20261028",
+ "purpose": "Retrieval funnel and answer-disposition probe for student questions in four writing forms over ten topics present in the served corpus (Quy chế đào tạo 1486, Sổ tay sinh viên 2026-2027).",
+ "limitations": [
+  "Questions and gold section labels were authored by the coding agent after reading the served corpus; no human review.",
+  "A label matches when it is a substring of the section label in the retrieval trace; acceptable sections are the agent's judgment and can be debated (e.g. bảo lưu: Điều 14 versus Điều 11 khoản 3).",
+  "Measures disposition (answered / partial / abstained) and where the gold section is lost; it does not grade answer correctness.",
+  "Single run per case unless --repeat is used; generation and verification are not deterministic."
+ ],
+ "requires": "Local runtime on port 8015 and an API log with retrieval_pool / retrieval_trace lines (warning level).",
+ "cases": [
+  {
+   "case_id": "nat-reserve-formal",
+   "topic": "reserve",
+   "topic_label": "Bảo lưu kết quả học tập",
+   "form": "formal",
+   "question": "Sinh viên muốn bảo lưu kết quả học tập thì cần làm thủ tục gì?",
+   "gold_section_labels": [
+    "Điều 14",
+    "trang 39"
+   ]
+  },
+  {
+   "case_id": "nat-reserve-no_diacritics",
+   "topic": "reserve",
+   "topic_label": "Bảo lưu kết quả học tập",
+   "form": "no_diacritics",
+   "question": "sinh vien muon bao luu ket qua hoc tap can lam thu tuc gi",
+   "gold_section_labels": [
+    "Điều 14",
+    "trang 39"
+   ]
+  },
+  {
+   "case_id": "nat-reserve-keyword",
+   "topic": "reserve",
+   "topic_label": "Bảo lưu kết quả học tập",
+   "form": "keyword",
+   "question": "bảo lưu",
+   "gold_section_labels": [
+    "Điều 14",
+    "trang 39"
+   ]
+  },
+  {
+   "case_id": "nat-reserve-slang",
+   "topic": "reserve",
+   "topic_label": "Bảo lưu kết quả học tập",
+   "form": "slang",
+   "question": "e muốn bảo lưu thì làm sao ạ",
+   "gold_section_labels": [
+    "Điều 14",
+    "trang 39"
+   ]
+  },
+  {
+   "case_id": "nat-quit-formal",
+   "topic": "quit",
+   "topic_label": "Buộc thôi học",
+   "form": "formal",
+   "question": "Sinh viên bị buộc thôi học trong những trường hợp nào?",
+   "gold_section_labels": [
+    "Điều 11",
+    "trang 42",
+    "trang 109",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-quit-no_diacritics",
+   "topic": "quit",
+   "topic_label": "Buộc thôi học",
+   "form": "no_diacritics",
+   "question": "sinh vien bi buoc thoi hoc trong nhung truong hop nao",
+   "gold_section_labels": [
+    "Điều 11",
+    "trang 42",
+    "trang 109",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-quit-keyword",
+   "topic": "quit",
+   "topic_label": "Buộc thôi học",
+   "form": "keyword",
+   "question": "thôi học",
+   "gold_section_labels": [
+    "Điều 11",
+    "trang 42",
+    "trang 109",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-quit-slang",
+   "topic": "quit",
+   "topic_label": "Buộc thôi học",
+   "form": "slang",
+   "question": "bị đuổi học khi nào v ạ",
+   "gold_section_labels": [
+    "Điều 11",
+    "trang 42",
+    "trang 109",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-grad-formal",
+   "topic": "grad",
+   "topic_label": "Điều kiện xét tốt nghiệp",
+   "form": "formal",
+   "question": "Điều kiện để được xét tốt nghiệp của sinh viên là gì?",
+   "gold_section_labels": [
+    "Điều 13",
+    "Điều 17",
+    "trang 113",
+    "trang 114",
+    "trang 31"
+   ]
+  },
+  {
+   "case_id": "nat-grad-no_diacritics",
+   "topic": "grad",
+   "topic_label": "Điều kiện xét tốt nghiệp",
+   "form": "no_diacritics",
+   "question": "dieu kien de duoc xet tot nghiep cua sinh vien la gi",
+   "gold_section_labels": [
+    "Điều 13",
+    "Điều 17",
+    "trang 113",
+    "trang 114",
+    "trang 31"
+   ]
+  },
+  {
+   "case_id": "nat-grad-keyword",
+   "topic": "grad",
+   "topic_label": "Điều kiện xét tốt nghiệp",
+   "form": "keyword",
+   "question": "tốt nghiệp",
+   "gold_section_labels": [
+    "Điều 13",
+    "Điều 17",
+    "trang 113",
+    "trang 114",
+    "trang 31"
+   ]
+  },
+  {
+   "case_id": "nat-grad-slang",
+   "topic": "grad",
+   "topic_label": "Điều kiện xét tốt nghiệp",
+   "form": "slang",
+   "question": "bao giờ thì đc xét tốt nghiệp",
+   "gold_section_labels": [
+    "Điều 13",
+    "Điều 17",
+    "trang 113",
+    "trang 114",
+    "trang 31"
+   ]
+  },
+  {
+   "case_id": "nat-warning-formal",
+   "topic": "warning",
+   "topic_label": "Cảnh báo học vụ",
+   "form": "formal",
+   "question": "Sinh viên bị cảnh báo học vụ khi nào?",
+   "gold_section_labels": [
+    "Điều 11",
+    "trang 109",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-warning-no_diacritics",
+   "topic": "warning",
+   "topic_label": "Cảnh báo học vụ",
+   "form": "no_diacritics",
+   "question": "sinh vien bi canh bao hoc vu khi nao",
+   "gold_section_labels": [
+    "Điều 11",
+    "trang 109",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-warning-keyword",
+   "topic": "warning",
+   "topic_label": "Cảnh báo học vụ",
+   "form": "keyword",
+   "question": "cảnh báo học vụ",
+   "gold_section_labels": [
+    "Điều 11",
+    "trang 109",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-warning-slang",
+   "topic": "warning",
+   "topic_label": "Cảnh báo học vụ",
+   "form": "slang",
+   "question": "khi nào bị cảnh báo học vụ z",
+   "gold_section_labels": [
+    "Điều 11",
+    "trang 109",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-improve-formal",
+   "topic": "improve",
+   "topic_label": "Học cải thiện điểm",
+   "form": "formal",
+   "question": "Điều kiện để học cải thiện điểm một học phần là gì?",
+   "gold_section_labels": [
+    "Điều 9, khoản 5",
+    "trang 107",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-improve-no_diacritics",
+   "topic": "improve",
+   "topic_label": "Học cải thiện điểm",
+   "form": "no_diacritics",
+   "question": "dieu kien de hoc cai thien diem mot hoc phan la gi",
+   "gold_section_labels": [
+    "Điều 9, khoản 5",
+    "trang 107",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-improve-keyword",
+   "topic": "improve",
+   "topic_label": "Học cải thiện điểm",
+   "form": "keyword",
+   "question": "cải thiện điểm",
+   "gold_section_labels": [
+    "Điều 9, khoản 5",
+    "trang 107",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-improve-slang",
+   "topic": "improve",
+   "topic_label": "Học cải thiện điểm",
+   "form": "slang",
+   "question": "muốn cải thiện điểm môn đã qua thì đc ko",
+   "gold_section_labels": [
+    "Điều 9, khoản 5",
+    "trang 107",
+    "trang 110"
+   ]
+  },
+  {
+   "case_id": "nat-major-formal",
+   "topic": "major",
+   "topic_label": "Chuyển ngành",
+   "form": "formal",
+   "question": "Sinh viên muốn chuyển ngành thì cần điều kiện gì?",
+   "gold_section_labels": [
+    "Điều 15"
+   ]
+  },
+  {
+   "case_id": "nat-major-no_diacritics",
+   "topic": "major",
+   "topic_label": "Chuyển ngành",
+   "form": "no_diacritics",
+   "question": "sinh vien muon chuyen nganh thi can dieu kien gi",
+   "gold_section_labels": [
+    "Điều 15"
+   ]
+  },
+  {
+   "case_id": "nat-major-keyword",
+   "topic": "major",
+   "topic_label": "Chuyển ngành",
+   "form": "keyword",
+   "question": "chuyển ngành",
+   "gold_section_labels": [
+    "Điều 15"
+   ]
+  },
+  {
+   "case_id": "nat-major-slang",
+   "topic": "major",
+   "topic_label": "Chuyển ngành",
+   "form": "slang",
+   "question": "chuyển ngành đc ko z",
+   "gold_section_labels": [
+    "Điều 15"
+   ]
+  },
+  {
+   "case_id": "nat-leave-formal",
+   "topic": "leave",
+   "topic_label": "Nghỉ học tạm thời",
+   "form": "formal",
+   "question": "Sinh viên xin nghỉ học tạm thời trong những trường hợp nào?",
+   "gold_section_labels": [
+    "Điều 14",
+    "trang 39"
+   ]
+  },
+  {
+   "case_id": "nat-leave-no_diacritics",
+   "topic": "leave",
+   "topic_label": "Nghỉ học tạm thời",
+   "form": "no_diacritics",
+   "question": "sinh vien xin nghi hoc tam thoi trong nhung truong hop nao",
+   "gold_section_labels": [
+    "Điều 14",
+    "trang 39"
+   ]
+  },
+  {
+   "case_id": "nat-leave-keyword",
+   "topic": "leave",
+   "topic_label": "Nghỉ học tạm thời",
+   "form": "keyword",
+   "question": "nghỉ học tạm thời",
+   "gold_section_labels": [
+    "Điều 14",
+    "trang 39"
+   ]
+  },
+  {
+   "case_id": "nat-leave-slang",
+   "topic": "leave",
+   "topic_label": "Nghỉ học tạm thời",
+   "form": "slang",
+   "question": "xin nghỉ học tạm thời đc ko ạ",
+   "gold_section_labels": [
+    "Điều 14",
+    "trang 39"
+   ]
+  },
+  {
+   "case_id": "nat-enroll-formal",
+   "topic": "enroll",
+   "topic_label": "Đăng ký học phần",
+   "form": "formal",
+   "question": "Sinh viên đăng ký học phần như thế nào?",
+   "gold_section_labels": [
+    "Điều 7",
+    "trang 27",
+    "trang 28"
+   ]
+  },
+  {
+   "case_id": "nat-enroll-no_diacritics",
+   "topic": "enroll",
+   "topic_label": "Đăng ký học phần",
+   "form": "no_diacritics",
+   "question": "sinh vien dang ky hoc phan nhu the nao",
+   "gold_section_labels": [
+    "Điều 7",
+    "trang 27",
+    "trang 28"
+   ]
+  },
+  {
+   "case_id": "nat-enroll-keyword",
+   "topic": "enroll",
+   "topic_label": "Đăng ký học phần",
+   "form": "keyword",
+   "question": "đăng ký học phần",
+   "gold_section_labels": [
+    "Điều 7",
+    "trang 27",
+    "trang 28"
+   ]
+  },
+  {
+   "case_id": "nat-enroll-slang",
+   "topic": "enroll",
+   "topic_label": "Đăng ký học phần",
+   "form": "slang",
+   "question": "đk học phần cần lưu ý j ko",
+   "gold_section_labels": [
+    "Điều 7",
+    "trang 27",
+    "trang 28"
+   ]
+  },
+  {
+   "case_id": "nat-recheck-formal",
+   "topic": "recheck",
+   "topic_label": "Phúc khảo",
+   "form": "formal",
+   "question": "Sinh viên muốn phúc khảo bài thi thì làm thế nào?",
+   "gold_section_labels": [
+    "trang 61"
+   ]
+  },
+  {
+   "case_id": "nat-recheck-no_diacritics",
+   "topic": "recheck",
+   "topic_label": "Phúc khảo",
+   "form": "no_diacritics",
+   "question": "sinh vien muon phuc khao bai thi thi lam the nao",
+   "gold_section_labels": [
+    "trang 61"
+   ]
+  },
+  {
+   "case_id": "nat-recheck-keyword",
+   "topic": "recheck",
+   "topic_label": "Phúc khảo",
+   "form": "keyword",
+   "question": "phúc khảo",
+   "gold_section_labels": [
+    "trang 61"
+   ]
+  },
+  {
+   "case_id": "nat-recheck-slang",
+   "topic": "recheck",
+   "topic_label": "Phúc khảo",
+   "form": "slang",
+   "question": "muốn phúc khảo thì làm sao",
+   "gold_section_labels": [
+    "trang 61"
+   ]
+  },
+  {
+   "case_id": "nat-drop-formal",
+   "topic": "drop",
+   "topic_label": "Rút bớt học phần",
+   "form": "formal",
+   "question": "Sinh viên được rút bớt học phần trong thời gian nào?",
+   "gold_section_labels": [
+    "trang 27",
+    "Điều 7"
+   ]
+  },
+  {
+   "case_id": "nat-drop-no_diacritics",
+   "topic": "drop",
+   "topic_label": "Rút bớt học phần",
+   "form": "no_diacritics",
+   "question": "sinh vien duoc rut bot hoc phan trong thoi gian nao",
+   "gold_section_labels": [
+    "trang 27",
+    "Điều 7"
+   ]
+  },
+  {
+   "case_id": "nat-drop-keyword",
+   "topic": "drop",
+   "topic_label": "Rút bớt học phần",
+   "form": "keyword",
+   "question": "rút học phần",
+   "gold_section_labels": [
+    "trang 27",
+    "Điều 7"
+   ]
+  },
+  {
+   "case_id": "nat-drop-slang",
+   "topic": "drop",
+   "topic_label": "Rút bớt học phần",
+   "form": "slang",
+   "question": "rút môn đc đến khi nào",
+   "gold_section_labels": [
+    "trang 27",
+    "Điều 7"
+   ]
+  }
+ ]
+}

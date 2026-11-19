@@ -87,6 +87,15 @@ class ConfirmationTokenService:
         if payload.get("act") != expected_actor_id:
             return ConfirmationValidationResult(is_valid=False, error_code="ACTOR_MISMATCH")
 
+        for field, expected, code in (
+            ("sid", expected_session_id, "SESSION_MISMATCH"),
+            ("cid", expected_conversation_id, "CONVERSATION_MISMATCH"),
+            ("tver", expected_tool_version, "TOOL_VERSION_MISMATCH"),
+            ("pver", expected_policy_version, "POLICY_VERSION_MISMATCH"),
+        ):
+            if payload.get(field) != expected:
+                return ConfirmationValidationResult(is_valid=False, error_code=code)
+
         if payload.get("atyp") != expected_action_type:
             return ConfirmationValidationResult(is_valid=False, error_code="ACTION_TYPE_MISMATCH")
 

@@ -1,13 +1,15 @@
 ---
 document_id: "DOC-GOV-CONTROL-001"
-version: "1.0.0"
+version: "1.1.0"
 status: "approved"
 owner: "Documentation Chief Editor"
 approvers: ["Product Owner", "Architecture Owner", "Security Owner", "Quality Owner"]
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 ---
 
 # Document control policy
+
+[DEC-023](LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md) supplies standing human authority for assigned local/synthetic changes. The executor performs the affected technical review, versions the artifact and records traceability without asking for a new document-owner/product/security approval. Approval roles in the classification table describe responsibility; they do not create another execution checkpoint in this scope.
 
 ## Purpose
 
@@ -26,7 +28,7 @@ Atomic tasks use a separate lifecycle:
 
 `draft -> reviewed -> ready -> in_progress -> verification -> accepted | blocked | failed`
 
-Only the orchestrator or a human reviewer may set `ready` or `accepted`.
+The authorized executor may record local/synthetic technical readiness or acceptance under DEC-023 after verifying dependencies and evidence. A changed workflow does not promote an artifact or task without that evidence.
 
 ## Required document header
 
@@ -59,7 +61,7 @@ An agent MUST stop and emit a structured blocker when:
 - requirement and contract disagree;
 - a dependency task is not accepted;
 - the change requires files outside the task allowlist;
-- a new dependency or architecture decision is necessary;
+- necessary technical dependency or architecture evidence cannot be resolved within the assigned objective;
 - verification cannot be performed as specified.
 
 The agent MUST NOT resolve a normative conflict by guessing, silently broadening scope or weakening a test/control.

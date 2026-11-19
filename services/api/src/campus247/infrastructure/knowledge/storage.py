@@ -1,7 +1,10 @@
 """Exclusive SSD writes; artifacts are immutable and orphan files are retained."""
 from __future__ import annotations
 
+import asyncio
 import hashlib
+import json
+import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -28,10 +31,47 @@ def validate_signature(prefix: bytes, count: int, media_type: str):
             raise PlatformError(422, "MIME_MISMATCH", "TXT cần nội dung UTF-8 hợp lệ.") from None
 
 
+logger = logging.getLogger("campus247.knowledge.scan")
+
+
+def run_blocking(coroutine):
+    """Run a coroutine to completion from synchronous code, even when a loop is already running in this thread."""
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(coroutine)
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        return pool.submit(asyncio.run, coroutine).result()
+
+
 class FileKnowledgeStorage:
+    # A malware scanner (ports.file_scanner.FileScanner) or None. When set, no original is accepted before it is clean.
+    scanner = None
+
     def __init__(self, workspace: Path, root: Path):
         self.workspace = workspace.absolute()
         self.root = checked_path(root, self.workspace)
+
+    async def scan_original(self, target: Path):
+        """Fail closed: a file with no clean verdict is never registered. The bytes on disk are kept for inspection."""
+        if self.scanner is None:
+            return None
+        from campus247.ports.file_scanner import ScanRejected, ScannerUnavailable
+        try:
+            receipt = await self.scanner.scan(target)
+        except ScanRejected as failure:
+            logger.warning(json.dumps({"event": "knowledge.scan", "result": "rejected", "code": failure.code, "signature": failure.signature}))
+            raise PlatformError(422, "FILE_REJECTED", "Tệp chưa vượt qua kiểm tra an toàn; bản ghi dở được giữ để kiểm tra.") from None
+        except ScannerUnavailable as failure:
+            logger.warning(json.dumps({"event": "knowledge.scan", "result": "unavailable", "code": failure.code}))
+            stale = failure.code == "SCANNER_STALE"
+            raise PlatformError(503, "SCANNER_STALE" if stale else "SCANNER_UNAVAILABLE",
+                                "Cơ sở dữ liệu nhận diện mã độc đã cũ; chưa thể kiểm tra tệp." if stale
+                                else "Bộ quét tệp chưa sẵn sàng; hãy thử lại sau.") from None
+        evidence = receipt.as_dict() if hasattr(receipt, "as_dict") else None
+        logger.info(json.dumps({**(evidence or {}), "event": "knowledge.scan", "result": "clean"}))
+        return evidence
 
     def path(self, key: str) -> Path:
         # Server generated keys only. Reject traversal before canonicalization.
@@ -60,7 +100,8 @@ class FileKnowledgeStorage:
             stream.flush()
             os.fsync(stream.fileno())
         validate_signature(bytes(prefix), count, media_type)
-        return StoredArtifact(identifier, identifier, checksum.hexdigest(), count, media_type, "original")
+        evidence = await self.scan_original(target)
+        return StoredArtifact(identifier, identifier, checksum.hexdigest(), count, media_type, "original", scan=evidence)
 
     def write_json(self, value: bytes, kind: str) -> StoredArtifact:
         return self.write_bytes(value, kind, "application/json")
@@ -105,7 +146,8 @@ class FileKnowledgeStorage:
             os.fsync(output.fileno())
         if checksum.hexdigest() != expected_sha256:
             raise PlatformError(409, "IMPORT_ORIGINAL_CHECKSUM", "Nguồn thay đổi so với inventory; dừng phiên bản này.")
-        return StoredArtifact(identifier,identifier,checksum.hexdigest(),count,media_type,"original")
+        evidence = run_blocking(self.scan_original(target)) if self.scanner is not None else None
+        return StoredArtifact(identifier,identifier,checksum.hexdigest(),count,media_type,"original",scan=evidence)
 
 
 class ReadThroughKnowledgeStorage(FileKnowledgeStorage):
