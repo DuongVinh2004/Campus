@@ -88,7 +88,7 @@ def test_adopting_a_baseline_keeps_the_previous_one_and_refuses_an_unfinished_ru
     nightly.adopt_baseline(tmp_path, tmp_path / first["folder"])
     second = nightly.run(tmp_path, probe=fake_probe(probe_output(top8=100)), check=UP, now=lambda: T(18))
     nightly.adopt_baseline(tmp_path, tmp_path / second["folder"])
-    assert len(list(tmp_path.glob("baseline-before-*.json"))) == 1
+    assert len(list(tmp_path.glob("baseline-before-*.json"))) == 2  # the automatic first baseline, then the one adopted by hand
     assert json.loads((tmp_path / "baseline.json").read_text(encoding="utf-8"))["from"] == second["folder"]
     (tmp_path / "broken").mkdir()
     (tmp_path / "broken" / "run.json").write_text(json.dumps({"ok": False}), encoding="utf-8")
@@ -132,3 +132,20 @@ def test_the_systemd_files_run_the_script_at_low_priority_before_the_backup():
     assert service["Service"]["ExecStart"].endswith("nightly_retrieval.py run --trigger schedule") and service["Service"]["User"] == "campus247"
     assert service["Service"]["Nice"] == "15" and service["Service"]["IOSchedulingClass"] == "idle"
     assert timer["Timer"]["OnCalendar"] == "*-*-* 02:30:00" and timer["Timer"]["Persistent"] == "true" and timer["Install"]["WantedBy"] == "timers.target"
+
+
+def test_the_first_successful_run_becomes_the_baseline_and_no_later_run_replaces_it(tmp_path):
+    first = nightly.run(tmp_path, probe=fake_probe(probe_output()), check=UP, now=T)
+    baseline = json.loads((tmp_path / "baseline.json").read_text(encoding="utf-8"))
+    assert baseline["auto"] is True and baseline["from"] == first["folder"] and baseline["metrics"]["fused_top8"] == pytest.approx(0.9)
+    worse = nightly.run(tmp_path, probe=fake_probe(probe_output(top8=60)), check=UP, now=lambda: T(18))
+    assert worse["baseline"] is True and worse["regressions"]  # compared with the first run, which stays the reference
+    assert json.loads((tmp_path / "baseline.json").read_text(encoding="utf-8")) == baseline
+
+
+def test_a_run_that_is_skipped_or_crashes_does_not_create_a_baseline(tmp_path):
+    nightly.run(tmp_path, probe=fake_probe(probe_output()), check=DOWN, now=T)
+    def crash(out, limit, index):
+        raise subprocess.SubprocessError("boom")
+    nightly.run(tmp_path, probe=crash, check=UP, now=T)
+    assert not (tmp_path / "baseline.json").exists()

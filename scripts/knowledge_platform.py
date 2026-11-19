@@ -617,6 +617,19 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     from campus247.application.knowledge.freshness_reminders import run_freshness_reminders
                     jobs.append(asyncio.create_task(run_freshness_reminders(
                         freshness_service, ops_service.store, lambda: [owner_adapter.directory()["owner_id"]])))
+                    from campus247.application.knowledge.release_check import ReleaseWatch, run_release_watch
+                    from campus247.observability.ops_metrics import OPS as release_check_ops
+
+                    async def start_release_check():
+                        # The same script the nightly timer runs, tagged as release-triggered; it skips itself when the models are down.
+                        check = await asyncio.create_subprocess_exec(sys.executable, "-B", str(ROOT / "evals/runners/nightly_retrieval.py"), "run", "--trigger", "release",
+                            cwd=str(ROOT), stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
+                        asyncio.create_task(check.wait())
+
+                    jobs.append(asyncio.create_task(run_release_watch(ReleaseWatch(
+                        lambda: (runtime.current or {}).get("release_id"), start_release_check,
+                        lambda: release_check_ops.gauges.get("in_flight", 0) > 3))))
+
                     from campus247.observability.alert_job import run_alerts
                     from campus247.observability.alert_notifiers import build_notifier
                     from campus247.observability.alerts import AlertManager
