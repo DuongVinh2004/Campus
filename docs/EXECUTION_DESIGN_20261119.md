@@ -456,3 +456,46 @@ B4.4 (các màn hình còn lại) để sau, vì khối lượng lớn.
 - **Đồ thị quy chế trên v2**: cần trích quan hệ điều khoản từ đơn vị `rag_v2`, fingerprint theo chỉ mục v2, repository riêng và duyệt của người quản trị. Đáng thiết kế riêng khi có nhu cầu thật.
 - **Rerank**: tắt có chủ ý theo số đo. Nếu sau này có GPU hoặc reranker nhanh hơn thì đo lại bằng bộ dev và bộ giữ lại trước khi bật.
 - **B4.4 và B4.5**: quyết định sau khi có số đo của E14.
+
+---
+
+## 8. Kết quả thực thi (cập nhật cuối ngày 19/11/2026)
+
+Mỗi gói nằm trên nhánh riêng từ `origin/main`; nhánh `integration/e-all-20261119` gộp tất cả (một xung đột ở `app/knowledge/page.tsx`, đã giải bằng tay: giữ cả hai liên kết mới và điều kiện hiện của đồ thị quy chế). Chưa push, chưa merge vào `main`.
+
+| Gói | Nhánh · commit | Kết quả đo được | Khác với thiết kế |
+|---|---|---|---|
+| E0 | `chore/e0-repo-hygiene` · 704f795 | `.pytest-tmp*/` được bỏ qua; `scripts/maintenance/list_test_temp.py` liệt kê 118 thư mục (2,1 GB, 42 thư mục không đọc được), chỉ xóa tên đã duyệt; 3 test đạt, 1 bỏ qua (symlink) | Danh sách đã xuất ở `infra/local/pytest-tmp-list-20261119.csv`, **chưa xóa gì** |
+| E1 | `fix/e1-rooms-availability-batch` · 1e47291 | `GET /v1/rooms/availability` bằng 2 truy vấn; kết quả từng phòng bằng đúng câu trả lời từng phòng (test trên mọi phòng, mọi ngày có lịch); web gọi 1 lần thay vì 34; 75 test Python, 88 test web đạt | — |
+| E2 | `fix/e2-rrf-only-trace` · 3c120d9 | trace ghi `RRF_ONLY` khi rerank tắt có chủ ý; ứng viên và thứ tự không đổi; `tests/rag_v2` 753 đạt | — |
+| E3 | `fix/e3-hide-policy-graph-link` · 2a67862 | liên kết đồ thị quy chế chỉ hiện khi API trả lời; 2 test đạt | — |
+| E7 | `feat/e7-citation-review-status` · 1802756 | `GET /v1/knowledge/source-review-status` (tối đa 20 nguồn, cache 5 phút, xóa khi có rà soát); nhãn "Nguồn quá hạn rà soát" trong ngăn trích dẫn; 21 test Python, 280 test web đạt | **Tra cứu riêng bên cạnh câu trả lời** thay vì ghi vào luồng chat và lịch sử, nên không byte nào của câu trả lời đổi |
+| E10 | `feat/e10b-exit-ticket-reminders` · 3c9a5e9, ccdf4f1 | nhắc phiếu ra lớp T−24h và T−2h, chỉ sinh viên chưa nộp, một lần, tôn trọng công tắc mới `exit_tickets`; đã nối vào vòng việc nền của leader; 28 test Python, 16 test web đạt | xếp trên E11 |
+| E11 | `feat/e11-source-reminder-switch` · 99208ff | công tắc nhắc nguồn chỉ hiện cho quản trị tri thức; 4 test mới đạt | — |
+| E12 | `fix/e12-pwa-clear-on-signout` · eec9910 | đăng xuất gọi `clearPwaCaches` đúng một lần (test đỏ trước, xanh sau) | **Chưa kiểm trên trình duyệt thật** (cần runtime) |
+| E8 | `feat/e8-answer-gaps` · e1c077c | mỗi lần từ chối được đếm theo cụm nguồn và lý do, không lưu người/hội thoại/câu hỏi (test quét các cột của bảng); trang `/knowledge/quality`; quyết định có ghi chú, `RESOLVED` cần mã bản phát hành; 37 + 114 + 204 test Python, 5 test web đạt | một loại sự kiện `REFUSED` theo lý do (không tách ABSTAINED/GATE_REFUSED); trang riêng thay vì tab; cũng thêm liên kết "Hiệu lực nguồn" vào `/knowledge` |
+| E9 | `feat/e9-release-retrieval-check` · b918f8b | theo dõi mã release đang chạy, gom đổi trong 10 phút, bỏ qua khi >3 lượt chat đang chạy (hỏi lại 3 lần); lần chạy thành công đầu tiên thành baseline, không bao giờ bị lần chạy ghi đè; 702 test đạt | **Chưa chạy thật** (cần model server) |
+| E15 | `chore/e15-postgres-checks` · 18294d0 | SQL độ mới nguồn chạy đúng trên Postgres thật (114 nguồn); sao lưu thật 302 s / 566 MB; diễn tập khôi phục 95,6 s, 63 bảng giống hệt, đã dọn; tìm và sửa 2 lỗi (sao lưu dừng vì tệp bị Defender chặn; `--work-dir` tương đối làm hỏng kiểm tra an toàn); 201 test đạt | chưa thử restic/systemd |
+| E14 (nền) | `feat/e14-i18n-foundation` · 443f9b0 | từ điển `vi.ts`/`en.ts` có kiểu (thiếu khóa là lỗi biên dịch), nút chuyển ngôn ngữ, cookie `lang`, `<html lang>`; điều hướng, ô tìm kiếm và khung đăng nhập đã dịch; toàn bộ web 147 tệp / 936 test đạt, `tsc` sạch | chỉ đọc cookie ở trình duyệt (trang vẫn tĩnh); **B4.1 (đo truy hồi tiếng Anh) chưa chạy** |
+| E17 | `eval/e17-heldout-2` · 38d17e0 | 18 câu trên 3 tài liệu mới (điều khoản tham chiếu chéo, bảng hai tầng, thông báo có ngoại lệ); gold được code kiểm đạt | **Chưa chạy** (cần model nhúng và gateway); chạy đúng một lần, không chỉnh |
+
+### Chưa làm hoặc bị chặn
+
+| Gói | Tình trạng | Lý do cụ thể | Đầu vào tối thiểu |
+|---|---|---|---|
+| E4 học liệu theo lớp | chưa | Luồng giao diện học liệu đã được kiểm 8/8 ngày 17/11 trên bản diễn tập biệt lập. Việc còn lại là ghi danh `student-local` vào một lớp của runtime vận hành qua API giảng viên, cần runtime 8015 chạy | RAM trống đủ để khởi động runtime |
+| E5 phát hành thử, E6 quét virus thật, E16 chạy tải | chưa | cần runtime 8015 + worker nhập liệu + ClamAV. Máy chỉ còn 1,2–2,4 GB RAM trống trên 15,6 GB; launcher cần khoảng 2,6 GB ngoài model server. Tôi không đóng ứng dụng của bạn để lấy RAM | đóng bớt ứng dụng hoặc cho phép dừng thứ gì đó |
+| E13 ôn tập | chưa | xem bản đồ tích hợp bên dưới: nhiều điểm chạm vào bộ máy preview/confirm của học liệu, cần quyết định thiết kế nhỏ, không để mã dở dang | thời gian làm riêng |
+| E14.B4.1, E17 chạy thật | chưa | cần model nhúng 18081 và gateway 8025 | như E5 |
+
+**Bản đồ tích hợp E13** (đọc từ mã ngày 19/11, theo mẫu "idea cards"):
+1. `LearningService.__init__` nhận thêm `practice_offerings`; cờ theo lớp lấy ở `bootstrap/learning.py:78-98` (mỗi tính năng gắn một revision migration; `config.json` hiện tại dùng lưu trữ SQLite nên không cần migration cho bản cục bộ).
+2. Đọc: thêm nhóm `PRACTICE_READS` vào `LearningService.query` (`service.py:202-230`).
+3. Ghi: thêm hành động vào cơ chế xem trước/xác nhận (`service.py:380-450`) và vào `presentation/learning.py` (schemas `SCHEMAS`, bảng `write_endpoint`), kèm tái phát theo khóa idempotency.
+4. Kiểm trích dẫn: dùng `blobs.extract_page(storage_key, page_no)` như `idea_cards.py:71`, rồi `practice.verify_citation` (đã có, 26 test).
+5. Postgres: tên bảng trong `COLLECTIONS` của `infra/learning/repository.py`, migration 0032 (cần duyệt hash trước khi áp vào DB vận hành), `practice_schema=True`.
+6. Hợp đồng: `tests/learning_entry/test_openapi_contract.py` sẽ đòi cập nhật; thêm test quyền và phiên bị thu hồi giữa transaction.
+7. Web: bộ soạn của giảng viên và phiên ôn tập của sinh viên cạnh `ExitTickets.tsx`.
+Cần một quyết định nhỏ: bài ôn tập có dùng cùng bước xác nhận như phiếu ra lớp không (đề xuất: có cho giảng viên, không cho sinh viên nộp bài).
+
+Cổng nghiệm thu `web_acceptance.mjs` chỉ thay đổi ở phần đã sửa (số lần gọi khả dụng phòng, trang `/knowledge/quality`) và **chưa chạy lại** vì chưa có runtime.
