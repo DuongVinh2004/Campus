@@ -610,6 +610,9 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 async def start_jobs():
                     jobs = [asyncio.create_task(platform.schedules.serve())]
                     jobs.append(asyncio.create_task(run_reminders(ops_service.store, student_subjects)))
+                    if learning_service is not None:
+                        from campus247.application.campus_ops.reminder_job import run_exit_ticket_reminders
+                        jobs.append(asyncio.create_task(run_exit_ticket_reminders(learning_service, ops_service.store)))
                     from campus247.application.knowledge.freshness_reminders import run_freshness_reminders
                     jobs.append(asyncio.create_task(run_freshness_reminders(
                         freshness_service, ops_service.store, lambda: [owner_adapter.directory()["owner_id"]])))

@@ -1,7 +1,7 @@
 import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { ReminderPreferences } from "./ReminderPreferences";
+import { ReminderPreferences, ReminderPreferencesForMe, reminderKindsFor } from "./ReminderPreferences";
 
 const fetchMock = vi.fn();
 
@@ -72,5 +72,36 @@ describe("ReminderPreferences", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2); // the load and one save
     release(json(200, { exam: false, sources: true }));
     await waitFor(() => expect(screen.getByRole("switch", { name: "Nhắc lịch thi" }).getAttribute("aria-checked")).toBe("false"));
+  });
+});
+
+describe("reminders by role", () => {
+  it("offers the source reminder only to people who manage knowledge", () => {
+    expect(reminderKindsFor(["STUDENT"])).toEqual(["exam", "exit_tickets"]);
+    expect(reminderKindsFor(["SUPPORT_OFFICER"])).toEqual(["exam"]);
+    expect(reminderKindsFor(["LECTURER", "KNOWLEDGE_CONTRIBUTOR"])).toEqual(["exam"]);
+    expect(reminderKindsFor(["KNOWLEDGE_ADMIN"])).toEqual(["exam", "sources"]);
+    expect(reminderKindsFor(["SYSTEM_ADMIN"])).toEqual(["exam", "sources"]);
+    expect(reminderKindsFor(["STUDENT", "KNOWLEDGE_ADMIN"])).toEqual(["exam", "exit_tickets", "sources"]);
+    expect(reminderKindsFor(undefined)).toEqual(["exam"]);
+  });
+
+  it.each([
+    ["STUDENT", false],
+    ["KNOWLEDGE_ADMIN", true],
+  ])("for a %s the source switch is shown: %s", async (role, shown) => {
+    fetchMock.mockImplementation(async (url: string) =>
+      String(url).includes("/v1/users/me") ? json(200, { roles: [role] }) : json(200, { exam: true, sources: true }));
+    render(<ReminderPreferencesForMe />);
+    await screen.findByRole("switch", { name: "Nhắc lịch thi" });
+    expect(screen.queryByRole("switch", { name: "Nhắc rà soát nguồn tri thức" }) !== null).toBe(shown);
+  });
+
+  it("falls back to the exam switch when the person cannot be identified", async () => {
+    fetchMock.mockImplementation(async (url: string) =>
+      String(url).includes("/v1/users/me") ? problem(401, "no session") : json(200, { exam: true, sources: true }));
+    render(<ReminderPreferencesForMe />);
+    await screen.findByRole("switch", { name: "Nhắc lịch thi" });
+    expect(screen.queryByRole("switch", { name: /nguồn/ })).toBeNull();
   });
 });

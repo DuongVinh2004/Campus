@@ -55,3 +55,51 @@ async def test_the_loop_can_be_cancelled_while_it_sleeps(store):
     task.cancel()
     with pytest.raises(asyncio.CancelledError):
         await task
+
+
+class FakeLearning:
+    """Stands in for the learning service: the reminder loop only needs its exit-ticket offerings and a transaction over the state."""
+    def __init__(self, state, offerings):
+        from contextlib import asynccontextmanager
+        self.exit_ticket_offerings = frozenset(offerings)
+
+        @asynccontextmanager
+        async def transaction():
+            yield state
+
+        self.repository = type("Repository", (), {"transaction": staticmethod(transaction)})()
+
+
+@pytest.mark.asyncio
+async def test_the_exit_ticket_loop_reminds_once_and_survives_a_failing_pass(store, caplog):
+    from campus247.application.campus_ops.reminder_job import run_exit_ticket_reminders
+    now = datetime(2026, 11, 20, 3, 0, tzinfo=UTC)
+    stamp = lambda hours: (now + timedelta(hours=hours)).isoformat().replace("+00:00", "Z")  # noqa: E731
+    state = {"exit_tickets": {"t1": {"id": "t1", "session_id": "s1", "offering_id": "o1", "status": "PUBLISHED", "published_question_revision": 1,
+                                     "opens": {"utc": stamp(-1)}, "closes": {"utc": stamp(10)}}},
+             "members": {"m": {"actor_subject_id": "subject-1", "role": "STUDENT", "status": "ACTIVE", "offering_id": "o1"}},
+             "exit_submissions": {}, "sessions": {"s1": {"title": "Buổi 2"}}}
+    good = FakeLearning(state, {"o1"})
+    calls = []
+
+    class Flaky:
+        exit_ticket_offerings = good.exit_ticket_offerings
+
+        @property
+        def repository(self):
+            calls.append(1)
+            if len(calls) == 1:
+                raise RuntimeError("storage unavailable")
+            return good.repository
+
+    with caplog.at_level(logging.WARNING, logger="campus247.reminders"):
+        await run_exit_ticket_reminders(Flaky(), store, every_s=0, clock=lambda: now, passes=3)
+    assert [n["title"] for n in inbox(store)] == ["Phiếu ra lớp sắp đóng: Buổi 2"]
+    assert "exit_ticket_reminders_failed kind=RuntimeError" in caplog.text and "storage unavailable" not in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_no_loop_work_when_no_class_has_exit_tickets(store):
+    from campus247.application.campus_ops.reminder_job import run_exit_ticket_reminders
+    await run_exit_ticket_reminders(FakeLearning({}, set()), store, every_s=0, clock=lambda: EXAM, passes=2)
+    assert store.query("SELECT COUNT(*) n FROM ops_notifications")[0]["n"] == 0
