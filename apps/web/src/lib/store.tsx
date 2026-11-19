@@ -14,6 +14,7 @@ import {
   IssuedCertificateDocument,
   StoredAttachment,
 } from "./types";
+import { clearPwaCaches } from "@/components/PwaRegister";
 import { createGateway } from "./data/create-gateway";
 import { getDataConfig, DataConfig } from "./data/config";
 import { CampusDataGateway } from "./data/gateway";
@@ -392,6 +393,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     authRestored.current = true;
     setCurrentUser(null);
     if (typeof window !== "undefined") localStorage.removeItem(LOCAL_STORAGE_KEY_USER);
+    clearPwaCaches(); // the offline cache must not outlive the session
   };
 
   const getTicket = (id: string) => tickets.find((t) => t.id === id || t.code === id);
