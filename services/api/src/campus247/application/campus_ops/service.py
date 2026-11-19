@@ -357,7 +357,7 @@ class CampusOpsService:
         return {"id": event_id, "deleted": True}
 
     # ---------------------------------------------------------- notifications
-    REMINDER_KINDS = ("exam", "sources")
+    REMINDER_KINDS = ("exam", "exit_tickets", "sources")
 
     def reminder_preferences(self, identity: IdentityContext) -> dict[str, bool]:
         """Which kinds of reminders the caller receives. Everything is on until the person switches it off."""
