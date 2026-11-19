@@ -4,11 +4,12 @@ import React, { useEffect, useState } from "react";
 import { CAMPUS_API_BASE_URL } from "../../lib/api/base-url";
 import { ApiClient, ApiClientError } from "../../lib/api/client";
 
-type Kind = "exam" | "sources";
+type Kind = "exam" | "exit_tickets" | "sources";
 type Preferences = Record<Kind, boolean>;
 
 const LABELS: Record<Kind, { title: string; help: string }> = {
   exam: { title: "Nhắc lịch thi", help: "Thông báo trước giờ thi 24 giờ và 2 giờ." },
+  exit_tickets: { title: "Nhắc nộp phiếu ra lớp", help: "Thông báo trước khi phiếu ra lớp đóng 24 giờ và 2 giờ, nếu bạn chưa nộp." },
   sources: { title: "Nhắc rà soát nguồn tri thức", help: "Thông báo trước khi nguồn hết hiệu lực hoặc đến hạn rà soát, và tóm tắt hằng tuần." },
 };
 
@@ -16,9 +17,12 @@ const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });
 
 const MANAGER_ROLES = ["KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"];
 
-/** Everyone gets the exam switch; only people who manage knowledge get the one for source reviews. */
+/** Everyone gets the exam switch; students also get exit tickets, and people who manage knowledge get source reviews. */
 export function reminderKindsFor(roles: readonly string[] | undefined): Kind[] {
-  return roles?.some((role) => MANAGER_ROLES.includes(role)) ? ["exam", "sources"] : ["exam"];
+  const kinds: Kind[] = ["exam"];
+  if (roles?.includes("STUDENT")) kinds.push("exit_tickets");
+  if (roles?.some((role) => MANAGER_ROLES.includes(role))) kinds.push("sources");
+  return kinds;
 }
 
 /** The same switches, choosing which ones to show from the signed-in person's roles. */

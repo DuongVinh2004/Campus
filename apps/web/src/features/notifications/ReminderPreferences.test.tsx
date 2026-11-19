@@ -77,11 +77,12 @@ describe("ReminderPreferences", () => {
 
 describe("reminders by role", () => {
   it("offers the source reminder only to people who manage knowledge", () => {
-    expect(reminderKindsFor(["STUDENT"])).toEqual(["exam"]);
+    expect(reminderKindsFor(["STUDENT"])).toEqual(["exam", "exit_tickets"]);
     expect(reminderKindsFor(["SUPPORT_OFFICER"])).toEqual(["exam"]);
     expect(reminderKindsFor(["LECTURER", "KNOWLEDGE_CONTRIBUTOR"])).toEqual(["exam"]);
     expect(reminderKindsFor(["KNOWLEDGE_ADMIN"])).toEqual(["exam", "sources"]);
     expect(reminderKindsFor(["SYSTEM_ADMIN"])).toEqual(["exam", "sources"]);
+    expect(reminderKindsFor(["STUDENT", "KNOWLEDGE_ADMIN"])).toEqual(["exam", "exit_tickets", "sources"]);
     expect(reminderKindsFor(undefined)).toEqual(["exam"]);
   });
 
