@@ -9,6 +9,7 @@ import { ChatDraftSessionProvider } from "@/features/chat/route-drafts";
 import { KnowledgeWorkspaceSession } from "@/features/knowledge/KnowledgeWorkspaceSession";
 import { PwaRegister } from "@/components/PwaRegister";
 import { ThemeProvider } from "@/lib/theme";
+import { LanguageProvider } from "@/lib/i18n";
 
 export const metadata = {
   title: "Campus 24/7 — Cổng Dịch Vụ Số & Trợ Lý Học Vụ HUCE",
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="min-h-screen flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white transition-colors" style={{ backgroundColor: "var(--bg-page)", color: "var(--text-primary)" }}>
+        <LanguageProvider>
         <ThemeProvider>
         {process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true" ? <ChatDraftSessionProvider><div className="knowledge-operational"><KnowledgeAvailability /><div className="knowledge-operational-content"><KnowledgeWorkspaceSession>{children}</KnowledgeWorkspaceSession></div></div></ChatDraftSessionProvider> : <StoreProvider>
           <DraftSessionProvider>
@@ -50,6 +52,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </DraftSessionProvider>
         </StoreProvider>}
         </ThemeProvider>
+        </LanguageProvider>
         <PwaRegister />
       </body>
     </html>

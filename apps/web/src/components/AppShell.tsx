@@ -35,6 +35,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageToggle } from "./LanguageToggle";
+import { useT, type MessageKey } from "../lib/i18n";
 import { CERTIFICATE_DEMO } from "../lib/data/api/certificate-gateway";
 import { SERVICE_DEMO } from "../lib/data/api/service-gateway";
 import { AccessibleDialog } from "./shared/AccessibleDialog";
@@ -55,7 +57,7 @@ export interface AppShellProps {
 
 type NavigationItem = {
   key: string;
-  label: string;
+  label: MessageKey; // a message key, shown through t()
   href: string;
   icon: typeof House;
   roles: Role[];
@@ -63,38 +65,38 @@ type NavigationItem = {
 };
 
 const navigation: NavigationItem[] = [
-  { key: "learning", label: "Học liệu", href: "/learning", icon: BookOpen, roles: ["student", "lecturer", "admin"] },
-  { key: "home", label: "Tổng quan", href: "/", icon: House, roles: ["student", "guest", "staff", "admin"] },
-  { key: "chat", label: "Trợ lý", href: "/chat", icon: Bot, roles: ["student", "guest"] },
-  { key: "services", label: "Dịch vụ", href: "/services", icon: ClipboardList, roles: ["student"] },
-  { key: "tickets", label: "Hồ sơ", href: "/tickets", icon: FolderOpen, roles: ["student", "staff", "admin"] },
-  { key: "schedule", label: "Lịch học", href: "/schedule", icon: CalendarDays, roles: ["student"] },
-  { key: "rooms", label: "Phòng học", href: "/rooms", icon: Building2, roles: ["student", "staff", "admin"] },
-  { key: "staff", label: "Cán bộ", href: "/staff", icon: LayoutDashboard, roles: ["staff", "admin"] },
-  { key: "knowledge", label: "Tri thức", href: "/knowledge", icon: BookOpen, roles: ["staff", "admin"] },
-  { key: "admin", label: "Quản trị", href: "/admin", icon: Settings2, roles: ["admin"] },
+  { key: "learning", label: "nav.learning", href: "/learning", icon: BookOpen, roles: ["student", "lecturer", "admin"] },
+  { key: "home", label: "nav.home", href: "/", icon: House, roles: ["student", "guest", "staff", "admin"] },
+  { key: "chat", label: "nav.assistant", href: "/chat", icon: Bot, roles: ["student", "guest"] },
+  { key: "services", label: "nav.services", href: "/services", icon: ClipboardList, roles: ["student"] },
+  { key: "tickets", label: "nav.tickets", href: "/tickets", icon: FolderOpen, roles: ["student", "staff", "admin"] },
+  { key: "schedule", label: "nav.schedule", href: "/schedule", icon: CalendarDays, roles: ["student"] },
+  { key: "rooms", label: "nav.rooms", href: "/rooms", icon: Building2, roles: ["student", "staff", "admin"] },
+  { key: "staff", label: "nav.staff", href: "/staff", icon: LayoutDashboard, roles: ["staff", "admin"] },
+  { key: "knowledge", label: "nav.knowledge", href: "/knowledge", icon: BookOpen, roles: ["staff", "admin"] },
+  { key: "admin", label: "nav.admin", href: "/admin", icon: Settings2, roles: ["admin"] },
 ];
 const knowledgeNavigation: NavigationItem[] = [
-  { key: "learning", label: "Học liệu", href: "/learning", icon: BookOpen, roles: ["student", "lecturer", "admin"] },
-  { key: "chat", label: "Hỏi đáp có nguồn", href: "/chat", icon: Bot, roles: ["student", "guest", "staff", "admin", "contributor"] },
-  { key: "documents", label: "Thêm tài liệu", href: "/knowledge/documents", icon: FilePlus2, roles: ["admin", "contributor"] },
-  { key: "crawl", label: "Nguồn tự động", href: "/knowledge/crawl", icon: RefreshCw, roles: ["admin"] },
-  { key: "services", label: "Dịch vụ học vụ", href: "/services", icon: ClipboardList, roles: ["student", "guest", "admin"] },
-  { key: "tickets", label: "Hồ sơ của tôi", href: "/tickets", icon: FolderOpen, roles: ["student"] },
-  { key: "schedule", label: "Lịch học", href: "/schedule", icon: CalendarDays, roles: ["student"] },
-  { key: "rooms", label: "Phòng học", href: "/rooms", icon: Building2, roles: ["student", "staff"] },
-  { key: "staff", label: "Hàng đợi hồ sơ", href: "/staff", icon: LayoutDashboard, roles: ["staff"] },
-  { key: "notifications", label: "Thông báo", href: "/notifications", icon: Bell, roles: ["student", "staff", "admin"] },
-  { key: "admin", label: "Tổng quan vận hành", href: "/admin", icon: Settings2, roles: ["admin"] },
-  { key: "knowledge", label: "Quản trị nguồn", href: "/knowledge/sources", icon: BookOpen, roles: ["admin"] },
-  { key: "privacy", label: "Quyền riêng tư", href: "/privacy", icon: ShieldCheck, roles: ["student", "guest", "admin"] },
+  { key: "learning", label: "nav.learning", href: "/learning", icon: BookOpen, roles: ["student", "lecturer", "admin"] },
+  { key: "chat", label: "nav.assistantSourced", href: "/chat", icon: Bot, roles: ["student", "guest", "staff", "admin", "contributor"] },
+  { key: "documents", label: "nav.documents", href: "/knowledge/documents", icon: FilePlus2, roles: ["admin", "contributor"] },
+  { key: "crawl", label: "nav.crawl", href: "/knowledge/crawl", icon: RefreshCw, roles: ["admin"] },
+  { key: "services", label: "nav.servicesAcademic", href: "/services", icon: ClipboardList, roles: ["student", "guest", "admin"] },
+  { key: "tickets", label: "nav.myTickets", href: "/tickets", icon: FolderOpen, roles: ["student"] },
+  { key: "schedule", label: "nav.schedule", href: "/schedule", icon: CalendarDays, roles: ["student"] },
+  { key: "rooms", label: "nav.rooms", href: "/rooms", icon: Building2, roles: ["student", "staff"] },
+  { key: "staff", label: "nav.staffQueue", href: "/staff", icon: LayoutDashboard, roles: ["staff"] },
+  { key: "notifications", label: "nav.notifications", href: "/notifications", icon: Bell, roles: ["student", "staff", "admin"] },
+  { key: "admin", label: "nav.adminOverview", href: "/admin", icon: Settings2, roles: ["admin"] },
+  { key: "knowledge", label: "nav.knowledgeSources", href: "/knowledge/sources", icon: BookOpen, roles: ["admin"] },
+  { key: "privacy", label: "nav.privacy", href: "/privacy", icon: ShieldCheck, roles: ["student", "guest", "admin"] },
 ];
 
 const publicNavigation: NavigationItem[] = [
-  { key: "chat", label: "Hỏi đáp AI", href: "/chat", icon: Sparkles, roles: ["student", "guest", "staff", "admin"] },
-  { key: "schedule", label: "Cổng sinh viên", href: "https://sinhvien.huce.edu.vn", icon: CalendarDays, roles: ["student", "guest", "staff", "admin"], external: true },
-  { key: "tickets", label: "Một cửa HUCE", href: "https://motcua.huce.edu.vn", icon: FileText, roles: ["student", "guest", "staff", "admin"], external: true },
-  { key: "rooms", label: "Thư viện HUCE", href: "https://thuvien.huce.edu.vn", icon: Building2, roles: ["student", "guest", "staff", "admin"], external: true },
+  { key: "chat", label: "nav.askAi", href: "/chat", icon: Sparkles, roles: ["student", "guest", "staff", "admin"] },
+  { key: "schedule", label: "nav.studentPortal", href: "https://sinhvien.huce.edu.vn", icon: CalendarDays, roles: ["student", "guest", "staff", "admin"], external: true },
+  { key: "tickets", label: "nav.oneStop", href: "https://motcua.huce.edu.vn", icon: FileText, roles: ["student", "guest", "staff", "admin"], external: true },
+  { key: "rooms", label: "nav.library", href: "https://thuvien.huce.edu.vn", icon: Building2, roles: ["student", "guest", "staff", "admin"], external: true },
 ];
 
 const titles: Record<string, string> = {
@@ -138,6 +140,7 @@ export function AppShell({
   publicKnowledge = false,
   checkSessionOnResume = false,
 }: AppShellProps) {
+  const t = useT();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [navigationWidth, setNavigationWidth] = useState(224);
   const [navigationCollapsed, setNavigationCollapsed] = useState(activeNav === "chat" && process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM !== "true");
@@ -243,12 +246,12 @@ export function AppShell({
                 href={item.href}
                 target="_blank"
                 rel="noreferrer"
-                aria-label={item.label}
+                aria-label={t(item.label)}
                 onClick={closeMenu}
                 className="campus-nav-item"
               >
                 <item.icon size={19} strokeWidth={1.7} aria-hidden="true" />
-                <span className="campus-nav-label">{item.label}</span>
+                <span className="campus-nav-label">{t(item.label)}</span>
                 <ExternalLink size={14} className="campus-external-icon" aria-hidden="true" />
               </a>
             );
@@ -258,13 +261,13 @@ export function AppShell({
               key={item.key}
               href={item.href}
               onClick={closeMenu}
-              aria-label={item.label}
-              title={item.label}
+              aria-label={t(item.label)}
+              title={t(item.label)}
               aria-current={isActive ? "page" : undefined}
               className={"campus-nav-item" + (isActive ? " is-active" : "")}
             >
               <item.icon size={19} strokeWidth={1.7} aria-hidden="true" />
-              <span className="campus-nav-label">{item.label}</span>
+              <span className="campus-nav-label">{t(item.label)}</span>
               {item.key === "chat" && (
                 <span className="campus-ai-label" aria-hidden="true">
                   AI
@@ -283,7 +286,7 @@ export function AppShell({
         {!operational && !isPublic && !chat && (
           <>
             <span className="campus-nav-divider" aria-hidden="true" />
-            {navItems.filter(item => item.key === "rooms").map(item => <Link key={item.key} href={item.href} onClick={closeMenu} aria-current={activeNav === item.key ? "page" : undefined} className={"campus-nav-item" + (activeNav === item.key ? " is-active" : "")}><item.icon size={19} aria-hidden="true" /><span>{item.label}</span></Link>)}
+            {navItems.filter(item => item.key === "rooms").map(item => <Link key={item.key} href={item.href} onClick={closeMenu} aria-current={activeNav === item.key ? "page" : undefined} className={"campus-nav-item" + (activeNav === item.key ? " is-active" : "")}><item.icon size={19} aria-hidden="true" /><span>{t(item.label)}</span></Link>)}
             <Link
               href="/notifications"
               onClick={closeMenu}
@@ -387,14 +390,15 @@ export function AppShell({
               action="/chat"
               method="GET"
               role="search"
-              aria-label="Tìm nhanh trong Campus"
+              aria-label={t("shell.searchForm")}
               className="campus-toolbar-search"
             >
               <Search size={16} aria-hidden="true" />
-              <input aria-label="Tìm quy chế hoặc thủ tục" name="q" placeholder="Tìm thông tin học vụ…" />
+              <input aria-label={t("shell.searchLabel")} name="q" placeholder={t("shell.searchPlaceholder")} />
               <kbd aria-hidden="true">↵</kbd>
             </form>
 
+            <LanguageToggle className="campus-theme-toggle" />
             <ThemeToggle className="campus-theme-toggle" />
 
             <Link href="/notifications" className="campus-icon-button relative" aria-label={unreadCount > 0 ? `Mở thông báo, ${unreadCount} chưa đọc` : "Mở thông báo"}>
@@ -430,7 +434,7 @@ export function AppShell({
       </div>
 
       {!operational && !isPublic && <nav className="campus-bottom-navigation" aria-label="Điều hướng nhanh">
-        {navItems.filter(item => userRole === "student" ? ["home", "chat", "services", "tickets", "schedule"].includes(item.key) : ["home", "staff", "tickets", "knowledge", "documents", "crawl", "admin"].includes(item.key)).map(item => <Link key={item.key} href={item.href} aria-current={activeNav === item.key ? "page" : undefined}><item.icon size={20} aria-hidden="true" /><span>{item.label}</span></Link>)}
+        {navItems.filter(item => userRole === "student" ? ["home", "chat", "services", "tickets", "schedule"].includes(item.key) : ["home", "staff", "tickets", "knowledge", "documents", "crawl", "admin"].includes(item.key)).map(item => <Link key={item.key} href={item.href} aria-current={activeNav === item.key ? "page" : undefined}><item.icon size={20} aria-hidden="true" /><span>{t(item.label)}</span></Link>)}
       </nav>}
 
       <AccessibleDialog
