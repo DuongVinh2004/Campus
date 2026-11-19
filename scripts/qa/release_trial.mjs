@@ -29,17 +29,31 @@ await page.locator("input[name=password]").fill(creds.password);
 await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
 await page.waitForURL((url) => !url.pathname.startsWith("/login"), { timeout: 20000 });
 const api = context.request;
-const snapshot = async () => (await (await api.get(BASE + "/health/ready")).json()).rag_v2;
-const listing = async () => (await (await api.get(BASE + "/v1/knowledge/platform/documents")).json());
+// The API is busy while it swaps the index and may reset a connection for a moment: try again instead of giving up.
+async function again(fn) {
+  for (let attempt = 0; ; attempt++) {
+    try { return await fn(); } catch (error) { if (attempt >= 8) throw error; await new Promise((r) => setTimeout(r, 5000)); }
+  }
+}
+const snapshot = () => again(async () => (await (await api.get(BASE + "/health/ready")).json()).rag_v2);
+const listing = () => again(async () => (await (await api.get(BASE + "/v1/knowledge/platform/documents")).json()));
+const resume = process.argv.includes("--resume"); // attach to the QA document of an earlier, interrupted run
 
 const before = await snapshot();
+// When resuming, the index already holds the QA document: say how many units it had before (printed by the interrupted run).
+if (resume && arg("--units-before", null)) before.unit_count = Number(arg("--units-before", before.unit_count));
 console.log("before:", JSON.stringify({ units: before.unit_count, release: before.release_id, generation: before.generation }));
 const uri = `https://qa.huce.edu.vn/release-trial-${STAMP}-${crypto.randomBytes(4).toString("hex")}`;
 let versionId = null;
 try {
+  if (resume) {
+    const old = ((await listing()).items || []).find((r) => /^QA-/.test(r.title));
+    versionId = old?.version_id ?? null;
+    console.log("resuming with", versionId, old?.state);
+  }
   const metadata = { title: `QA-${STAMP} Giờ làm việc Phòng Thí nghiệm Hư Cấu`, owner_unit: "QA", canonical_uri: uri, programs: ["PUBLIC"],
     audiences: ["STUDENT", "KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"], effective_from: null, publish_directly: true, attested: true };
-  const sent = await api.post(BASE + "/v1/knowledge/platform/documents", {
+  const sent = resume ? { status: () => 202, json: async () => ({ version_id: versionId }) } : await api.post(BASE + "/v1/knowledge/platform/documents", {
     headers: { "Idempotency-Key": crypto.randomUUID() },
     multipart: { metadata: JSON.stringify(metadata), file: { name: "qa-release-trial.txt", mimeType: "text/plain", buffer: Buffer.from(TEXT, "utf8") } } });
   check(sent.status() === 202, `the document is accepted (HTTP ${sent.status()})`);
@@ -72,7 +86,7 @@ try {
   }
 } finally {
   if (versionId) {
-    const revoked = await api.post(`${BASE}/v1/knowledge/platform/documents/${versionId}/revoke`, { data: { note: "QA release trial finished" } });
+    const revoked = await again(() => api.post(`${BASE}/v1/knowledge/platform/documents/${versionId}/revoke`, { data: { note: "QA release trial finished" } }));
     check(revoked.status() === 200, `the document is revoked (HTTP ${revoked.status()})`);
     const started = Date.now();
     let after = await snapshot();
