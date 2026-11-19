@@ -89,6 +89,11 @@ def create_campus_ops_router(service: CampusOpsService) -> APIRouter:
     def my_bookings(request: Request):
         return _json(service.my_bookings(get_current_identity(request)))
 
+    @r.get("/v1/rooms/availability")
+    def availability_many(request: Request, date: str = Query(..., max_length=10), room_ids: str = Query("", max_length=4200)):
+        get_current_identity(request)
+        return _json(service.availability_many([i.strip() for i in room_ids.split(",")] if room_ids.strip() else [], date))
+
     @r.get("/v1/rooms/{room_id}/availability")
     def availability(room_id: str, request: Request, date: str = Query(..., max_length=10)):
         get_current_identity(request)

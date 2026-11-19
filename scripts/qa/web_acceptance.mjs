@@ -217,8 +217,11 @@ async function cleanupLeftovers() {
 
 async function roomsFlow() {
   const { context, page } = await newSession("student");
+  const availabilityCalls = [];
+  page.on("request", (r) => { if (/\/v1\/rooms\/(availability|[^/]+\/availability)\?/.test(r.url())) availabilityCalls.push(r.url()); });
   await visit(page, "/rooms");
   await page.getByText(/Danh sách phòng học \(\d+\)/).waitFor({ timeout: 15000 });
+  check(availabilityCalls.length >= 1 && availabilityCalls.length <= 2, `rooms: availability of every room is fetched in at most 2 requests (saw ${availabilityCalls.length})`);
   await page.getByRole("button", { name: "Đặt phòng" }).first().click();
   const dialog = page.locator("[role=dialog]");
   await dialog.locator("textarea").fill(`${TAG} họp nhóm`);

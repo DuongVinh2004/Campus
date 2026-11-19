@@ -25,6 +25,7 @@ import {
   type Room,
   type RoomList,
   type Availability,
+  MAX_AVAILABILITY_BATCH,
   type Booking,
   type BookingPreview,
   type BusyInterval,
@@ -168,19 +169,13 @@ export function RoomFinder() {
   const loadAvailability = useCallback(async (rooms: Room[], targetDate: string) => {
     const reqId = ++availReqIdRef.current;
     const nextMap: Record<string, Availability> = {};
-    const batchSize = 6;
-
-    for (let i = 0; i < rooms.length; i += batchSize) {
+    // One request per MAX_AVAILABILITY_BATCH rooms (a page load used to send one per room).
+    for (let i = 0; i < rooms.length; i += MAX_AVAILABILITY_BATCH) {
       if (availReqIdRef.current !== reqId) return;
-      const batch = rooms.slice(i, i + batchSize);
-      const batchResults = await Promise.all(
-        batch.map((r) => roomsApi.availability(r.id, targetDate).catch(() => null))
-      );
+      const res = await roomsApi.availabilityMany(rooms.slice(i, i + MAX_AVAILABILITY_BATCH).map((r) => r.id), targetDate).catch(() => null);
       if (availReqIdRef.current !== reqId) return;
-      batchResults.forEach((res, idx) => {
-        if (res) {
-          nextMap[batch[idx].id] = res;
-        }
+      res?.items.forEach((item) => {
+        nextMap[item.room.id] = { room: item.room, date: res.date, open: res.open, close: res.close, busy: item.busy, limits: res.limits };
       });
     }
 
