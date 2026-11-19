@@ -13,7 +13,12 @@ import pytest
 from campus247.infrastructure.scanning.clamd import ClamdScanner
 from campus247.ports.file_scanner import ScanRejected, ScannerUnavailable
 
-from test_clamd_scanner import BUILT, FakeClamd, run, scanner
+import importlib.util
+
+_spec = importlib.util.spec_from_file_location("clamd_scanner_fixtures", Path(__file__).with_name("test_clamd_scanner.py"))
+_fixtures = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_fixtures)
+FakeClamd, run, scanner = _fixtures.FakeClamd, _fixtures.run, _fixtures.scanner
 
 
 def test_a_file_that_vanished_after_it_was_written_is_rejected_at_once(tmp_path):
