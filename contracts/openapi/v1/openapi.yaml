@@ -86,6 +86,20 @@ paths:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1change-set"
   /v1/learning/sessions/{session_id}/exit-tickets:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1exit-tickets"
+  /v1/learning/practice-items/{item_id}/attempts:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1practice-items~1{item_id}~1attempts"
+  /v1/learning/practice-sets/{set_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1practice-sets~1{set_id}"
+  /v1/learning/practice-sets/{set_id}/items:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1practice-sets~1{set_id}~1items"
+  /v1/learning/practice-sets/{set_id}/publication:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1practice-sets~1{set_id}~1publication"
+  /v1/learning/practice-sets/{set_id}/session:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1practice-sets~1{set_id}~1session"
+  /v1/learning/practice-sets/{set_id}/stats:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1practice-sets~1{set_id}~1stats"
+  /v1/learning/sessions/{session_id}/practice-sets:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1practice-sets"
   /v1/learning/exit-tickets/{ticket_id}:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1exit-tickets~1{ticket_id}"
   /v1/learning/exit-tickets/{ticket_id}/me/submission:

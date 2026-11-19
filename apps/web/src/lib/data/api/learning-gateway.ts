@@ -1,6 +1,6 @@
 /** Authenticated learning API. All calls stay on the Campus entry origin. */
 export interface LearningPage<T> { items: T[]; page?: { next_cursor: string | null; has_more?: boolean; limit?: number } }
-export interface LearningOffering { id: string; course_id: string; term_id: string; section_code: string; title: string; status: string; revision: number; timezone?: string; member_role: string | null; capabilities: { read: boolean; manage: boolean; page_feedback?: boolean; page_explanations?: boolean; exit_tickets?: boolean } }
+export interface LearningOffering { id: string; course_id: string; term_id: string; section_code: string; title: string; status: string; revision: number; timezone?: string; member_role: string | null; capabilities: { read: boolean; manage: boolean; page_feedback?: boolean; page_explanations?: boolean; exit_tickets?: boolean; practice?: boolean } }
 export interface LearningSession { id: string; offering_id: string; sequence_no: number; title: string; description: string; starts_at: string | null; revision: number }
 export type LearningSessionContext = Pick<LearningSession, "id" | "offering_id" | "sequence_no" | "title">;
 export interface LearningVersion { id: string; version_id?: string; rendition_id?: string | null; source_media_type?: string; error_detail?: string; version_no: number; processing_state: string; publication_state: string; page_count: number; has_text_layer: boolean; revision: number; schedule_error?: string; capabilities?: { version_changes?: boolean } }
