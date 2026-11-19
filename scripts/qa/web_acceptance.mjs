@@ -38,7 +38,7 @@ async function step(name, fn) {
 const PAGES = {
   student: ["/chat", "/services", "/tickets", "/schedule", "/rooms", "/notifications", "/learning", "/privacy", "/memory"],
   staff: ["/staff", "/tickets", "/chat", "/rooms", "/notifications"],
-  owner: ["/admin", "/knowledge/sources", "/knowledge/documents", "/knowledge/freshness", "/knowledge/policy-graph", "/knowledge/crawl"],
+  owner: ["/admin", "/knowledge/sources", "/knowledge/documents", "/knowledge/freshness", "/knowledge/quality", "/knowledge/policy-graph", "/knowledge/crawl"],
 };
 const PUBLIC_PAGES = ["/login", "/offline"];
 // Requests that are expected to be refused for a role (the page shows its own message for them).
