@@ -17,6 +17,7 @@ from campus247.application.learning.accessible_text import (
     OCR_WRITES,
     LearningAccessibleText,
 )
+from campus247.application.learning.practice_sets import PRACTICE_READS, PRACTICE_WRITES, LearningPractice
 from campus247.application.learning.exit_tickets import (
     EXIT_TICKET_READS,
     EXIT_TICKET_WRITES,
@@ -69,8 +70,8 @@ def reserved_upload_bytes(uploads, offering):
                if row["offering_id"] == offering and not row.get("reservation_released"))
 
 
-class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplanation, LearningPageFeedback, LearningVersionChanges, LearningExitTickets, LearningIdeaCards, LearningAccessibleText):
-    def __init__(self, repository, blob_store, *, tenant_id, signing_key, scanner=None, directory=None, ai_gateway=None, ai_verifier=None, ai_source_hashes=(), optimize_pdf=False, pptx_converter=None, page_feedback_offerings=(), page_explanations_available=True, version_change_offerings=(), exit_ticket_offerings=(), idea_card_offerings=(), accessible_text_offerings=(), accessible_text_ocr_paused_offerings=(), accessible_text_pipeline=None, accessible_text_byte_quota=12 * 1024**3):
+class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplanation, LearningPageFeedback, LearningVersionChanges, LearningExitTickets, LearningPractice, LearningIdeaCards, LearningAccessibleText):
+    def __init__(self, repository, blob_store, *, tenant_id, signing_key, scanner=None, directory=None, ai_gateway=None, ai_verifier=None, ai_source_hashes=(), optimize_pdf=False, pptx_converter=None, page_feedback_offerings=(), page_explanations_available=True, version_change_offerings=(), exit_ticket_offerings=(), practice_offerings=(), idea_card_offerings=(), accessible_text_offerings=(), accessible_text_ocr_paused_offerings=(), accessible_text_pipeline=None, accessible_text_byte_quota=12 * 1024**3):
         require(bool(signing_key) and bool(tenant_id), 503, "LEARNING_UNAVAILABLE", "Chưa cấu hình học liệu.")
         self.repository, self.blobs, self.tenant_id = repository, blob_store, tenant_id
         self.signing_key = signing_key.encode()
@@ -89,6 +90,7 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
         self.accessible_text_pipeline = accessible_text_pipeline
         self.accessible_text_byte_quota = accessible_text_byte_quota
         self.exit_ticket_offerings = frozenset(exit_ticket_offerings)
+        self.practice_offerings = frozenset(practice_offerings)
 
     @property
     def pptx_available(self):
@@ -194,6 +196,7 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
             "timezone": timezone, "member_role": role,
             "capabilities": {"read": member is not None, "manage": role == "INSTRUCTOR",
                 "exit_tickets": member is not None and offering["id"] in self.exit_ticket_offerings,
+                "practice": member is not None and offering["id"] in self.practice_offerings,
                 "page_feedback": role == "INSTRUCTOR" and offering["id"] in self.page_feedback_offerings,
                 "page_explanations": self.page_explanations_available and member is not None
                     and offering["id"] in self.page_feedback_offerings},
@@ -213,6 +216,10 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
                 idea_result = copy.deepcopy(self.read_ideas(s, actor, kind, target))
             require(idea_result is not None)
             return idea_result
+        if kind in PRACTICE_READS:
+            require(bool(self.practice_offerings))
+            async with self.repository.transaction() as s:
+                return copy.deepcopy(self.read_practice(s, actor, kind, target))
         if kind in EXIT_TICKET_READS:
             require(bool(self.exit_ticket_offerings))
             view = self.repository.read_view(actor, kind, target, params) if hasattr(self.repository, "read_view") else self.repository.transaction()
@@ -388,6 +395,8 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
                 details["change_set"] = self.change_projection(row, base_visible=True)
             elif action in {"exit-ticket-update", "exit-review-save"}:
                 details = self.preview_exit_action(s, actor, action, target, payload)
+            elif action in PRACTICE_WRITES:
+                raise LearningError(422, "PREVIEW_UNSUPPORTED", "Preview is not needed for this action.")
             elif action in EXIT_TICKET_WRITES:
                 raise LearningError(422, "PREVIEW_UNSUPPORTED", "Thao tác này không cần bản xem trước.")
             elif action == "idea-share-create":
@@ -419,7 +428,7 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
             transaction = self.repository.transaction()
         async with transaction as s:
             actor = self.recheck(actor, still_valid)
-            request_payload = {k: v for k, v in payload.items() if k != "_idea_source"}
+            request_payload = {k: v for k, v in payload.items() if k not in {"_idea_source", "_practice_pages"}}
             stamp = fingerprint({"target": target, "payload": request_payload})
             if key:
                 require(16 <= len(key) <= 128 and key.isascii(), 422, "INVALID_IDEMPOTENCY_KEY", "Khóa thao tác không hợp lệ.")
@@ -517,6 +526,9 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
             self.explanation_for_write(s, actor, target)
         elif action == "version-change-save":
             self.version_change_access(s, actor, target, write=True)
+        elif action in PRACTICE_WRITES:
+            require(bool(self.practice_offerings))
+            self.authorize_practice_action(s, actor, action, target)
         elif action in EXIT_TICKET_WRITES:
             self.authorize_exit_action(s, actor, action, target)
         elif action in IDEA_WRITES:
@@ -531,6 +543,8 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
             return self.command_accessible_text(s, actor, action, target, p, supplied)
         if action in IDEA_WRITES:
             return self.command_idea(s, actor, action, target, p, supplied)
+        if action in PRACTICE_WRITES:
+            return self.command_practice(s, actor, action, target, p, supplied)
         if action in EXIT_TICKET_WRITES:
             return self.command_exit_ticket(s, actor, action, target, p, supplied)
         if action == "version-change-save":

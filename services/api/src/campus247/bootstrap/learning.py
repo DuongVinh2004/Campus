@@ -76,6 +76,10 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
     version_change_offerings = learning_offering_ids(config, "version_change_offerings")
     exit_ticket_offerings = learning_offering_ids(config, "exit_ticket_offerings")
     idea_card_offerings = learning_offering_ids(config, "idea_card_offerings")
+    practice_offerings = learning_offering_ids(config, "practice_offerings")
+    if practice_offerings and config["storage"] != "sqlite":
+        # Practice questions live in the local learning state; the PostgreSQL schema (migration 0032) needs its hash approved first.
+        raise ValueError("Practice questions currently require the local SQLite learning store")
     accessible_text_offerings = learning_offering_ids(config, "accessible_text_offerings")
     ocr_paused_offerings = learning_offering_ids(config, "accessible_text_ocr_paused_offerings")
     if not set(ocr_paused_offerings).issubset(accessible_text_offerings):
@@ -150,7 +154,7 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
         signing_key=directory["signing_key"], scanner=scanner, directory=adapter.public_directory,
         ai_source_hashes=ai_hashes, optimize_pdf=optimize_pdf, page_feedback_offerings=feedback_offerings,
         page_explanations_available=config["storage"] == "sqlite" or schema_has("0027"),
-        version_change_offerings=version_change_offerings, exit_ticket_offerings=exit_ticket_offerings,
+        version_change_offerings=version_change_offerings, exit_ticket_offerings=exit_ticket_offerings, practice_offerings=practice_offerings,
         idea_card_offerings=idea_card_offerings, accessible_text_offerings=accessible_text_offerings,
         accessible_text_ocr_paused_offerings=ocr_paused_offerings,
         accessible_text_byte_quota=ocr_quota)

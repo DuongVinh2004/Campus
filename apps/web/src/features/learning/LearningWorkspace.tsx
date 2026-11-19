@@ -19,6 +19,7 @@ import type { LearningIdeaSource as IdeaSource } from "../../lib/data/api/learni
 import { ChangeDetails, VersionChangeBanner, VersionChangeEditor, olderPublishedVersions } from "./VersionChanges";
 import { ExitTicketDetail } from "./ExitTicketDetail";
 import { ExitTicketPreviewDetails, SessionExitTickets } from "./ExitTickets";
+import { SessionPracticeSets } from "./PracticeSets";
 import { AccessibleText, OcrReleasePreview } from "./AccessibleText";
 import { CAMPUS_TIMEZONE, classDateTime, classDateTimeToUtc, classTimeZone } from "./learning-time";
 import styles from "./learning.module.css";
@@ -769,6 +770,8 @@ export function LearningWorkspace() {
         {activeSession && actorId && exitEnabled && <SessionExitTickets key={`exit:${actorId}:${sessionId}`} actorId={actorId}
           sessionId={sessionId} materials={materials} instructions={instructions} zoneId={offering?.timezone || CAMPUS_TIMEZONE}
           canManage={manageable} source={exitReaderSource} refresh={exitRevision} onRows={acceptExitRows} onSelect={selectExitTicket} />}
+        {activeSession && actorId && offering?.capabilities.practice && <SessionPracticeSets key={`practice:${actorId}:${sessionId}`} actorId={actorId}
+          sessionId={sessionId} materials={materials} canManage={manageable} />}
         {activeSession && offering?.capabilities.page_feedback && <SessionPageFeedback
           key={`feedback:${actorId}:${activeSession.id}`} actorId={actorId} sessionId={activeSession.id}
           startsAt={activeSession.starts_at} timeZone={timeZone} canOpen={manageable}
