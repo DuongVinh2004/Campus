@@ -39,6 +39,10 @@ CI_PATHS = [
     "tests/api/test_gateway_sidecar.py", "tests/api/test_chat_admission.py", "tests/api/test_abuse_limits.py", "tests/api/test_answer_quality.py",
 ]
 
+# Inside the paths above, these import helper modules that exist only under infra/local/rag-fixture (not in the repository), so a
+# clean checkout cannot even collect them. They stay in the local full run and are listed as not run in --ci.
+CI_IGNORE = ["tests/unit/runtime_review", "tests/unit/conversation/test_m2_info_snapshot.py"]
+
 # (name, test paths, base temp directory relative to infra/local, extra pytest args)
 GROUPS = [
     ("stream-c", ["tests/unified_final", "tests/integration/test_unified_storage_completion.py"],
@@ -67,7 +71,7 @@ def ci_not_run(paths: list[str] | None = None) -> list[str]:
                 missing.append(rel)
         return missing
 
-    return walk(ROOT / "tests")
+    return sorted(walk(ROOT / "tests") + ([] if paths is not None else CI_IGNORE))
 
 
 def run_ci(out: Path) -> int:
@@ -76,7 +80,7 @@ def run_ci(out: Path) -> int:
     evidence.mkdir(exist_ok=True)
     env = dict(os.environ, LEARNING_TEST_ROOT=str(evidence), PYTHONPATH=os.pathsep.join(
         [str(ROOT / "services/worker/src"), str(ROOT / "scripts"), os.environ.get("PYTHONPATH", "")]))
-    command = [*PY, f"--basetemp={out / 'basetemp'}", *CI_PATHS]
+    command = [*PY, f"--basetemp={out / 'basetemp'}", *CI_PATHS, *[f"--ignore={p}" for p in CI_IGNORE]]
     started = time.time()
     code, text = run(command, env, out / "pytest-ci.log")
     final = [line for line in text.splitlines() if re.search(r"\d+ (passed|failed|error)", line)][-1:]
