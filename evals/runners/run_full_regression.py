@@ -41,7 +41,24 @@ CI_PATHS = [
 
 # Inside the paths above, these import helper modules that exist only under infra/local/rag-fixture (not in the repository), so a
 # clean checkout cannot even collect them. They stay in the local full run and are listed as not run in --ci.
-CI_IGNORE = ["tests/unit/runtime_review", "tests/unit/conversation/test_m2_info_snapshot.py"]
+CI_IGNORE = [
+    "tests/unit/runtime_review", "tests/unit/conversation/test_m2_info_snapshot.py",
+    # These read retained real documents or measurement helpers under data/, .tooling/ or infra/local, none of which is tracked.
+    "tests/unit/agent/test_multi_agent_admission.py", "tests/unit/agent/test_public_discipline_rules.py",
+    "tests/unit/assistance/test_baseline_evidence.py", "tests/unit/conversation/test_m2_reference_resolution_73.py",
+    "tests/unit/learning/test_pdf_subprocess.py", "tests/unit/retrieval/test_advanced_policy_regeneration.py",
+    "tests/unit/retrieval/test_advanced_rag.py", "tests/unit/retrieval/test_conjunctive_conditions.py",
+    "tests/unit/retrieval/test_huce_calendar_source_rows.py", "tests/unit/retrieval/test_huce_common_core_slices.py",
+    "tests/unit/retrieval/test_huce_common_support_sources.py", "tests/unit/retrieval/test_huce_conference_sources.py",
+    "tests/unit/retrieval/test_huce_discovery.py", "tests/unit/retrieval/test_huce_english_primary_sources.py",
+    "tests/unit/retrieval/test_huce_fee_units.py", "tests/unit/retrieval/test_huce_ict_rules_sources.py",
+    "tests/unit/retrieval/test_huce_instruction_quantities.py", "tests/unit/retrieval/test_huce_irregular_course_line.py",
+    "tests/unit/retrieval/test_huce_it_related_programmes.py", "tests/unit/retrieval/test_huce_native_table_variants.py",
+    "tests/unit/retrieval/test_huce_raster_curriculum.py", "tests/unit/retrieval/test_huce_service_release.py",
+    "tests/unit/retrieval/test_public_faq_index.py", "tests/unit/retrieval/test_public_rag_gateway_concurrency.py",
+    "tests/unit/retrieval/test_public_rag_wiring.py", "tests/unit/retrieval/test_public_source_excerpts.py",
+    "tests/unit/retrieval/test_tuition_credit_questions.py",
+]
 
 # (name, test paths, base temp directory relative to infra/local, extra pytest args)
 GROUPS = [
