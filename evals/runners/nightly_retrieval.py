@@ -1,13 +1,14 @@
 """Nightly retrieval check: does the index still find the right passages? No answer is generated, so it costs nothing.
 
   python evals/runners/nightly_retrieval.py run     [--limit 120] [--index DIR] [--results evals/results/nightly]
-  python evals/runners/nightly_retrieval.py adopt-baseline --from evals/results/nightly/<date>      # an explicit decision, never automatic
+  python evals/runners/nightly_retrieval.py adopt-baseline --from evals/results/nightly/<date>      # replace the baseline: always an explicit decision
   python evals/runners/nightly_retrieval.py status  [--results ...]
 
 `run` starts the existing retrieval probe (evals/runners/rag_v2_retrieval_probe.py: embedding and rerank servers on this machine, no model
 that writes answers, no paid call), keeps its raw output in a NEW folder named by date (nothing is overwritten), appends one line to
 trend.jsonl and writes LATEST.json with the numbers and any regression against baseline.json. It is skipped, and says so in LATEST.json,
 when the embedding or rerank server is not answering. Regressions are reported, never repaired: changing retrieval is the owner's decision.
+The first successful run with no baseline.json becomes the baseline (recorded with "auto": true); an existing baseline is never replaced by a run.
 """
 from __future__ import annotations
 
@@ -118,6 +119,8 @@ def run(results: Path, *, limit: int = 120, index: str = DEFAULT_INDEX, probe: P
     found = regressions(metrics, baseline)
     latest |= {"ok": True, "folder": folder.name, "metrics": metrics, "regressions": found, "baseline": baseline is not None, "limit": limit}
     write_json(folder / "run.json", latest)
+    if baseline is None:  # nothing to compare with yet: this run is the reference from now on
+        write_json(baseline_path, {"adopted_at": latest["at"], "from": folder.name, "metrics": metrics, "auto": True})
     with (results / "trend.jsonl").open("a", encoding="utf-8") as stream:
         stream.write(json.dumps({"at": latest["at"], "trigger": trigger, "folder": folder.name, **metrics, "regressed": bool(found)}, ensure_ascii=False) + "\n")
     write_json(results / "LATEST.json", latest)
@@ -136,7 +139,13 @@ def adopt_baseline(results: Path, source: Path) -> dict:
         raise SystemExit("that run did not finish; it cannot be a baseline")
     target = results / "baseline.json"
     if target.exists():
-        target.rename(results / f"baseline-before-{int(time.time())}.json")
+        stem = f"baseline-before-{int(time.time())}"
+        kept = results / f"{stem}.json"
+        for number in range(2, 100):  # two decisions in the same second must not collide
+            if not kept.exists():
+                break
+            kept = results / f"{stem}-{number:02d}.json"
+        target.rename(kept)
     record = {"adopted_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "from": source.name, "metrics": run_file["metrics"]}
     write_json(target, record)
     return record
