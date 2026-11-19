@@ -145,3 +145,15 @@ def test_the_real_drop_step_refuses_names_that_are_not_rehearsal_databases(tmp_p
             steps.drop_database("campus247")
     finally:
         backup_tool.connection = original
+
+
+def test_a_relative_work_directory_works_like_an_absolute_one(tmp_path, monkeypatch):
+    """mkdtemp returns an absolute path, so the safety comparison must not fail for a relative --work-dir (it did on Windows)."""
+    backups = tmp_path / "backups"
+    backups.mkdir()
+    folder = backups / "campus247-backup-20261119T000000Z"
+    folder.mkdir()
+    (folder / "MANIFEST.json").write_text("{}", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    record = rehearse(backups=backups, work_dir=Path("work"), steps=Recorder().make(), now=NOW)
+    assert record["ok"] is True and "AssertionError" not in json.dumps(record)
