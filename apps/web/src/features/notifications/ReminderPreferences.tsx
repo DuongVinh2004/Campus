@@ -14,6 +14,31 @@ const LABELS: Record<Kind, { title: string; help: string }> = {
 
 const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });
 
+const MANAGER_ROLES = ["KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"];
+
+/** Everyone gets the exam switch; only people who manage knowledge get the one for source reviews. */
+export function reminderKindsFor(roles: readonly string[] | undefined): Kind[] {
+  return roles?.some((role) => MANAGER_ROLES.includes(role)) ? ["exam", "sources"] : ["exam"];
+}
+
+/** The same switches, choosing which ones to show from the signed-in person's roles. */
+export function ReminderPreferencesForMe() {
+  const [roles, setRoles] = useState<string[] | undefined>(undefined);
+  const [known, setKnown] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    client()
+      .get<{ roles?: string[] }>("/v1/users/me")
+      .then((me) => !cancelled && setRoles(me.roles))
+      .catch(() => undefined) // not identified: the exam switch alone is the safe default
+      .finally(() => !cancelled && setKnown(true));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return known ? <ReminderPreferences kinds={reminderKindsFor(roles)} /> : <p role="status" className="text-sm">Đang tải cài đặt nhắc việc…</p>;
+}
+
 /** On/off switches for the reminders a person receives. `kinds` lists which ones to show (students: exam; knowledge managers: sources). */
 export function ReminderPreferences({ kinds = ["exam"] }: { kinds?: Kind[] }) {
   const [prefs, setPrefs] = useState<Preferences | null>(null);
