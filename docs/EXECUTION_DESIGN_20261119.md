@@ -499,3 +499,21 @@ Mỗi gói nằm trên nhánh riêng từ `origin/main`; nhánh `integration/e-a
 Cần một quyết định nhỏ: bài ôn tập có dùng cùng bước xác nhận như phiếu ra lớp không (đề xuất: có cho giảng viên, không cho sinh viên nộp bài).
 
 Cổng nghiệm thu `web_acceptance.mjs` chỉ thay đổi ở phần đã sửa (số lần gọi khả dụng phòng, trang `/knowledge/quality`) và **chưa chạy lại** vì chưa có runtime.
+
+---
+
+## 9. Cập nhật 20/11/2026 (làm tiếp sau lần báo cáo đầu)
+
+Phần "chưa làm" của mục 8 đã được làm tiếp; trạng thái mới (đã kiểm trên runtime 8015 chạy bản build `frontend-knowledge-eall-20261120-01`, gồm mã của nhánh tích hợp):
+
+| Gói | Kết quả |
+|---|---|
+| **E13 ôn tập** `feat/e13-practice` · a805c89 | Làm đủ chiều dọc: dịch vụ (`application/learning/practice_sets.py`), 8 route (`presentation/learning_practice.py`), hợp đồng OpenAPI (7 đường dẫn), bootstrap (`practice_offerings`, từ chối lưu trữ PostgreSQL cho tới khi migration 0032 được duyệt), giao diện giảng viên và sinh viên (`PracticeSets.tsx`). 16 test HTTP thật (quyền, ẩn đáp án, trích dẫn sai chặn công bố, chấm, lặp lại ngắt quãng, trùng khóa idempotency, thống kê ẩn dưới 5 sinh viên), toàn bộ bộ học liệu 166 đạt, web 313 đạt, `tsc` sạch. **Lưu trữ**: trạng thái SQLite cục bộ như các tính năng theo lớp khác; bản Postgres cần migration 0032 và chủ dự án duyệt hash |
+| **E4 học liệu theo lớp** | `scripts/learning_enroll_local_student.py` (chạy khô mặc định, idempotent) ghi danh `student-local` vào "Lớp SQL 20261104-03" qua chính API (xem trước + xác nhận); sinh viên thấy lớp; luồng `learning` mới trong cổng nghiệm thu đạt |
+| **Cổng nghiệm thu trên runtime thật** | `web_acceptance.mjs` toàn bộ: **479 kiểm tra đạt, 0 lỗi** (gồm trang `/knowledge/quality`, khẳng định phòng học ≤ 2 yêu cầu, ẩn liên kết đồ thị quy chế); riêng các luồng sau khi thêm luồng học liệu: 38 đạt, 0 lỗi |
+| **E12/E2-PWA kiểm bằng trình duyệt thật** | `scripts/qa/pwa_check.mjs`: service worker đăng ký; sau một phiên dùng không cache nào chứa địa chỉ API; tắt mạng thì hiện trang ngoại tuyến; vào `/login` không còn trang nào trong cache. **Phát hiện**: bản vận hành không có nút đăng xuất (chỉ bản store cũ gọi `logout`), nên việc xóa cache cũng được gắn vào lúc vào trang đăng nhập; thực tế worker chỉ lưu tệp tĩnh và trang ngoại tuyến |
+| **B4.1 truy hồi tiếng Anh** | 60 ca dev dịch sang tiếng Anh, gold giống hệt: top 8 **73%** so với **97%** tiếng Việt, top 12 85% so với 97% → theo quy tắc, **dừng ở giao diện tiếng Anh**, câu trả lời vẫn tiếng Việt (`evals/results/b4-1-20261120/`) |
+| **E17 bộ giữ lại 2** | Chạy đúng một lần: **16/18 (89%)**. Một ca (tt-04) là lỗi gold của tôi (cấm "40%" nhưng tài liệu có cả hai tỉ lệ); một ca (tt-06) là thiếu sót thật: quy tắc chung trong văn xuôi áp dụng cho ngành không được nêu tên bị từ chối thay vì trả lời bằng quy tắc chung. Cần cơ chế chung (cùng lớp lỗi với R3 nhưng ở văn xuôi), chưa sửa |
+| **E9 chạy thật** | xem mục kết quả nightly bên dưới |
+
+Còn lại thật sự: E5 (phát hành thử, cần worker và ≥ 2 GB RAM trống), E6 (ClamAV thật, cần thêm ~1 GB cho `clamd` và khởi động lại API), E16 (chạy tải 100 người) — xem trạng thái ở cuối mục này; ngoài ra các việc cần đầu vào của bạn ở mục 6 và sửa lỗi tt-06 bằng cơ chế chung.
