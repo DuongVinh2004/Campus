@@ -1,6 +1,7 @@
 import React from "react";
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { CitationSource, type CitationSourceBinding } from "./CitationSource";
+import { useSourceReviewStates } from "../../lib/use-source-review-states";
 import { FileTextIcon, XIcon, ShieldCheckIcon, AlertTriangleIcon, ArrowRightIcon } from "../../components/Icons";
 
 export interface CitationItem {
@@ -17,6 +18,8 @@ export interface CitationItem {
   sourceBinding?: CitationSourceBinding;
   confidence?: number;
   isAuthorized?: boolean;
+  /** Knowledge source id, used only to look up whether the source is overdue for review. */
+  sourceId?: string;
 }
 
 export interface CitationDrawerProps {
@@ -32,6 +35,7 @@ export function CitationDrawer({
   onClose,
   onReportIssue,
 }: CitationDrawerProps) {
+  const reviewStates = useSourceReviewStates(citations.flatMap((cite) => (cite.sourceId ? [cite.sourceId] : [])), isOpen);
   const getValidityBadge = (status?: string) => {
     switch (status) {
       case "stale":
@@ -172,6 +176,11 @@ export function CitationDrawer({
                     <span className={badge.className} style={{ maxWidth: "100%", whiteSpace: "normal", lineHeight: 1.5 }}>
                       {badge.text}
                     </span>
+                    {cite.sourceId && reviewStates[cite.sourceId] === "OVERDUE" && (
+                      <span className="badge badge-warning" style={{ maxWidth: "100%", whiteSpace: "normal", lineHeight: 1.5 }}>
+                        Nguồn quá hạn rà soát — nên đối chiếu văn bản gốc
+                      </span>
+                    )}
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "12px", color: "var(--color-text-muted, #475569)", marginBottom: "10px" }}>

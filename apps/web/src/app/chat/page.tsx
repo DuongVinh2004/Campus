@@ -39,7 +39,7 @@ function rememberConversation(id: string | null, mode: "push" | "replace" = "rep
 
 function citationItems(citations: StreamCitation[], conversationId?: string | null, messageId?: string | null): CitationItem[] {
   return citations.map(({ citation }) => ({
-    id: citation.citation_id, title: citation.source_title, documentRef: citation.version_label,
+    id: citation.citation_id, sourceId: citation.source_id, title: citation.source_title, documentRef: citation.version_label,
     quote: citation.quote || "", isSimulation: citation.source_status === "SYNTHETIC",
     validityStatus: ["CURRENT", "SYNTHETIC"].includes(citation.source_status) ? "active" : "stale",
     locator: citation.locator.section_path || citation.locator.paragraph_id || `Trang ${citation.locator.page_start}`,

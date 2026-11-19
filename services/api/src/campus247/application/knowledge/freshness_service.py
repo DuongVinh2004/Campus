@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import sqlite3
 from contextlib import closing
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -36,6 +36,7 @@ CURRENT_SOURCES_SQL_NO_DISPOSITION = CURRENT_SOURCES_SQL.replace(
                    ORDER BY x.created_at DESC, x.id DESC LIMIT 1) d ON true
 """, "")
 
+STATE_CACHE_TTL = timedelta(minutes=5)
 SEVERITY = {Freshness.EXPIRED: 0, Freshness.OVERDUE: 1, Freshness.DUE_SOON: 2, Freshness.OK: 3}
 
 
@@ -106,12 +107,25 @@ def summary(items: list[dict[str, Any]]) -> dict[str, int]:
 class FreshnessService:
     def __init__(self, pool, reviews: SourceReviewStore, *, tenant: str, campus: str = "HUCE") -> None:
         self._pool, self._reviews, self._tenant, self._campus = pool, reviews, tenant, campus
+        self._state_cache: tuple[datetime, dict[str, str]] | None = None
 
     async def current_rows(self) -> list[dict[str, Any]]:
         async with self._pool.acquire() as conn:
             has_dispositions = await conn.fetchval("SELECT to_regclass('knowledge_source_disposition') IS NOT NULL")
             sql = CURRENT_SOURCES_SQL if has_dispositions else CURRENT_SOURCES_SQL_NO_DISPOSITION
             return [dict(row) for row in await conn.fetch(sql, self._tenant, self._campus)]
+
+    async def review_states(self, source_ids: list[str], *, now: datetime | None = None) -> dict[str, str]:
+        """State (OK, DUE_SOON, OVERDUE, EXPIRED) of each requested source of the current release; others are left out.
+
+        Readers see only this label next to a citation. The judgement is cached for a few minutes so a busy chat does not
+        query the knowledge database for every citation; a recorded review clears the cache."""
+        now = now or datetime.now(UTC)
+        if self._state_cache is None or now - self._state_cache[0] >= STATE_CACHE_TTL or now < self._state_cache[0]:
+            items = assess_rows(await self.current_rows(), self._reviews.latest(), now=now)
+            self._state_cache = (now, {item["source_id"]: item["state"] for item in items})
+        states = self._state_cache[1]
+        return {source_id: states[source_id] for source_id in source_ids if source_id in states}
 
     async def report(self, *, now: datetime | None = None) -> dict[str, Any]:
         now = now or datetime.now(UTC)
@@ -122,4 +136,6 @@ class FreshnessService:
         """Record that a person looked at a source of the current release. Unknown ids are refused, not stored."""
         if source_id not in {row["source_id"] for row in await self.current_rows()}:
             raise LookupError("source is not in the current release")
-        return self._reviews.record(source_id, reviewer_id, note)
+        recorded = self._reviews.record(source_id, reviewer_id, note)
+        self._state_cache = None
+        return recorded

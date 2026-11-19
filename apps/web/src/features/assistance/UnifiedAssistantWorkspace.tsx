@@ -96,7 +96,7 @@ export function UnifiedAssistantWorkspace({ compact = false }: { compact?: boole
   </div>;
   function citations(id?: string) {
     const all = id ? Object.values(active?.citations || {}).find(items => items.some(item => item.citation.citation_id === id)) || [] : Object.values(active?.citations || {}).flat();
-    const items: CitationItem[] = all.map(({ citation }) => ({ id: citation.citation_id, title: citation.source_title, documentRef: citation.version_label, quote: citation.quote || "",
+    const items: CitationItem[] = all.map(({ citation }) => ({ id: citation.citation_id, sourceId: citation.source_id, title: citation.source_title, documentRef: citation.version_label, quote: citation.quote || "",
       isSimulation: citation.source_status === "SYNTHETIC", validityStatus: ["CURRENT", "SYNTHETIC"].includes(citation.source_status) ? "active" : "stale",
       locator: citation.locator.section_path || citation.locator.paragraph_id || `Trang ${citation.locator.page_start}`,
       canonicalUrl: citation.canonical_uri.startsWith("https://") ? citation.canonical_uri : undefined,

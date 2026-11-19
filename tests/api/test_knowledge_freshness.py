@@ -192,3 +192,33 @@ class TestApi:
         assert client.post("/v1/knowledge/freshness/not-a-uuid/reviewed", headers=auth("kadmin"), json={"note": "Đã đối chiếu với bản gốc"}).status_code == 422
         unknown = client.post(f"/v1/knowledge/freshness/{generate_uuid7()}/reviewed", headers=auth("kadmin"), json={"note": "Đã đối chiếu với bản gốc"})
         assert unknown.status_code == 404
+
+
+class TestReviewStatusForReaders:
+    """Any signed-in person can learn whether a cited source is overdue for review; nothing else about the report."""
+
+    def test_a_student_gets_only_the_state_per_source_and_unknown_ids_are_left_out(self, client):
+        unknown = generate_uuid7()
+        reply = client.get("/v1/knowledge/source-review-status", params={"source_ids": f"{A},{B},{C},{unknown}"}, headers=auth("student"))
+        assert reply.status_code == 200 and reply.headers["cache-control"] == "no-store"
+        assert reply.json() == {"states": {A: "OVERDUE", B: "DUE_SOON", C: "OK"}}
+
+    def test_anonymous_is_refused_and_bad_ids_are_422(self, client):
+        assert client.get("/v1/knowledge/source-review-status", params={"source_ids": A}).status_code == 401
+        for bad in ("", "not-a-uuid", ",".join(generate_uuid7() for _ in range(21))):
+            assert client.get("/v1/knowledge/source-review-status", params={"source_ids": bad}, headers=auth("student")).status_code == 422
+
+    def test_a_review_by_a_manager_shows_at_once(self, client):
+        assert client.get("/v1/knowledge/source-review-status", params={"source_ids": A}, headers=auth("student")).json()["states"][A] == "OVERDUE"
+        client.post(f"/v1/knowledge/freshness/{A}/reviewed", headers=auth("kadmin"), json={"note": "Đã đối chiếu với bản gốc"})
+        assert client.get("/v1/knowledge/source-review-status", params={"source_ids": A}, headers=auth("student")).json()["states"][A] == "OK"
+
+    @pytest.mark.asyncio
+    async def test_the_database_is_read_once_inside_the_cache_window(self, tmp_path):
+        conn = FakeConn(ROWS)
+        service = FreshnessService(FakePool(conn), SourceReviewStore(tmp_path / "r.sqlite3"), tenant="t")
+        await service.review_states([A], now=NOW)
+        await service.review_states([B, C], now=NOW + timedelta(minutes=4))
+        assert len(conn.queries) == 1
+        await service.review_states([A], now=NOW + timedelta(minutes=6))
+        assert len(conn.queries) == 2
