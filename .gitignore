@@ -85,3 +85,6 @@ Thumbs.db
 
 # UI screenshots cache (safe to delete; regenerate with scripts/ui_shots.mjs)
 infra/local/ui-shots/
+
+# Per-run pytest base temp directories (created in the repo because tests require basetemp inside it)
+/.pytest-tmp*/
