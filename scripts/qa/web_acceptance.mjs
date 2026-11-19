@@ -268,6 +268,23 @@ async function scheduleFlow() {
   await context.close();
 }
 
+// Needs the local student to be enrolled in a synthetic class first: python scripts/learning_enroll_local_student.py --apply
+async function learningFlow() {
+  const { context, page } = await newSession("student");
+  const log = watch(page, "student");
+  await visit(page, "/learning");
+  await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
+  const text = await page.locator("main").innerText();
+  check(/Lớp SQL/.test(text), "learning: the enrolled synthetic class is listed for the student");
+  check(!/không có quyền|Dịch vụ học liệu chưa sẵn sàng/.test(text), "learning: no access or availability error is shown");
+  await page.waitForTimeout(1500); // the first class is selected on its own and its sessions load
+  const after = await page.locator("main").innerText();
+  check(/Buổi|buổi/.test(after), "learning: opening the class shows its sessions");
+  check(log.badResponses.length === 0, `learning: failed requests ${log.badResponses.slice(0, 3).join(" | ")}`);
+  check(log.pageErrors.length === 0, `learning: page errors ${log.pageErrors.join(" | ")}`);
+  await context.close();
+}
+
 async function ticketFlow() {
   const student = await newSession("student");
   const staff = await newSession("staff");
@@ -377,6 +394,7 @@ if (ONLY === "all" || ONLY === "flows") {
   await step("rooms", roomsFlow);
   await step("schedule", scheduleFlow);
   await step("tickets", ticketFlow);
+  await step("learning", learningFlow);
   await step("owner", ownerFlow);
 }
 await browser.close();
