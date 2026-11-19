@@ -30,6 +30,10 @@ SERVICE_KINDS = {
 TICKET_OPEN = ("SUBMITTED", "IN_REVIEW", "NEED_INFO")
 TICKET_STATUSES = TICKET_OPEN + ("RESOLVED", "REJECTED", "CANCELLED")
 STAFF_TARGETS = {"IN_REVIEW", "NEED_INFO", "RESOLVED", "REJECTED"}
+STATUS_LABELS = {"SUBMITTED": "Đã gửi, chờ tiếp nhận", "IN_REVIEW": "Đang xử lý", "NEED_INFO": "Cần bổ sung thông tin",
+                 "RESOLVED": "Đã giải quyết", "REJECTED": "Từ chối", "CANCELLED": "Đã hủy"}
+ROLE_LABELS = {"STUDENT": "Sinh viên", "SUPPORT_OFFICER": "Cán bộ Một cửa", "SYSTEM_ADMIN": "Quản trị hệ thống",
+               "KNOWLEDGE_ADMIN": "Quản trị tri thức"}
 SLA_DAYS = 7
 
 
@@ -275,6 +279,26 @@ class CampusOpsService:
         return {"items": [self._event_view(r) for r in rows], "page": {"next_cursor": None, "has_more": False, "limit": 2000},
                 "sources": sorted({r["source"] for r in rows})}
 
+    def schedule_ics(self, identity: IdentityContext, frm: str, to: str) -> str:
+        """The caller's own timetable for a range as an iCalendar file. Same access and range rules as list_schedule."""
+        from campus247.application.campus_ops.ics import IcsEvent, build_ics
+
+        def moment(text: str) -> datetime:
+            value = datetime.fromisoformat(text.replace("Z", "+00:00"))
+            return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+
+        events = []
+        for item in self.list_schedule(identity, frm, to)["items"]:
+            exam = item["kind"] == "EXAM"
+            details = [f"Giảng viên: {item['instructor_display_name']}"] if item["instructor_display_name"] else []
+            if item["note"]:
+                details.append(item["note"])
+            details.append(f"Nguồn: {item['source_system']} (không phải lịch chính thức của trường nếu là dữ liệu tổng hợp)")
+            events.append(IcsEvent(id=item["id"], title=("[Thi] " if exam else "") + f"{item['course_name']} ({item['course_code']})",
+                                   starts_at=moment(item["starts_at"]), ends_at=moment(item["ends_at"]), location=item["location_label"] or "",
+                                   description="\n".join(details)))
+        return build_ics(events, now=datetime.now(timezone.utc))[0]
+
     @staticmethod
     def _event_view(r: dict[str, Any]) -> dict[str, Any]:
         return {"id": r["id"], "kind": r["kind"], "course_code": r["course_code"], "course_name": r["course_name"],
@@ -333,6 +357,29 @@ class CampusOpsService:
         return {"id": event_id, "deleted": True}
 
     # ---------------------------------------------------------- notifications
+    REMINDER_KINDS = ("exam", "sources")
+
+    def reminder_preferences(self, identity: IdentityContext) -> dict[str, bool]:
+        """Which kinds of reminders the caller receives. Everything is on until the person switches it off."""
+        from campus247.application.campus_ops.reminders import PREFS_SCHEMA
+        with self.store.tx() as c:
+            c.execute(PREFS_SCHEMA)
+            stored = {row[0]: bool(row[1]) for row in c.execute("SELECT kind, enabled FROM ops_reminder_prefs WHERE subject_id = ?", (identity.subject_id,))}
+        return {kind: stored.get(kind, True) for kind in self.REMINDER_KINDS}
+
+    def set_reminder_preferences(self, identity: IdentityContext, body: dict[str, Any]) -> dict[str, bool]:
+        from campus247.application.campus_ops.reminders import PREFS_SCHEMA
+        if not body or set(body) - set(self.REMINDER_KINDS) or any(type(value) is not bool for value in body.values()):
+            raise OpsError(422, "INVALID_PREFERENCE", "Chỉ được bật hoặc tắt các loại nhắc: " + ", ".join(self.REMINDER_KINDS) + ".")
+        with self.store.tx() as c:
+            c.execute(PREFS_SCHEMA)
+            for kind, enabled in body.items():
+                c.execute("""INSERT INTO ops_reminder_prefs(subject_id, kind, enabled, updated_at) VALUES (?,?,?,?)
+                             ON CONFLICT(subject_id, kind) DO UPDATE SET enabled = excluded.enabled, updated_at = excluded.updated_at""",
+                          (identity.subject_id, kind, int(enabled), now_iso()))
+            self.store.audit(c, identity.subject_id, "reminders.preferences", identity.subject_id, {kind: enabled for kind, enabled in body.items()})
+        return self.reminder_preferences(identity)
+
     def list_notifications(self, identity: IdentityContext, unread_only: bool, limit: int) -> dict[str, Any]:
         where = "recipient_subject_id=?" + (" AND read_at IS NULL" if unread_only else "")
         rows = self.store.query(f"SELECT * FROM ops_notifications WHERE {where} ORDER BY created_at DESC LIMIT ?",
@@ -362,9 +409,22 @@ class CampusOpsService:
                 "created_at": t["created_at"], "updated_at": t["updated_at"], "due_at": t["due_at"],
                 "overdue": bool(t["due_at"] and t["status"] in TICKET_OPEN and t["due_at"] < now_iso())}
 
-    def _events(self, ticket_id: str, *, internal: bool) -> list[dict[str, Any]]:
+    @staticmethod
+    def _readable_body(kind: str, body: str) -> str:
+        """Status-change events were stored with the raw codes ("SUBMITTED → NEED_INFO"); show the Vietnamese labels, old rows included."""
+        if kind != "STATUS_CHANGE":
+            return body
+        for code, label in STATUS_LABELS.items():
+            body = body.replace(code, label)
+        return body
+
+    def _events(self, ticket_id: str, *, internal: bool, viewer_subject_id: str | None = None) -> list[dict[str, Any]]:
         sql = "SELECT * FROM ops_ticket_events WHERE ticket_id=?" + ("" if internal else " AND visibility='PUBLIC'") + " ORDER BY created_at, rowid"
-        return [{"id": e["id"], "kind": e["kind"], "actor_role": e["actor_role"], "actor_display": e["actor_display"], "body": e["body"],
+        return [{"id": e["id"], "kind": e["kind"], "actor_role": e["actor_role"],
+                 "actor_role_label": ROLE_LABELS.get(e["actor_role"], "Hệ thống"),
+                 "actor_kind": "student" if e["actor_role"] == "STUDENT" else ("system" if e["actor_role"] == "UNKNOWN" else "staff"),
+                 "is_mine": viewer_subject_id is not None and e["actor_subject_id"] == viewer_subject_id,
+                 "actor_display": e["actor_display"], "body": self._readable_body(e["kind"], e["body"]),
                  "visibility": e["visibility"], "created_at": e["created_at"]} for e in self.store.query(sql, (ticket_id,))]
 
     @staticmethod
@@ -417,12 +477,15 @@ class CampusOpsService:
         staff = is_staff(identity)
         if row is None or (row["owner_subject_id"] != identity.subject_id and not staff):
             raise OpsError(404, "TICKET_NOT_FOUND", "Không tìm thấy hồ sơ.")
-        return {**self._ticket_view(row), "events": self._events(ticket_id, internal=staff),
+        return {**self._ticket_view(row), "events": self._events(ticket_id, internal=staff, viewer_subject_id=identity.subject_id),
                 "allowed_actions": self._allowed(row, identity)}
 
     def _allowed(self, t: dict[str, Any], identity: IdentityContext) -> list[str]:
         if is_staff(identity):
-            return ["claim", "reply", "status", "note"] if t["status"] in TICKET_OPEN else ["note"]
+            if t["status"] not in TICKET_OPEN:
+                return ["note"]
+            mine = t["assignee_subject_id"] == identity.subject_id
+            return ["reply", "status", "note"] if mine else ["claim", "reply", "status", "note"]
         if t["owner_subject_id"] != identity.subject_id:
             return []
         actions = []
@@ -516,12 +579,12 @@ class CampusOpsService:
             if t["assignee_subject_id"] not in (None, identity.subject_id):
                 raise OpsError(409, "ALREADY_CLAIMED", f"Hồ sơ đang do {t['assignee_display']} xử lý.")
             self._add_event(c, ticket_id, identity, "STAFF_REPLY", text)
-            status = set_status or ("NEED_INFO" if t["status"] == "SUBMITTED" else t["status"])
+            status = set_status or ("IN_REVIEW" if t["status"] == "SUBMITTED" else t["status"])
             assignee = (identity.subject_id, identity.display_name) if t["assignee_subject_id"] is None else (t["assignee_subject_id"], t["assignee_display"])
             c.execute("UPDATE ops_tickets SET status=?, assignee_subject_id=?, assignee_display=?, updated_at=? WHERE id=?",
                       (status, assignee[0], assignee[1], now_iso(), ticket_id))
             if status != t["status"]:
-                self._add_event(c, ticket_id, identity, "STATUS_CHANGE", f"Trạng thái: {t['status']} → {status}")
+                self._add_event(c, ticket_id, identity, "STATUS_CHANGE", f"Trạng thái: {STATUS_LABELS[t['status']]} → {STATUS_LABELS[status]}")
             self.store.notify(c, t["owner_subject_id"], "TICKET", f"Phản hồi mới cho hồ sơ {t['code']}", text[:140], f"/tickets?id={ticket_id}")
             self.store.audit(c, identity.subject_id, "ticket.staff_reply", ticket_id, {"status": status})
         return self.ticket_detail(identity, ticket_id)
@@ -543,6 +606,28 @@ class CampusOpsService:
             self.store.audit(c, identity.subject_id, "ticket.note", ticket_id, {})
         return self.ticket_detail(identity, ticket_id)
 
+    def _readable_audit(self, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """The audit table keeps ids; the operations page shows a person's name and the business code (HS-…, BK-…) where one is known."""
+        names: dict[str, str] = {}
+        for table, id_col, name_col in (("ops_tickets", "owner_subject_id", "owner_display"), ("ops_room_bookings", "owner_subject_id", "owner_display"),
+                                        ("ops_ticket_events", "actor_subject_id", "actor_display")):
+            for r in self.store.query(f"SELECT DISTINCT {id_col} AS i, {name_col} AS n FROM {table}"):
+                names.setdefault(r["i"], r["n"])
+        codes = {r["id"]: r["code"] for r in self.store.query("SELECT id, code FROM ops_tickets")}
+        codes.update({r["id"]: r["code"] for r in self.store.query("SELECT id, code FROM ops_room_bookings")})
+        kinds = (("schedule.", "Sự kiện lịch cá nhân"), ("reminders.", "Cài đặt nhắc nhở"), ("ticket.", "Hồ sơ"), ("room.", "Đặt phòng"))
+
+        def resource(row: dict[str, Any]) -> str:
+            value = row["resource"]
+            if value in codes:
+                return codes[value]
+            if len(str(value)) >= 32 and str(value).count("-") == 4:  # a bare id: say what kind of thing it was instead
+                return next((label for prefix, label in kinds if str(row["action"]).startswith(prefix)), "—")
+            return value
+
+        return [{**r, "actor": "Hệ thống" if str(r["actor"]).startswith("system") else names.get(r["actor"]) or f"Tài khoản …{str(r['actor'])[-4:]}",
+                 "resource": resource(r)} for r in rows]
+
     # ------------------------------------------------------------------ admin
     def admin_overview(self, identity: IdentityContext) -> dict[str, Any]:
         require_admin(identity)
@@ -553,6 +638,7 @@ class CampusOpsService:
         upcoming = self.store.one("SELECT COUNT(*) n FROM ops_room_bookings WHERE status='CONFIRMED' AND starts_at>?", (now,))["n"]
         rooms = {r["status"]: r["n"] for r in self.store.query("SELECT status, COUNT(*) n FROM ops_rooms GROUP BY status")}
         audit = self.store.query("SELECT at, actor, action, resource FROM ops_audit ORDER BY id DESC LIMIT 20")
+        audit = self._readable_audit(audit)
         return {"tickets": {"by_status": statuses, "overdue": overdue, "total": sum(statuses.values())},
                 "bookings": {"by_status": bookings, "upcoming": upcoming},
                 "rooms": {"by_status": rooms, "total": sum(rooms.values())},

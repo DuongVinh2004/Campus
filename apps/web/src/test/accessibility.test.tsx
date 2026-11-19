@@ -15,7 +15,7 @@ describe("Accessibility & Keyboard Regression (TASK-WEB-A11Y-001)", () => {
     render(<AppShell><div>Nội dung</div></AppShell>);
 
     expect(screen.getByRole("banner")).toBeDefined();
-    expect(screen.getByRole("navigation")).toBeDefined();
+    expect(screen.getByRole("navigation", { name: "Điều hướng chính" })).toBeDefined();
     expect(screen.getByRole("main")).toBeDefined();
     expect(screen.getByRole("contentinfo")).toBeDefined();
 

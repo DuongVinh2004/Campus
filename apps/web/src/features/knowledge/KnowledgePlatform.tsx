@@ -1,12 +1,16 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { usePolling } from "@/lib/use-polling";
+import Link from "next/link";
+import { AlertTriangle, CheckCircle2, MessageSquare } from "lucide-react";
 import { AppShell } from "../../components/AppShell";
 import { ApiClient } from "../../lib/api/client";
 import { KnowledgeIntake } from "./KnowledgeIntake";
 import { RenditionCorrection } from "./RenditionCorrection";
 import { EditionWorkspace } from "./EditionWorkspace";
 import { KnowledgeSchedules } from "./KnowledgeSchedules";
+import { PreservedActivity } from "../learning/learning-session";
 
 const base = "/v1/knowledge/platform";
 const client = () => new ApiClient();
@@ -27,6 +31,11 @@ type Preview = { preview_id: string; confirmation_token: string; expires_at: str
   payload: { operation: string; target_id: string; generation: number; members: unknown[] } };
 type Rendition = { pages: Array<{ page: number | null; text: string }>; issues: Array<{ page: number | null; code: string }> };
 type Hit = { chunk_id: string; title: string; content_text: string; page_start: number | null; section_path: string; release_id: string };
+type KnowledgeActor = { user_id: string; roles: string[] };
+const sameKnowledgeActor = (a: KnowledgeActor, b: KnowledgeActor) => a.user_id === b.user_id
+  && JSON.stringify([...new Set(a.roles)].sort()) === JSON.stringify([...new Set(b.roles)].sort());
+type VersionDraft = { note: string; applicableFrom: string; applicableUntil: string; basis: string };
+const emptyVersionDraft: VersionDraft = { note: "", applicableFrom: "", applicableUntil: "", basis: "" };
 
 async function checkedFetch(path: string, init: RequestInit = {}) {
   const response = await fetch(path, { ...init, credentials: "include", cache: "no-store" });
@@ -41,7 +50,9 @@ async function checkedFetch(path: string, init: RequestInit = {}) {
 
 export function KnowledgePlatform() {
   const [state, setState] = useState<State | null>(null);
-  const [actor, setActor] = useState<{ user_id: string; roles: string[] } | null>(null);
+  const [actor, setActor] = useState<KnowledgeActor | null>(null);
+  const actorScope = useRef<KnowledgeActor | null>(null);
+  const loadAttempt = useRef(0);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -49,14 +60,26 @@ export function KnowledgePlatform() {
   const [rendition, setRendition] = useState<Rendition | null>(null);
   const [preview, setPreview] = useState<Preview | null>(null);
   const [releaseId, setReleaseId] = useState("");
-  const [note, setNote] = useState("");
+  const [versionDrafts, setVersionDrafts] = useState<Record<string, VersionDraft>>({});
+  const [openedCorrections, setOpenedCorrections] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
   const [libraryFilter, setLibraryFilter] = useState("");
   const [showHistory, setShowHistory] = useState(false);
-  const [applicableFrom, setApplicableFrom] = useState("");
-  const [applicableUntil, setApplicableUntil] = useState("");
-  const [basis, setBasis] = useState("");
+  const { note, applicableFrom, applicableUntil, basis } = versionDrafts[selected] ?? emptyVersionDraft;
+  const updateDraft = (patch: Partial<VersionDraft>) => setVersionDrafts(old => ({ ...old,
+    [selected]: { ...(old[selected] ?? emptyVersionDraft), ...patch } }));
+  const setNote = (note: string) => updateDraft({ note });
+  const setApplicableFrom = (applicableFrom: string) => updateDraft({ applicableFrom });
+  const setApplicableUntil = (applicableUntil: string) => updateDraft({ applicableUntil });
+  const setBasis = (basis: string) => updateDraft({ basis });
+  const selectionRequest = useRef<AbortController | null>(null);
+  const selectedRef = useRef(selected);
+  useEffect(() => {
+    selectedRef.current = selected;
+    if (selected) setOpenedCorrections(old => old.includes(selected) ? old : [...old, selected]);
+  }, [selected]);
+  useEffect(() => () => selectionRequest.current?.abort(), []);
   const uploadKey = useRef<string | null>(null);
   const version = state?.versions.find(v => v.version_id === selected);
   const source = state?.sources.find(s => s.id === version?.source_id);
@@ -64,17 +87,19 @@ export function KnowledgePlatform() {
   const mayReview = actor && version && actor.user_id !== version.created_by;
 
   const load = useCallback(async () => {
-    const [nextState, currentActor] = await Promise.all([
-      client().get<State>(base + "/state"), client().get<{ user_id: string; roles: string[] }>("/v1/users/me")]);
+    const attempt = ++loadAttempt.current;
+    const currentActor = await client().get<KnowledgeActor>("/v1/users/me");
+    if (actorScope.current && !sameKnowledgeActor(actorScope.current, currentActor)) return;
+    const nextState = await client().get<State>(base + "/state");
+    const confirmedActor = await client().get<KnowledgeActor>("/v1/users/me");
+    if (attempt !== loadAttempt.current || !sameKnowledgeActor(currentActor, confirmedActor)
+      || actorScope.current && !sameKnowledgeActor(actorScope.current, confirmedActor)) return;
+    // AppShell owns the session notice. Background polling must retain the
+    // original tab's actor and forms while that shell conceals another account.
+    actorScope.current ??= currentActor;
     setState(nextState); setActor(currentActor);
   }, []);
-  useEffect(() => {
-    let active = true;
-    const refresh = async () => { try { if (active) await load(); } catch (e) { if (active) setError((e as Error).message); } };
-    void refresh();
-    const timer = setInterval(() => void refresh(), 5000);
-    return () => { active = false; clearInterval(timer); };
-  }, [load]);
+  usePolling(async () => { try { await load(); } catch (e) { setError((e as Error).message); } }, 5000, [load]);
 
   async function run(action: () => Promise<void>) {
     setBusy(true); setError(""); setNotice("");
@@ -82,20 +107,31 @@ export function KnowledgePlatform() {
     finally { setBusy(false); }
   }
   async function choose(identifier: string) {
-    setSelected(identifier); setPreview(null); setRendition(null); setNote(""); setApplicableFrom(""); setApplicableUntil(""); setBasis("");
-    await run(async () => {
-      const data = await client().get<Rendition>(`${base}/versions/${identifier}/rendition`);
-      setRendition(data);
-    });
+    selectionRequest.current?.abort();
+    const controller = new AbortController(); selectionRequest.current = controller;
+    const current = () => !controller.signal.aborted && selectionRequest.current === controller;
+    selectedRef.current = identifier;
+    setSelected(identifier); setPreview(null); setRendition(null); setBusy(true); setError(""); setNotice("");
+    try {
+      const response = await checkedFetch(`${base}/versions/${identifier}/rendition`, { signal: controller.signal });
+      const data: Rendition = await response.json();
+      if (!current()) return;
+      await load();
+      if (current()) setRendition(data);
+    } catch (error) {
+      if (current()) setError((error as Error).message);
+    } finally {
+      if (current()) setBusy(false);
+    }
   }
   async function requestPreview(operation: "activate" | "revoke" | "rollback", target_id: string) {
     if (!state) return;
     setPreview(await client().post<Preview>(base + "/previews", { operation, target_id, expected_generation: state.desired.generation }));
   }
 
-  return <AppShell userRole="admin" activeNav="knowledge"><main className="campus-knowledge space-y-5">
+  return <AppShell userRole="admin" activeNav="knowledge" checkSessionOnResume><main className="campus-knowledge space-y-5">
     <header><h1 className="text-2xl font-semibold">Kho tri thức RAG</h1>
-      <p className="mt-2 text-sm">Tài liệu gốc → xử lý nền BGE → duyệt độc lập → xuất bản → xác nhận runtime.</p></header>
+      <p className="mt-2 text-sm">Tài liệu gốc → xử lý nền → duyệt độc lập → xuất bản → hệ thống xác nhận đang dùng.</p></header>
     {error && <div role="alert" className="rounded-xl border border-red-300 p-4 text-red-800">{error}
       <button className="ml-3 underline" disabled={busy} onClick={() => void run(async () => {})}>Tải lại</button>
       {/phiên|đăng nhập/i.test(error) && <a className="ml-3 underline" href="/login">Đăng nhập tài khoản quản trị</a>}</div>}
@@ -111,12 +147,51 @@ export function KnowledgePlatform() {
     </details>}
     {state && <>
       {state.environment === "rehearsal" && <p className="campus-panel text-sm" role="status">Bản chạy thử tiếp nhận tài liệu · Hồ sơ mới được lưu trong kho thử riêng.</p>}
-      <section className="campus-panel space-y-2"><h2 className="font-semibold">Xuất bản và phục vụ</h2>
-        <p className="break-all text-sm">Desired: {state.desired.release_id || "Chưa xuất bản"} · generation {state.desired.generation}</p>
-        <p role="status" className="font-medium">{state.is_serving ? "Runtime đã xác nhận phục vụ release hiện tại" : "Chưa có xác nhận phục vụ còn hiệu lực"}</p>
-        {state.serving.map(a => <p key={a.instance_id} className="text-xs">{a.instance_id} · ack đến {new Date(a.valid_until).toLocaleTimeString("vi-VN")}</p>)}
-        {state.runtime.filter(a => a.error_code).map(a => <p key={a.instance_id} className="text-red-700">{a.instance_id}: {a.error_code}</p>)}
-        <a href="/chat" className="underline">Mở chatbot kiểm chứng nguồn</a>
+      <section className="campus-panel space-y-4"><h2 className="font-semibold">Xuất bản và phục vụ</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] p-3 min-w-0">
+            <span className="block text-xs font-medium text-[var(--text-secondary)]">Bản phát hành mong muốn</span>
+            <span className="mt-1 block font-mono text-xs break-all">{state.desired.release_id || "Chưa xuất bản"}</span>
+          </div>
+          <div className="rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] p-3 min-w-0">
+            <span className="block text-xs font-medium text-[var(--text-secondary)]">Thế hệ chỉ mục</span>
+            <span className="mt-1 block font-mono text-xs break-all">{state.desired.generation}</span>
+          </div>
+        </div>
+        <div
+          role="status"
+          className={`flex items-start sm:items-center gap-2.5 rounded-xl border p-3 text-sm font-medium ${
+            state.is_serving
+              ? "border-emerald-200 bg-emerald-50/80 text-emerald-950 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200"
+              : "border-amber-200 bg-amber-50/80 text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
+          }`}
+        >
+          {state.is_serving ? (
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          ) : (
+            <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+          )}
+          <span>{state.is_serving ? "Runtime đã xác nhận phục vụ release hiện tại" : "Chưa có xác nhận phục vụ còn hiệu lực"}</span>
+        </div>
+        {state.serving.map(a => <p key={a.instance_id} className="text-xs break-all text-[var(--text-secondary)]">{a.instance_id} · ack đến {new Date(a.valid_until).toLocaleTimeString("vi-VN")}</p>)}
+        {state.runtime.filter(a => a.error_code).map(a => (
+          <div
+            key={a.instance_id}
+            className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50/80 p-3 text-sm text-red-900 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200 min-w-0"
+          >
+            <AlertTriangle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400 mt-0.5" aria-hidden="true" />
+            <p className="break-all font-mono text-xs">{a.instance_id}: {a.error_code}</p>
+          </div>
+        ))}
+        <div>
+          <Link
+            href="/chat"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2.5 text-sm font-medium text-[var(--color-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] transition-colors"
+          >
+            <MessageSquare className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>Mở chatbot kiểm chứng nguồn</span>
+          </Link>
+        </div>
       </section>
       <KnowledgeIntake onResolved={identifier => { void choose(identifier); }} />
       {state.session_schedules_available && <KnowledgeSchedules releases={state.releases} generation={state.desired.generation}
@@ -138,7 +213,7 @@ export function KnowledgePlatform() {
       }}><h2 className="font-semibold">Upload tài liệu</h2><fieldset disabled={busy} className="grid gap-4 md:grid-cols-2">
         <label>Tên tài liệu<input name="title" className="fluent-input w-full" required minLength={3} maxLength={300} /></label>
         <label>Đơn vị ban hành<input name="owner_unit" className="fluent-input w-full" required minLength={2} maxLength={160} /></label>
-        <label>URI gốc / xuất xứ<input name="canonical_uri" placeholder="https://… hoặc urn:…" className="fluent-input w-full" required /></label>
+        <label>URI gốc / xuất xứ<input name="canonical_uri" placeholder="https://…huce.edu.vn/…" pattern="https://.*" title="URI nguồn phải bắt đầu bằng https://" className="fluent-input w-full" required /></label>
         <label>Bắt đầu hiệu lực<input name="effective_from" type="datetime-local" className="fluent-input w-full" /></label>
         <label>Phiên bản của nguồn<select name="source_id" className="fluent-input w-full"><option value="">Nguồn mới</option>
           {state.sources.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}</select></label>
@@ -186,8 +261,13 @@ export function KnowledgePlatform() {
               {["QUEUED", "RUNNING", "RETRY_WAIT"].includes(job.state) && <button disabled={busy || job.cancel_requested} onClick={() => void run(async () => { await client().post(`${base}/jobs/${job.id}/cancel`); })}>Hủy job</button>}
               {["FAILED", "CANCELLED"].includes(job.state) && <button disabled={busy || job.attempts >= 3} onClick={() => void run(async () => { await client().post(`${base}/jobs/${job.id}/retry`); })}>Thử lại từ checkpoint</button>}
               {job.attempts >= 3 && <p className="text-sm">Đã dùng hết ba lần xử lý; checkpoint được giữ để đối chiếu nguyên nhân.</p>}</div>}
-            {state.correction_history_available && actor && version.publication_state === "DRAFT" && !version.revoked_at &&
-              <RenditionCorrection key={version.version_id} versionId={version.version_id} actorId={actor.user_id} authorId={version.created_by} onCreated={id => void choose(id)} />}
+          </>}
+          {state.correction_history_available && actor && state.versions.filter(v => openedCorrections.includes(v.version_id)).map(correctionVersion =>
+            <PreservedActivity key={correctionVersion.version_id} mode={selected === correctionVersion.version_id && correctionVersion.publication_state === "DRAFT" && !correctionVersion.revoked_at ? "visible" : "hidden"}>
+              <RenditionCorrection versionId={correctionVersion.version_id} actorId={actor.user_id} authorId={correctionVersion.created_by}
+                onCreated={id => { if (selectedRef.current === correctionVersion.version_id) void choose(id); }} />
+            </PreservedActivity>)}
+          {version && <>
             {state.edition_decisions_available && actor && <EditionWorkspace key={`edition:${version.version_id}`} versionId={version.version_id} actorId={actor.user_id} />}
             {version.index_version && !version.revoked_at && <details className="rounded-xl border p-3 space-y-3"><summary>Bổ sung hiệu lực bằng phiên bản mới</summary>
               <p className="my-3 text-sm">Nhập ngày và căn cứ đã kiểm chứng từ nguồn. Bản mới dùng lại original/vector đúng input, cần người khác duyệt trước khi xuất bản.</p>
@@ -199,7 +279,7 @@ export function KnowledgePlatform() {
                   expected_revision: version.revision, effective_from: new Date(applicableFrom).toISOString(),
                   effective_until: applicableUntil ? new Date(applicableUntil).toISOString() : null, basis,
                 }, { "Idempotency-Key": `applicability:${version.version_id}:${version.revision}:${applicableFrom}:${applicableUntil}` });
-                setSelected(result.version_id); setPreview(null); setNote(""); setNotice("Đã tạo phiên bản metadata mới, cần duyệt độc lập; release đang phục vụ giữ nguyên.");
+                setSelected(result.version_id); setPreview(null); setNotice("Đã tạo phiên bản metadata mới, cần duyệt độc lập; release đang phục vụ giữ nguyên.");
               })}>Tạo phiên bản để duyệt</button>
             </details>}
             <label className="block">Ghi chú đối chiếu original và rendition<textarea className="fluent-input w-full" value={note} maxLength={2000} onChange={e => setNote(e.target.value)} /></label>

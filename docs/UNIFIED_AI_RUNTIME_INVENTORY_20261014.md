@@ -1,0 +1,60 @@
+# UNI-001–003: bản chạy, phạm vi hỗ trợ và baseline
+
+**Cập nhật chặng07:** code storage UNI-006 đã implemented; source candidate **v7** có validated held-history reads, durable feedback/privacy requests, private staff-draft API và consumer autosave trong service/certificate workspaces. Main composition chọn rõ actor/run stores và dùng cùng SessionService cho auth/logout.457test backend duy nhất đạt;12component tests được chạy trước yêu cầu hoãn UI, TypeScript/build đạt với build mới `ICdzNGE7r89XQ1ao7_BOz` giữ dưới `infra/local/unified-ai-20261014-07/frontend01/acceptance-20261012-58-frontend-repair1-local-repair2`. Chưa test browser theo yêu cầu trực tiếp; chưa handoff hoặc nạp source mới vào8006. Runtime/build/PID của chặng06 bên dưới vẫn là bản phục vụ, không coi build mới là đang live. Clone rehearsal bảo toàn513conversations/1310messages/497runs; dữ liệu gốc và writer/native được kiểm đọc, không migrate/restart. UNI-006 full verification pending; next coding task UNI-007. [SESSION07](UNIFIED_AI_SESSION07_20261014.md), `infra/local/unified-ai-20261014-07/session-verification-02.json`.
+
+**Cập nhật chặng 06:** source v6 đã nối services nội bộ settings/grant requests/proposal–evidence bundle và explicit consent SQLite composition; 401 backend tests duy nhất đạt, clone rehearsal giữ mọi hàng cũ. **Runtime vẫn v5/PID3216 tại8006**, frontend3006/build `d7WLzedC5Vjq3fb11xvgM`/PID22800 và writer/native PID14208/6132 khớp command/creation time preflight. Source mới chưa được nạp live; consent mode v6 mới được kiểm trên fixture/clone. Không restart vì chưa có UI consumer và stateless sessions chưa cho phép chứng minh không còn user session hoạt động; baseline không có measurement mở không thay bằng chứng đó. Bốn DB business/actor05/history/runs nguyên hàng/hash; paid/native delta0, caps/uncertain reservations giữ nguyên. UNI-006 vẫn in_progress/next_task. [SESSION06](UNIFIED_AI_SESSION06_20261014.md), `infra/local/unified-ai-20261014-06/runtime-verification-01.json`. Các quan sát trước bên dưới được giữ làm lịch sử.
+
+**Cập nhật chặng 05:** candidate là `http://localhost:8006/login`, API `unified-local-v5`/PID3216; frontend3006/build `d7WLzedC5Vjq3fb11xvgM`/PID22800 giữ nguyên. AI8003/native giữ PID14208/6132 và code đã nạp trước đó. Actor-state mới tách tại `infra/local/unified-ai-20261014-05/actor-state.sqlite3`, chỉ là nền tảng server nội bộ; preferences/grants product features chưa bật. Mọi bảng business candidate/measurements giữ nguyên. Migration bổ sung history/run chỉ diễn tập trên clone: 513 conversations,1310 messages,497 runs đọc lại được, giữ hàng dữ liệu gốc. Source live history/run chưa migrate hoặc restart. Ghi nhận trong [SESSION05](UNIFIED_AI_SESSION05_20261014.md) và `infra/local/unified-ai-20261014-05/runtime-verification-01.json`; luôn kiểm command/creation time/ownership trước thao tác tiếp theo. Các quan sát8004/PID/count bên dưới thuộc chặng01. Human baseline vẫn deferred; UNI-003/004/005 chưa verified đầy đủ; UNI-006 in_progress và vẫn là next_task.
+
+Quan sát 14/10/2026, Asia/Bangkok. Evidence mới: `infra/local/unified-ai-20261014-01/runtime-probe-01.json`; baseline `baseline-tests-01.xml`: **117 passed**, 37.93s. Đây là kiểm chứng local/synthetic, không phải nghiệm thu usefulness hoặc production.
+
+## Bản chạy được kiểm trực tiếp
+
+Một URL hiện hành `http://localhost:8004/login` phục vụ frontend3005/build `Z3GzIYwCw4g3n8T7ic0IF`, snapshot `infra/local/service-stage6-20261014-01/frontend02/acceptance-20261012-58-frontend-repair1-local-repair2`. Listener/process command được kiểm lại bằng Get-NetTCPConnection/Get-CimInstance, không suy từ PID cũ: API8004 PID1436, frontend3005 PID7588; multi-agent8003 PID5480/frontend3004 PID18312. Các con số chỉ là observation tại thời điểm probe.
+
+8004: `run_service_stage6.py` → `create_service_demo_app` → `create_certificate_demo_app`. Certificate, phúc khảo, hỗ trợ và quản trị nguồn cùng business SQLite. Conversations/policy graph proxy sang writer8003; không mở Gateway mới. 8003 là `run_multi_agent.py --mode live --frontend 3004 --policy-graph huce-policy-development-v1`. Probe không gửi chat/stream/resume hay gọi model. `/v1/capabilities` trên8004 trả404, do đó không thể dùng capability banner để chứng minh các tính năng đều hoạt động.
+
+Source và snapshot có hash trùng ở layout/chat/ServiceWorkspace/StudentRuntime/assistant-context. Tuy nhiên layout hiện không mount StudentRuntime và build không có `/student/assistant`, `/student/certificate`, `/student/complaint`. Các component này cùng guidanceAdapter/localStorage là code chưa hoạt động trong luồng hiện hành, không phải AI xuyên ứng dụng đã verified. Không tự chuyển VinUni form/source vào HUCE.
+
+## Danh tính, dữ liệu và nguồn
+
+- `huce-local-public`, synthetic directory; SV001/SV024 chỉ có STUDENT; OF001 queue HUCE_GENERAL; OF002 queue ACADEMIC_SERVICES; KA001 knowledge admin, không có quyền staff queue. Session, role, active/expiry/tenant và ownership kiểm server.
+- Probe xác nhận students đọc course/own requests200, staff queue403; staff đọc queue200, student courses/requests403; knowledge admin staff queue403. Tránh dump profile, token hoặc notes vào evidence.
+- Business: `infra/local/certificate-stage1-20261013-01/demo.sqlite3`: 4 certificate records, 2 service records tại probe. History: `infra/local/public-rag-20261013/conversations.sqlite3`: 512 conversations, 1308 messages. Runs: `infra/local/multi-agent-integrated-20261013-01/agent-runs.sqlite3`: 496 runs. Các counts không chứng minh mọi record đúng hoặc quyền discovery.
+- Conversation mặc định30ngày; get/read từ chối khi retention hết. SQLite đã inject trong launcher8003, nhưng `create_app()`/main mặc định có thể fallback in-memory. Chưa có discovery/list/rename/pin theo tài khoản. Chưa chứng minh cross-device bằng UI.
+- Certificate nguồn public handbook2026–2027 p35/p39 qua `public_guidance()`: snapshot, không chứng minh phí/SLA/mẫu chi tiết hiện hành. Service nguồn demo có immutable checksum/rendition, version/review/build/publish, effective dates. UI nguồn đang dùng v2, checksum `7b7ec9b6afb54195f1844ceb482a3a6f9a906db66ff6438140a402d79ab1341a`; đây là text mô phỏng do Codex tạo, không phải quy định trường.
+- StaffTicketQueue có confidence99.8%, stamp và SLA24h constants. Ghi nhận gap AT-29; không dùng chúng để nghiệm thu correctness. Nháp staff Map/process-local assignment ở các luồng khác chưa chứng minh nhiều instance. Preference/consent/memory bền vững chưa verified.
+
+## Ma trận thao tác, quyền và handler
+
+Mức E=giải thích, P=chuẩn bị, X=thực hiện sau kiểm tra/xác nhận hiện có. Một handler thủ công không đồng nghĩa trợ lý đã hỗ trợ thao tác.
+
+| Route / thao tác / field-error | Actor và nguồn | Handler hiện có | Mức AI / gap và bước tiếp |
+|---|---|---|---|
+| `/login`, đổi tài khoản/expired session | Signed synthetic identity | demo-login/session; local-session renewal | Thủ công; trợ lý không cấp role, UNI010/011 |
+| `/chat`, nhập câu hỏi, nguồn/citation, lỗi stream | STUDENT, server source scope | conversations/messages SSE; multi-agent coordinator/research/verifier; CitationSource | E; typed service proposal P hạn chế; staff chat403; UNI016/017 |
+| `/chat?conversation_id=...`, restore/cancel/resume | Owner + scope/source freshness | history.ts, run ownership/CAS, source validation | E; ID restore có, discovery/settings chưa có; UNI012/013 |
+| `/tickets`, purpose/recipient/copies/delivery/attachments | Own STUDENT profile; p35/p39 + demo schema | CertificateWorkspace, draft/preview/confirm/receipt | P qua document-assistant/draft adapter; X chỉ UI/server; missing purpose/recipient hỏi lại dù có trong prose; UNI021/022 |
+| `/staff` certificate accept/supplement/approve/reject | OF001 HUCE_GENERAL, assignment/version | CertificateService + CertificateWorkspace | Thủ công X; case package, confidence thật, autosave chưa có; UNI026–031 |
+| `/services`, course/kind/reason/contact/txt attachment | Own STUDENT; fixture hash/eligibility/deadline/current guidance | ServiceWorkspace, ServiceRequestService | E/P intent bằng keyword; form thủ công; source-missing/expired/ineligible fail closed; UNI021–024 |
+| `/services?request=...`, bổ sung/read result/history | Own STUDENT; request version + public exchange | preview/confirm supplement, result/checksum/receipt | X có; supplement là prose chưa typed criteria/items; UNI033/035 |
+| `/services`, staff queue/detail/note/recipient/outcome | Queue/assignment SUPPORT_OFFICER | list/read/claim/assign/transfer/respond/request_information/resolve/reject | Thủ công X; AI chưa đọc/context/case package; gửi staff cần nâng cấp preview/confirm, UNI031 |
+| `/knowledge/sources`, snapshot/version/mapping/review/build/publish/withdraw | KNOWLEDGE_ADMIN, author≠reviewer, source checksum | SourceOperations/KnowledgeOperations | Thủ công X có confirmation; trợ lý admin chưa có, UNI032 |
+| `/knowledge/policy-graph`, nguồn/relations/unsupported/errors | Server scope + graph publication/fingerprint | PolicyGraphReview +8003 proxy | E tri thức; không suy relational proposal thành policy; UNI005/018 |
+| `/schedule`, tìm/xem lịch | Actor-scoped API ở main; shell route8004 chưa phục vụ | ScheduleView, `/v1/me/schedule` ở main | Gap bản dùng: navigation dẫn404, mock/store riêng; UNI002/025 |
+| `/rooms`, tìm/chọn/booking/cancel/errors | Role/resource/policy ở main | RoomBooking/main API | Gap bản dùng8004:404; không quảng cáo booking đã hợp nhất, UNI024/025 |
+| `/privacy`, consent/history/export/revoke | Actor + purpose/scope | PrivacyCenter/main privacy API | UI có; routes8004 chưa có backend tương ứng; persistence/revoke gap, UNI009/010/015 |
+| `/knowledge`, `/admin`, source review/config/error | Admin + authority scopes ở main | KnowledgeReview/admin main | Gap8004 và chưa có AI handler admin; UNI032 |
+| Field help và route context legacy student/staff | local UI/user keyed stores, VinUni source | assistant-context/guidanceAdapter; staff-policy/useStaffDraft | Không mount trong HUCE build; không thay backend checks bằng local facts, UNI011 |
+
+UI trực tiếp trên8004: SV001 thấy2own records, nguồn demo và course options (ineligible/expired/missing được phân biệt); OF002 thấy đúng1appeal queue record, cùng public trạng tháiREADY. Không sửa/nộp lại hồ sơ cũ để tạo bằng chứng.
+
+## Baseline và giới hạn đo lường
+
+Dataset `evals/datasets/unified-ai-baseline-20261014.json` giữ case IDs, expected và source/test references. Gold của chặng này là hợp đồng local/synthetic, không phải luật hoặc quy định chính thức. Existing tests được reuse, không chạy backlog AI/ST cũ. CLI baseline: `.venv/Scripts/python.exe -B -m pytest tests/api/test_service_stage6.py tests/api/test_certificate_stage1.py tests/api/test_multi_agent_api.py tests/unit/agent/test_multi_agent_integrated.py tests/unit/agent/test_multi_agent_admission.py --basetemp=infra/local/unified-ai-20261014-01/baseline-tests-01 --junitxml=infra/local/unified-ai-20261014-01/baseline-tests-01.xml -q -p no:cacheprovider -p pytest_asyncio.plugin`, exit0.
+
+Pilot measurement protocol frozen trước đánh giá: paired tasks cùng complexity/data; đếm field nhập lại/correction/manual clicks, active seconds, waiting seconds, completion/first-pass/supplement loops. Các timestamps API không thay active human time. Ngưỡng kỹ thuật:0unauthorized effect,0duplicate receipt,0fabricated mandatory source. Mục tiêu pilot tạm: median active time và manual fields giảm≥30% trong paired cohort, không giảm tỷ lệ đúng; cần người dùng và task cohort UNI047 để kiểm chứng, chưa có số đo usefulness. Không gắn “30% cải thiện” cho bản hiện tại.
+
+## Quyết định triển khai một ứng dụng
+
+Theo yêu cầu mới “hợp nhất ... vào1cái”: một candidate/entry URL cho student/staff/admin, reuse backend transactions/checks và existing writer8003, không mở paid writer thứ hai. Build candidate mới giữ source/snapshots/DB cũ. Không đưa module chỉ có mock/confidence constants vào danh sách verified. Bản đầu thêm assistance context server-backed dùng chung hai phía; UNI004 vẫn in_progress đến khi toàn bộ DTO/API/error/compatibility scope được kiểm đủ.

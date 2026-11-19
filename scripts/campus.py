@@ -167,7 +167,7 @@ if __name__ == "__main__":
             "--name", "frontend-knowledge-main-" + stamp().lower()]
     else:
         command = [str(python), "-B", "-X", "utf8", "scripts/knowledge_platform_runtime.py", args.command,
-            "--defer-worker", "--engine", "v2", "--rag-v2-index", "data/rag_v2_index/embedded2"]
+            "--engine", "v2", "--rag-v2-index", "data/rag_v2_index/embedded2"]  # worker on: uploads are processed
     result = subprocess.run(command, cwd=ROOT, creationflags=HIDDEN, check=False,
         capture_output=True, text=True, encoding="utf-8", errors="replace")
     print(result.stdout, end="", flush=True)

@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": ["next-env.d.ts", "src/app/chat/page.tsx", "src/features/chat/CitationDrawer.tsx", "src/features/chat/CitationSource.tsx"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
+}

@@ -1,0 +1,13 @@
+[Unit]
+Description=Campus 24/7 nightly retrieval check (does the index still find the right passages? no answer is generated, no paid call)
+After=campus247-models.service campus247-api.service
+
+[Service]
+Type=oneshot
+User=campus247
+WorkingDirectory=/opt/campus247
+ExecStart=/opt/campus247/.venv/bin/python -B /opt/campus247/evals/runners/nightly_retrieval.py run --trigger schedule
+# The check shares the embedding and rerank servers with real users: keep it at the back of the queue.
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=2h

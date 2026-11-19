@@ -13,7 +13,7 @@ from campus247.infrastructure.retrieval.vector import VectorIndexEntry, VectorSe
 
 
 def test_vector_search_cosine_similarity() -> None:
-    adapter = VectorSearchAdapter()
+    adapter = VectorSearchAdapter(environment="test", dimension=3)
 
     # Seed 3 vectors
     adapter.add_entry(
@@ -55,6 +55,6 @@ def test_vector_search_cosine_similarity() -> None:
 
 
 def test_vector_search_empty_query_fails() -> None:
-    adapter = VectorSearchAdapter()
+    adapter = VectorSearchAdapter(environment="test", dimension=3)
     with pytest.raises(ValueError, match="Query vector cannot be empty"):
         adapter.search(query_vector=[], limit=5)

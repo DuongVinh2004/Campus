@@ -62,3 +62,29 @@ def test_bounded_context_empty_turns() -> None:
     assert manifest.turns == ()
     assert manifest.summary is None
     assert manifest.total_chars == 0
+
+
+def test_oversized_latest_turn_cannot_exceed_context_budget() -> None:
+    turns = [
+        TurnItem(turn_id="old", role="user", content="short"),
+        TurnItem(turn_id="latest", role="assistant", content="x" * 101),
+    ]
+    manifest = BoundedContextBuilder(max_chars=100).build("conv_004", turns)
+    assert manifest.turns == ()
+    assert manifest.total_chars == manifest.item_count == 0
+    assert turns[-1].content == "x" * 101  # Stored history is not truncated.
+
+
+def test_context_budget_keeps_exact_latest_suffix_at_boundary() -> None:
+    turns = [TurnItem(str(i), "user", content) for i, content in enumerate(["old", "12345", "67890"])]
+    manifest = BoundedContextBuilder(max_chars=10).build("conv_005", turns)
+    assert manifest.turns == tuple(turns[1:])
+    assert manifest.total_chars == 10
+    assert manifest.item_count == 2
+
+
+@pytest.mark.parametrize("invalid", [0, -1, True, 1.5, "5"])
+@pytest.mark.parametrize("name", ["max_turns", "max_chars"])
+def test_invalid_context_budget_is_rejected(name, invalid) -> None:
+    with pytest.raises(ValueError, match=name):
+        BoundedContextBuilder(**{name: invalid})

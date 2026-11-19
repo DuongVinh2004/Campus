@@ -21,7 +21,9 @@ REFUSAL_MESSAGES = {
     "unverified": "Mình đã tìm thấy nguồn nhưng chưa xác minh được phát biểu để trả lời.",
     "unsafe": "Mình không thể hỗ trợ yêu cầu này vì có thể ảnh hưởng đến an toàn hoặc quyền riêng tư.",
 }
-PARTIAL_NOTE = "Mình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ."
+TOPIC_CHIPS = ("Học phí", "Học bổng", "Đăng ký học phần", "Bảo lưu kết quả học tập", "Điều kiện tốt nghiệp")
+EXEMPTION_CHIPS = ("Điều kiện miễn giảm học phí", "Miễn học phần ngoại ngữ", "Miễn giáo dục thể chất")
+PARTIAL_NOTE ="Mình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ."
 TRANSIENT_MESSAGE = "Mình đang gặp lỗi kết nối khi kiểm tra thông tin."
 RETRY_HINT = "Bạn vui lòng thử lại sau ít phút."
 # The turn ran out of its time budget while checking sources; nothing unverified is shown.
@@ -35,7 +37,7 @@ def build_outcome(
     semantic_results: Sequence[bool] | None = None, semantic_required: bool = True,
     coverage: float = 1.0, infra_error: bool = False,
     refuse_reason: RefuseReason | None = None, suggestions: Sequence[str] = (),
-    missing_parts: Sequence[str] = (),
+    missing_parts: Sequence[str] = (), scope_note: str | None = None,
 ) -> Outcome:
     """Semantic results align with *all* verdicts; unavailable means fail closed.
 
@@ -44,9 +46,13 @@ def build_outcome(
     """
     if refuse_reason is not None or understanding.out_of_scope:
         reason = refuse_reason or "out_of_scope"
-        return Outcome("refuse", REFUSAL_MESSAGES[reason], reason=reason)
+        return Outcome("refuse", REFUSAL_MESSAGES[reason], reason=reason,
+                       suggestions=tuple(suggestions) if reason in {"no_source", "unverified"} else ())
     if understanding.clarify_prompt:
         hints = tuple(suggestions) or tuple(understanding.missing_slots)
+        if not hints and understanding.question_type == "unclear":
+            # Tappable starting points instead of a bare question: each one is a topic the sources really cover.
+            hints = (EXEMPTION_CHIPS if "miễn" in understanding.clarify_prompt else TOPIC_CHIPS)
         return Outcome("clarify", understanding.clarify_prompt, suggestions=hints)
     if infra_error:
         return Outcome("transient_error", TRANSIENT_MESSAGE, retry_hint=RETRY_HINT)
@@ -78,13 +84,26 @@ def build_outcome(
             )
     if not accepted:
         reason = "unverified" if candidates or verdicts else "no_source"
-        return Outcome("refuse", REFUSAL_MESSAGES[reason], reason=reason)
-    partial = len(accepted) < len(verdicts) or coverage < 1.0 or bool(missing_parts) or bool(understanding.missing_slots)
+        return Outcome("refuse", REFUSAL_MESSAGES[reason], reason=reason, suggestions=tuple(suggestions))
+    incomplete = len(accepted) < len(verdicts) or coverage < 1.0 or bool(missing_parts)
+    # An answer that holds for several scopes (cohort, programme, term) is complete for what the sources say;
+    # the server then invites the user to narrow it down instead of calling it incomplete.
+    open_scope = bool(understanding.missing_slots) and bool(understanding.ask_back)
+    partial = incomplete or bool(understanding.missing_slots) or bool(scope_note)
     text = "\n".join(stmt.text for stmt in accepted)
-    if partial:
-        text += "\n\n" + PARTIAL_NOTE
+    note = None
+    if incomplete:
+        note = PARTIAL_NOTE
         if missing_parts:
             # The parts are the user's own words from the question, never model-authored text.
-            text += " Chưa tìm thấy căn cứ cho: " + "; ".join(missing_parts) + "."
-    return Outcome("partial" if partial else "answer", text, tuple(accepted),
-                   tuple(citations.values()), partial_note=PARTIAL_NOTE if partial else None)
+            note += " Chưa tìm thấy căn cứ cho: " + "; ".join(missing_parts) + "."
+        if open_scope:
+            note += " " + understanding.ask_back
+    elif open_scope:
+        note = understanding.ask_back
+    elif partial:
+        note = PARTIAL_NOTE
+    if note:
+        text += "\n\n" + note
+    return Outcome("partial" if partial else "answer", text, tuple(accepted), tuple(citations.values()),
+                   partial_note=note, suggestions=tuple(suggestions), preface=scope_note)

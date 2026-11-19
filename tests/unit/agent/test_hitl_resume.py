@@ -172,3 +172,20 @@ def test_execute_handover_node_contact_fix() -> None:
     next_state3 = execute_handover_node(state, contact_port=FakeContactPort())
     assert "113" in next_state3.draft.text
     assert "Cảnh sát" in next_state3.draft.text
+
+
+def test_non_crisis_high_without_contact_does_not_claim_maintenance() -> None:
+    from campus247.agent.nodes.definitions import execute_handover_node
+    from campus247.agent.state import AgentState, NormalizedTurn, SafetyDecision, SafetySeverity
+
+    state = AgentState(
+        request=NormalizedTurn(session_id="s", turn_id="t", user_id="u", query="q"),
+        safety=SafetyDecision(is_crisis=False, severity=SafetySeverity.HIGH, reason="financial_impact"),
+    )
+    text = execute_handover_node(state, contact_port=None).draft.text
+    assert "bảo trì" not in text
+    crisis = AgentState(
+        request=state.request,
+        safety=SafetyDecision(is_crisis=True, severity=SafetySeverity.CRITICAL),
+    )
+    assert "bảo trì" in execute_handover_node(crisis, contact_port=None).draft.text

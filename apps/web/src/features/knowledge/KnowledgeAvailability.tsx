@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { usePolling } from "@/lib/use-polling";
 
 export function KnowledgeAvailability() {
   const [status, setStatus] = useState<{ ready: boolean; message: string; serving_documents: number; pending_versions: number;
@@ -10,22 +11,17 @@ export function KnowledgeAvailability() {
   useEffect(() => {
     let active = true;
     fetch("/v1/users/me", { cache: "no-store", credentials: "include" })
-      .then(response => { if (active) setSignedIn(response.ok); }).catch(() => { if (active) setSignedIn(false); });
+      .then(async response => { await Promise.resolve(response.text?.()).catch(() => ""); if (active) setSignedIn(response.ok); })  // read the body: an unread one keeps the connection busy.catch(() => { if (active) setSignedIn(false); });
     return () => { active = false; };
   }, []);
-  useEffect(() => {
-    let active = true;
-    const update = async () => {
-      try {
-        const response = await fetch("/v1/knowledge/platform/availability", { cache: "no-store" });
-        if (!response.ok) throw new Error("Unavailable");
-        const value = await response.json();
-        if (active) setStatus(value);
-      } catch { if (active) setStatus(null); }
-    };
-    void update(); const timer = setInterval(() => void update(), 5000);
-    return () => { active = false; clearInterval(timer); };
-  }, []);
+  // Once a minute while the tab is visible (it was every 5 seconds on every page, even in the background).
+  usePolling(async () => {
+    try {
+      const response = await fetch("/v1/knowledge/platform/availability", { cache: "no-store" });
+      if (!response.ok) throw new Error("Unavailable");
+      setStatus(await response.json());
+    } catch { setStatus(null); }
+  }, 60_000);
   const headline = status?.message || "Chưa xác nhận được trạng thái kho HUCE. Không coi chatbot là đã có nguồn sẵn sàng.";
   return <aside role="status" className="knowledge-availability" data-ready={status ? "true" : "false"}>
     <div className="knowledge-availability-line">

@@ -12,8 +12,11 @@ from campus247.domain.shared.values import generate_uuid7
 from campus247.ports.identity import IdentityContext, IdentityRole
 from campus247.rag_v2.adapters.http_reranker import HTTPReranker
 from campus247.rag_v2.adapters.index_store import ROOT, read_index
+
+ROOT_DIR = ROOT
 from campus247.rag_v2.adapters.memory_index import MemoryIndex
 from campus247.rag_v2.service import RagV2Service
+from campus247.rag_v2.vocabulary import Vocabulary
 
 
 class RagV2Status:
@@ -90,7 +93,7 @@ def load_rag_v2(settings, *, gateway, knowledge_runtime, inventory_reader=None):
     index = MemoryIndex.__new__(MemoryIndex)
     index.manifest = snapshot.manifest
     index._initialize(snapshot.units, snapshot.embeddings, embed)
-    service = RagV2Service(snapshot.facts)
+    service = RagV2Service(snapshot.facts, Vocabulary.from_units(snapshot.units))
     node = RagV2Node(service=service, index=index,
         reranker=HTTPReranker(batch_size=10), embed=embed, gateway=gateway,
         authorize_sources=lambda query, context: knowledge_runtime.rag_v2_sources(
@@ -99,6 +102,108 @@ def load_rag_v2(settings, *, gateway, knowledge_runtime, inventory_reader=None):
     node.rag_v2_status = RagV2Status(manifest, knowledge_runtime, inventory_reader)
     node.start_injection_warmup()
     return node
+
+
+class SwappableRagNode:
+    """Holds the node that is serving; a newer index replaces it with a single attribute assignment.
+
+    A turn already running keeps the node object it started with, so it finishes on the index it began on. Nothing
+    of retrieval, ranking, thresholds or prompts lives here: every call is forwarded to the current RagV2Node.
+    """
+    def __init__(self, node):
+        self.current = node
+        self.refreshing = False   # a newer release is being indexed or loaded (readiness stays up while true)
+        self.loaded_path = None   # index directory currently serving (set by the reloader)
+
+    async def __call__(self, *args, **kwargs):
+        return await self.current(*args, **kwargs)
+
+    def __getattr__(self, name):
+        if name == "current":  # not yet set (copy/unpickle): never recurse
+            raise AttributeError(name)
+        return getattr(self.current, name)
+
+
+class RagV2IndexReloader:
+    """Loads the index the ingestion worker built for the serving release, in the background, then swaps it in.
+
+    Uses `load_rag_v2` and `start_rag_v2_warmup` unchanged (same checks, same warm-up of the source gate), so the new
+    node is complete and warm before any question sees it. Failure leaves the serving node untouched.
+    """
+    REFRESH_WINDOW_S = 600.0
+
+    def __init__(self, proxy, *, settings, gateway, knowledge_runtime, inventory_reader, context_factory, store,
+                 instance_id, poll_seconds=5.0, warm_timeout_s=240.0):
+        self.proxy, self.settings, self.gateway = proxy, settings, gateway
+        self.runtime, self.inventory_reader, self.context_factory = knowledge_runtime, inventory_reader, context_factory
+        self.store, self.instance_id, self.poll, self.warm_timeout = store, instance_id, poll_seconds, warm_timeout_s
+        self.proxy.loaded_path = str(Path(settings.rag_v2_index_dir).resolve())
+        self._stale_since = None
+        self._failed = {}   # registry id -> monotonic time of the last failed attempt
+
+    def _matches(self, pointer) -> bool:
+        manifest = self.proxy.current.rag_v2_status.manifest
+        return (pointer["release_id"] is not None and str(manifest.get("release_id")) == str(pointer["release_id"])
+                and manifest.get("generation") == pointer["generation"]
+                and manifest.get("policy_generation") == pointer["policy_generation"])
+
+    async def run(self):
+        import logging
+        await self.store.ensure()
+        while True:
+            try:
+                await self.step()
+            except asyncio.CancelledError:
+                raise
+            except Exception as error:  # noqa: BLE001 -- serving continues on the current index; retried next poll
+                logging.getLogger("campus247.rag_v2").warning("rag_v2_reload_step_failed kind=%s", type(error).__name__)
+            await asyncio.sleep(self.poll)
+
+    async def step(self):
+        import time
+        repo = self.runtime.repo
+        async with repo.pool.acquire() as conn:
+            pointer = await repo.pointer(conn)
+            ready = (await self.store.registry_for(conn, pointer["release_id"], pointer["generation"], pointer["policy_generation"])
+                     if pointer["release_id"] else None)
+        matches = self._matches(pointer)
+        if matches:
+            self._stale_since = None
+        else:
+            self._stale_since = self._stale_since or time.monotonic()
+        self.proxy.refreshing = (not matches) and time.monotonic() - self._stale_since < self.REFRESH_WINDOW_S
+        if not matches and ready is not None and time.monotonic() - self._failed.get(str(ready["id"]), -1e9) > 60:
+            try:
+                await self.swap(ready)
+                matches = self._matches(pointer)
+                if matches:
+                    self._stale_since, self.proxy.refreshing = None, False
+            except asyncio.CancelledError:
+                raise
+            except Exception as error:  # noqa: BLE001
+                import logging
+                self._failed[str(ready["id"])] = time.monotonic()
+                logging.getLogger("campus247.rag_v2").warning("rag_v2_reload_failed kind=%s", type(error).__name__)
+        async with repo.pool.acquire() as conn:
+            await self.store.ack_instance(conn, self.instance_id, ready["id"] if (matches and ready is not None) else None,
+                                          self.proxy.loaded_path)
+
+    async def swap(self, ready):
+        path = Path(ready["path"])
+        path = path if path.is_absolute() else ROOT_DIR / path
+        settings = self.settings.model_copy(update={"rag_v2_index_dir": path})
+        node = await asyncio.to_thread(load_rag_v2, settings, gateway=self.gateway, knowledge_runtime=self.runtime,
+                                       inventory_reader=self.inventory_reader)
+        warm = start_rag_v2_warmup(node, self.runtime, self.context_factory)
+        try:
+            await asyncio.wait_for(warm, self.warm_timeout)
+        except BaseException:
+            warm.cancel()
+            raise
+        if node.rag_v2_status.warm != "ready":
+            raise RuntimeError("RAG_V2_RELOAD_WARMUP_FAILED")
+        self.proxy.current = node          # the only moment the serving node changes
+        self.proxy.loaded_path = str(path.resolve())
 
 
 def start_rag_v2_warmup(node, runtime, context_factory):

@@ -1,13 +1,15 @@
 ---
 document_id: "DOC-GOV-NAV-001"
-version: "1.1.0"
+version: "1.2.0"
 status: "reviewed"
 owner: "Delivery Navigator"
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 navigation_status: "COMPLETED"
 ---
 
 # Campus 24/7 — Tài liệu Điều hướng Thực thi (Execution Navigator)
+
+Quy tắc thực thi hiện hành: [DEC-023](LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md) bỏ checkpoint xin phê duyệt bổ sung cho công việc local/synthetic đã giao. Các bảng, gate và approval entries từ ngày 2026-09-22 bên dưới là hồ sơ tại thời điểm đó; không dùng chúng để yêu cầu task-specific/package-specific approval lại. Source/dependency readiness và technical acceptance vẫn phải có evidence hiện tại.
 
 Tài liệu này là bản đồ điều hướng thực thi và kiểm soát tiến độ thống nhất dành cho Orchestrator và các AI coding agent trong dự án Campus 24/7 (phiên bản V1 — HUCE Demo). 
 
@@ -48,8 +50,8 @@ Tài liệu hoạt động dưới sự chỉ đạo của `AGENTS.md`, tuân th
 
 1. **Rào cản Vòng đời Task (Task Lifecycle Gate)**:
    Toàn bộ 176 task đều đang có trạng thái `draft`. Theo khế ước `AGENTS.md` (mục *Before any mutation* số 4) và `DOC-AGENT-001` (`EXECUTOR_CONTRACT.md`), coding agent tuyệt đối không được nhận hoặc thực thi task nếu task chưa có `status: ready` và toàn bộ dependency chưa đạt `accepted`.
-2. **Rào cản Phê duyệt Con người (Human Approval Gate)**:
-   73/176 task (bao gồm 6/10 task của P00) bắt buộc phải có Human Approval gắn kèm với task ID và phạm vi cụ thể. Trong đó, cả 5 root tasks (in-degree = 0) đều yêu cầu Human Approval. Không có approval bằng văn bản, không task nào được mở khóa.
+2. **Quyền thực thi hiện hành (DEC-023)**:
+   Phân loại approval của 73/176 task là metadata lịch sử. Công việc local/synthetic đã giao sử dụng standing human authority DEC-023, không cần xin approval mới theo task ID. Chỉ đưa task vào thực thi khi dependency và technical readiness được kiểm chứng.
 3. **Rào cản Trạng thái Tài liệu Nguồn (Upstream Artifact Status)**:
    Tài liệu requirement trung tâm `DOC-PROD-012` (`docs/01-product/requirements.yaml`) hiện ở trạng thái `reviewed`, chưa phải `approved`. Các tài liệu kiến trúc (`docs/04-architecture/**`), bảo mật (`docs/06-security/**`), hạ tầng platform (`docs/07-platform/**`), thiết kế dịch vụ (`docs/02-service-design/**`) và UX (`docs/03-ux/**`) hiện là `draft` hoặc `reviewed`.
 4. **Rào cản Câu hỏi Mở (OQ-001 đến OQ-008)**:

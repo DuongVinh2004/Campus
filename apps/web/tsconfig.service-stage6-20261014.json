@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": ["next-env.d.ts", "src/app/services/page.tsx", "src/app/knowledge/sources/page.tsx", "src/features/documents/ServiceWorkspace.tsx", "src/features/knowledge/SourceOperations.tsx"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
+}

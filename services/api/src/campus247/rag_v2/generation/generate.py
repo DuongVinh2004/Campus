@@ -84,27 +84,49 @@ def _facets(raw, question):
     return tuple(result) if len(result) >= 2 else ()
 
 
+PROVIDER_INPUT_BUDGET_BYTES = 27_000   # the gateway's bound is 28,000 including a 512-byte allowance
+_FIXED_REQUEST_BYTES = len(GENERATION_PROMPT.encode()) + len(json.dumps(STATEMENTS_SCHEMA).encode()) + 1_200
+
+
 async def generate_draft(
     gateway: LlmGateway, question: str, understanding: Understanding, units: Sequence[Unit],
-    *, deadline_ms: int, max_output_tokens: int, focus: Sequence[str] = (),
+    *, deadline_ms: int, max_output_tokens: int, focus: Sequence[str] = (), relaxed: bool = False,
+    repair: bool = False, scope_names: Sequence[str] = (),
 ) -> Draft:
     selected = list(units[:12])
     if not selected:
         return Draft()
-    markers = contact_map(selected)
-    labels = {f"U{i}": unit for i, unit in enumerate(selected, 1)}
-    evidence = [{"label": f"[{label}]", "text": redact(unit.text, markers),
-                 "scope": {"cohorts": unit.scope.cohorts, "programs": unit.scope.programs,
-                           "academic_years": unit.scope.academic_years}}
-                for label, unit in labels.items()]
-    body = {"question": question, "question_type": understanding.question_type, "sources": evidence}
-    if focus:
-        # Parts of the question (its own words) that an earlier answer left uncovered; data, not instructions.
-        body["missing_parts"] = list(focus)
-    content = json.dumps(body, ensure_ascii=False)
-    # Known source contacts are minimized everywhere in the model view. Other
-    # user identifiers remain subject to the unmodified outbound policy.
-    content = redact(content, markers)
+    while True:
+        markers = contact_map(selected)
+        labels = {f"U{i}": unit for i, unit in enumerate(selected, 1)}
+        evidence = [{"label": f"[{label}]", "text": redact(unit.text, markers),
+                     "scope": {"cohorts": unit.scope.cohorts, "programs": unit.scope.programs,
+                               "academic_years": unit.scope.academic_years}}
+                    for label, unit in labels.items()]
+        body = {"question": question, "question_type": understanding.question_type, "sources": evidence}
+        if relaxed:
+            # No source applies to the exact year or cohort asked; these are the nearest ones. The server states the
+            # difference itself, so the model only has to keep each source's own scope in its statements.
+            body["scope_relaxed"] = True
+        if scope_names:
+            # Names the question uses as a qualifier (a major, a programme). Data, not instructions: the prompt says what to do when
+            # a source is not written along that name.
+            body["scope_names"] = list(scope_names)
+        if repair:
+            # The previous reply was cut off or had no statement list; the same call would repeat it.
+            body["format_reminder"] = True
+        if focus:
+            # Parts of the question (its own words) that an earlier answer left uncovered; data, not instructions.
+            body["missing_parts"] = list(focus)
+        content = json.dumps(body, ensure_ascii=False)
+        # Known source contacts are minimized everywhere in the model view. Other
+        # user identifiers remain subject to the unmodified outbound policy.
+        content = redact(content, markers)
+        # The provider gateway refuses a request above 28,000 input bytes, which failed the whole turn for questions
+        # whose twelve sources are large tables. Leave out the lowest-ranked sources until the request fits.
+        if len(content.encode()) + _FIXED_REQUEST_BYTES <= PROVIDER_INPUT_BUDGET_BYTES or len(selected) <= 1:
+            break
+        selected = selected[:-1]
     if len(content) > 90_000:
         raise ValueError("rag_v2 prompt exceeds bound")
     request = LlmRequest(
@@ -133,7 +155,8 @@ async def generate_draft(
         slots = tuple(dict.fromkeys(s for s in proposed if isinstance(s, str) and s in SLOT_LABELS)) if isinstance(proposed, list) else ()
         return Draft((), decision, clarification_question(slots), slots)
     rows = value.get("statements") if value else None
-    drops = {"parsed": value is not None, "status": str(getattr(response, "status", "?")), "rows": 0,
+    drops = {"parsed": value is not None, "status": str(getattr(response, "status", "?")),
+             "finish": str(getattr(response, "finish_reason", "?")), "rows": 0,
              "shape": 0, "ref": 0, "contact": 0}
     if not isinstance(rows, list):
         logging.getLogger("campus247.rag_v2").warning("rag_v2_gen %s", json.dumps(drops))

@@ -1,0 +1,217 @@
+{
+ "summary": {
+  "total": 18,
+  "good": 17,
+  "good_rate": 0.944,
+  "classes": {
+   "helpful": 16,
+   "wrong": 1,
+   "correct_stop": 1
+  },
+  "by_kind": {
+   "abstain_scope": {
+    "correct_stop": 1
+   },
+   "deadline": {
+    "helpful": 2
+   },
+   "dimension_absent": {
+    "helpful": 1
+   },
+   "major_present": {
+    "helpful": 3
+   },
+   "prose": {
+    "helpful": 7
+   },
+   "row_scope_excluded": {
+    "wrong": 1
+   },
+   "table_row": {
+    "helpful": 3
+   }
+  }
+ },
+ "results": [
+  {
+   "id": "lh-01",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Lớp Giải tích 1 khóa K70 học bù vào Thứ Hai, tiết 12-13, tại phòng A1-301, giảng viên TS. Lê Văn An.\nHọc bù được tổ chức vào các buổi tối trong tuần 12 và tuần 13 của học kỳ; sinh viên đăng ký học bù trên cổng thông tin trước ngày 25/10/2027.",
+   "reason": null,
+   "scored_text": "Lớp Giải tích 1 khóa K70 học bù vào Thứ Hai, tiết 12-13, tại phòng A1-301, giảng viên TS. Lê Văn An.\nHọc bù được tổ chức vào các buổi tối trong tuần 12 và tuần 13 của học kỳ; sinh viên đăng ký học bù trên cổng thông tin trước ngày 25/10/2027.",
+   "class": "helpful"
+  },
+  {
+   "id": "lh-02",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Lớp Lập trình căn bản (K71) học bù do TS. Ngô Quang Minh dạy, Thứ Tư tiết 12-14, phòng H2-202.",
+   "reason": null,
+   "scored_text": "Lớp Lập trình căn bản (K71) học bù do TS. Ngô Quang Minh dạy, Thứ Tư tiết 12-14, phòng H2-202.",
+   "class": "helpful"
+  },
+  {
+   "id": "lh-03",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Lớp Cơ học kết cấu khóa K69 học bù vào Thứ Năm, tiết 12-13, phòng B3-110, giảng viên PGS. Trần Đức Thành.",
+   "reason": null,
+   "scored_text": "Lớp Cơ học kết cấu khóa K69 học bù vào Thứ Năm, tiết 12-13, phòng B3-110, giảng viên PGS. Trần Đức Thành.",
+   "class": "helpful"
+  },
+  {
+   "id": "lh-04",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên đăng ký học bù trên cổng thông tin trước ngày 25/10/2027.",
+   "reason": null,
+   "scored_text": "Sinh viên đăng ký học bù trên cổng thông tin trước ngày 25/10/2027.",
+   "class": "helpful"
+  },
+  {
+   "id": "lh-05",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên vắng quá 2 buổi học bù sẽ không được công nhận kết quả học bù.",
+   "reason": null,
+   "scored_text": "Sinh viên vắng quá 2 buổi học bù sẽ không được công nhận kết quả học bù.",
+   "class": "helpful"
+  },
+  {
+   "id": "lh-06",
+   "kind": "row_scope_excluded",
+   "expected": "abstain",
+   "outcome": "partial",
+   "text": "Học bù được tổ chức vào các buổi tối trong tuần 12 và tuần 13 của học kỳ; sinh viên đăng ký học bù trên cổng thông tin trước ngày 25/10/2027.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "reason": null,
+   "scored_text": "Học bù được tổ chức vào các buổi tối trong tuần 12 và tuần 13 của học kỳ; sinh viên đăng ký học bù trên cổng thông tin trước ngày 25/10/2027.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "class": "wrong"
+  },
+  {
+   "id": "lk-01",
+   "kind": "major_present",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Học phí ngành An ninh mạng hệ Liên kết 2+2 là 38.500.000 đồng/năm (năm học 2027-2028).\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Học phí ngành An ninh mạng hệ Liên kết 2+2 là 38.500.000 đồng/năm (năm học 2027-2028).\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.\nK72\nK71",
+   "class": "helpful"
+  },
+  {
+   "id": "lk-02",
+   "kind": "major_present",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học phí ngành Khoa học dữ liệu, hệ Liên kết 3+1 là 42.000.000 đồng/năm (năm học 2027-2028).",
+   "reason": null,
+   "scored_text": "Học phí ngành Khoa học dữ liệu, hệ Liên kết 3+1 là 42.000.000 đồng/năm (năm học 2027-2028).",
+   "class": "helpful"
+  },
+  {
+   "id": "lk-03",
+   "kind": "major_present",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Học phí ngành Robot và trí tuệ nhân tạo ứng dụng hệ Liên kết 3+1 là 45.000.000 đồng/năm (năm học 2027-2028).\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Học phí ngành Robot và trí tuệ nhân tạo ứng dụng hệ Liên kết 3+1 là 45.000.000 đồng/năm (năm học 2027-2028).\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.\nK72\nK71",
+   "class": "helpful"
+  },
+  {
+   "id": "lk-04",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Khóa K72 đóng học phí theo học kỳ; mức học phí mỗi học kỳ của khóa K72 bằng 55% mức học phí năm.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Khóa K72 đóng học phí theo học kỳ; mức học phí mỗi học kỳ của khóa K72 bằng 55% mức học phí năm.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "class": "helpful"
+  },
+  {
+   "id": "lk-05",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên nộp học phí chậm nhất ngày 15/09/2027 đối với học kỳ 1.",
+   "reason": null,
+   "scored_text": "Sinh viên nộp học phí chậm nhất ngày 15/09/2027 đối với học kỳ 1.",
+   "class": "helpful"
+  },
+  {
+   "id": "lk-06",
+   "kind": "abstain_scope",
+   "expected": "abstain",
+   "outcome": "refuse",
+   "text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "reason": "no_source",
+   "scored_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "class": "correct_stop"
+  },
+  {
+   "id": "mg-01",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên thuộc hộ cận nghèo được giảm 70% học phí.",
+   "reason": null,
+   "scored_text": "Sinh viên thuộc hộ cận nghèo được giảm 70% học phí.",
+   "class": "helpful"
+  },
+  {
+   "id": "mg-02",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên là con của người có công với cách mạng được miễn 100% học phí.",
+   "reason": null,
+   "scored_text": "Sinh viên là con của người có công với cách mạng được miễn 100% học phí.",
+   "class": "helpful"
+  },
+  {
+   "id": "mg-03",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Hồ sơ miễn giảm học phí nộp tại Phòng Công tác sinh viên trong vòng 30 ngày kể từ đầu học kỳ.",
+   "reason": null,
+   "scored_text": "Hồ sơ miễn giảm học phí nộp tại Phòng Công tác sinh viên trong vòng 30 ngày kể từ đầu học kỳ.",
+   "class": "helpful"
+  },
+  {
+   "id": "mg-04",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Chính sách miễn giảm học phí năm học 2027-2028 không áp dụng cho học phần học lại và học phần học vượt.",
+   "reason": null,
+   "scored_text": "Chính sách miễn giảm học phí năm học 2027-2028 không áp dụng cho học phần học lại và học phần học vượt.",
+   "class": "helpful"
+  },
+  {
+   "id": "mg-05",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên thuộc nhiều đối tượng chỉ được hưởng một mức giảm cao nhất.",
+   "reason": null,
+   "scored_text": "Sinh viên thuộc nhiều đối tượng chỉ được hưởng một mức giảm cao nhất.",
+   "class": "helpful"
+  },
+  {
+   "id": "mg-06",
+   "kind": "dimension_absent",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Sinh viên có anh chị em ruột cùng học tại trường được giảm 10% học phí của người học sau.\nSinh viên thuộc nhiều đối tượng chỉ được hưởng một mức giảm cao nhất.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "reason": null,
+   "scored_text": "Sinh viên có anh chị em ruột cùng học tại trường được giảm 10% học phí của người học sau.\nSinh viên thuộc nhiều đối tượng chỉ được hưởng một mức giảm cao nhất.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "class": "helpful"
+  }
+ ]
+}

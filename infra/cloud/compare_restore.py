@@ -14,7 +14,8 @@ import sys
 from pathlib import Path
 
 STATE_REL = Path("infra/local/knowledge-platform-20261023")
-STORES = ("conversations.sqlite3", "actor-state.sqlite3", "campus-ops.sqlite3", "action-idempotency.sqlite3", "write-previews.sqlite3")
+STORES = ("conversations.sqlite3", "actor-state.sqlite3", "campus-ops.sqlite3", "action-idempotency.sqlite3", "write-previews.sqlite3",
+          "source-reviews.sqlite3", "oidc.sqlite3", "answer-quality.sqlite3")
 
 
 def pg_counts(conn: dict) -> dict:

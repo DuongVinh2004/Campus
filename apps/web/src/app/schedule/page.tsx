@@ -1,13 +1,18 @@
 "use client";
+import { CAMPUS_API_BASE_URL } from "@/lib/api/base-url";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { AppShell } from "../../components/AppShell";
 import { ScheduleView, type ScheduleEntry } from "../../features/schedule/ScheduleView";
 import { AsyncState, type AsyncStatus } from "../../components/AsyncState";
-import { RefreshCwIcon, AlertTriangleIcon } from "../../components/Icons";
-import { ApiClient, ApiClientError } from "../../lib/api/client";
+import { RefreshCw, AlertTriangle } from "lucide-react";
+import { ApiClient } from "../../lib/api/client";
+import { UnavailableStudentSurface } from "../../features/assistance/UnavailableStudentSurface";
+import { WeekSchedule } from "../../features/schedule/WeekSchedule";
+import { OPS_ENABLED } from "../../lib/campus-ops-api";
+import { isExamTitle, vnTimeRange, vnWeekday } from "../../lib/schedule-time";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = CAMPUS_API_BASE_URL;
 
 interface ScheduleApiResponse {
   items: Array<{
@@ -27,7 +32,32 @@ interface ScheduleApiResponse {
   };
 }
 
+const DEMO_SCHEDULE_ENTRIES: ScheduleEntry[] = [
+  { id: "demo-1", courseCode: "IT3120", courseName: "Trí tuệ Nhân tạo", dayOfWeek: "Thứ Hai", time: "07:00 - 09:25", room: "H3-301", lecturer: "PGS.TS Nguyễn Thanh Hải", type: "class" },
+  { id: "demo-2", courseCode: "IT3080", courseName: "Mạng máy tính", dayOfWeek: "Thứ Hai", time: "09:35 - 11:55", room: "H3-204", lecturer: "TS. Trần Văn Minh", type: "class" },
+  { id: "demo-3", courseCode: "IT3090", courseName: "Cơ sở dữ liệu", dayOfWeek: "Thứ Ba", time: "07:00 - 09:25", room: "H3-301", lecturer: "TS. Lê Thị Hương", type: "class" },
+  { id: "demo-4", courseCode: "IT3150", courseName: "Kỹ thuật Phần mềm", dayOfWeek: "Thứ Tư", time: "13:00 - 15:25", room: "H5-102", lecturer: "PGS.TS Phạm Đức Thắng", type: "class" },
+  { id: "demo-5", courseCode: "IT3120", courseName: "Trí tuệ Nhân tạo", dayOfWeek: "Thứ Năm", time: "07:00 - 09:25", room: "H3-301", lecturer: "PGS.TS Nguyễn Thanh Hải", type: "class" },
+  { id: "demo-6", courseCode: "SS1010", courseName: "Giáo dục Quốc phòng", dayOfWeek: "Thứ Sáu", time: "07:00 - 11:55", room: "Sân KTX", lecturer: "Đại tá Nguyễn Văn Quân", type: "class" },
+  { id: "demo-7", courseCode: "IT3080", courseName: "Thi giữa kỳ — Mạng máy tính", dayOfWeek: "Thứ Bảy", date: "15/10/2026", time: "08:00 - 09:30", room: "H3-401", lecturer: "TS. Trần Văn Minh", type: "exam" },
+];
+
+function OpsSchedulePage() {
+  return (
+    <AppShell activeNav="schedule">
+      <div className="campus-page space-y-6">
+        <WeekSchedule />
+      </div>
+    </AppShell>
+  );
+}
+
 export default function SchedulePage() {
+  if (OPS_ENABLED) return <OpsSchedulePage />;
+  return process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true" || process.env.NEXT_PUBLIC_UNIFIED_AI === "true" ? <UnavailableStudentSurface kind="schedule" /> : <LegacySchedulePage />;
+}
+
+function LegacySchedulePage() {
   const [entries, setEntries] = useState<ScheduleEntry[]>([]);
   const [status, setStatus] = useState<AsyncStatus>("loading");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -52,44 +82,25 @@ export default function SchedulePage() {
       const items = response.items || [];
       if (items.length === 0) {
         // Demo mode: provide high-quality mock schedule for demonstration
-        const demoEntries: ScheduleEntry[] = [
-          { id: "demo-1", courseCode: "IT3120", courseName: "Trí tuệ Nhân tạo", dayOfWeek: "Thứ Hai", time: "07:00 - 09:25", room: "H3-301", lecturer: "PGS.TS Nguyễn Thanh Hải", type: "class" },
-          { id: "demo-2", courseCode: "IT3080", courseName: "Mạng máy tính", dayOfWeek: "Thứ Hai", time: "09:35 - 11:55", room: "H3-204", lecturer: "TS. Trần Văn Minh", type: "class" },
-          { id: "demo-3", courseCode: "IT3090", courseName: "Cơ sở dữ liệu", dayOfWeek: "Thứ Ba", time: "07:00 - 09:25", room: "H3-301", lecturer: "TS. Lê Thị Hương", type: "class" },
-          { id: "demo-4", courseCode: "IT3150", courseName: "Kỹ thuật Phần mềm", dayOfWeek: "Thứ Tư", time: "13:00 - 15:25", room: "H5-102", lecturer: "PGS.TS Phạm Đức Thắng", type: "class" },
-          { id: "demo-5", courseCode: "IT3120", courseName: "Trí tuệ Nhân tạo", dayOfWeek: "Thứ Năm", time: "07:00 - 09:25", room: "H3-301", lecturer: "PGS.TS Nguyễn Thanh Hải", type: "class" },
-          { id: "demo-6", courseCode: "SS1010", courseName: "Giáo dục Quốc phòng", dayOfWeek: "Thứ Sáu", time: "07:00 - 11:55", room: "Sân KTX", lecturer: "Đại tá Nguyễn Văn Quân", type: "class" },
-          { id: "demo-7", courseCode: "IT3080", courseName: "Thi giữa kỳ — Mạng máy tính", dayOfWeek: "Thứ Bảy", date: "15/10/2026", time: "08:00 - 09:30", room: "H3-401", lecturer: "TS. Trần Văn Minh", type: "exam" },
-        ];
-        setEntries(demoEntries);
+        setEntries(DEMO_SCHEDULE_ENTRIES);
         setStatus("success");
         setIsStale(false);
         setFreshness(new Date().toISOString());
         return;
       }
 
-      const days = ["Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
-      const mappedEntries: ScheduleEntry[] = items.map((item) => {
-        const start = new Date(item.starts_at);
-        const end = new Date(item.ends_at);
-        const dayOfWeek = days[start.getDay()] || "Thứ Hai";
-        const time = `${start.toLocaleTimeString("vi-VN", {
-          timeZone: "Asia/Ho_Chi_Minh",
-          hour: "2-digit",
-          minute: "2-digit",
-        })} - ${end.toLocaleTimeString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit" })}`;
-
-        return {
-          id: item.id,
-          courseCode: item.course_code,
-          courseName: item.course_name,
-          dayOfWeek,
-          time,
-          room: item.location_label,
-          lecturer: item.instructor_display_name,
-          type: item.course_name.toLowerCase().includes("thi") ? "exam" : "class",
-        };
-      });
+      const mappedEntries: ScheduleEntry[] = items.map((item) => ({
+        id: item.id,
+        courseCode: item.course_code,
+        courseName: item.course_name,
+        dayOfWeek: vnWeekday(item.starts_at),
+        time: vnTimeRange(item.starts_at, item.ends_at),
+        startsAt: item.starts_at,
+        endsAt: item.ends_at,
+        room: item.location_label,
+        lecturer: item.instructor_display_name,
+        type: isExamTitle(item.course_name) ? "exam" : "class",
+      }));
 
       setEntries(mappedEntries);
       setFreshness(new Date().toISOString());
@@ -98,7 +109,7 @@ export default function SchedulePage() {
       );
       setIsStale(false);
       setStatus("success");
-    } catch (err: unknown) {
+    } catch {
       // If we already have verified entries from a prior fetch:
       // Retain the cached data, mark it as stale, and surface a clear stale warning.
       setEntries((prev) => {
@@ -106,15 +117,7 @@ export default function SchedulePage() {
           return prev; // keep cached
         }
         // Demo fallback: show mock data when backend is unavailable
-        return [
-          { id: "demo-1", courseCode: "IT3120", courseName: "Trí tuệ Nhân tạo", dayOfWeek: "Thứ Hai", time: "07:00 - 09:25", room: "H3-301", lecturer: "PGS.TS Nguyễn Thanh Hải", type: "class" },
-          { id: "demo-2", courseCode: "IT3080", courseName: "Mạng máy tính", dayOfWeek: "Thứ Hai", time: "09:35 - 11:55", room: "H3-204", lecturer: "TS. Trần Văn Minh", type: "class" },
-          { id: "demo-3", courseCode: "IT3090", courseName: "Cơ sở dữ liệu", dayOfWeek: "Thứ Ba", time: "07:00 - 09:25", room: "H3-301", lecturer: "TS. Lê Thị Hương", type: "class" },
-          { id: "demo-4", courseCode: "IT3150", courseName: "Kỹ thuật Phần mềm", dayOfWeek: "Thứ Tư", time: "13:00 - 15:25", room: "H5-102", lecturer: "PGS.TS Phạm Đức Thắng", type: "class" },
-          { id: "demo-5", courseCode: "IT3120", courseName: "Trí tuệ Nhân tạo", dayOfWeek: "Thứ Năm", time: "07:00 - 09:25", room: "H3-301", lecturer: "PGS.TS Nguyễn Thanh Hải", type: "class" },
-          { id: "demo-6", courseCode: "SS1010", courseName: "Giáo dục Quốc phòng", dayOfWeek: "Thứ Sáu", time: "07:00 - 11:55", room: "Sân KTX", lecturer: "Đại tá Nguyễn Văn Quân", type: "class" },
-          { id: "demo-7", courseCode: "IT3080", courseName: "Thi giữa kỳ — Mạng máy tính", dayOfWeek: "Thứ Bảy", date: "15/10/2026", time: "08:00 - 09:30", room: "H3-401", lecturer: "TS. Trần Văn Minh", type: "exam" },
-        ];
+        return DEMO_SCHEDULE_ENTRIES;
       });
       setIsStale(true);
       setStatus("success");
@@ -127,30 +130,14 @@ export default function SchedulePage() {
 
   return (
     <AppShell activeNav="schedule">
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "8px 0" }}>
-        <header
-          style={{
-            marginBottom: "24px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "16px",
-          }}
-        >
+      <div className="campus-page">
+        <header className="campus-page-heading">
           <div>
-            <h1
-              style={{
-                fontSize: "24px",
-                fontWeight: 800,
-                margin: "0 0 6px 0",
-                color: "var(--color-slate-900, #0f172a)",
-              }}
-            >
-              Thời khóa biểu & Lịch thi cá nhân
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+              Lịch học & Lịch thi của bạn
             </h1>
-            <p style={{ margin: 0, fontSize: "14px", color: "var(--color-slate-500, #64748b)" }}>
-              Lịch học tập và lịch thi kết thúc học phần được đồng bộ tự động từ cổng đào tạo HUCE
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Theo dõi lịch học và lịch thi kết thúc học phần được đồng bộ tự động từ cổng đào tạo HUCE
             </p>
           </div>
 
@@ -158,24 +145,9 @@ export default function SchedulePage() {
             type="button"
             onClick={fetchSchedule}
             disabled={status === "loading"}
-            style={{
-              padding: "10px 18px",
-              borderRadius: "var(--radius-md, 8px)",
-              border: "1px solid var(--color-slate-200, #e2e8f0)",
-              backgroundColor: "#ffffff",
-              color: "var(--color-slate-700, #334155)",
-              fontSize: "13px",
-              fontWeight: 600,
-              cursor: status === "loading" ? "not-allowed" : "pointer",
-              boxShadow: "var(--shadow-xs)",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              minHeight: "44px",
-              transition: "var(--transition-fast, 150ms ease)",
-            }}
+            className="fluent-btn-secondary text-xs"
           >
-            <RefreshCwIcon size={16} />
+            <RefreshCw className={`h-4 w-4 text-slate-500 ${status === "loading" ? "animate-spin" : ""}`} />
             <span>{status === "loading" ? "Đang đồng bộ..." : "Đồng bộ lại"}</span>
           </button>
         </header>
@@ -184,41 +156,19 @@ export default function SchedulePage() {
         {isStale && (
           <div
             role="alert"
-            style={{
-              padding: "12px 18px",
-              marginBottom: "20px",
-              backgroundColor: "#fffbeb",
-              border: "1px solid #fde68a",
-              borderRadius: "var(--radius-md, 8px)",
-              color: "#92400e",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontSize: "13px",
-              flexWrap: "wrap",
-              gap: "12px",
-            }}
+            className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300 shadow-xs"
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <AlertTriangleIcon size={18} />
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
               <span>
-                <strong>[~] Dữ liệu cũ (Chưa thể đồng bộ mới nhất):</strong> Đang hiển thị bản sao
-                lưu lịch học lúc {lastSyncTime || "trước đó"}. Máy chủ cổng đào tạo đang tạm thời gián đoạn kết nối.
+                <strong>[~] Dữ liệu cũ (Chưa thể đồng bộ mới nhất):</strong> Đang hiển thị bản sao lưu lịch học lúc{" "}
+                {lastSyncTime || "trước đó"}. Máy chủ cổng đào tạo đang tạm thời gián đoạn kết nối.
               </span>
             </div>
             <button
               type="button"
               onClick={fetchSchedule}
-              style={{
-                padding: "6px 14px",
-                backgroundColor: "#ffffff",
-                border: "1px solid #d97706",
-                borderRadius: "6px",
-                color: "#92400e",
-                fontWeight: 600,
-                cursor: "pointer",
-                fontSize: "12px",
-              }}
+              className="fluent-btn-secondary text-xs font-semibold"
             >
               Thử lại ngay
             </button>
@@ -227,12 +177,17 @@ export default function SchedulePage() {
 
         <AsyncState
           status={status}
-          loadingMessage="Đang đồng bộ thời khóa biểu sinh viên..."
-          emptyMessage="Không có lịch học hoặc lịch thi nào trong khoảng thời gian này"
+          loadingMessage="Đang đồng bộ thời khóa biểu của bạn..."
+          emptyMessage="Bạn hiện không có lịch học hoặc lịch thi nào trong khoảng thời gian này."
           errorMessage={errorMessage}
           onRetry={fetchSchedule}
         >
-          <ScheduleView entries={entries} freshnessTimestamp={freshness} isStale={isStale} isDegraded={status === "error"} />
+          <ScheduleView
+            entries={entries}
+            freshnessTimestamp={freshness}
+            isStale={isStale}
+            isDegraded={status === "error"}
+          />
         </AsyncState>
       </div>
     </AppShell>

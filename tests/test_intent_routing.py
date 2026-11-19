@@ -42,7 +42,7 @@ def fake_llm() -> DeterministicFakeProvider:
         ("Xem thời khóa biểu tuần này của tôi", Route.PERSONAL_SCHEDULE),
         ("Lịch học ngày mai có những môn nào?", Route.PERSONAL_SCHEDULE),
         ("Tôi muốn làm đơn xin cấp bảng điểm và giấy xác nhận sinh viên", Route.DOCUMENT_REQUEST),
-        ("Thủ tục xin hoãn nghĩa vụ quân sự cần giấy tờ gì?", Route.DOCUMENT_REQUEST),
+        ("Thủ tục xin hoãn nghĩa vụ quân sự cần giấy tờ gì?", Route.GROUNDED_FAQ),
         ("Đăng ký mượn phòng học H1 để làm việc nhóm", Route.ROOM_BOOKING),
         ("Tôi muốn tạo ticket khiếu nại điểm thi môn sức bền", Route.TICKET_CREATE),
         ("Tôi muốn báo cáo sự cố cơ sở vật chất phòng học", Route.TICKET_CREATE),

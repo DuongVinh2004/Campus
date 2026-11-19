@@ -35,7 +35,21 @@ class OpenAICompatibleAdapter(LlmGateway):
         model_name: str,
         is_free: bool = False,
         default_timeout_sec: float = 15.0,
+        *,
+        disable_thinking: bool = False,
+        json_mode: bool = False,
     ) -> None:
+        if type(disable_thinking) is not bool:
+            raise ValueError("disable_thinking must be boolean")
+        if type(json_mode) is not bool:
+            raise ValueError("json_mode must be boolean")
+        if (disable_thinking or json_mode) and (
+            provider_id != "deepseek" or model_name != "deepseek-flash"
+            or base_url.rstrip("/") not in {"https://api.deepseek.com", "https://api.deepseek.com/v1"}
+        ):
+            raise ValueError("Non-thinking option requires the approved DeepSeek endpoint/model")
+        self._disable_thinking = disable_thinking
+        self._json_mode = json_mode
         self._provider_id = provider_id
         self._base_url = base_url.rstrip("/")
         self._api_key = api_key or ""
@@ -74,8 +88,12 @@ class OpenAICompatibleAdapter(LlmGateway):
             "model": self._model_name,
             "messages": messages,
             "temperature": request.temperature,
-            "max_tokens": max(request.max_output_tokens, 1024),
+            "max_tokens": request.max_output_tokens,
         }
+        if self._disable_thinking:
+            payload["thinking"] = {"type": "disabled"}
+        if self._json_mode:
+            payload["response_format"] = {"type": "json_object"}
         return payload
 
     def _normalize_response(self, raw_data: dict[str, Any], latency_ms: int = 0) -> LlmResponse:
@@ -115,7 +133,7 @@ class OpenAICompatibleAdapter(LlmGateway):
             input_tokens=usage_raw.get("prompt_tokens", 0),
             cached_input_tokens=usage_raw.get("prompt_tokens_details", {}).get("cached_tokens", 0),
             output_tokens=usage_raw.get("completion_tokens", 0),
-            reasoning_tokens=0,
+            reasoning_tokens=usage_raw.get("completion_tokens_details", {}).get("reasoning_tokens", 0),
         )
 
         return LlmResponse(
@@ -142,10 +160,10 @@ class OpenAICompatibleAdapter(LlmGateway):
             "Content-Type": "application/json",
         }
         payload = self._build_payload(request)
-        timeout_sec = max(request.deadline_ms / 1000.0, self._default_timeout)
+        timeout_sec = min(request.deadline_ms / 1000.0, self._default_timeout)
 
         start_time = time.monotonic()
-        async with httpx.AsyncClient(timeout=timeout_sec) as client:
+        async with asyncio.timeout(request.deadline_ms / 1000.0), httpx.AsyncClient(timeout=timeout_sec) as client:
             resp = await client.post(url, headers=headers, json=payload)
             resp.raise_for_status()
             raw_data = resp.json()
@@ -164,11 +182,11 @@ class OpenAICompatibleAdapter(LlmGateway):
         }
         payload = self._build_payload(request)
         payload["stream"] = True
-        timeout_sec = max(request.deadline_ms / 1000.0, self._default_timeout)
+        timeout_sec = min(request.deadline_ms / 1000.0, self._default_timeout)
 
         yield LlmEvent(event_type=LlmEventType.RESPONSE_STARTED)
 
-        async with httpx.AsyncClient(timeout=timeout_sec) as client:
+        async with asyncio.timeout(request.deadline_ms / 1000.0), httpx.AsyncClient(timeout=timeout_sec) as client:
             async with client.stream("POST", url, headers=headers, json=payload) as stream_resp:
                 stream_resp.raise_for_status()
                 async for line in stream_resp.aiter_lines():

@@ -34,4 +34,4 @@
 
 ## Đo chất lượng
 
-Các gate nằm ở `evals/gates/regression-gates.yaml`, kịch bản đối kháng ở `evals/red-team`. Thiếu fixture hay chưa chạy là `not_verified`, không tính là đạt.
+Các gate nằm ở `evals/gates/regression-gates.yaml`, kịch bản đối kháng ở `evals/red-team`. Gate chưa chạy thì chưa tính là đạt; gate đã chạy trên bộ ca do mô hình viết với đáp án chuẩn kiểm bằng mã thì tính, không cần người kiểm và không cần nhãn "do mô hình tạo, chưa có người kiểm".

@@ -61,6 +61,11 @@ class Understanding:
     missing_slots: tuple[str, ...]
     clarify_prompt: str | None   # fixed server text with suggestions when we must ask back
     out_of_scope: bool = False
+    # Server-built sentence for a question whose answer depends on a slot the user did not give but whose sources
+    # can still be shown per scope. The answer is given first; this sentence invites the user to narrow it down.
+    ask_back: str | None = None
+    # Scope names the question mentions (majors, programmes; folded). The service checks that the sources it found carry them.
+    scope_terms: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -108,4 +113,5 @@ class Outcome:
     partial_note: str | None = None
     retry_hint: str | None = None
     suggestions: tuple[str, ...] = ()
+    preface: str | None = None                 # server text shown before the answer (e.g. a scope caveat)
     trace: Mapping[str, object] = field(default_factory=dict)  # finite counters/codes only, never question text

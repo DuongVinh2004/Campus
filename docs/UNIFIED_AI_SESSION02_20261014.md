@@ -1,0 +1,32 @@
+# Chặng 02 — contracts dùng chung và phiên tự thử local
+
+Candidate duy nhất: **http://localhost:8006/login**. Build đang phục vụ: `F9SQs0fHbDbawaCr3j_W6`, frontend3006 và API8006; runtime `unified-local-v2`. Bản SQLite candidate đã giữ từ chặng trước, không tự đồng bộ với app8004. UNI-001/002 verified; UNI-003/004 implemented, chưa verified. Các task005–050 vẫn planned theo phụ thuộc.
+
+Đã bổ sung contracts intent, draft, task/DAG, preferences, grant-request, supplement, batch preparation, pagination, metadata, acknowledgement và error; 13 JSON Schemas gồm hai input của bộ đo. Server kiểm cross-field/target/audience/DAG ngoài JSON Schema; schema, grant request hoặc proposal không cấp quyền thực hiện. Registry `/v1/assistant/contracts` vẫn yêu cầu authentication/authorization và no-store. Các proxy GET/POST có operation ID riêng, giữ hành vi cũ. Thông báo401 rõ bằng tiếng Việt; structured problem và authentication giữ nguyên.
+
+Bộ đo tùy chọn tại `/services` ghi loại thao tác, tên trường cho phép, số lần và khoảng thời gian server; không ghi giá trị nhập, nội dung hồ sơ hay ghi chú. Hai bảng SQLite mới, owner/tenant/role kiểm server. CAS, stable event ID, replay và receipt bảo vệ việc đếm trùng; kết quả ghi chưa rõ được giữ để thử lại. Lỗi đo không chặn thao tác nghiệp vụ. Pause/wait/finish không gửi hoặc xử lý hồ sơ. Khoảng quá5phút được ghi chưa phân loại. Đây là thời gian theo trạng thái recorder, không chứng nhận người thật hoặc sự chú ý; chỉ đếm thao tác đã gắn hook trên service workspace, không phải mọi click trên toàn ứng dụng.
+
+## Người dùng tự thử trên local
+
+Người dùng đã chọn “Tôi tự thử trên bản local”. Tab hiện đã đăng nhập **SV001**, chọn **UB-04**, loại phiên **Người thử (tự khai)**; chưa bấm bắt đầu. Dùng dữ liệu mô phỏng, không nhập dữ liệu cá nhân thật. Giữ mọi hồ sơ cũ.
+
+1. Trong **Đo phiên thử thao tác (tùy chọn)**, bấm **Bắt đầu đo** khi sẵn sàng làm bài. Chờ hiện phiên bản và ID phiên đo. Khi nghỉ, chọn **Tạm dừng đo**; khi thật sự đang chờ, chọn **Bắt đầu chờ**, rồi **Tiếp tục đo**. Kết thúc khi hoàn thành hoặc gặp lỗi không thể tiếp tục.
+2. **SV001 / UB-04:** tạo hồ sơ phúc khảo mới, chọn CS101 (`demo-student1-CS101`), nhập lý do mô phỏng “Đối chiếu câu 2 và cách cộng điểm trong bài thi demo”. Đọc hướng dẫn, lưu nháp, xem trước, tự kiểm học phần/lý do/nguồn, rồi xác nhận gửi vào hàng đợi local nếu muốn chạy hết ca. Kỳ vọng backend kiểm fixture/eligibility/hạn; chỉ có trạng thái gửi và receipt sau xác nhận. Phí/hạn/mẫu HUCE thật vẫn chưa xác minh. Kết thúc đo, giữ ID phiên và ID hồ sơ mới.
+3. **OF002 / UB-08:** dùng **Đổi tài khoản**, đăng nhập OF002, chọn UB-08 và bắt đầu một phiên đo người thử khác. Mở đúng hồ sơ mới ở ACADEMIC_SERVICES, đối chiếu dữ liệu/nguồn/phiên bản trước khi tiếp nhận bằng ghi chú mô phỏng. Ghi lại phần phải đọc hoặc nhập lại, lỗi và kết quả. Kết thúc đo. Case cũ `13d817c2` đã có kết quả; không dùng nó làm ca tiếp nhận mới.
+4. Có thể thử riêng **UB-14** để xem cảnh báo nguồn khác snapshot, hoặc **UB-10** nếu chủ động thử yêu cầu/bổ sung giữa hai vai trò. Mỗi ca có phiên riêng; không cần chạy hết14ca ngay. Một lượt đổi vai trò của cùng người là baseline thăm dò, chưa phải pilot UNI-047 hay chứng minh giảm30%.
+5. Sau tải lại trang, **Mở phiên gần đây** đọc lại phiên của tài khoản hiện tại. Trước đổi tài khoản hoặc đóng tab, kết thúc/tạm dừng và chờ biên nhận; recorder không tự suy khoảng rời tab là active time. Phiên cũ luôn giữ khi chọn đo phiên mới.
+
+Khi quay lại cuộc chat, cung cấp ID phiên sinh viên/cán bộ, ID hồ sơ đã thử và nhận xét: hoàn thành hay bị chặn, điểm phải nhập/tìm lại, kết quả/nguồn có đúng không. Không gửi token hoặc thông tin cá nhân. Có thể đọc metadata/receipts đã lưu từ candidate; nội dung nhận xét vẫn cần người thử cung cấp. Completion/first-pass/correction/supplement loop chưa được tự động suy ra từ số click. Chưa có phép đo paired sau cải tiến và chưa tuyên bố usefulness.
+
+## Kiểm chứng và bảo toàn
+
+- **112 tests backend +19 frontend =131 tests duy nhất trong chặng02**, union theo classname/name của JUnit; không cộng các lần chạy lại. Bao gồm bounds/unknown fields/target/audience/DAG, auth/owner/role isolation, CAS/replay/quota/clock, proxy SSE byte/citation/history compatibility, context binding và retry của UI. SSE dùng fake transport, không gọi model trả phí.
+- Next compiler và TypeScript build03 exit0;5file source UI khớp byte-for-byte snapshot đang chạy. Guard giữ nguyên SHA256 `8f0886295da2214205cf257dd9e1d9476993ed1a7fb0ac67434909fa4af2eae6`.60OpenAPI operation IDs không trùng;13schemas khớp model hiện hành.
+- Live readback: no-store, ngoài scope404, chưa đăng nhập401, sai contract422, stale409; student/staff dùng cùng trạng thái/evidence đúng projection. Context không chứa internal notes hoặc confirmation token.
+- Browser OF002: automation UB-08 `01a138e5-5aee-7ba8-9db7-a582d71a2b56` đi active→pause→resume→manual open→wait→resume→finished, version7,6events. Tổng interval receipts bằng record; tải trang/mở lại giữ kết quả. SV001 không thấy phiên đo của OF002. Đây chỉ là smoke recorder; không hoàn thành bài staff review hoặc human baseline.
+- Row count/hash mọi bảng nghiệp vụ có trước bằng backup nhất quán `business-before-01.sqlite3`; chỉ thêm `unified_baseline_session`/`unified_baseline_event`. Pre-existing Git status entries vẫn giữ. Snapshot/build/log/evidence cũ không overwrite hoặc cleanup. Handoff chỉ các tiến trình candidate đã xác minh command/parent/time/port; app8003/8004 không đổi.
+- Scoped diff check pass. Full working-tree diff check vẫn có blank line EOF tại `apps/web/src/app/globals.css` từ trước; giữ nguyên. Không commit/push/deploy, gửi bên ngoài, automation hoặc gọi model trả phí.
+
+Evidence chính: `infra/local/unified-ai-20261014-02/candidate-verification-01.json`, `browser-verification-01.json`, `runtime-launch-02.json`, `frontend-build-03.json`, `backend-tests-01.xml`, `backend-tests-02.xml`, `baseline-final-tests-01.xml`, `proxy-tests-01.xml`, `frontend-tests-03.xml`. Các source backup và DB backup ở cùng thư mục. Verifier: `.venv/Scripts/python.exe -B scripts/verify_unified_ai_session02.py` exit0; output exclusive-create, không chạy lại vào evidence01.
+
+Contracts không triển khai thay các task settings/memory/grants/history discovery, staff model chat, typed supplement execution, batch hoặc schedule/room. UNI-004 chưa verified vì UNI-003 còn thiếu baseline người dùng. `next_task=UNI-003`: đọc kết quả tự thử và đối chiếu correctness, rồi xác minh004 để bắt đầu005 khi đủ căn cứ; không có bước duyệt tài liệu mới.

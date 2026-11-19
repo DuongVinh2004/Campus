@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 import advanced_rag_frontend as frontend
+import runtime_routes
 from knowledge_platform import ROOT, STATE, checked_path, retain
 
 # Portable templates for a server that does not have the development machine's retained frontend files.
@@ -25,9 +26,7 @@ def prepare():
                 # Only real operational pages enter this new serving snapshot.
                 # Source files and all older snapshots remain untouched.
                 if relative.parts[:2]==("src","app") and len(relative.parts)>3:
-                    if relative.parts[2] not in {"chat","knowledge","login","services","tickets","schedule","rooms","privacy","learning","staff","notifications","admin"}:
-                        continue
-                    if relative.parts[2]=="knowledge" and len(relative.parts)>4 and relative.parts[3]!="sources":
+                    if relative.parts[2] not in runtime_routes.top_level_page_folders():
                         continue
                 if relative.as_posix()=="src/app/page.tsx":
                     frontend.write(scope / relative,b'import { redirect } from "next/navigation";\nexport default function Page() { redirect("/chat"); }\n')

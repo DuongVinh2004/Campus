@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ThumbsUpIcon, ThumbsDownIcon } from "../../components/Icons";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 
 export type FeedbackRating = "helpful" | "not_helpful";
 
@@ -34,11 +34,7 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
     return (
       <div
         aria-live="polite"
-        style={{
-          fontSize: "13px",
-          color: "var(--color-status-success, #15803d)",
-          padding: "4px 0",
-        }}
+        className="text-xs text-emerald-600 dark:text-emerald-400 py-1 font-medium"
       >
         Cảm ơn bạn đã phản hồi!
       </div>
@@ -46,23 +42,8 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "4px",
-        marginTop: "8px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          fontSize: "13px",
-          color: "var(--color-text-muted, #4b5563)",
-        }}
-      >
+    <div className="flex flex-col gap-1 mt-2">
+      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
         <span>Câu trả lời có hữu ích không?</span>
         <button
           type="button"
@@ -70,24 +51,13 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
           disabled={isSubmitting}
           aria-label="Hữu ích"
           aria-pressed={selectedRating === "helpful"}
-          style={{
-            minHeight: "36px",
-            padding: "6px 14px",
-            fontSize: "13px",
-            fontWeight: 500,
-            border: `1px solid ${selectedRating === "helpful" ? "#bfdbfe" : "var(--color-slate-200, #e2e8f0)"}`,
-            borderRadius: "var(--radius-full, 9999px)",
-            backgroundColor: selectedRating === "helpful" ? "var(--color-primary-light, #eff6ff)" : "#ffffff",
-            color: selectedRating === "helpful" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-700, #334155)",
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-            boxShadow: selectedRating === "helpful" ? "none" : "var(--shadow-xs)",
-            transition: "var(--transition-fast, 150ms ease)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-          }}
+          className={`min-h-[36px] px-3.5 py-1.5 text-xs font-medium rounded-full inline-flex items-center gap-1.5 transition-colors cursor-pointer border ${
+            selectedRating === "helpful"
+              ? "border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 shadow-none"
+              : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-xs"
+          } ${isSubmitting ? "cursor-not-allowed opacity-60" : ""}`}
         >
-          <ThumbsUpIcon size={16} />
+          <ThumbsUp className="w-3.5 h-3.5" />
           <span>Hữu ích</span>
         </button>
         <button
@@ -96,24 +66,13 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
           disabled={isSubmitting}
           aria-label="Chưa hữu ích"
           aria-pressed={selectedRating === "not_helpful"}
-          style={{
-            minHeight: "36px",
-            padding: "6px 14px",
-            fontSize: "13px",
-            fontWeight: 500,
-            border: `1px solid ${selectedRating === "not_helpful" ? "#fecaca" : "var(--color-slate-200, #e2e8f0)"}`,
-            borderRadius: "var(--radius-full, 9999px)",
-            backgroundColor: selectedRating === "not_helpful" ? "#fef2f2" : "#ffffff",
-            color: selectedRating === "not_helpful" ? "#b91c1c" : "var(--color-slate-700, #334155)",
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-            boxShadow: selectedRating === "not_helpful" ? "none" : "var(--shadow-xs)",
-            transition: "var(--transition-fast, 150ms ease)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-          }}
+          className={`min-h-[36px] px-3.5 py-1.5 text-xs font-medium rounded-full inline-flex items-center gap-1.5 transition-colors cursor-pointer border ${
+            selectedRating === "not_helpful"
+              ? "border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 shadow-none"
+              : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-xs"
+          } ${isSubmitting ? "cursor-not-allowed opacity-60" : ""}`}
         >
-          <ThumbsDownIcon size={16} />
+          <ThumbsDown className="w-3.5 h-3.5" />
           <span>Chưa hữu ích</span>
         </button>
       </div>
@@ -121,29 +80,14 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
       {errorMessage && (
         <div
           role="alert"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            fontSize: "12px",
-            color: "var(--color-status-error, #b91c1c)",
-            marginTop: "4px",
-          }}
+          className="flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400 mt-1"
         >
           <span>{errorMessage}</span>
           {selectedRating && (
             <button
               type="button"
               onClick={() => handleVote(selectedRating)}
-              style={{
-                fontSize: "12px",
-                textDecoration: "underline",
-                background: "none",
-                border: "none",
-                color: "var(--color-status-error, #b91c1c)",
-                cursor: "pointer",
-                padding: "2px 4px",
-              }}
+              className="text-xs underline bg-transparent border-0 text-rose-600 dark:text-rose-400 cursor-pointer px-1 py-0.5 font-medium hover:text-rose-700 dark:hover:text-rose-300"
             >
               Thử lại
             </button>

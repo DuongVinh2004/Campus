@@ -195,6 +195,34 @@ async def test_a_reached_cap_refuses_before_any_provider_call(tmp_path):
     assert len(gateway.calls) == 1 and app.state.counters["refused"] == 1
 
 
+@pytest.mark.asyncio
+async def test_status_reports_counters_and_the_days_spend_and_needs_the_token(tmp_path):
+    budget, gateway = Budget(), CountingGateway()
+    cap = sidecar.DailySpendCap(tmp_path / "cap.json", budget.snapshot, usd_cap=Decimal("5.00"), call_cap=2000)
+    remote, app, http = client_for(gateway, cap)
+    await remote.generate(make_request())
+    budget.spend("0.25")
+    body = (await http.get("/v1/status")).json()
+    assert body["counters"]["ok"] == 1 and body["counters"]["in_flight"] == 0
+    assert body["today"] == {"usd": "0.25", "calls": 1, "usd_cap": "5.00", "call_cap": 2000,
+                             "cap_enabled": True, "cap_reached": False}
+    budget.spend("4.80", calls=1999)
+    assert (await http.get("/v1/status")).json()["today"]["cap_reached"] is True
+    anonymous = httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8025")
+    assert (await anonymous.get("/v1/status")).status_code == 401
+    wrong = await anonymous.get("/v1/status", headers={"X-Gateway-Token": "x" * 64})
+    assert wrong.status_code == 401 and "usd" not in wrong.text
+
+
+@pytest.mark.asyncio
+async def test_status_without_a_cap_says_so(tmp_path):
+    _, _, http = client_for(CountingGateway(), None)
+    assert (await http.get("/v1/status")).json()["today"] is None
+    off = sidecar.DailySpendCap(tmp_path / "o.json", Budget().snapshot, usd_cap=Decimal("0"), call_cap=0)
+    _, _, http = client_for(CountingGateway(), off)
+    assert (await http.get("/v1/status")).json()["today"]["cap_enabled"] is False
+
+
 # ---- sidecar down / misuse ---------------------------------------------------------------------------------
 
 @pytest.mark.asyncio

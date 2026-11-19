@@ -82,7 +82,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <span style={{ fontSize: "16px", flexShrink: 0 }}>
                 {TOAST_ICONS[toast.type]}
               </span>
-              <span style={{ flex: 1 }}>{toast.message}</span>
+              <details style={{ flex: 1, minWidth: 0 }}>
+                <summary className="cursor-pointer truncate" title={toast.message}>{toast.message}</summary>
+                <p className="mt-1 max-h-32 overflow-y-auto whitespace-pre-wrap break-words font-normal">{toast.message}</p>
+              </details>
               <button
                 type="button"
                 onClick={() => removeToast(toast.id)}

@@ -196,13 +196,13 @@ export function StaffTicketQueue({
     return (
       <div
         role="alert"
-        className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-900 shadow-xs dark:border-red-900/60 dark:bg-red-950/60 dark:text-red-200"
+        className="rounded-2xl border border-[var(--color-danger-subtle)] bg-[var(--surface-subtle)] p-6 text-[var(--color-danger)] shadow-xs"
       >
         <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" aria-hidden="true" />
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-danger)]" aria-hidden="true" />
           <div>
-            <h3 className="mb-2 text-lg font-bold">Từ chối quyền truy cập</h3>
-            <p className="text-sm leading-relaxed text-red-800 dark:text-red-300">
+            <h3 className="mb-2 text-lg font-bold text-[var(--text-primary)]">Từ chối quyền truy cập</h3>
+            <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
               Bạn không có thẩm quyền truy cập hàng đợi cán bộ một cửa. Chức năng này chỉ dành cho tài khoản có vai trò Cán bộ tiếp nhận hoặc Quản trị viên hệ thống.
             </p>
           </div>
@@ -424,15 +424,15 @@ export function StaffTicketQueue({
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm text-amber-800 dark:text-amber-200">Checklist cục bộ cần đối chiếu nguồn trước khi xử lý. Dữ liệu mô phỏng phải được nhận diện theo hồ sơ; trạng thái chưa có bằng chứng luôn là chưa xác minh.</p>
-      {!businessActionsAvailable && <p role="status" className="text-sm">Hàng đợi này chưa có consumer nghiệp vụ bền vững. Tiếp nhận, chuyển, yêu cầu bổ sung và hoàn tất đang khóa; mở workspace nghiệp vụ có hỗ trợ hoặc liên hệ đơn vị phụ trách để xử lý thủ công.</p>}
+      <p className="text-sm text-[var(--color-warning)]">Checklist cục bộ cần đối chiếu nguồn trước khi xử lý. Dữ liệu mô phỏng phải được nhận diện theo hồ sơ; trạng thái chưa có bằng chứng luôn là chưa xác minh.</p>
+      {!businessActionsAvailable && <p role="status" className="text-sm text-[var(--text-secondary)]">Hàng đợi này chưa có consumer nghiệp vụ bền vững. Tiếp nhận, chuyển, yêu cầu bổ sung và hoàn tất đang khóa; mở workspace nghiệp vụ có hỗ trợ hoặc liên hệ đơn vị phụ trách để xử lý thủ công.</p>}
       {/* Header and Staff Identity */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
             Hàng đợi tiếp nhận yêu cầu (Cán bộ một cửa)
           </h2>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-xs text-[var(--text-secondary)]">
             Không gian phân loại mật độ cao với kiểm soát quyền sở hữu và giải quyết xung đột
           </p>
         </div>
@@ -450,7 +450,7 @@ export function StaffTicketQueue({
             </button>
           )}
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--surface-subtle)] px-3.5 py-1.5 text-xs text-[var(--text-primary)]">
             <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
             <span>
               Cán bộ trực: <strong>{currentStaffId || "Chưa xác định"}</strong>
@@ -460,10 +460,10 @@ export function StaffTicketQueue({
       </div>
 
       {/* Search & Sort Toolbar */}
-      <div className={`${staffSurface} flex flex-wrap items-center justify-between gap-3 p-3 shadow-xs`}>
+      <div className={`${staffSurface} flex flex-wrap items-center justify-between gap-3 p-3 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
         <div className="relative min-w-[280px] flex-1">
           <span className="sr-only">Tìm theo mã, tên sinh viên hoặc tiêu đề...</span>
-          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" />
           <input
             type="search"
             placeholder="Tìm theo mã, tên sinh viên hoặc tiêu đề..."
@@ -474,14 +474,14 @@ export function StaffTicketQueue({
         </div>
 
         <div className="flex items-center gap-2">
-          <label htmlFor="sort-queue" className="whitespace-nowrap text-xs font-semibold text-slate-600 dark:text-slate-400">
+          <label htmlFor="sort-queue" className="whitespace-nowrap text-xs font-semibold text-[var(--text-secondary)]">
             Sắp xếp:
           </label>
           <select
             id="sort-queue"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortType)}
-            className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            className="min-h-10 rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-2 text-sm text-[var(--text-primary)]"
           >
             <option value="default">Theo thứ tự tiếp nhận</option>
             <option value="urgent">Độ khẩn cấp ưu tiên</option>
@@ -493,7 +493,7 @@ export function StaffTicketQueue({
       <div
         role="tablist"
         aria-label="Bộ lọc hàng đợi tiếp nhận"
-        className="flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800/80"
+        className="flex flex-wrap gap-1 rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] p-1"
       >
         <button
           type="button"
@@ -504,8 +504,8 @@ export function StaffTicketQueue({
           onClick={() => setFilter("all")}
           className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
             filter === "all"
-              ? "bg-white text-blue-700 shadow-xs dark:bg-slate-900 dark:text-blue-300"
-              : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+              ? "bg-[var(--surface-card)] text-[var(--color-primary)] shadow-xs"
+              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           }`}
         >
           Tất cả ({items.length})
@@ -519,8 +519,8 @@ export function StaffTicketQueue({
           onClick={() => setFilter("unassigned")}
           className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
             filter === "unassigned"
-              ? "bg-white text-blue-700 shadow-xs dark:bg-slate-900 dark:text-blue-300"
-              : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+              ? "bg-[var(--surface-card)] text-[var(--color-primary)] shadow-xs"
+              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           }`}
         >
           Chưa nhận
@@ -534,8 +534,8 @@ export function StaffTicketQueue({
           onClick={() => setFilter("my")}
           className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
             filter === "my"
-              ? "bg-white text-blue-700 shadow-xs dark:bg-slate-900 dark:text-blue-300"
-              : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+              ? "bg-[var(--surface-card)] text-[var(--color-primary)] shadow-xs"
+              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           }`}
         >
           Ca của tôi
@@ -549,8 +549,8 @@ export function StaffTicketQueue({
           onClick={() => setFilter("urgent")}
           className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
             filter === "urgent"
-              ? "bg-white text-blue-700 shadow-xs dark:bg-slate-900 dark:text-blue-300"
-              : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+              ? "bg-[var(--surface-card)] text-[var(--color-primary)] shadow-xs"
+              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           }`}
         >
           Khẩn cấp
@@ -562,10 +562,10 @@ export function StaffTicketQueue({
         id="queue-panel"
         role="region"
         aria-label="Danh sách yêu cầu tiếp nhận"
-        className={`${staffSurface} overflow-x-auto shadow-xs`}
+        className={`${staffSurface} overflow-x-auto shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}
       >
-        <table className="campus-staff-table w-full text-left text-sm fluent-table">
-          <thead className="bg-slate-50 text-xs font-medium uppercase tracking-wider text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+        <table className="campus-staff-table w-full text-left text-sm">
+          <thead className="bg-[var(--surface-subtle)] text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] border-b border-[var(--border-color)]">
             <tr>
               <th scope="col" className="px-4 py-3.5">Mã yêu cầu</th>
               <th scope="col" className="px-4 py-3.5">Sinh viên</th>
@@ -575,7 +575,7 @@ export function StaffTicketQueue({
               <th scope="col" className="px-4 py-3.5">Hành động</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-[var(--border-color)]">
             {filteredItems.map((item) => {
               const isUnassigned = item.status === "unassigned";
               const isMyItem = item.assignedStaffId === currentStaffId;
@@ -755,42 +755,42 @@ export function StaffTicketQueue({
 
                   {/* Expandable detail region with Intake Checklist & AI Copilot */}
                   {isExpanded && !isRestricted && (
-                    <tr className="bg-slate-50/80 dark:bg-slate-900/80">
-                      <td colSpan={6} className="border-t border-slate-200 p-5 dark:border-slate-800">
+                    <tr className="bg-[var(--surface-subtle)]">
+                      <td colSpan={6} className="border-t border-[var(--border-color)] p-5">
                         <div className="flex flex-col gap-5">
                           {/* Public Context & Internal Staff Notes */}
                           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className={`${staffSurface} p-4 shadow-xs`}>
-                              <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase text-blue-600 dark:text-blue-400">
+                            <div className="fluent-card p-4 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]">
+                              <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase text-[var(--color-primary)]">
                                 <span>●</span>
                                 <span>Nội dung công khai (Sinh viên thấy)</span>
                               </div>
-                              <p className="text-sm leading-relaxed text-slate-800 dark:text-slate-200">
+                              <p className="text-sm leading-relaxed text-[var(--text-primary)]">
                                 {item.publicContent || item.title}
                               </p>
                             </div>
 
-                            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 shadow-xs dark:border-amber-900/60 dark:bg-amber-950/40">
-                              <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase text-amber-800 dark:text-amber-400">
+                            <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--surface-card)] p-4 shadow-xs">
+                              <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase text-[var(--color-warning)]">
                                 <span>🔒</span>
                                 <span>Ghi chú nội bộ (Chỉ lưu hành nội bộ)</span>
                               </div>
-                              <p className="text-sm leading-relaxed text-amber-900 dark:text-amber-200">
+                              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
                                 {item.internalNotes || "Không có ghi chú nội bộ cho ca này."}
                               </p>
                             </div>
                           </div>
 
                           {/* AI Copilot Triage Assistant Card */}
-                          <div className="rounded-2xl border border-purple-200 bg-purple-50/60 p-5 shadow-xs dark:border-purple-900/60 dark:bg-purple-950/40">
-                            <div className="mb-3 flex items-center gap-2 text-purple-800 dark:text-purple-300">
-                              <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-                              <h4 className="text-sm font-bold">
+                          <div className="rounded-2xl border border-[var(--color-primary-subtle)] bg-[var(--surface-card)] p-5 shadow-xs">
+                            <div className="mb-3 flex items-center gap-2 text-[var(--color-primary)]">
+                              <Sparkles className="h-5 w-5 text-[var(--color-primary)]" aria-hidden="true" />
+                              <h4 className="text-sm font-bold text-[var(--text-primary)]">
                                 Trợ lý AI Tiếp nhận & Phân loại thông minh
                               </h4>
                             </div>
 
-                            <div className="space-y-2 text-sm text-purple-900 dark:text-purple-200">
+                            <div className="space-y-2 text-sm text-[var(--text-primary)]">
                               <div>
                                 <strong>Tóm tắt AI:</strong> Hồ sơ Một cửa: {item.title}{item.priority === "urgent" ? " (được đánh dấu khẩn)" : ""}. Hạn xử lý theo quy trình của đơn vị; hệ thống chưa có căn cứ thời hạn cho loại hồ sơ này.
                               </div>
@@ -805,7 +805,7 @@ export function StaffTicketQueue({
                                     setSupplementModalId(item.id);
                                     setSupplementMsg("Chào bạn, Nhà trường đã tiếp nhận hồ sơ. Vui lòng bổ sung bản chụp CCCD hai mặt để hoàn thiện thủ tục.");
                                   }}
-                                  className="rounded-lg border border-purple-300 bg-white px-3 py-1 text-xs font-semibold text-purple-800 shadow-xs hover:bg-purple-50 dark:border-purple-700 dark:bg-slate-900 dark:text-purple-300"
+                                  className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)] shadow-xs hover:bg-[var(--surface-card)]"
                                 >
                                   Mẫu: Yêu cầu bổ sung CCCD
                                 </button>
@@ -815,9 +815,9 @@ export function StaffTicketQueue({
 
                           {/* Student Attachments with OCR Badges */}
                           {item.attachments && item.attachments.length > 0 && (
-                            <div className={`${staffSurface} p-5 shadow-xs`}>
+                            <div className="fluent-card p-5 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]">
                               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                <h4 className="text-sm font-bold text-[var(--text-primary)]">
                                   📎 Minh chứng & Hồ sơ sinh viên đính kèm ({item.attachments.length})
                                 </h4>
                                 <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -828,11 +828,11 @@ export function StaffTicketQueue({
                                 {item.attachments.map((att, attIdx) => (
                                   <div
                                     key={attIdx}
-                                    className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 p-3 dark:border-slate-800 dark:bg-slate-900"
+                                    className="flex items-center justify-between rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] p-3"
                                   >
                                     <div className="flex items-center gap-2">
                                       <span className="text-base">{att.type === "pdf" ? "📄" : "🖼️"}</span>
-                                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{att.name}</span>
+                                      <span className="text-xs font-semibold text-[var(--text-primary)]">{att.name}</span>
                                     </div>
                                     <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                                       {att.evidence?.state === "checked" && att.evidence.locator && att.evidence.version
@@ -846,18 +846,18 @@ export function StaffTicketQueue({
                           )}
 
                           {/* Adaptive Intake Checklist */}
-                          <div className={`${staffSurface} p-5 shadow-xs`}>
+                          <div className="fluent-card p-5 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]">
                             {/* Preset Actions Bar */}
-                            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50/70 p-3 dark:border-blue-900/60 dark:bg-blue-950/40">
-                              <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900 dark:text-blue-300">
-                                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] p-3">
+                              <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-primary)]">
+                                <Sparkles className="h-4 w-4 text-[var(--color-primary)]" aria-hidden="true" />
                                 <span>Thao tác chuẩn 1-chạm:</span>
                               </div>
                               <div className="flex flex-wrap items-center gap-2">
                                 <button
                                   type="button"
                                   onClick={() => handleAiAutoCheck(item.id)}
-                                  className="rounded-lg border border-blue-400 bg-white px-3 py-1.5 text-xs font-bold text-blue-700 shadow-xs hover:bg-blue-50 dark:border-blue-700 dark:bg-slate-900 dark:text-blue-300"
+                                  className="rounded-lg border border-[var(--color-primary)] bg-[var(--surface-card)] px-3 py-1.5 text-xs font-bold text-[var(--color-primary)] shadow-xs hover:bg-[var(--surface-subtle)]"
                                 >
                                   Cán bộ đối chiếu từng mục
                                 </button>
@@ -867,7 +867,7 @@ export function StaffTicketQueue({
                                     setSupplementModalId(item.id);
                                     setSupplementMsg("Chào em, hồ sơ còn thiếu bản scan có con dấu tròn đỏ xác nhận. Vui lòng bổ sung.");
                                   }}
-                                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                                  className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] shadow-xs hover:bg-[var(--surface-subtle)]"
                                 >
                                   ⚠️ Mẫu: Yêu cầu bổ sung dấu đỏ
                                 </button>
@@ -876,10 +876,10 @@ export function StaffTicketQueue({
 
                             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                               <div>
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                <h4 className="text-sm font-bold text-[var(--text-primary)]">
                                   Checklist tiếp nhận hồ sơ (Bắt buộc {checkedCount}/{INTAKE_CHECKLIST_GATES.length})
                                 </h4>
-                                <span className={`text-xs font-medium ${checkedCount === INTAKE_CHECKLIST_GATES.length ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}>
+                                <span className={`text-xs font-medium ${checkedCount === INTAKE_CHECKLIST_GATES.length ? "text-emerald-600 dark:text-emerald-400" : "text-[var(--text-secondary)]"}`}>
                                   {checkedCount === INTAKE_CHECKLIST_GATES.length ? "Đã đạt 100% tiêu chí hợp lệ" : `Tiến độ thẩm định: ${Math.round((checkedCount / INTAKE_CHECKLIST_GATES.length) * 100)}%`}
                                 </span>
                               </div>
@@ -888,7 +888,7 @@ export function StaffTicketQueue({
                                   type="button"
                                   onClick={() => handleAiAutoCheck(item.id)}
                                   disabled={isFinalized}
-                                  className="rounded-lg border border-purple-300 bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-700 hover:bg-purple-100 disabled:opacity-50 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300"
+                                  className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)] hover:bg-[var(--surface-card)] disabled:opacity-50"
                                 >
                                   Kiểm tra khả năng đối chiếu
                                 </button>
@@ -900,10 +900,10 @@ export function StaffTicketQueue({
                               </div>
                             </div>
 
-                            <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                            <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-subtle)] border border-[var(--border-color)]">
                               <div
                                 className={`h-full transition-all duration-300 ${
-                                  checkedCount === INTAKE_CHECKLIST_GATES.length ? "bg-emerald-600" : "bg-blue-600"
+                                  checkedCount === INTAKE_CHECKLIST_GATES.length ? "bg-emerald-600" : "bg-[var(--color-primary)]"
                                 }`}
                                 style={{ width: `${(checkedCount / INTAKE_CHECKLIST_GATES.length) * 100}%` }}
                               />
@@ -915,24 +915,24 @@ export function StaffTicketQueue({
                                   key={gate.id}
                                   className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition ${
                                     ticketGates[gate.id]
-                                      ? "border-blue-500 bg-blue-50/50 shadow-xs dark:border-blue-700 dark:bg-blue-950/30"
-                                      : "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900"
+                                      ? "border-[var(--color-primary)] bg-[var(--color-primary-subtle)] shadow-xs"
+                                      : "border-[var(--border-color)] bg-[var(--surface-card)] hover:bg-[var(--surface-subtle)]"
                                   }`}
                                 >
                                   <input
                                     type="checkbox"
                                     checked={!!ticketGates[gate.id]}
                                     onChange={() => handleGateToggle(item.id, gate.id)}
-                                    className="mt-0.5 h-4 w-4 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                    className="mt-0.5 h-4 w-4 cursor-pointer rounded border-[var(--border-color)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                   />
                                   <div className="flex flex-1 flex-col gap-1">
                                     <div className="flex flex-wrap items-center justify-between gap-1.5">
-                                      <span className="font-semibold text-slate-900 dark:text-slate-100">{gate.label}</span>
+                                      <span className="font-semibold text-[var(--text-primary)]">{gate.label}</span>
                                       <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold ${gate.sourceBadgeClass}`}>
                                         {gate.sourceBadge}
                                       </span>
                                     </div>
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                    <span className="text-xs text-[var(--text-secondary)]">
                                       {gate.aiEvidence} <strong className="text-emerald-600 dark:text-emerald-400">({gate.confidence})</strong>
                                     </span>
                                   </div>
@@ -940,9 +940,9 @@ export function StaffTicketQueue({
                               ))}
                             </div>
 
-                            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+                            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-color)] pt-3">
                               <div className="flex flex-wrap items-center gap-2">
-                                <label htmlFor={`ex-${item.id}`} className="text-xs text-slate-600 dark:text-slate-400">
+                                <label htmlFor={`ex-${item.id}`} className="text-xs text-[var(--text-secondary)]">
                                   Ghi chú vấn đề cần xử lý (không thay kiểm tra bắt buộc):
                                 </label>
                                 <input
@@ -953,7 +953,7 @@ export function StaffTicketQueue({
                                   onChange={(e) =>
                                     setExceptionReasons((prev) => ({ ...prev, [item.id]: e.target.value }))
                                   }
-                                  className="w-64 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-900 shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                                  className="w-64 rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-2.5 py-1 text-xs text-[var(--text-primary)] shadow-xs"
                                 />
                               </div>
 
@@ -973,7 +973,7 @@ export function StaffTicketQueue({
                             <button
                               type="button"
                               onClick={() => handleOpenAiDraft(item)}
-                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/60 dark:text-purple-300"
+                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2 text-sm font-semibold text-[var(--color-primary)] hover:bg-[var(--surface-subtle)]"
                             >
                               <Sparkles className="h-4 w-4" aria-hidden="true" />
                               <span>AI Dự thảo phản hồi cho SV</span>
@@ -984,14 +984,14 @@ export function StaffTicketQueue({
                               onClick={() => setReceiptModalId(item.id)}
                               className={staffButton}
                             >
-                              <Printer className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                              <Printer className="h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" />
                               <span>In Phiếu Tiếp Nhận (Mẫu 01/MC)</span>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setSupplementModalId(item.id)}
-                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2 text-sm font-semibold text-[var(--color-warning)] hover:bg-[var(--surface-subtle)]"
                             >
                               <span>Yêu cầu bổ sung thông tin</span>
                             </button>
@@ -999,7 +999,7 @@ export function StaffTicketQueue({
                             <button
                               type="button"
                               onClick={() => setTransferModalId(item.id)}
-                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
+                              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2 text-sm font-semibold text-[var(--color-primary)] hover:bg-[var(--surface-subtle)]"
                             >
                               <span>Chuyển đơn vị chuyên môn</span>
                             </button>
@@ -1018,13 +1018,13 @@ export function StaffTicketQueue({
       {/* Transfer Department Modal */}
       {transferModalId && (
         <AccessibleDialog open onClose={() => setTransferModalId(null)} labelledBy="transfer-title" className="campus-decision-sheet">
-          <div className="w-full max-w-md space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900">
-            <h3 id="transfer-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
+          <div className="w-full max-w-md space-y-4 fluent-card border border-[var(--border-color)] bg-[var(--surface-card)] p-6 shadow-xl text-[var(--text-primary)]">
+            <h3 id="transfer-title" className="text-base font-bold text-[var(--text-primary)]">
               Chuyển hồ sơ sang đơn vị chuyên môn
             </h3>
 
             <div className="space-y-1.5">
-              <label htmlFor="dept-select" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <label htmlFor="dept-select" className="text-xs font-semibold text-[var(--text-secondary)]">
                 Đơn vị tiếp nhận mới
               </label>
               <select
@@ -1042,7 +1042,7 @@ export function StaffTicketQueue({
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="transfer-reason" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <label htmlFor="transfer-reason" className="text-xs font-semibold text-[var(--text-secondary)]">
                 Lý do chuyển tiếp (Lưu lịch sử kiểm toán)
               </label>
               <textarea
@@ -1079,13 +1079,13 @@ export function StaffTicketQueue({
       {/* Request Supplement Modal */}
       {supplementModalId && (
         <AccessibleDialog open onClose={() => setSupplementModalId(null)} labelledBy="supp-title" className="campus-decision-sheet">
-          <div className="w-full max-w-md space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900">
-            <h3 id="supp-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
+          <div className="w-full max-w-md space-y-4 fluent-card border border-[var(--border-color)] bg-[var(--surface-card)] p-6 shadow-xl text-[var(--text-primary)]">
+            <h3 id="supp-title" className="text-base font-bold text-[var(--text-primary)]">
               Yêu cầu sinh viên bổ sung thông tin hồ sơ
             </h3>
 
             <div className="space-y-1.5">
-              <label htmlFor="supp-msg" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <label htmlFor="supp-msg" className="text-xs font-semibold text-[var(--text-secondary)]">
                 Nội dung yêu cầu gửi tới sinh viên
               </label>
               <textarea
@@ -1125,9 +1125,9 @@ export function StaffTicketQueue({
         if (!item) return null;
         return (
           <AccessibleDialog open onClose={() => setAiDraftModalId(null)} labelledBy="ai-draft-title" className="campus-decision-sheet">
-            <div className="flex max-h-[90vh] w-full max-w-2xl flex-col gap-4 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
-                <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+            <div className="flex max-h-[90vh] w-full max-w-2xl flex-col gap-4 overflow-y-auto fluent-card border border-[var(--border-color)] bg-[var(--surface-card)] p-6 shadow-2xl text-[var(--text-primary)]">
+              <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
+                <div className="flex items-center gap-2 text-[var(--color-primary)]">
                   <Sparkles className="h-5 w-5" aria-hidden="true" />
                   <h3 id="ai-draft-title" className="text-base font-bold">
                     Trợ lý AI Soạn Thảo Phản Hồi Cho Sinh Viên
@@ -1136,26 +1136,26 @@ export function StaffTicketQueue({
                 <button
                   type="button"
                   onClick={() => setAiDraftModalId(null)}
-                  className="rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className="rounded-lg p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   aria-label="Đóng hộp thoại"
                 >
                   <X className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
 
-              <div className="text-xs text-slate-600 dark:text-slate-400">
+              <div className="text-xs text-[var(--text-secondary)]">
                 Hồ sơ: <strong>{item.ticketCode}</strong> — {item.studentName} ({item.studentId})
               </div>
 
               {/* Template selector tabs */}
-              <div className="flex flex-wrap gap-2 border-b border-slate-100 pb-2 dark:border-slate-800">
+              <div className="flex flex-wrap gap-2 border-b border-[var(--border-color)] pb-2">
                 <button
                   type="button"
                   onClick={() => handleAiDraftTypeChange("approve", item)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                     aiDraftType === "approve"
-                      ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
-                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                      ? "bg-[var(--surface-subtle)] text-[var(--color-primary)] border border-[var(--border-color)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   ✓ Tiếp nhận & Hẹn trả kết quả
@@ -1165,8 +1165,8 @@ export function StaffTicketQueue({
                   onClick={() => handleAiDraftTypeChange("supplement", item)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                     aiDraftType === "supplement"
-                      ? "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                      ? "bg-[var(--surface-subtle)] text-[var(--color-warning)] border border-[var(--border-color)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   ⚠️ Yêu cầu bổ sung hồ sơ
@@ -1176,8 +1176,8 @@ export function StaffTicketQueue({
                   onClick={() => handleAiDraftTypeChange("forward", item)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                     aiDraftType === "forward"
-                      ? "bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
-                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                      ? "bg-[var(--surface-subtle)] text-[var(--color-primary)] border border-[var(--border-color)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   ↗ Hướng dẫn chuyển tuyến
@@ -1185,7 +1185,7 @@ export function StaffTicketQueue({
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="ai-draft-content" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <label htmlFor="ai-draft-content" className="text-xs font-semibold text-[var(--text-secondary)]">
                   Nội dung phản hồi (có thể chỉnh sửa trực tiếp)
                 </label>
                 <textarea
@@ -1198,7 +1198,7 @@ export function StaffTicketQueue({
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium text-[var(--text-secondary)]">
                   {draftCopied ? "✓ Đã sao chép vào bộ nhớ tạm!" : "Mẫu nháp tham khảo; chưa có nguồn để kết luận nghiệp vụ"}
                 </span>
 
@@ -1220,7 +1220,7 @@ export function StaffTicketQueue({
                       }
                       setAiDraftModalId(null);
                     }}
-                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-purple-700"
+                    className={staffPrimary}
                   >
                     Áp dụng phản hồi này
                   </button>
@@ -1237,29 +1237,29 @@ export function StaffTicketQueue({
         if (!item) return null;
         return (
           <AccessibleDialog open onClose={() => setReceiptModalId(null)} labelledBy="receipt-title" className="campus-decision-sheet">
-            <div className="flex max-h-[90vh] w-full max-w-2xl flex-col gap-5 overflow-y-auto rounded-2xl border-2 border-slate-900 bg-white p-8 shadow-2xl dark:border-slate-100 dark:bg-slate-900">
+            <div className="flex max-h-[90vh] w-full max-w-2xl flex-col gap-5 overflow-y-auto rounded-2xl border border-[var(--border-color)] bg-[var(--surface-card)] p-8 shadow-2xl text-[var(--text-primary)]">
               {/* Official Header */}
-              <div className="border-b-2 border-slate-900 pb-4 text-center dark:border-slate-100">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              <div className="border-b-2 border-[var(--border-color)] pb-4 text-center">
+                <div className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
                   TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI
                 </div>
-                <div className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                <div className="text-xs font-medium text-[var(--text-secondary)]">
                   BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ MỘT CỬA SỐ
                 </div>
-                <div className="mx-auto my-2 h-0.5 w-20 bg-slate-900 dark:bg-slate-100" />
-                <h2 id="receipt-title" className="text-lg font-extrabold uppercase tracking-tight text-slate-900 dark:text-slate-100">
+                <div className="mx-auto my-2 h-0.5 w-20 bg-[var(--color-primary)]" />
+                <h2 id="receipt-title" className="text-lg font-extrabold uppercase tracking-tight text-[var(--text-primary)]">
                   GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ
                 </h2>
-                <div className="text-xs italic text-slate-500 dark:text-slate-400">
+                <div className="text-xs italic text-[var(--text-secondary)]">
                   Bản tham khảo cục bộ · chưa xác minh mẫu chính thức hoặc receipt nghiệp vụ
                 </div>
-                <div className="mt-2 text-xs font-bold text-blue-700 dark:text-blue-300">
+                <div className="mt-2 text-xs font-bold text-[var(--color-primary)]">
                   Mã số biên nhận: {item.ticketCode}
                 </div>
               </div>
 
               {/* Receipt Body */}
-              <div className="space-y-2.5 text-sm leading-relaxed text-slate-800 dark:text-slate-200">
+              <div className="space-y-2.5 text-sm leading-relaxed text-[var(--text-primary)]">
                 <div><strong>Người nộp hồ sơ:</strong> {item.studentName} — MSSV: <strong>{item.studentId}</strong></div>
                 <div><strong>Nội dung thủ tục:</strong> {item.title}</div>
                 <div><strong>Đơn vị chuyên môn xử lý:</strong> {item.targetDepartment || "Phòng Quản lý Đào tạo"}</div>
@@ -1274,17 +1274,17 @@ export function StaffTicketQueue({
               </div>
 
               {/* Signature block */}
-              <div className="flex items-center justify-between border-t border-dashed border-slate-300 pt-4 dark:border-slate-700">
+              <div className="flex items-center justify-between border-t border-dashed border-[var(--border-color)] pt-4">
                 <div className="w-1/2 text-center">
-                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">NGƯỜI NỘP HỒ SƠ</div>
-                  <div className="text-[11px] italic text-slate-500">(Chưa xác minh chữ ký điện tử)</div>
-                  <div className="mt-6 font-bold text-slate-900 dark:text-slate-100">{item.studentName}</div>
+                  <div className="text-xs font-semibold text-[var(--text-secondary)]">NGƯỜI NỘP HỒ SƠ</div>
+                  <div className="text-[11px] italic text-[var(--text-secondary)]">(Chưa xác minh chữ ký điện tử)</div>
+                  <div className="mt-6 font-bold text-[var(--text-primary)]">{item.studentName}</div>
                 </div>
 
                 <div className="w-1/2 text-center">
-                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">CÁN BỘ TIẾP NHẬN</div>
-                  <div className="text-[11px] italic text-slate-500">(Cần receipt xác nhận nghiệp vụ)</div>
-                  <div className="mt-6 font-bold text-blue-700 dark:text-blue-300">{item.assignedStaffId || "Cán bộ Một cửa HUCE"}</div>
+                  <div className="text-xs font-semibold text-[var(--text-secondary)]">CÁN BỘ TIẾP NHẬN</div>
+                  <div className="text-[11px] italic text-[var(--text-secondary)]">(Cần receipt xác nhận nghiệp vụ)</div>
+                  <div className="mt-6 font-bold text-[var(--color-primary)]">{item.assignedStaffId || "Cán bộ Một cửa HUCE"}</div>
                 </div>
               </div>
 
@@ -1316,28 +1316,28 @@ export function StaffTicketQueue({
       })()}
 
       {/* Audit Log Drawer / Panel */}
-      <div className={`${staffSurface} overflow-hidden shadow-xs`}>
+      <div className={`${staffSurface} overflow-hidden shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
         <button
           type="button"
           onClick={() => setShowAuditLog((prev) => !prev)}
-          className="flex w-full items-center justify-between px-5 py-3.5 text-left text-sm font-bold text-slate-800 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/50"
+          className="flex w-full items-center justify-between px-5 py-3.5 text-left text-sm font-bold text-[var(--text-primary)] transition hover:bg-[var(--surface-subtle)]"
         >
           <span>📋 Nhật ký thao tác (Audit Trail) — {auditLog.length} bản ghi</span>
-          <span className="text-xs font-normal text-slate-500">
+          <span className="text-xs font-normal text-[var(--text-secondary)]">
             {showAuditLog ? "▲ Thu gọn" : "▼ Mở rộng"}
           </span>
         </button>
 
         {showAuditLog && (
-          <div className="border-t border-slate-100 p-5 dark:border-slate-800">
+          <div className="border-t border-[var(--border-color)] p-5">
             {auditLog.length === 0 ? (
-              <div className="py-6 text-center text-xs text-slate-500">
+              <div className="py-6 text-center text-xs text-[var(--text-secondary)]">
                 Chưa có thao tác nào được ghi nhận.
               </div>
             ) : (
               <div className="max-h-72 overflow-y-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                  <thead className="bg-[var(--surface-subtle)] text-[11px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
                     <tr>
                       <th scope="col" className="px-3 py-2">Thời điểm</th>
                       <th scope="col" className="px-3 py-2">Cán bộ</th>
@@ -1346,10 +1346,10 @@ export function StaffTicketQueue({
                       <th scope="col" className="px-3 py-2">Chi tiết</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tbody className="divide-y divide-[var(--border-color)]">
                     {auditLog.slice(0, 50).map((entry, idx) => (
-                      <tr key={`audit-${idx}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-slate-500">
+                      <tr key={`audit-${idx}`} className="hover:bg-[var(--surface-subtle)]">
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-[var(--text-secondary)]">
                           {new Date(entry.timestamp).toLocaleString("vi-VN", {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -1358,10 +1358,10 @@ export function StaffTicketQueue({
                             month: "2-digit",
                           })}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 font-semibold text-blue-700 dark:text-blue-300">
+                        <td className="whitespace-nowrap px-3 py-2 font-semibold text-[var(--color-primary)]">
                           {entry.staffId}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 font-semibold">
+                        <td className="whitespace-nowrap px-3 py-2 font-semibold text-[var(--text-primary)]">
                           {entry.ticketId.slice(0, 8)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-2">
@@ -1375,13 +1375,13 @@ export function StaffTicketQueue({
                                 ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
                                 : entry.action === "GATE_UNCHECK"
                                 ? "bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
-                                : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                                : "bg-[var(--surface-subtle)] text-[var(--text-primary)]"
                             }`}
                           >
                             {entry.action}
                           </span>
                         </td>
-                        <td className="max-w-xs truncate px-3 py-2 text-slate-600 dark:text-slate-400">
+                        <td className="max-w-xs truncate px-3 py-2 text-[var(--text-secondary)]">
                           {entry.detail}
                         </td>
                       </tr>

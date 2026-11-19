@@ -1,6 +1,9 @@
 "use client";
 import { CAMPUS_API_BASE_URL } from "@/lib/api/base-url";
 import { clearLegacyLocalToken, sessionLoginHref } from "../features/chat/local-session";
+import { LearningSessionNotice, PreservedActivity, useLearningSession } from "../features/learning/learning-session";
+import { ChatDraftActor, chatDraftActorScope } from "../features/chat/route-drafts";
+import { useUnreadNotifications } from "../lib/use-unread-notifications";
 
 import React, { type ReactNode, createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
@@ -15,6 +18,7 @@ import {
   CalendarDays,
   ChevronRight,
   ExternalLink,
+  FilePlus2,
   FileText,
   GraduationCap,
   HelpCircle,
@@ -28,6 +32,7 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  RefreshCw,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { CERTIFICATE_DEMO } from "../lib/data/api/certificate-gateway";
@@ -36,7 +41,7 @@ import { AccessibleDialog } from "./shared/AccessibleDialog";
 import { useOptionalUnifiedAssistant } from "../lib/unified-assistant-runtime";
 import { PanelResizeHandle } from "./shared/PanelResizeHandle";
 
-export type Role = "student" | "staff" | "admin" | "guest";
+export type Role = "student" | "lecturer" | "staff" | "admin" | "guest" | "contributor";
 const ChatMenuContext = createContext<{ target: HTMLElement | null; close: () => void }>({ target: null, close: () => {} });
 export const useChatMenu = () => useContext(ChatMenuContext);
 
@@ -45,6 +50,7 @@ export interface AppShellProps {
   activeNav?: string;
   userRole?: Role;
   publicKnowledge?: boolean;
+  checkSessionOnResume?: boolean;
 }
 
 type NavigationItem = {
@@ -57,6 +63,7 @@ type NavigationItem = {
 };
 
 const navigation: NavigationItem[] = [
+  { key: "learning", label: "Học liệu", href: "/learning", icon: BookOpen, roles: ["student", "lecturer", "admin"] },
   { key: "home", label: "Tổng quan", href: "/", icon: House, roles: ["student", "guest", "staff", "admin"] },
   { key: "chat", label: "Trợ lý", href: "/chat", icon: Bot, roles: ["student", "guest"] },
   { key: "services", label: "Dịch vụ", href: "/services", icon: ClipboardList, roles: ["student"] },
@@ -68,11 +75,17 @@ const navigation: NavigationItem[] = [
   { key: "admin", label: "Quản trị", href: "/admin", icon: Settings2, roles: ["admin"] },
 ];
 const knowledgeNavigation: NavigationItem[] = [
-  { key: "chat", label: "Hỏi đáp có nguồn", href: "/chat", icon: Bot, roles: ["student", "guest", "staff", "admin"] },
+  { key: "learning", label: "Học liệu", href: "/learning", icon: BookOpen, roles: ["student", "lecturer", "admin"] },
+  { key: "chat", label: "Hỏi đáp có nguồn", href: "/chat", icon: Bot, roles: ["student", "guest", "staff", "admin", "contributor"] },
+  { key: "documents", label: "Thêm tài liệu", href: "/knowledge/documents", icon: FilePlus2, roles: ["admin", "contributor"] },
+  { key: "crawl", label: "Nguồn tự động", href: "/knowledge/crawl", icon: RefreshCw, roles: ["admin"] },
   { key: "services", label: "Dịch vụ học vụ", href: "/services", icon: ClipboardList, roles: ["student", "guest", "admin"] },
   { key: "tickets", label: "Hồ sơ của tôi", href: "/tickets", icon: FolderOpen, roles: ["student"] },
   { key: "schedule", label: "Lịch học", href: "/schedule", icon: CalendarDays, roles: ["student"] },
-  { key: "rooms", label: "Phòng học", href: "/rooms", icon: Building2, roles: ["student"] },
+  { key: "rooms", label: "Phòng học", href: "/rooms", icon: Building2, roles: ["student", "staff"] },
+  { key: "staff", label: "Hàng đợi hồ sơ", href: "/staff", icon: LayoutDashboard, roles: ["staff"] },
+  { key: "notifications", label: "Thông báo", href: "/notifications", icon: Bell, roles: ["student", "staff", "admin"] },
+  { key: "admin", label: "Tổng quan vận hành", href: "/admin", icon: Settings2, roles: ["admin"] },
   { key: "knowledge", label: "Quản trị nguồn", href: "/knowledge/sources", icon: BookOpen, roles: ["admin"] },
   { key: "privacy", label: "Quyền riêng tư", href: "/privacy", icon: ShieldCheck, roles: ["student", "guest", "admin"] },
 ];
@@ -85,6 +98,7 @@ const publicNavigation: NavigationItem[] = [
 ];
 
 const titles: Record<string, string> = {
+  learning: "Học liệu theo buổi học",
   home: "Tổng quan",
   chat: "Trợ lý học vụ",
   services: "Dịch vụ sinh viên",
@@ -93,6 +107,8 @@ const titles: Record<string, string> = {
   rooms: "Không gian học tập",
   staff: "Bàn làm việc cán bộ",
   knowledge: "Quản lý tri thức",
+  documents: "Thêm tài liệu tri thức",
+  crawl: "Nguồn tự động",
   admin: "Quản trị hệ thống",
   privacy: "Quyền riêng tư",
   notifications: "Thông báo",
@@ -120,6 +136,7 @@ export function AppShell({
   activeNav = "home",
   userRole: suppliedRole,
   publicKnowledge = false,
+  checkSessionOnResume = false,
 }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [navigationWidth, setNavigationWidth] = useState(224);
@@ -127,10 +144,15 @@ export function AppShell({
   const [desktopActions, setDesktopActions] = useState<HTMLDivElement | null>(null);
   const [mobileActions, setMobileActions] = useState<HTMLDivElement | null>(null);
   const runtime = useOptionalUnifiedAssistant();
-  const [localActor, setLocalActor] = useState<{ display_name?: string; student_code?: string; roles: string[] } | null>(null);
+  const [localActor, setLocalActor] = useState<{ user_id?: string; subject_id?: string; display_name?: string; student_code?: string; roles: string[] } | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const currentActor = localActor ?? runtime?.actor;
-  const userRole: Role = localActor ? localActor.roles.some(role => ["KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"].includes(role)) ? "admin" : "student" : suppliedRole ?? (runtime?.actor?.roles.some(role => ["KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"].includes(role)) ? "admin" : runtime?.capabilities?.audience === "staff" ? "staff" : "student");
+  const actorRoles = currentActor?.roles ?? [];
+  const inferredRole: Role = actorRoles.some(role => ["KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"].includes(role))
+    ? "admin" : actorRoles.includes("KNOWLEDGE_CONTRIBUTOR") ? "contributor"
+    : actorRoles.includes("LECTURER") ? "lecturer" : actorRoles.includes("SUPPORT_OFFICER") ? "staff"
+    : runtime?.capabilities?.audience === "staff" ? "staff" : "student";
+  const userRole: Role = localActor ? inferredRole : suppliedRole ?? inferredRole;
   const shellRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLButtonElement>(null);
   const chat = activeNav === "chat";
@@ -148,6 +170,8 @@ export function AppShell({
   }, [chat]);
 
   const operational = process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true";
+  const unreadCount = useUnreadNotifications(operational && !!localActor);
+  const session = useLearningSession(operational && activeNav !== "learning" ? localActor?.user_id || localActor?.subject_id || "" : "", localActor?.roles, checkSessionOnResume);
   useEffect(() => {
     if (!operational) return;
     let active = true;
@@ -156,9 +180,10 @@ export function AppShell({
         if (active) setSessionExpired(response.status === 401);
         return response.ok ? response.json() : null;
       })
-      .then(actor => { if (active) setLocalActor(actor); }).catch(() => { if (active) setLocalActor(null); });
+      .then(actor => { if (active) setLocalActor(previous => checkSessionOnResume && previous ? previous : actor); })
+      .catch(() => { if (active) setLocalActor(previous => checkSessionOnResume && previous ? previous : null); });
     return () => { active = false; };
-  }, [operational]);
+  }, [operational, checkSessionOnResume]);
   const navItems = operational ? knowledgeNavigation.filter(item => item.roles.includes(userRole)) : isPublic
     ? publicNavigation
     : navigation
@@ -198,6 +223,8 @@ export function AppShell({
             ? "KHÔNG GIAN CÁN BỘ"
             : userRole === "admin"
             ? "KHÔNG GIAN QUẢN TRỊ"
+            : userRole === "lecturer"
+            ? "KHÔNG GIAN GIẢNG VIÊN"
             : "KHÔNG GIAN SINH VIÊN"}
         </span>
       </div>
@@ -241,6 +268,11 @@ export function AppShell({
               {item.key === "chat" && (
                 <span className="campus-ai-label" aria-hidden="true">
                   AI
+                </span>
+              )}
+              {item.key === "notifications" && unreadCount > 0 && (
+                <span className="campus-ai-label" data-testid="notification-badge" aria-label={`${unreadCount} thông báo chưa đọc`}>
+                  {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
             </Link>
@@ -313,6 +345,11 @@ export function AppShell({
   );
 
   return (
+    <><LearningSessionNotice state={session.state} onCheck={() => void session.check()}
+      title="Kiểm tra tài khoản Campus" destination={typeof window === "undefined" ? "/chat" : window.location.pathname + window.location.search}
+      destinationLabel="Mở Campus bằng phiên hiện tại trong tab mới" />
+    <PreservedActivity mode={session.state === "ready" ? "visible" : "hidden"}>
+    <ChatDraftActor value={chatDraftActorScope(localActor)}>
     <ChatMenuContext.Provider value={{ target: mobileOpen ? mobileActions : desktopActions, close: closeMenu }}>
     <div ref={shellRef} className={"campus-app" + (chat ? " campus-app-chat" : "")} data-campus-ui="v2">
       <a href="#main-content" className="skip-link">
@@ -360,9 +397,10 @@ export function AppShell({
 
             <ThemeToggle className="campus-theme-toggle" />
 
-            {!operational && <Link href="/notifications" className="campus-icon-button" aria-label="Mở thông báo">
+            <Link href="/notifications" className="campus-icon-button relative" aria-label={unreadCount > 0 ? `Mở thông báo, ${unreadCount} chưa đọc` : "Mở thông báo"}>
               <Bell size={19} aria-hidden="true" />
-            </Link>}
+              {unreadCount > 0 && <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-[var(--color-primary)] px-1 text-center text-[10px] font-bold leading-4 text-[var(--color-on-primary)]" aria-hidden="true">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+            </Link>
 
             <span className="campus-toolbar-divider" aria-hidden="true" />
             <span className="campus-institution">
@@ -392,7 +430,7 @@ export function AppShell({
       </div>
 
       {!operational && !isPublic && <nav className="campus-bottom-navigation" aria-label="Điều hướng nhanh">
-        {navItems.filter(item => userRole === "student" ? ["home", "chat", "services", "tickets", "schedule"].includes(item.key) : ["home", "staff", "tickets", "knowledge", "admin"].includes(item.key)).map(item => <Link key={item.key} href={item.href} aria-current={activeNav === item.key ? "page" : undefined}><item.icon size={20} aria-hidden="true" /><span>{item.label}</span></Link>)}
+        {navItems.filter(item => userRole === "student" ? ["home", "chat", "services", "tickets", "schedule"].includes(item.key) : ["home", "staff", "tickets", "knowledge", "documents", "crawl", "admin"].includes(item.key)).map(item => <Link key={item.key} href={item.href} aria-current={activeNav === item.key ? "page" : undefined}><item.icon size={20} aria-hidden="true" /><span>{item.label}</span></Link>)}
       </nav>}
 
       <AccessibleDialog
@@ -420,5 +458,7 @@ export function AppShell({
       </AccessibleDialog>
     </div>
     </ChatMenuContext.Provider>
+    </ChatDraftActor>
+    </PreservedActivity></>
   );
 }

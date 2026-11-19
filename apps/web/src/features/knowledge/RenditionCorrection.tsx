@@ -1,6 +1,7 @@
 "use client";
 
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useRef, useState } from "react";
+import { usePreviewImages } from "./use-preview-images";
 
 type Page = { page: number; text: string; expected_page_sha256: string; preview_image_sha256: string };
 type Preview = { expected_revision: number; expected_rendition_sha256: string; intake_id: string; pages: Page[] };
@@ -25,13 +26,11 @@ export function RenditionCorrection({ versionId, actorId, authorId, onCreated }:
   const [pageIndex, setPageIndex] = useState(0);
   const [texts, setTexts] = useState<Record<number,string>>({});
   const [reviewVerdict, setReviewVerdict] = useState("REJECTED");
-  const [images, setImages] = useState<Record<string, string>>({});
+  const { images, cacheImage } = usePreviewImages();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const key = useRef<string | null>(null);
-  const urls = useRef<string[]>([]);
-  useEffect(() => () => urls.current.forEach(url => URL.revokeObjectURL(url)), []);
   async function load() {
     const [a, b] = await Promise.all([request(`${base}/versions/${versionId}/correction-preview`), request(`${base}/versions/${versionId}/corrections`)]);
     setPreview(await a.json()); setHistory((await b.json()).items);
@@ -68,7 +67,7 @@ export function RenditionCorrection({ versionId, actorId, authorId, onCreated }:
   async function image(intake: string, page: number) {
     await run(async () => {
       const response = await request(`${base}/intakes/${intake}/pages/${page}/preview`);
-      const url = URL.createObjectURL(await response.blob()); urls.current.push(url); setImages(old => ({ ...old, [`${intake}:${page}`]: url }));
+      cacheImage(`${intake}:${page}`, await response.blob());
     });
   }
   if (!open) return <button onClick={() => { setOpen(true); void run(load); }}>Sửa chữ/OCR bằng bản mới</button>;

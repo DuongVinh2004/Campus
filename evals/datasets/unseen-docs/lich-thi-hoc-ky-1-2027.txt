@@ -1,0 +1,20 @@
+LỊCH THI KẾT THÚC HỌC PHẦN HỌC KỲ 1 NĂM HỌC 2027-2028 (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)
+
+Quy định chung
+Sinh viên có mặt tại phòng thi trước giờ thi 15 phút và mang theo thẻ sinh viên. Sinh viên đến muộn quá 15 phút kể từ khi bắt đầu giờ thi không được vào phòng thi.
+
+Lịch thi
+
+STT | Học phần | Mã học phần | Khóa | Ngày thi | Giờ thi | Phòng thi
+1 | Cơ sở dữ liệu | IT3090 | K68 | 05/12/2027 | 07:30 | A2-201
+2 | Cơ sở dữ liệu | IT3090 | K69 | 06/12/2027 | 09:30 | A2-203
+3 | Mạng máy tính | IT3080 | K68 | 07/12/2027 | 13:30 | H3-301
+4 | Xác suất thống kê | MI2020 | K70 | 08/12/2027 | 07:30 | A2-402
+5 | Trí tuệ nhân tạo cơ bản | IT3190 | K69 | 10/12/2027 | 15:30 | H5-102
+6 | Cấp thoát nước đô thị | WS3010 | K68 | 12/12/2027 | 09:30 | B1-105
+
+Quy định về phòng thi
+Sinh viên không được mang điện thoại vào phòng thi. Sinh viên vi phạm quy chế thi bị đình chỉ thi và nhận điểm 0 cho học phần đó.
+
+Liên hệ
+Phòng Khảo thí và Đảm bảo chất lượng, email: khaothi@kiemthu-huce.example.

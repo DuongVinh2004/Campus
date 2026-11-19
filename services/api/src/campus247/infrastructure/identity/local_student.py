@@ -73,22 +73,57 @@ class LocalStudentIdentityAdapter:
 
 class LocalCampusIdentityAdapter:
     """An unverified issuer only selects a verifier; each verifier checks its own signature."""
-    def __init__(self, owner, student):
+    def __init__(self, owner, student, learning=None, staff=None):
         self.owner, self.student = owner, student
+        self.learning = learning
+        self.staff = staff
+        if learning is not None:
+            reserved = {owner.directory()["username"]}
+            if student.path.is_file():
+                reserved.add(student.directory()["username"])
+            if reserved.intersection(a["username"] for a in learning.directory()["accounts"]):
+                raise ValueError("Learning accounts must not replace existing accounts")
 
     def authenticate(self, username, password):
+        if self.learning is not None and any(a["username"] == username for a in self.learning.directory()["accounts"]):
+            return self.learning.authenticate(username, password)
         if username == self.owner.directory()["username"]:
             return self.owner.authenticate(username,password)
+        if self.staff is not None and self.staff.path.is_file() and username == self.staff.directory()["username"]:
+            return self.staff.authenticate(username,password)
         if self.student.path.is_file() and username == self.student.directory()["username"]:
             return self.student.authenticate(username,password)
         return self.owner.authenticate(username,password)
+
+    def learning_directory(self):
+        """Existing local students may be enrolled without changing their identity or data."""
+        rows = self.learning.public_directory() if self.learning is not None else []
+        if self.student.path.is_file():
+            student = self.student.directory()
+            if not any(row["subject_id"] == student["subject_id"] for row in rows):
+                rows.append({"subject_id": student["subject_id"], "display_name": "Sinh viên local",
+                    "roles": ["STUDENT"], "is_synthetic": False})
+        return rows
 
     def resolve_token(self, token):
         if not isinstance(token,str) or len(token) > 4096:
             raise ValueError("Invalid local session")
         claims = json.loads(base64.urlsafe_b64decode(token.split(".")[0]))
+        if self.learning is not None:
+            from campus247.infrastructure.identity.local_learning import ISSUER as LEARNING_ISSUER
+            if claims.get("iss") == LEARNING_ISSUER:
+                return self.learning.resolve_token(token)
         if claims.get("iss") == OWNER_ISSUER:
             return self.owner.resolve_token(token)
+        if self.staff is not None and self.staff.path.is_file():
+            from campus247.infrastructure.identity.local_staff import ISSUER as STAFF_ISSUER
+            if claims.get("iss") == STAFF_ISSUER:
+                return self.staff.resolve_token(token)
         if claims.get("iss") == ISSUER and self.student.path.is_file():
             return self.student.resolve_token(token)
+        oidc = getattr(self, "oidc", None)  # set by the runtime when sign-in with the university account is configured
+        if oidc is not None:
+            from campus247.infrastructure.identity.oidc_session import ISSUER as OIDC_ISSUER
+            if claims.get("iss") == OIDC_ISSUER:
+                return oidc.resolve_token(token)
         raise ValueError("Unrecognized local issuer")

@@ -6,9 +6,12 @@ import base64
 import hashlib
 import hmac
 import json
+import re
 import sqlite3
+import unicodedata
 from datetime import UTC, date, datetime
 from typing import Any, Literal
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Path, Request
@@ -244,6 +247,16 @@ def parse(action, raw):
     return value
 
 
+def content_disposition(download, title, extension):
+    """Name the saved file after the material, with an ASCII fallback for old clients."""
+    cleaned = re.sub(r'[\x00-\x1f\x7f"\\/:*?<>|;]+', " ", str(title or ""))
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" .")[:120] or "lecture"
+    ascii_name = unicodedata.normalize("NFKD", cleaned.replace("đ", "d").replace("Đ", "D")).encode("ascii", "ignore").decode()
+    ascii_name = re.sub(r"[^A-Za-z0-9 ._()-]+", "", ascii_name).strip(" .") or "lecture"
+    return (f"{'attachment' if download else 'inline'}; filename=\"{ascii_name}.{extension}\"; "
+            f"filename*=UTF-8''{quote(cleaned + '.' + extension, safe='')}")
+
+
 class LearningRoute(APIRoute):
     def get_route_handler(self):
         original = super().get_route_handler()
@@ -396,7 +409,8 @@ def create_learning_router(service):
                         401, "READER_SESSION_CHANGED", "Phiên đọc đã thay đổi.")
                 current = refreshed
             target = request.path_params.get(target_field) if target_field else payload.get("version_id")
-            result = await service.command(current, action, target, payload, key=key)
+            result = await service.command(current, action, target, payload, key=key,
+                                           still_valid=lambda: actor(request, write=True))
             return JSONResponse(result, headers={"Cache-Control": "no-store"}) if private_write else result
         return write
 
@@ -458,12 +472,12 @@ def create_learning_router(service):
         key = request.headers.get("Idempotency-Key")
         require(bool(key), 422, "IDEMPOTENCY_REQUIRED", "Cần khóa chống ghi trùng.")
         current = actor(request, write=True)
-        return await service.complete(current, upload_id, key=key)
+        return await service.complete(current, upload_id, key=key, still_valid=lambda: actor(request, write=True))
 
     @router.post("/upload-intents/{upload_id}/abort")
     async def upload_abort(upload_id: str, request: Request):
         current = actor(request, write=True)
-        return await service.abort(current, upload_id)
+        return await service.abort(current, upload_id, still_valid=lambda: actor(request, write=True))
 
     async def content(version_id, request, download=False):
         current = actor(request)
@@ -471,11 +485,13 @@ def create_learning_router(service):
         path = service.blobs.path(row["storage_key"])
         require(path.is_file() and path.stat().st_size == row["byte_size"], 503, "BLOB_UNAVAILABLE", "Tệp học liệu không đầy đủ.")
         await service.blobs.verify(row["storage_key"], row["sha256"], row["byte_size"])
+        # The checksum is awaited; a session revoked meanwhile must not receive the first byte.
+        service.recheck(current, lambda: actor(request))
         etag = '"' + row["sha256"] + '"'
         selection = select_bytes(row["byte_size"], request.headers.get("Range"), method=request.method, if_range=request.headers.get("If-Range"), etag=etag)
         media_type = row.get('content_type', 'application/pdf')
         extension = 'pdf' if media_type == 'application/pdf' else 'pptx'
-        headers = {"Content-Type": media_type, "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff", "Accept-Ranges": "bytes", "ETag": etag, "Content-Length": str(selection.length), "Content-Disposition": ('attachment' if download else 'inline') + '; filename="lecture.' + extension + '"'}
+        headers = {"Content-Type": media_type, "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff", "Accept-Ranges": "bytes", "ETag": etag, "Content-Length": str(selection.length), "Content-Disposition": content_disposition(download, row.get("title"), extension)}
         if selection.content_range:
             headers["Content-Range"] = selection.content_range
         if request.method == "HEAD" or selection.status == 416:

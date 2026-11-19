@@ -10,8 +10,11 @@ from campus247.domain.shared.values import is_valid_uuid7
 
 class IdentityRole(StrEnum):
     STUDENT = "STUDENT"
+    LECTURER = "LECTURER"
     SUPPORT_OFFICER = "SUPPORT_OFFICER"
     KNOWLEDGE_ADMIN = "KNOWLEDGE_ADMIN"
+    # May add documents; every document of this role needs a second person's approval before it is published.
+    KNOWLEDGE_CONTRIBUTOR = "KNOWLEDGE_CONTRIBUTOR"
     SYSTEM_ADMIN = "SYSTEM_ADMIN"
 
 

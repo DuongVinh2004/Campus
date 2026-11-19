@@ -25,6 +25,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "scripts"), str(ROOT / "services/api/src")
     str(ROOT / ".tooling/knowledge-platform-20261023/site-packages")]
 from campus247.infrastructure.knowledge.storage import FileKnowledgeStorage, ReadThroughKnowledgeStorage, checked_path
 from knowledge_parser_runtime import resolve_parser_python
+from runtime_routes import api_path_allowed, is_served_path, not_found_response
 
 STATE = checked_path(ROOT / "infra/local/knowledge-platform-20261023", ROOT)
 PGROOT = checked_path(ROOT / ".tooling/knowledge-postgres-20261023/pgsql", ROOT)
@@ -301,6 +302,8 @@ async def components(*, rehearsal=None, learning_rehearsal=None):
               else rehearsal_bundle_paths(rehearsal))
     storage = (FileKnowledgeStorage(ROOT, bundle["artifacts"]) if bundle else
         ReadThroughKnowledgeStorage(ROOT, STATE / "rehearsals" / value["database"] / "artifacts", STATE / "artifacts") if rehearsal else FileKnowledgeStorage(ROOT, STATE / "artifacts"))
+    from campus247.bootstrap.scanner import scanner_from_environment
+    storage.scanner = scanner_from_environment()  # every original is scanned before it is registered (None: not configured)
     platform = KnowledgePlatform(repository, storage, ConfirmationTokenService(settings.CONFIRMATION_SIGNING_KEY))
     # Several API processes: share the agent write-flow's signing key (derived for that purpose only) and its previews.
     from campus247.agent.tools.write_flow import configure_shared_state
@@ -328,9 +331,32 @@ async def work(once=False, *, rehearsal=None, heartbeat_file=None):
     worker = KnowledgeIngestionWorker(platform.repo, platform.storage, runtime.embedding, owner="worker-" + str(uuid4()),
         parser_python=parser_python, platform=platform,
         ocr_adapter=LocalOcrAdapter(platform.storage,node=NODE,package_root=NODE.parents[1] / "package.json"))
+    from campus247.agent.guardrails.prompt_injection import PromptInjectionDetector
+    from campus247.agent.prompts.composer import TrustDomain
+    from campus247.application.knowledge.auto_publication import AutoPublicationService
+    from campus247.infrastructure.knowledge.auto_publication_store import AutoPublicationStore
+    from campus247.infrastructure.knowledge.index_builder import SubprocessIndexBuilder
+    detector = PromptInjectionDetector()
+    auto = AutoPublicationService(platform, AutoPublicationStore(platform.repo),
+        scan_text=lambda text: detector.scan(text, TrustDomain.RETRIEVED_EVIDENCE).is_injection,
+        index_builder=SubprocessIndexBuilder(ROOT),
+        baseline_index=ROOT / os.environ.get("CAMPUS247_RAG_V2_INDEX", "data/rag_v2_index/embedded2"))
+    from campus247.application.knowledge.crawl.service import CrawlService
+    from campus247.infrastructure.knowledge.crawl_fetch import PublicPageFetcher
+    from campus247.infrastructure.knowledge.crawl_store import CrawlStore
+    crawl = CrawlService(platform, auto, CrawlStore(platform.repo), PublicPageFetcher())
+
+    class Ticks:
+        """One entry for everything the ingestion loop does between jobs; a failing part never stops the others."""
+        async def tick(self):
+            for part in (auto, crawl):
+                try:
+                    await part.tick()
+                except Exception:  # noqa: BLE001
+                    pass
     try:
         await serve_worker(worker, rehearsal_connection(rehearsal)["database"] if rehearsal else DB_NAME,
-            heartbeat_file, once=once)
+            heartbeat_file, once=once, auto=None if rehearsal else Ticks())
     finally:
         await pool.close()
 
@@ -483,8 +509,62 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.include_router(create_learning_router(learning_service))
     app.state.learning_service = learning_service
 
+    # Operations page: numbers from every API worker (snapshot files), probes of the services around the API.
+    from campus247.observability.ops_status import OpsConfig
+    from campus247.infrastructure.llm.remote_gateway import read_token
+    from campus247.presentation.admin_ops import create_admin_ops_router
+    gateway_url = os.environ.get("CAMPUS247_GATEWAY_URL")
+    gateway_token_file = os.environ.get("CAMPUS247_GATEWAY_TOKEN_FILE")
+    backup_dir = os.environ.get("CAMPUS247_BACKUP_DIR")
+    ops_config = OpsConfig(
+        metrics_dir=STATE / "ops-metrics", data_dir=ROOT, backup_dir=Path(backup_dir) if backup_dir else None,
+        quality_dir=ROOT / "evals/results/nightly",
+        model_urls={"embedding": "http://127.0.0.1:18081/info", "reranker": "http://127.0.0.1:18082/info"},
+        gateway_url=gateway_url,
+        gateway_token=read_token(gateway_token_file) if gateway_url and gateway_token_file else None,
+        background=lambda: {"leader": bool(getattr(getattr(app.state, "background_leader", None), "is_leader", False)),
+                            "learning_worker": getattr(app.state, "learning_worker_status", "disabled")})
+    app.include_router(create_admin_ops_router(ops_config))
+
+    # Freshness of the sources in the current release, for knowledge managers (reads the release pointer, writes only its own file).
+    from campus247.application.knowledge.freshness_service import FreshnessService, SourceReviewStore
+    from campus247.presentation.knowledge_freshness import create_freshness_router
+    freshness_service = FreshnessService(pool, SourceReviewStore(STATE / "source-reviews.sqlite3"), tenant=TENANT)
+    app.include_router(create_freshness_router(freshness_service))
+
+    # Which sources are behind answers people mark "not helpful": counts per source only, no question and no person.
+    from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_quality_recording
+    from campus247.presentation.knowledge_quality import create_quality_router
+    quality_store = AnswerQualityStore(STATE / "answer-quality.sqlite3")
+    feedback = getattr(app.state, "feedback_service", None)  # absent in the rehearsal/learning-only apps: nothing to record then
+    if feedback is not None:
+        attach_quality_recording(feedback, quality_store)
+    app.include_router(create_quality_router(quality_store, freshness_service))
+
+    # Sign in with the university account: only when the owner supplied a provider configuration (CAMPUS247_OIDC_CONFIG).
+    if os.environ.get("CAMPUS247_OIDC_CONFIG"):
+        import httpx as oidc_httpx
+        from campus247.infrastructure.identity.oidc import OidcClient, OidcConfig
+        from campus247.infrastructure.identity.oidc_accounts import OidcAccountStore, validate_config as validate_oidc_config
+        from campus247.infrastructure.identity.oidc_session import OidcSessionAdapter, load_or_create_key
+        from campus247.presentation.oidc import create_oidc_router
+        oidc_config = OidcConfig.from_dict(json.loads(Path(os.environ["CAMPUS247_OIDC_CONFIG"]).read_text(encoding="utf-8")),
+                                           secret_reader=lambda name: Path(name).read_text(encoding="utf-8").strip())
+        validate_oidc_config(oidc_config)  # refuses a configuration that would let the provider grant an administrator role
+        oidc_sessions = OidcSessionAdapter(load_or_create_key(STATE / "oidc-session.key"), TENANT)
+        campus_adapter.oidc = oidc_sessions
+        app.include_router(create_oidc_router(oidc_config, OidcClient(oidc_config, oidc_httpx.AsyncClient(trust_env=False)),
+                                              OidcAccountStore(STATE / "oidc.sqlite3"), oidc_sessions))
+
     @app.get("/health/entry", include_in_schema=False)
-    def entry_health():
+    async def entry_health():
+        scanner_state = None
+        probe = getattr(getattr(learning_service, "scanner", None), "health", None)
+        if probe is not None:
+            try:
+                scanner_state = await asyncio.wait_for(probe(), timeout=2.0)
+            except Exception:
+                scanner_state = {"up": False}
         return {"entry_url": f"http://127.0.0.1:{api_port}", "api_same_origin": True,
             "authentication": "password_local", "knowledge": "current_release",
             "student_services": "owned_local_preparations", "university_connected": False,
@@ -492,7 +572,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
             "shared_history": True, "shared_actor_storage": True,
             "learning": {"configured": learning_service is not None,
                 "worker": getattr(app.state, "learning_worker_status", "starting" if learning_service else "disabled"),
-                "last_success_at": getattr(app.state, "learning_worker_last_success", None)}}
+                "last_success_at": getattr(app.state, "learning_worker_last_success", None),
+                "scanner": scanner_state}}
 
     @asynccontextmanager
     async def owned_lifespan(application):
@@ -519,8 +600,28 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 from campus247.infrastructure.leader import BackgroundLeader
                 leader = application.state.background_leader = BackgroundLeader(lambda: pool)
 
+                from campus247.application.campus_ops.reminder_job import run_reminders
+
+                def student_subjects():
+                    # student code -> subject id for the local student account (the only account with a schedule here)
+                    student = campus_adapter.student.directory()
+                    return {student["student_code"]: student["subject_id"]}.get
+
                 async def start_jobs():
                     jobs = [asyncio.create_task(platform.schedules.serve())]
+                    jobs.append(asyncio.create_task(run_reminders(ops_service.store, student_subjects)))
+                    from campus247.application.knowledge.freshness_reminders import run_freshness_reminders
+                    jobs.append(asyncio.create_task(run_freshness_reminders(
+                        freshness_service, ops_service.store, lambda: [owner_adapter.directory()["owner_id"]])))
+                    from campus247.observability.alert_job import run_alerts
+                    from campus247.observability.alert_notifiers import build_notifier
+                    from campus247.observability.alerts import AlertManager
+                    from campus247.observability.ops_status import ProbeCache, build_status
+                    import httpx
+                    alert_client, alert_cache = httpx.AsyncClient(trust_env=False), ProbeCache()
+                    alert_manager = AlertManager(STATE / "ops-alerts", build_notifier(os.environ))
+                    jobs.append(asyncio.create_task(run_alerts(
+                        alert_manager, lambda: build_status(ops_config, client=alert_client, cache=alert_cache))))
                     if learning_service is not None:
                         jobs.append(asyncio.create_task(learning_worker()))
                         if learning_service.accessible_text_pipeline is not None:
@@ -534,10 +635,14 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 leader_task = asyncio.create_task(leader.run(start_jobs, standby))
                 from campus247.infrastructure.loop_watchdog import LoopWatchdog
                 watchdog = LoopWatchdog(asyncio.get_running_loop()).start()
+                from campus247.observability.ops_metrics import OPS, run_writer
+                from campus247.rag_v2.observability.vector_stats import VECTOR_STATS
+                ops_writer = asyncio.create_task(run_writer(OPS, ops_config.metrics_dir, retrieval=VECTOR_STATS.snapshot))
                 try:
                     yield
                 finally:
                     watchdog.stop()
+                    ops_writer.cancel()
         finally:
             if leader_task is not None:
                 leader_task.cancel()  # its own cleanup cancels the jobs and releases the lock
@@ -644,9 +749,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         import re as _re
         if _re.fullmatch(r"/v1/tickets/preview|/v1/tickets/[^/]+/confirm|/v1/handovers(/.*)?|/v1/staff/handovers", path):
             return JSONResponse({"detail":"Chức năng này chưa kết nối dữ liệu vận hành."}, status_code=404)
-        if path.startswith("/v1/") and not (path.startswith(("/v1/knowledge/", "/v1/conversations", "/v1/privacy/", "/v1/assistant/", "/v1/student-preparations", "/v1/learning/",
-                "/v1/rooms", "/v1/tickets", "/v1/students/me/schedule", "/v1/staff/tickets", "/v1/notifications", "/v1/admin/overview"))
-                or path in {"/v1/users/me", "/v1/auth/logout"}):
+        if path.startswith("/v1/") and not api_path_allowed(path):
             return JSONResponse({"detail":"Chức năng này chưa kết nối dữ liệu vận hành."}, status_code=404)
         if path in {"/v1/auth/demo-session", "/v1/knowledge/platform/local-session"}:
             return JSONResponse({"detail":"Đăng nhập thử không được dùng trong phiên vận hành."}, status_code=404)
@@ -662,9 +765,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
             if page_path in {"", "knowledge"}:
                 from starlette.responses import RedirectResponse
                 return RedirectResponse("/chat" if not page_path else "/knowledge/sources")
-            if (not (page_path in {"", "chat", "login", "knowledge/sources", "knowledge", "services", "tickets", "schedule", "rooms", "privacy", "staff", "notifications", "admin"}
-                     or page_path == "learning" or page_path.startswith(("learning/", "_next/", "images/", "fonts/"))) or ".." in page_path or "\\" in page_path):
-                raise HTTPException(404)
+            if not is_served_path(page_path):
+                return not_found_response(request)
             return await proxy_frontend(page_path, request, frontend_port)
     return app
 

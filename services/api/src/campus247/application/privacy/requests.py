@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import hashlib
 
 from campus247.application.audit.writer import AuditWriter
-from campus247.domain.shared.values import generate_uuid7
+from campus247.domain.shared.values import generate_uuid7, is_valid_uuid7
 from campus247.ports.identity import IdentityContext
 
 VALID_REQUEST_TYPES = {"EXPORT", "CORRECTION", "DELETION"}
@@ -46,11 +46,14 @@ class PrivacyRequestStatusView:
 
 
 class PrivacyRequestService:
-    def __init__(self, audit_writer: AuditWriter | None = None) -> None:
+    def __init__(self, audit_writer: AuditWriter | None = None, repository=None) -> None:
         self._audit_writer = audit_writer or AuditWriter()
         self._requests: dict[str, PrivacyRequestRecord] = {}
+        self._repository = repository
 
     def get_raw_record(self, request_id: str) -> PrivacyRequestRecord | None:
+        if self._repository is not None:
+            raise ValueError("durable privacy records require an authenticated owner")
         return self._requests.get(request_id)
 
     def create_request(
@@ -59,12 +62,20 @@ class PrivacyRequestService:
         request_type: str,
         correction_summary: str | None = None,
         requester_note: str | None = None,
+        client_id: str | None = None,
     ) -> tuple[PrivacyRequestRecord, PrivacyRequestReceipt]:
         if request_type not in VALID_REQUEST_TYPES:
             raise ValueError(f"Invalid request_type: {request_type}")
 
         if request_type == "CORRECTION" and not (correction_summary and correction_summary.strip()):
             raise ValueError("correction_summary is required for CORRECTION requests")
+
+        if self._repository is not None:
+            record = self._repository.create(actor,request_type,
+                correction_summary.strip() if correction_summary else None,
+                requester_note.strip() if requester_note else None,client_id)
+            return record, PrivacyRequestReceipt(record.id,record.request_type,record.status,
+                record.received_at.isoformat(),record.tracking_reference)
 
         now = datetime.now(timezone.utc)
         req_id = generate_uuid7()
@@ -109,7 +120,9 @@ class PrivacyRequestService:
         actor: IdentityContext,
         request_id: str,
     ) -> PrivacyRequestStatusView | None:
-        rec = self._requests.get(request_id)
+        if not is_valid_uuid7(request_id):
+            return None
+        rec = self._repository.read(actor,request_id) if self._repository is not None else self._requests.get(request_id)
         if not rec or rec.requester_user_id != actor.subject_id:
             return None
 

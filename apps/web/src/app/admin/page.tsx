@@ -1,7 +1,27 @@
 "use client";
 
 import React, { useState } from "react";
-import { AppShell } from "../../components/AppShell";
+import { AdminOverviewPanel } from "../../features/admin/AdminOverviewPanel";
+import { OperationsPanel } from "../../features/admin/OperationsPanel";
+import { OPS_ENABLED } from "../../lib/campus-ops-api";
+import {
+  Download,
+  TrendingUp,
+  Clock,
+  Star,
+  Sliders,
+  ShieldCheck,
+  CheckCircle2,
+  FileSpreadsheet,
+  Edit3,
+  X,
+  AlertCircle,
+} from "lucide-react";
+import {
+  staffButton,
+  staffPrimary,
+  staffSurface,
+} from "../../components/staff/StaffShell";
 
 interface SlaConfigItem {
   id: string;
@@ -20,6 +40,18 @@ interface AuditLogItem {
 }
 
 export default function AdminDashboardPage() {
+  if (OPS_ENABLED) {
+    return (
+      <div className="campus-page space-y-6">
+        <AdminOverviewPanel />
+        <OperationsPanel />
+      </div>
+    );
+  }
+  return <LegacyAdminDashboardPage />;
+}
+
+function LegacyAdminDashboardPage() {
   const [slaConfigs, setSlaConfigs] = useState<SlaConfigItem[]>([
     { id: "xac_nhan_sv", name: "Giấy xác nhận sinh viên", department: "Phòng CTSV", currentHours: 24 },
     { id: "bang_diem", name: "Bảng điểm tạm thời", department: "Phòng Quản lý Đào tạo", currentHours: 48 },
@@ -64,10 +96,12 @@ export default function AdminDashboardPage() {
   };
 
   const handleSaveSla = (id: string) => {
-    const config = slaConfigs.find((c) => c.id === id);
+    const config = slaConfigs.find((configItem) => configItem.id === id);
     const oldHours = config?.currentHours;
     setSlaConfigs((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, currentHours: Number(newSlaHours) } : c))
+      prev.map((configItem) =>
+        configItem.id === id ? { ...configItem, currentHours: Number(newSlaHours) } : configItem
+      )
     );
     // Auto-log SLA change to audit trail
     if (config && oldHours !== Number(newSlaHours)) {
@@ -88,7 +122,7 @@ export default function AdminDashboardPage() {
     const csvContent =
       "data:text/csv;charset=utf-8,ID,Timestamp,Actor,Action,Target,Details\n" +
       auditLogs
-        .map((l) => `${l.id},${l.timestamp},${l.actor},${l.action},${l.targetId},"${l.details}"`)
+        .map((logItem) => `${logItem.id},${logItem.timestamp},${logItem.actor},${logItem.action},${logItem.targetId},"${logItem.details}"`)
         .join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -102,15 +136,19 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <AppShell activeNav="admin" userRole="admin">
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1140px", margin: "0 auto" }}>
+    <div className="campus-page flex flex-col gap-6">
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+        <header className="campus-page-heading">
           <div>
-            <h1 style={{ margin: "0 0 6px 0", fontSize: "24px", fontWeight: 800, color: "var(--color-slate-900, #0f172a)" }}>
-              Bảng điều khiển Quản trị Một cửa số (Admin Ops)
-            </h1>
-            <p style={{ margin: 0, fontSize: "14px", color: "var(--color-slate-600, #475569)" }}>
+            <div className="flex items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                Bảng điều khiển Quản trị Một cửa số (Admin Ops)
+              </h1>
+            </div>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Giám sát chất lượng tiếp nhận, cấu hình cam kết SLA và kiểm toán tuân thủ toàn trường
             </p>
           </div>
@@ -118,328 +156,237 @@ export default function AdminDashboardPage() {
           <button
             type="button"
             onClick={handleExportAudit}
-            style={{
-              padding: "10px 18px",
-              borderRadius: "8px",
-              border: "1px solid var(--color-slate-300, #cbd5e1)",
-              backgroundColor: "#ffffff",
-              color: "var(--color-slate-800, #1e293b)",
-              fontSize: "13px",
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "var(--shadow-xs)",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
+            className={staffButton}
+            aria-label="Xuất dữ liệu kiểm toán"
           >
-            <span>📥</span>
+            <Download className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <span>Xuất dữ liệu kiểm toán</span>
           </button>
-        </div>
+        </header>
 
         {exportNotice && (
           <div
             role="status"
-            style={{
-              padding: "10px 16px",
-              backgroundColor: "#f0fdf4",
-              border: "1px solid #bbf7d0",
-              borderRadius: "8px",
-              color: "#166534",
-              fontSize: "13px",
-              fontWeight: 600,
-            }}
+            className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-xs dark:border-emerald-900/60 dark:bg-emerald-950/60 dark:text-emerald-300"
           >
-            {exportNotice}
+            <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>{exportNotice}</span>
           </div>
         )}
 
         {/* Operational KPI Cards */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "16px",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              padding: "20px",
-              borderRadius: "14px",
-              border: "1px solid var(--color-slate-200, #e2e8f0)",
-              boxShadow: "var(--shadow-xs)",
-            }}
-          >
-            <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-slate-500, #64748b)", textTransform: "uppercase" }}>
-              Tổng hồ sơ tiếp nhận
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className={`${staffSurface} p-5 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                Tổng hồ sơ tiếp nhận
+              </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-primary-light)] text-[var(--color-primary)]">
+                <FileSpreadsheet className="h-4 w-4" aria-hidden="true" />
+              </span>
             </div>
-            <div style={{ fontSize: "28px", fontWeight: 800, color: "var(--color-slate-900, #0f172a)", marginTop: "6px" }}>
+            <div className="mt-3 text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
               1,248
             </div>
-            <div style={{ fontSize: "12px", color: "#16a34a", marginTop: "4px", fontWeight: 600 }}>
-              ↑ +12.4% so với tuần trước
+            <div className="mt-2 flex items-center gap-1 text-xs font-semibold text-[var(--color-status-success)]">
+              <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>↑ +12.4% so với tuần trước</span>
             </div>
           </div>
 
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              padding: "20px",
-              borderRadius: "14px",
-              border: "1px solid var(--color-slate-200, #e2e8f0)",
-              boxShadow: "var(--shadow-xs)",
-            }}
-          >
-            <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-slate-500, #64748b)", textTransform: "uppercase" }}>
-              Tỷ lệ đúng hạn SLA
+          <div className={`${staffSurface} p-5 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                Tỷ lệ đúng hạn SLA
+              </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-primary-light)] text-[var(--color-primary)]">
+                <Clock className="h-4 w-4" aria-hidden="true" />
+              </span>
             </div>
-            <div style={{ fontSize: "28px", fontWeight: 800, color: "#1e3a8a", marginTop: "6px" }}>
+            <div className="mt-3 text-3xl font-extrabold tracking-tight text-[var(--color-primary)]">
               98.5%
             </div>
-            <div style={{ fontSize: "12px", color: "var(--color-slate-500, #64748b)", marginTop: "4px" }}>
+            <div className="mt-2 text-xs text-[var(--text-secondary)]">
               Cam kết dịch vụ vượt chỉ tiêu 95%
             </div>
           </div>
 
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              padding: "20px",
-              borderRadius: "14px",
-              border: "1px solid var(--color-slate-200, #e2e8f0)",
-              boxShadow: "var(--shadow-xs)",
-            }}
-          >
-            <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-slate-500, #64748b)", textTransform: "uppercase" }}>
-              Hồ sơ đang tồn đọng
+          <div className={`${staffSurface} p-5 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                Hồ sơ đang tồn đọng
+              </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300">
+                <AlertCircle className="h-4 w-4" aria-hidden="true" />
+              </span>
             </div>
-            <div style={{ fontSize: "28px", fontWeight: 800, color: "#d97706", marginTop: "6px" }}>
+            <div className="mt-3 text-3xl font-extrabold tracking-tight text-amber-600 dark:text-amber-400">
               14
             </div>
-            <div style={{ fontSize: "12px", color: "var(--color-slate-500, #64748b)", marginTop: "4px" }}>
+            <div className="mt-2 text-xs text-[var(--text-secondary)]">
               0 ca quá hạn thời gian cam kết
             </div>
           </div>
 
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              padding: "20px",
-              borderRadius: "14px",
-              border: "1px solid var(--color-slate-200, #e2e8f0)",
-              boxShadow: "var(--shadow-xs)",
-            }}
-          >
-            <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-slate-500, #64748b)", textTransform: "uppercase" }}>
-              Mức độ hài lòng CSAT
+          <div className={`${staffSurface} p-5 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                Mức độ hài lòng CSAT
+              </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                <Star className="h-4 w-4" aria-hidden="true" />
+              </span>
             </div>
-            <div style={{ fontSize: "28px", fontWeight: 800, color: "#16a34a", marginTop: "6px" }}>
+            <div className="mt-3 text-3xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400">
               4.85 / 5
             </div>
-            <div style={{ fontSize: "12px", color: "var(--color-slate-500, #64748b)", marginTop: "4px" }}>
+            <div className="mt-2 text-xs text-[var(--text-secondary)]">
               Dựa trên 412 lượt đánh giá sinh viên
             </div>
           </div>
         </div>
 
         {/* SLA Configuration Table */}
-        <section
-          style={{
-            backgroundColor: "#ffffff",
-            padding: "24px",
-            borderRadius: "14px",
-            border: "1px solid var(--color-slate-200, #e2e8f0)",
-            boxShadow: "var(--shadow-xs)",
-          }}
-        >
-          <div style={{ marginBottom: "16px" }}>
-            <h2 style={{ margin: "0 0 4px 0", fontSize: "18px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
-              Cấu hình cam kết thời hạn xử lý (SLA)
-            </h2>
-            <p style={{ margin: 0, fontSize: "13px", color: "var(--color-slate-500, #64748b)" }}>
-              Thiết lập thời gian phản hồi và xử lý tối đa theo từng loại hồ sơ Một cửa số
-            </p>
+        <section className={`${staffSurface} p-6 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Sliders className="h-5 w-5 text-[var(--color-primary)]" aria-hidden="true" />
+                <h2 className="text-lg font-bold text-[var(--text-primary)]">
+                  Cấu hình cam kết thời hạn xử lý (SLA)
+                </h2>
+              </div>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                Thiết lập thời gian phản hồi và xử lý tối đa theo từng loại hồ sơ Một cửa số
+              </p>
+            </div>
           </div>
 
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
-            <thead>
-              <tr style={{ backgroundColor: "var(--color-slate-50, #f8fafc)", borderBottom: "1px solid var(--color-slate-200, #e2e8f0)", color: "var(--color-slate-600, #475569)" }}>
-                <th style={{ padding: "12px 16px" }}>Loại giấy tờ / Thủ tục</th>
-                <th style={{ padding: "12px 16px" }}>Đơn vị phụ trách</th>
-                <th style={{ padding: "12px 16px" }}>Thời hạn cam kết SLA</th>
-                <th style={{ padding: "12px 16px" }}>Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              {slaConfigs.map((config) => {
-                const isEditing = editingSlaId === config.id;
-                return (
-                  <tr key={config.id} style={{ borderBottom: "1px solid var(--color-slate-100, #f1f5f9)" }}>
-                    <td style={{ padding: "14px 16px", fontWeight: 600, color: "var(--color-slate-900, #0f172a)" }}>
-                      {config.name}
-                    </td>
-                    <td style={{ padding: "14px 16px", color: "var(--color-slate-600, #475569)" }}>
-                      {config.department}
-                    </td>
-                    <td style={{ padding: "14px 16px" }}>
-                      {isEditing ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <label htmlFor={`sla-input-${config.id}`} style={{ display: "none" }}>
-                            Thời hạn SLA mới (giờ)
-                          </label>
-                          <input
-                            id={`sla-input-${config.id}`}
-                            type="number"
-                            min={1}
-                            max={168}
-                            value={newSlaHours}
-                            onChange={(e) => setNewSlaHours(Number(e.target.value))}
-                            style={{
-                              width: "70px",
-                              padding: "4px 8px",
-                              borderRadius: "4px",
-                              border: "1px solid #cbd5e1",
-                              fontSize: "13px",
-                            }}
-                          />
-                          <span>giờ</span>
-                        </div>
-                      ) : (
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            color: "var(--color-primary, #1e3a8a)",
-                            backgroundColor: "var(--color-primary-light, #eff6ff)",
-                            padding: "3px 10px",
-                            borderRadius: "9999px",
-                          }}
-                        >
-                          {config.currentHours} giờ
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: "14px 16px" }}>
-                      {isEditing ? (
-                        <div style={{ display: "flex", gap: "6px" }}>
+          <div className="overflow-x-auto rounded-xl border border-[var(--border-color)]">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-[var(--surface-subtle)] text-xs font-semibold text-[var(--text-secondary)] border-b border-[var(--border-color)]">
+                <tr>
+                  <th scope="col" className="px-4 py-3">Loại giấy tờ / Thủ tục</th>
+                  <th scope="col" className="px-4 py-3">Đơn vị phụ trách</th>
+                  <th scope="col" className="px-4 py-3">Thời hạn cam kết SLA</th>
+                  <th scope="col" className="px-4 py-3">Hành động</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border-color)]">
+                {slaConfigs.map((config) => {
+                  const isEditing = editingSlaId === config.id;
+                  return (
+                    <tr key={config.id} className="hover:bg-[var(--surface-subtle)] transition-colors">
+                      <td className="px-4 py-3.5 font-semibold text-[var(--text-primary)]">
+                        {config.name}
+                      </td>
+                      <td className="px-4 py-3.5 text-[var(--text-secondary)]">
+                        {config.department}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        {isEditing ? (
+                          <div className="flex items-center gap-2">
+                            <label htmlFor={`sla-input-${config.id}`} className="sr-only">
+                              Thời hạn SLA mới (giờ)
+                            </label>
+                            <input
+                              id={`sla-input-${config.id}`}
+                              type="number"
+                              min={1}
+                              max={168}
+                              value={newSlaHours}
+                              onChange={(e) => setNewSlaHours(Number(e.target.value))}
+                              className="w-20 rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-2.5 py-1 text-sm font-semibold text-[var(--text-primary)] shadow-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                            />
+                            <span className="text-xs text-[var(--text-secondary)]">giờ</span>
+                          </div>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full bg-[var(--color-primary-light)] px-3 py-1 text-xs font-bold text-[var(--color-primary)]">
+                            {config.currentHours} giờ
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        {isEditing ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSaveSla(config.id)}
+                              className={staffPrimary}
+                              aria-label="Lưu cấu hình SLA"
+                            >
+                              Lưu cấu hình SLA
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingSlaId(null)}
+                              className={staffButton}
+                            >
+                              <X className="h-4 w-4" aria-hidden="true" />
+                              <span>Hủy</span>
+                            </button>
+                          </div>
+                        ) : (
                           <button
                             type="button"
-                            onClick={() => handleSaveSla(config.id)}
-                            style={{
-                              padding: "4px 12px",
-                              borderRadius: "6px",
-                              border: "none",
-                              backgroundColor: "var(--color-primary, #1e3a8a)",
-                              color: "#ffffff",
-                              fontSize: "12px",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                            }}
+                            onClick={() => handleEditSla(config)}
+                            aria-label={`Chỉnh sửa SLA ${config.name}`}
+                            className={staffButton}
                           >
-                            Lưu cấu hình SLA
+                            <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
+                            <span>Chỉnh sửa</span>
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setEditingSlaId(null)}
-                            style={{
-                              padding: "4px 10px",
-                              borderRadius: "6px",
-                              border: "1px solid #cbd5e1",
-                              backgroundColor: "#ffffff",
-                              fontSize: "12px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Hủy
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleEditSla(config)}
-                          aria-label={`Chỉnh sửa SLA ${config.name}`}
-                          style={{
-                            padding: "4px 12px",
-                            borderRadius: "6px",
-                            border: "1px solid var(--color-slate-300, #cbd5e1)",
-                            backgroundColor: "#ffffff",
-                            color: "var(--color-slate-700, #334155)",
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            cursor: "pointer",
-                          }}
-                        >
-                          Chỉnh sửa
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         {/* Audit Log Section */}
-        <section
-          style={{
-            backgroundColor: "#ffffff",
-            padding: "24px",
-            borderRadius: "14px",
-            border: "1px solid var(--color-slate-200, #e2e8f0)",
-            boxShadow: "var(--shadow-xs)",
-          }}
-        >
-          <div style={{ marginBottom: "16px" }}>
-            <h2 style={{ margin: "0 0 4px 0", fontSize: "18px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
+        <section className={`${staffSurface} p-6 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">
               Nhật ký kiểm toán Một cửa số (Audit Trail)
             </h2>
-            <p style={{ margin: 0, fontSize: "13px", color: "var(--color-slate-500, #64748b)" }}>
+            <p className="mt-1 text-xs text-[var(--text-secondary)]">
               Ghi nhận bất biến mọi tác vụ nghiệp vụ, phân quyền và can thiệp thủ tục của cán bộ
             </p>
           </div>
 
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
-              <thead>
-                <tr style={{ backgroundColor: "var(--color-slate-50, #f8fafc)", borderBottom: "1px solid var(--color-slate-200, #e2e8f0)", color: "var(--color-slate-600, #475569)" }}>
-                  <th style={{ padding: "10px 14px" }}>Thời gian</th>
-                  <th style={{ padding: "10px 14px" }}>Người thực hiện (Actor)</th>
-                  <th style={{ padding: "10px 14px" }}>Hành động</th>
-                  <th style={{ padding: "10px 14px" }}>Mã đối tượng</th>
-                  <th style={{ padding: "10px 14px" }}>Chi tiết tác vụ</th>
+          <div className="overflow-x-auto rounded-xl border border-[var(--border-color)]">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-[var(--surface-subtle)] text-xs font-semibold text-[var(--text-secondary)] border-b border-[var(--border-color)]">
+                <tr>
+                  <th scope="col" className="px-4 py-3">Thời gian</th>
+                  <th scope="col" className="px-4 py-3">Người thực hiện</th>
+                  <th scope="col" className="px-4 py-3">Hành động</th>
+                  <th scope="col" className="px-4 py-3">Mã đối tượng</th>
+                  <th scope="col" className="px-4 py-3">Chi tiết tác vụ</th>
                 </tr>
               </thead>
-              <tbody>
-                {auditLogs.map((log) => (
-                  <tr key={log.id} style={{ borderBottom: "1px solid var(--color-slate-100, #f1f5f9)" }}>
-                    <td style={{ padding: "12px 14px", color: "var(--color-slate-500, #64748b)", fontFamily: "monospace", fontSize: "12px" }}>
-                      {log.timestamp}
+              <tbody className="divide-y divide-[var(--border-color)]">
+                {auditLogs.map((logItem) => (
+                  <tr key={logItem.id} className="hover:bg-[var(--surface-subtle)] transition-colors">
+                    <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-[var(--text-secondary)]">
+                      {logItem.timestamp}
                     </td>
-                    <td style={{ padding: "12px 14px", fontWeight: 600, color: "var(--color-slate-900, #0f172a)" }}>
-                      {log.actor}
+                    <td className="whitespace-nowrap px-4 py-3 font-semibold text-[var(--text-primary)]">
+                      {logItem.actor}
                     </td>
-                    <td style={{ padding: "12px 14px" }}>
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          fontFamily: "monospace",
-                          fontWeight: 700,
-                          backgroundColor: "var(--color-slate-100, #f1f5f9)",
-                          padding: "2px 6px",
-                          borderRadius: "4px",
-                          color: "var(--color-slate-700, #334155)",
-                        }}
-                      >
-                        {log.action}
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <span className="rounded-md bg-[var(--surface-subtle)] px-2 py-0.5 font-mono text-xs font-semibold text-[var(--text-secondary)] border border-[var(--border-color)]">
+                        {logItem.action}
                       </span>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "var(--color-primary, #1e3a8a)", fontWeight: 600 }}>
-                      {log.targetId}
+                    <td className="whitespace-nowrap px-4 py-3 font-semibold text-[var(--color-primary)]">
+                      {logItem.targetId}
                     </td>
-                    <td style={{ padding: "12px 14px", color: "var(--color-slate-700, #334155)" }}>
-                      {log.details}
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {logItem.details}
                     </td>
                   </tr>
                 ))}
@@ -448,6 +395,5 @@ export default function AdminDashboardPage() {
           </div>
         </section>
       </div>
-    </AppShell>
   );
 }

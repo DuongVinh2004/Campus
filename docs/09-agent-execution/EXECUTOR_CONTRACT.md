@@ -1,13 +1,15 @@
 ---
 document_id: "DOC-AGENT-001"
-version: "1.0.0"
+version: "1.1.0"
 status: "reviewed"
 owner: "Agentic Delivery Architecture"
 approvers: ["Engineering Lead", "Security Owner", "Quality Owner"]
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 ---
 
 # Executor contract
+
+[DEC-023](../00-governance/LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md) is standing direct human authority for assigned local/synthetic engineering. Older approval flags, roles and guide passages do not require another task/package approval. Record the decision, prepare exact targets and technical evidence, and proceed within the assigned objective.
 
 ## Input
 
@@ -25,7 +27,7 @@ The resolver must reject an empty result, an unknown requirement/AC, an AC belon
 
 1. Parse and schema-validate the task.
 2. Resolve and record every upstream requirement and product AC; verify `status: ready` and dependency states.
-3. Verify human approval when required; approval must name this task and current scope.
+3. Record DEC-023 as execution authority for delegated local/synthetic work; verify that the task's actual target, environment and objective fall within it.
 4. Inspect Git status and record pre-existing changes.
 5. Resolve allowed paths canonically; reject roots, parent traversal, globs that escape the repository and symlink targets outside the workspace.
 6. Check no running task has overlapping paths or conflict keys.
@@ -47,10 +49,10 @@ The resolver must reject an empty result, an unknown requirement/AC, an AC belon
 ## Result semantics
 
 - `completed`: implementation and every required check passed.
-- `blocked`: work could not safely begin or continue because a required decision, artifact, approval or boundary is missing.
+- `blocked`: work could not safely begin or continue because required technical information, an artifact or an authorized environment boundary is missing. Do not use a historical approval flag as a blocker for DEC-023 work.
 - `failed`: in-scope implementation was attempted but acceptance still fails after the repair budget.
 
-The executor never returns `accepted`; acceptance belongs to independent review/orchestration.
+The task-output schema retains its result vocabulary. The authorized executor can separately record technical acceptance under DEC-022/DEC-023 after reviewing evidence; independent human review is not an execution prerequisite in this scope.
 
 ## Required output trace
 

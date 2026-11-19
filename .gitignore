@@ -67,3 +67,21 @@ Thumbs.db
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Local RAG v2 index snapshots
+/data/rag_v2_index/
+
+/data/rag_v2_debug/
+/data/rag_v2_vendor/
+
+# Credentials for the separately provisioned local learning module
+/infra/local/learning-materials-20261104-01/identity.json
+/infra/local/learning-materials-20261104-01/credentials.json
+
+# Secrets retained by this feature's synthetic tests and recovery copies
+/.tooling/learning-*/**/identity.json
+/.tooling/learning-*/**/credentials.json
+/.tooling/learning-*/**/browser-profile*/
+/.tooling/learning-pg-live-20261105-01/init-password.txt
+
+# UI screenshots cache (safe to delete; regenerate with scripts/ui_shots.mjs)
+infra/local/ui-shots/

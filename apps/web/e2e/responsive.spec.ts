@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, within } from "@testing-library/react";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { AppShell } from "../src/components/AppShell";
@@ -36,8 +36,8 @@ describe("Responsive Viewport Snapshots (TASK-WEB-RESPONSIVE-001)", () => {
 
     const banner = screen.getByRole("banner");
     expect(banner).toBeDefined();
-    expect(screen.getByText(/Campus 24\/7 — HUCE Demo/i)).toBeDefined();
-    expect(screen.getByText(/Dữ liệu mô phỏng/i)).toBeDefined();
+    expect(within(banner).getByText(/Campus 24\/7/i)).toBeDefined();
+    expect(within(banner).getByRole("search", { name: "Tìm nhanh trong Campus" })).toBeDefined();
   });
 
   it("negative path: asserts no horizontal overflow flag across declared viewports", () => {

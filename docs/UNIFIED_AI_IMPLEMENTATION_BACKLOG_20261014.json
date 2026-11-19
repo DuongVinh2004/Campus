@@ -1,0 +1,2993 @@
+{
+  "plan_id": "CAMPUS247-UNIFIED-AI-20261014",
+  "created_at": "2026-10-14",
+  "timezone": "Asia/Bangkok",
+  "plan_file": "docs/UNIFIED_AI_IMPLEMENTATION_PLAN_20261014.md",
+  "status": "in_progress",
+  "implementation_started": true,
+  "next_task": "UNI-045",
+  "pending_verification": ["UNI-003", "UNI-004", "UNI-005", "UNI-006", "UNI-007", "UNI-008", "UNI-009", "UNI-010", "UNI-011", "UNI-012", "UNI-013", "UNI-014", "UNI-015", "UNI-016", "UNI-017", "UNI-018", "UNI-019", "UNI-020", "UNI-021", "UNI-022", "UNI-023", "UNI-024", "UNI-025", "UNI-026", "UNI-027", "UNI-028", "UNI-029", "UNI-030", "UNI-031", "UNI-032", "UNI-033", "UNI-034", "UNI-035", "UNI-036", "UNI-037", "UNI-038", "UNI-039", "UNI-040", "UNI-041", "UNI-042", "UNI-044", "UNI-045", "UNI-046", "UNI-047", "UNI-048", "UNI-049", "UNI-050"],
+  "human_baseline_deferred": true,
+  "current_direct_human_direction": "Hoàn thiện tuần tự phần còn lại, kiểm UI/E2E/mobile; người dùng ủy quyền tự động cho công việc kỹ thuật. Không giả lập participants/chuyên gia thành người thật; giữ dữ liệu, budgets và protections.",
+  "continuation_note": "Sequential completion20261015-01 closes native persisted temporary-chat/memory consumer, fixes pre-dispatch deadline accounting and duplicate UI panel keys. Final source-stable backend08:877/877 unique,0 failures/skips; final guarded build/TypeScript pass, candidate04 BUILD_ID I0Xq0uJY2BXxvGQBOUo-i at3019/API8019. Actual UI two-role round trip spans09/10 with receipt readback, memory/chat/notification/feature-off and390px sampled accessibility observed; failures preserved. UNI-040 implemented,043 verified in local synthetic scope;044/046/048/049/050 implemented with full acceptance pending;045/047 need real model/expert/participants.34 calls remain,36 minimum reserve for multi campaign alone, so no paid dispatch.26REQ/50AT/50UNI/43source mappings reconciled. Historical session records remain unchanged. No retained DB mutation, serving transition, deletion, commit/push/deploy.",
+  "preferred_local_entry_url": "http://localhost:3019/login",
+  "execution_direction": "One unified student/staff/admin application; retain old data/builds/runtimes as references. No claim that all 50 tasks or production rollout are complete.",
+  "replaces_as_execution_entry_point": [
+    "docs/ASSISTANT_IMPLEMENTATION_PLAN_20261014.md",
+    "docs/ASSISTANT_IMPLEMENTATION_BACKLOG_20261014.json"
+  ],
+  "preserved_source_documents": [
+    "docs/ASSISTANT_PERSONALIZATION_PROPOSAL_20261014.md",
+    "docs/ASSISTANT_ADVANCED_PROPOSAL_20261014.md",
+    "docs/ASSISTANT_IMPLEMENTATION_PLAN_20261014.md",
+    "docs/ASSISTANT_IMPLEMENTATION_BACKLOG_20261014.json",
+    "docs/STAFF_ASSISTANT_PROPOSAL_20261014.md"
+  ],
+  "status_values": [
+    "planned",
+    "in_progress",
+    "implemented",
+    "verified",
+    "failed",
+    "needs_input"
+  ],
+  "status_semantics": "Only verified dependencies satisfy technical readiness; implemented is not verified. This record adds no document approval gates, deletion or production authority. Product multi-agent design does not authorize spawning coding agents.",
+  "estimation": {
+    "engineering_days": [
+      48,
+      76
+    ],
+    "confidence": "preliminary; revalidate after UNI-001 through UNI-003",
+    "not_calendar_commitment": true
+  },
+  "phases": [
+    {
+      "id": "U0",
+      "title": "Khảo sát và baseline",
+      "task_range": [
+        "UNI-001",
+        "UNI-003"
+      ],
+      "estimated_engineering_days": [
+        2,
+        3
+      ],
+      "milestone": "M0: runtime, inventory, ca chuẩn và baseline"
+    },
+    {
+      "id": "U1",
+      "title": "Domain, workflow, storage và context",
+      "task_range": [
+        "UNI-004",
+        "UNI-008"
+      ],
+      "estimated_engineering_days": [
+        5,
+        8
+      ],
+      "milestone": "Nguồn dữ liệu/quy trình và bảo toàn"
+    },
+    {
+      "id": "U2",
+      "title": "Lịch sử, giao diện, settings và quyền",
+      "task_range": [
+        "UNI-009",
+        "UNI-015"
+      ],
+      "estimated_engineering_days": [
+        5,
+        8
+      ],
+      "milestone": "M1: nền tảng hai vai trò có hiệu lực"
+    },
+    {
+      "id": "U3",
+      "title": "Trung tâm multi-agent và task bền vững",
+      "task_range": [
+        "UNI-016",
+        "UNI-020"
+      ],
+      "estimated_engineering_days": [
+        5,
+        8
+      ],
+      "milestone": "Phối hợp đúng scope, evidence và budgets"
+    },
+    {
+      "id": "U4",
+      "title": "Sinh viên: hiểu mục đích và chuẩn bị thủ tục",
+      "task_range": [
+        "UNI-021",
+        "UNI-025"
+      ],
+      "estimated_engineering_days": [
+        5,
+        7
+      ],
+      "milestone": "Nộp đúng với receipt"
+    },
+    {
+      "id": "U5",
+      "title": "Cán bộ: kiểm chứng và hỗ trợ xử lý",
+      "task_range": [
+        "UNI-026",
+        "UNI-032"
+      ],
+      "estimated_engineering_days": [
+        7,
+        11
+      ],
+      "milestone": "Review/draft/confirm đúng nguồn và thẩm quyền"
+    },
+    {
+      "id": "U6",
+      "title": "Bổ sung và bàn giao khép kín hai phía",
+      "task_range": [
+        "UNI-033",
+        "UNI-035"
+      ],
+      "estimated_engineering_days": [
+        3,
+        5
+      ],
+      "milestone": "M2: pilot end-to-end hai bên"
+    },
+    {
+      "id": "U7",
+      "title": "Batch, queue và tối ưu điểm nghẽn",
+      "task_range": [
+        "UNI-036",
+        "UNI-038"
+      ],
+      "estimated_engineering_days": [
+        3,
+        5
+      ],
+      "milestone": "M3: throughput có kiểm tra từng hồ sơ"
+    },
+    {
+      "id": "U8",
+      "title": "Memory và quyền riêng tư",
+      "task_range": [
+        "UNI-039",
+        "UNI-040"
+      ],
+      "estimated_engineering_days": [
+        3,
+        5
+      ],
+      "milestone": "Cá nhân hóa dài hạn kiểm soát được"
+    },
+    {
+      "id": "U9",
+      "title": "Theo dõi sự kiện và hỗ trợ chủ động",
+      "task_range": [
+        "UNI-041",
+        "UNI-042"
+      ],
+      "estimated_engineering_days": [
+        3,
+        5
+      ],
+      "milestone": "M4: chủ động trong grants"
+    },
+    {
+      "id": "U10",
+      "title": "Đối kháng, E2E, shadow, tải và pilot",
+      "task_range": [
+        "UNI-043",
+        "UNI-047"
+      ],
+      "estimated_engineering_days": [
+        5,
+        8
+      ],
+      "milestone": "M5: evidence chất lượng và hiệu quả"
+    },
+    {
+      "id": "U11",
+      "title": "Diễn tập, tài liệu và bàn giao",
+      "task_range": [
+        "UNI-048",
+        "UNI-050"
+      ],
+      "estimated_engineering_days": [
+        2,
+        3
+      ],
+      "milestone": "M6: deploy-ready nếu đủ evidence; chưa deploy"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "REQ-01",
+      "title": "Lịch sử theo tài khoản",
+      "description": "Lưu bền vững, danh sách/tìm/open, trạng thái lưu, restore và tiếp tục; new chat không xóa chat cũ."
+    },
+    {
+      "id": "REQ-02",
+      "title": "Câu trả lời trực quan",
+      "description": "Ngắn phù hợp mục đích; bước/bảng/thẻ/proposal/source; responsive, keyboard, dark và tin cũ."
+    },
+    {
+      "id": "REQ-03",
+      "title": "Settings và cá nhân hóa",
+      "description": "Cấu hình từng actor, chat override, bố cục/cách trả lời; giới hạn trong policy và templates hợp lệ."
+    },
+    {
+      "id": "REQ-04",
+      "title": "Quyền và consent thực thi",
+      "description": "Scope theo nguồn/tài nguyên/role/queue/assignment, expiry/revoke; kiểm tra ở server; consent tách quyền thao tác."
+    },
+    {
+      "id": "REQ-05",
+      "title": "Hiểu đúng mục đích",
+      "description": "Outcome/purpose/resource/constraints/facts; clarify phần làm đổi quyết định; giữ mục đích khi chuyển agent/route."
+    },
+    {
+      "id": "REQ-06",
+      "title": "AI xuyên giao diện sinh viên",
+      "description": "Điều hướng, dịch vụ, biểu mẫu, field, tài liệu, lỗi, hồ sơ, lịch, cài đặt; handler có ích theo scope."
+    },
+    {
+      "id": "REQ-07",
+      "title": "Chuẩn bị thủ tục tối đa",
+      "description": "Điền sẵn fact được phép; kiểm tra, missing-group, preview; không ghi đè manual edits hoặc tự quyết trường mơ hồ."
+    },
+    {
+      "id": "REQ-08",
+      "title": "Chính xác và tin cậy",
+      "description": "Nguồn/rule/schema/readiness/version/recipient/receipt; không model confidence hoặc prose thay nghiệp vụ."
+    },
+    {
+      "id": "REQ-09",
+      "title": "Multi-agent điều phối hai bên",
+      "description": "Một trung tâm điều phối logic, specialist theo nhu cầu, typed handoff/DAG/budgets; không mở rộng authority."
+    },
+    {
+      "id": "REQ-10",
+      "title": "Quy trình và quy tắc dùng chung",
+      "description": "Một definition có version/effective dates/mandatory steps/template cho student, staff và backend."
+    },
+    {
+      "id": "REQ-11",
+      "title": "Bằng chứng và nguồn gốc",
+      "description": "Claim/criterion/output truy nguồn; source locator/hash/version/actor/time; thiếu/xung đột/lỗi thời rõ."
+    },
+    {
+      "id": "REQ-12",
+      "title": "Thực thi chống lỗi và trùng",
+      "description": "CAS/version/claim/confirmation/idempotency/atomic receipts; retries/readback không tạo action khác."
+    },
+    {
+      "id": "REQ-13",
+      "title": "Công việc liên tục",
+      "description": "Goal/task/draft/case/run references, state/blockers/next action, restart/resume đúng bước."
+    },
+    {
+      "id": "REQ-14",
+      "title": "Bộ hồ sơ làm việc cán bộ",
+      "description": "Chuẩn bị mục đích/facts/tài liệu/timeline/checklist/căn cứ/dự thảo; mở nguồn trực tiếp."
+    },
+    {
+      "id": "REQ-15",
+      "title": "Review tập trung vấn đề",
+      "description": "Readiness có reason; phân biệt rule/AI proposal/officer review; giữ mọi kiểm tra bắt buộc."
+    },
+    {
+      "id": "REQ-16",
+      "title": "Chuẩn bị trước và kiểm tra phần đổi",
+      "description": "Versioned cache/dependencies/invalidation; compare supplement; không đọc/chạy lại phần không cần."
+    },
+    {
+      "id": "REQ-17",
+      "title": "Bổ sung liên thông",
+      "description": "Typed missing items/criteria/reason, staff preview/confirm public request, student checklist và delta readback."
+    },
+    {
+      "id": "REQ-18",
+      "title": "Dự thảo phản hồi và kết quả",
+      "description": "Templates đúng hiệu lực, structured decision facts/reasons, internal/public riêng, human decision theo thẩm quyền."
+    },
+    {
+      "id": "REQ-19",
+      "title": "Nháp và phụ trách bền vững",
+      "description": "Server autosave theo officer/case/version; concurrent tabs/people/process; không mất nháp hoặc làm trùng."
+    },
+    {
+      "id": "REQ-20",
+      "title": "Xử lý gộp có kiểm chứng",
+      "description": "Exact targets/per-item payload/check/receipt; partial outcomes; execute chỉ khi capability/policy cho phép."
+    },
+    {
+      "id": "REQ-21",
+      "title": "Ưu tiên, bàn giao và điểm nghẽn",
+      "description": "Deadlines/routing có căn cứ; context đúng scope; active/wait time; không tự đổi policy vì backlog."
+    },
+    {
+      "id": "REQ-22",
+      "title": "Memory có kiểm soát",
+      "description": "Opt-in từng actor; source/time/scope; update/abstention/forget suppression; không memory cross-user."
+    },
+    {
+      "id": "REQ-23",
+      "title": "Hỗ trợ chủ động",
+      "description": "Selected trigger/resource/channel/expiry/quiet hours; no-change suppression, dedup, revoke và stop tracking."
+    },
+    {
+      "id": "REQ-24",
+      "title": "Chất lượng, chi phí và hiệu năng",
+      "description": "Baseline, shadow và user pilot; latency/cost/tool limits, privacy metrics và evidence thực."
+    },
+    {
+      "id": "REQ-25",
+      "title": "AI xuyên giao diện cán bộ/quản trị",
+      "description": "Queue/detail/checklist/editor/error/handover/admin; staff intent đúng target; không copy hồ sơ sang chat."
+    },
+    {
+      "id": "REQ-26",
+      "title": "Bảo toàn, riêng tư và phục hồi",
+      "description": "Retain source data/dirty work/builds, verified migration, temporary/retention/export choices, recover without reset."
+    }
+  ],
+  "acceptance_groups": [
+    {
+      "id": "AT-01",
+      "title": "Đúng runtime/build/API/mode/identity/storage",
+      "expected": "Bằng chứng UI gắn đúng candidate; pass ở snapshot khác không tính đã sửa bản dùng."
+    },
+    {
+      "id": "AT-02",
+      "title": "Độ phủ thao tác hai vai trò",
+      "expected": "Inventory có handler và mức hỗ trợ được thử; unsupported được ghi gap, không tính là đã hỗ trợ."
+    },
+    {
+      "id": "AT-03",
+      "title": "History qua reload/relogin/restart/thiết bị",
+      "expected": "Lượt được ack commit còn đúng actor/order/retention; chưa commit có trạng thái chính xác."
+    },
+    {
+      "id": "AT-04",
+      "title": "Discovery và metadata phân trang",
+      "expected": "Search/open/rename/pin/archive/version; nhiều trang không mất/trùng."
+    },
+    {
+      "id": "AT-05",
+      "title": "Pending/stream/final/citations",
+      "expected": "Retry/timeout/interrupt đúng trạng thái; final source map bất biến theo message."
+    },
+    {
+      "id": "AT-06",
+      "title": "Legacy/import/demo/unknown ownership",
+      "expected": "Giữ dữ liệu gốc, preview/receipt/dedup; không gắn owner tùy ý hoặc demo vào thật."
+    },
+    {
+      "id": "AT-07",
+      "title": "Isolation actor/tenant/role/queue",
+      "expected": "Direct API/source/cache/resume/UI không đọc/chỉnh trái quyền hoặc lộ internal notes."
+    },
+    {
+      "id": "AT-08",
+      "title": "Grant expiry/revoke/race",
+      "expected": "Read không thành write; one-time consumption hợp lệ; pending action revalidates."
+    },
+    {
+      "id": "AT-09",
+      "title": "Settings persistence và concurrent edits",
+      "expected": "Saved/readback/chat override/CAS đúng; offline failure không báo đã lưu."
+    },
+    {
+      "id": "AT-10",
+      "title": "Renderer/accessibility/streaming",
+      "expected": "Short/list/table/cards/copy/source/mobile/dark/keyboard; không tràn toàn trang."
+    },
+    {
+      "id": "AT-11",
+      "title": "Context xuyên route/field/panel và đổi tài khoản",
+      "expected": "Goal/resource/error context đúng; không mất hoặc rò dữ liệu hai bên."
+    },
+    {
+      "id": "AT-12",
+      "title": "Intent rõ/mơ hồ/thiếu thông tin",
+      "expected": "Expected workflow/clarification đúng; không chọn thủ tục hay target quan trọng bằng đoán."
+    },
+    {
+      "id": "AT-13",
+      "title": "Đổi mục đích/ràng buộc giữa chừng",
+      "expected": "Reinterpret và diff cần thiết; giữ nháp/manual work; không action theo goal cũ."
+    },
+    {
+      "id": "AT-14",
+      "title": "Không hỏi/nhập lại fact hợp lệ",
+      "expected": "Dữ liệu đã có nguồn và được cấp được dùng đúng; missing thật mới hỏi."
+    },
+    {
+      "id": "AT-15",
+      "title": "Auto draft và provenance trường",
+      "expected": "Field types/domain checks đúng, có nguồn; inference và OCR candidate không bị giả fact."
+    },
+    {
+      "id": "AT-16",
+      "title": "Manual edits/stale/multiple drafts",
+      "expected": "Không overwrite hoặc chọn bừa; version conflict hiển thị và giữ work."
+    },
+    {
+      "id": "AT-17",
+      "title": "Tài liệu/OCR/required fields",
+      "expected": "File checks và schema/server validation; không xác thực con dấu/chữ ký từ detection."
+    },
+    {
+      "id": "AT-18",
+      "title": "Exact preview/confirmation",
+      "expected": "Đổi payload/recipient/target/version/expiry không dùng approval cũ; chưa confirm không chạy."
+    },
+    {
+      "id": "AT-19",
+      "title": "Crash/timeout quanh business commit",
+      "expected": "Read receipt và stable retries; không submit/send/issue/book hai lần."
+    },
+    {
+      "id": "AT-20",
+      "title": "Task continuity và receipt-based completion",
+      "expected": "Nhiều phiên/restart đúng resource/step; checkpoint không tự thực thi hay cấp quyền."
+    },
+    {
+      "id": "AT-21",
+      "title": "Rule/source/template effective versions",
+      "expected": "Chọn phiên bản áp dụng theo mốc cấu hình; source/rule đổi không làm kết luận stale được dùng."
+    },
+    {
+      "id": "AT-22",
+      "title": "Evidence và factual/semantic checks",
+      "expected": "Claim/criterion/output truy nguồn; missing/conflict không thành fact; UI không confidence giả."
+    },
+    {
+      "id": "AT-23",
+      "title": "Untrusted documents/tools/memory/output",
+      "expected": "Injection không tạo quyền, tool, executable UI hoặc thay workflow; unsafe links bị xử lý."
+    },
+    {
+      "id": "AT-24",
+      "title": "DAG/role/tool/output contracts",
+      "expected": "Cycle/unknown role/tool/bad output rejected; authority bound server; coverage không mất."
+    },
+    {
+      "id": "AT-25",
+      "title": "Mâu thuẫn giữa agents hoặc nguồn",
+      "expected": "Original evidence được đọc lại; không majority vote/fabricated synthesis; unresolved được nêu rõ."
+    },
+    {
+      "id": "AT-26",
+      "title": "Agent partial failure/cancel/budgets",
+      "expected": "Bound retries/time/cost/context; giữ work; partial/abstain đúng, không fake success."
+    },
+    {
+      "id": "AT-27",
+      "title": "Scope/freshness của cache và handoff",
+      "expected": "Cached evidence reauthorized; subagent chỉ nhận minimal context phù hợp; revoke làm invalidation đúng."
+    },
+    {
+      "id": "AT-28",
+      "title": "Durable runs và nhiều process",
+      "expected": "Concurrent resume/lease/version và restart không duplicate transition hoặc mất committed result."
+    },
+    {
+      "id": "AT-29",
+      "title": "Staff integrity của demo/checks/confidence",
+      "expected": "Constants 99.8%, stamp/SLA claims không hiển thị như evidence thật; unknown có reason."
+    },
+    {
+      "id": "AT-30",
+      "title": "Staff case package và source navigation",
+      "expected": "Đúng sinh viên/case/facts/timeline; mở chính xác locator/version, không bỏ blocker."
+    },
+    {
+      "id": "AT-31",
+      "title": "Readiness và mandatory reviews",
+      "expected": "Ready không bỏ required officer checks; model confidence/tick count không thay criterion truth."
+    },
+    {
+      "id": "AT-32",
+      "title": "Incremental recheck dependencies",
+      "expected": "Document/rule/fact/template đổi invalidates đủ findings/output; unrelated còn hợp lệ mới giữ."
+    },
+    {
+      "id": "AT-33",
+      "title": "Staff autosave/reload/concurrent tabs",
+      "expected": "Committed draft sống qua restart; saved/pending/error đúng; manual text không ghi đè."
+    },
+    {
+      "id": "AT-34",
+      "title": "Claim/assignment/transfer/concurrent officers",
+      "expected": "Một action đúng owner/queue; reassignment/revoke chặn old proposal; không mất drafts."
+    },
+    {
+      "id": "AT-35",
+      "title": "Official draft và structured outcome",
+      "expected": "Đúng mẫu/fields/facts/reasons/version; decision do cán bộ/workflow, không prose model."
+    },
+    {
+      "id": "AT-36",
+      "title": "Internal/public/recipient boundaries",
+      "expected": "Notes/memory/confidential attachments không lọt phản hồi hay notification; recipient bind đúng."
+    },
+    {
+      "id": "AT-37",
+      "title": "Supplement loop hai bên",
+      "expected": "Group known missing, typed item IDs, public request confirmed; bổ sung resolve đúng item, không hỏi lại."
+    },
+    {
+      "id": "AT-38",
+      "title": "Handover liên đơn vị",
+      "expected": "Đủ done/open/evidence/next step trong scope; transfer/public preview/receipt đúng, không share toàn chat."
+    },
+    {
+      "id": "AT-39",
+      "title": "Batch preflight/partial/retry",
+      "expected": "Exact list, per-item authorize/version/receipt; stale blocked, no target drift/copy outcome/duplicate."
+    },
+    {
+      "id": "AT-40",
+      "title": "Priority và routing minh bạch",
+      "expected": "Lý do theo policy/deadline/source; duplicate candidates không auto merge/delete/reject."
+    },
+    {
+      "id": "AT-41",
+      "title": "Bottleneck và effort metrics",
+      "expected": "Tách active/student wait/unit wait/system/complexity; số vòng bổ sung và reopen được đo đúng."
+    },
+    {
+      "id": "AT-42",
+      "title": "Memory temporal/update/contradiction",
+      "expected": "Opt-in đúng actor, relevance/validity; status học vụ lấy nguồn hiện hành."
+    },
+    {
+      "id": "AT-43",
+      "title": "Forget và derived contexts",
+      "expected": "Memory quên không tái tạo từ history/index/summary; giữ chat gốc theo lựa chọn riêng."
+    },
+    {
+      "id": "AT-44",
+      "title": "Temporary/history/retention/privacy",
+      "expected": "Memory off không xóa history; temporary không personal memory; disclosure đúng storage vận hành."
+    },
+    {
+      "id": "AT-45",
+      "title": "Events/quiet hours/revoke/restart",
+      "expected": "No-change im lặng, dedup, scope trước delivery; stop tracking có hiệu lực."
+    },
+    {
+      "id": "AT-46",
+      "title": "Notifications/channels/next action",
+      "expected": "Kênh/preview dữ liệu đúng quyền; mở resource đúng; không unverified promise hoặc auto write."
+    },
+    {
+      "id": "AT-47",
+      "title": "Adversarial facts/actions và lỗi hệ thống",
+      "expected": "Bad IDs/OCR/source/stale approvals/DB/audit/delivery failures không tạo quyết định sai hoặc rò dữ liệu."
+    },
+    {
+      "id": "AT-48",
+      "title": "Performance/cost/load/privacy",
+      "expected": "p95/throughput/cost measured; context/tool/retry/queue limits; no raw private logs; kiểm tra không bypass dưới tải."
+    },
+    {
+      "id": "AT-49",
+      "title": "Pilot thực hai bên và usefulness",
+      "expected": "Same tasks/conditions/complexity; người tham gia thật đánh giá completion/corrections/effort; synthetic chưa đủ."
+    },
+    {
+      "id": "AT-50",
+      "title": "Rollout/recovery/data compatibility",
+      "expected": "Feature off giữ history/evidence/drafts/receipts/manual path/safety; migration không overwrite nguồn."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "UNI-001",
+      "phase": "U0",
+      "title": "Khảo sát bản chạy, danh tính và storage",
+      "scope": "scripts launch/prepare; bootstrap/main; StudentRuntime; staff routes; repositories",
+      "depends_on": [],
+      "requirements": [
+        "REQ-01",
+        "REQ-08",
+        "REQ-09",
+        "REQ-24",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-01",
+        "AT-03",
+        "AT-29"
+      ],
+      "source_refs": [
+        "AI-001",
+        "ST-01"
+      ],
+      "status": "verified",
+      "evidence": [
+        "infra/local/unified-ai-20261014-01/runtime-probe-01.json",
+        "docs/UNIFIED_AI_RUNTIME_INVENTORY_20261014.md",
+        "infra/local/unified-ai-20261014-01/context-tests-03.xml",
+        "infra/local/unified-ai-20261014-01/candidate-verification-01.json"
+      ],
+      "status_history": ["planned", "in_progress", "implemented", "verified"],
+      "verification_scope": "Runtime/storage/identity/source/capability inventory, repository-restart retention probe and UI reproduction; not future history discovery or staff accuracy acceptance.",
+      "limitations": ["Legacy staff confidence/stamp/SLA constants remain a documented gap", "No production or cross-device user pilot", "Original app8004 and candidate8006 have separate retained business snapshots"],
+      "implementation_outline": "Xác định build/API thực tế, mode/tenant/role, storage, retention, nguồn và capabilities; tái hiện các vấn đề trên hai giao diện.",
+      "acceptance_summary": "Có runtime map và evidence phân biệt source, snapshot, demo và bản dùng thật."
+    },
+    {
+      "id": "UNI-002",
+      "phase": "U0",
+      "title": "Lập ma trận thao tác và quyền của hai bên",
+      "scope": "routes/components student/staff/admin; tool/capability registry",
+      "depends_on": [
+        "UNI-001"
+      ],
+      "requirements": [
+        "REQ-06",
+        "REQ-09",
+        "REQ-21",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-02",
+        "AT-07",
+        "AT-11"
+      ],
+      "source_refs": [
+        "AI-006",
+        "AI-020",
+        "AI-021"
+      ],
+      "status": "verified",
+      "evidence": ["docs/UNIFIED_AI_RUNTIME_INVENTORY_20261014.md", "infra/local/unified-ai-20261014-01/runtime-probe-01.json", "infra/local/unified-ai-20261014-01/browser-verification-01.json"],
+      "status_history": ["planned", "in_progress", "implemented", "verified"],
+      "verification_scope": "Handler/role/source/field-error inventory; unsupported routes and unused adapters recorded as gaps, not counted as AI coverage.",
+      "implementation_outline": "Inventory từng thao tác/field/error, vai trò, nguồn, handler và mức explain/prepare/execute; xác định phần chưa hỗ trợ.",
+      "acceptance_summary": "Mỗi thao tác có handler thật hoặc giới hạn/next step rõ; ownership và internal/public được ghi."
+    },
+    {
+      "id": "UNI-003",
+      "phase": "U0",
+      "title": "Baseline và bộ ca nghiệp vụ hai phía",
+      "scope": "evals/fixtures và E2E candidate mới trong workspace",
+      "depends_on": [
+        "UNI-001",
+        "UNI-002"
+      ],
+      "requirements": [
+        "REQ-05",
+        "REQ-07",
+        "REQ-08",
+        "REQ-24"
+      ],
+      "acceptance": [
+        "AT-12",
+        "AT-14",
+        "AT-30",
+        "AT-41",
+        "AT-49"
+      ],
+      "source_refs": [
+        "AI-002",
+        "ST-01"
+      ],
+      "status": "implemented",
+      "evidence": ["evals/datasets/unified-ai-baseline-20261014.json", "docs/UNIFIED_AI_RUNTIME_INVENTORY_20261014.md", "infra/local/unified-ai-20261014-01/baseline-tests-01.xml", "infra/local/unified-ai-20261014-01/context-tests-03.xml", "services/api/src/campus247/application/assistance/baseline.py", "apps/web/src/features/assistance/BaselineRecorder.tsx", "infra/local/unified-ai-20261014-02/baseline-final-tests-01.xml", "infra/local/unified-ai-20261014-02/candidate-verification-01.json", "infra/local/unified-ai-20261014-02/browser-verification-01.json", "docs/UNIFIED_AI_SESSION02_20261014.md"],
+      "status_history": ["planned", "in_progress", "implemented"],
+      "implemented_slices": ["14 fixed source-referenced cases with unchanged pilot thresholds", "Opt-in actor-owned durable recorder with server-time intervals, event receipts, CAS, replay and pause/wait states", "UI remains usable during recorder failure; uncertain event ID retained for explicit retry; no form or note contents collected"],
+      "user_trial_method": "Human user answered: Tôi tự thử trên bản local. SV001/OF002 self-trial is prepared; agent never starts human_declared sessions.",
+      "limitations": ["Human effort/active/wait baseline remains unmeasured; one automation recorder smoke is excluded", "Recorder state is not proven attention or human identity; only hooked service operations are counted", "Provisional pilot thresholds remain unchanged; single-person role switching does not establish UNI-047 usefulness", "Synthetic test success is not AT-49 acceptance"],
+      "remaining_work": ["Human explicitly deferred self-trial in session03; inspect user-supplied session/request IDs and completion/source feedback when available, without treating this as an implementation approval gate", "Retain comparable baseline and exact build attribution for later paired evaluation; do not infer improvement from a single self-trial"],
+      "session03_evidence": ["scripts/audit_unified_ai_baseline.py", "tests/unit/assistance/test_baseline_evidence.py", "infra/local/unified-ai-20261014-03/baseline-audit-01.json", "infra/local/unified-ai-20261014-03/workflow-tests-02.xml"],
+      "session03_observation": "Only the retained automation session with six consistent receipts exists; no human_declared session was started by the agent. Read-only auditor recomputes sequence/version/fingerprints/transitions/timing/counts and emits allowlisted metadata; it never infers business completion or human identity.",
+      "implementation_outline": "Tạo ca mục đích rõ/mơ hồ, thủ tục, staff review, bổ sung, nguồn thiếu/cũ và lỗi; đo công sức/active/wait time; expected results có nguồn.",
+      "acceptance_summary": "Dataset theo case IDs, nguồn và kết quả mong đợi, baseline và ngưỡng pilot chốt trước đánh giá."
+    },
+    {
+      "id": "UNI-004",
+      "phase": "U1",
+      "title": "Hợp đồng dữ liệu, API và lỗi dùng chung",
+      "scope": "contracts/openapi/json-schema; application models; frontend types",
+      "depends_on": [
+        "UNI-003"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-04",
+        "REQ-08",
+        "REQ-09",
+        "REQ-12"
+      ],
+      "acceptance": [
+        "AT-05",
+        "AT-07",
+        "AT-18",
+        "AT-24"
+      ],
+      "source_refs": [
+        "AI-003"
+      ],
+      "status": "implemented",
+      "status_history": ["planned", "in_progress", "implemented"],
+      "evidence": ["services/api/src/campus247/application/assistance/contracts.py", "contracts/json-schema/assistance/unified-context-v1/request.schema.json", "contracts/json-schema/assistance/unified-context-v1/response.schema.json", "infra/local/unified-ai-20261014-01/context-tests-03.xml", "infra/local/unified-ai-20261014-01/frontend-tests-02.xml", "infra/local/unified-ai-20261014-01/frontend-build-01.json", "infra/local/unified-ai-20261014-01/candidate-verification-01.json", "infra/local/unified-ai-20261014-01/browser-verification-01.json", "services/api/src/campus247/application/assistance/unified_contracts.py", "apps/web/src/lib/unified-ai-contracts.ts", "contracts/json-schema/assistance/unified-core-v1", "infra/local/unified-ai-20261014-02/backend-tests-02.xml", "infra/local/unified-ai-20261014-02/proxy-tests-01.xml", "infra/local/unified-ai-20261014-02/frontend-tests-03.xml", "infra/local/unified-ai-20261014-02/frontend-build-03.json", "infra/local/unified-ai-20261014-02/candidate-verification-01.json", "infra/local/unified-ai-20261014-02/browser-verification-01.json"],
+      "implemented_slices": ["Strict context/resource/evidence contracts and no-store read-only API", "Server identity/queue/ownership/version/source resolution; no model confirmation fields", "One local bootstrap/URL composing certificate/services/source operations and existing RAG proxy", "Same UI assistance panel for authorized student/staff service case", "Bounded intent/draft/task/preferences/grant/supplement/batch/pagination/metadata/ack/error models, frontend types and 13 exported schemas including recorder inputs", "Server cross-field, audience, target and DAG validators; grants/proposals confer no execution authority", "60 unique runtime OpenAPI operation IDs; legacy SSE bytes/citation payload/history cursor preserved under fake transport tests", "Expired-session error translated without changing authentication or structured diagnostics"],
+      "dependency_note": "Core contract implementation and isolated technical checks completed. Full task verification and subsequent dependent tasks still require UNI-003 verification; implemented is not readiness or acceptance.",
+      "remaining_work": ["Reconcile contracts with the user baseline and close UNI-003 dependency before verifying UNI-004", "Exercise later application handlers against these contracts in their assigned backlog tasks"],
+      "limitations": ["Contract definitions and validation do not implement staff model chat, durable preferences/memory, discovery, supplement or batch execution", "Legacy SSE compatibility uses fake transport; no paid live generation was invoked", "JSON Schema alone does not enforce all server cross-field/DAG/source/authority checks", "No paid calls, production deployment or automatic synchronization with app8004"],
+      "implementation_outline": "Định nghĩa intent/context/evidence/proposal/task/preferences/grant/supplement/batch; version, pagination, status/errors và backward compatibility.",
+      "acceptance_summary": "Payload ngoài schema/role/target bị từ chối; stream/citations cũ vẫn đọc được."
+    },
+    {
+      "id": "UNI-005",
+      "phase": "U1",
+      "title": "Quy trình, quy tắc và template có hiệu lực",
+      "scope": "domain/application document_request; knowledge/policy_graph; contracts",
+      "depends_on": [
+        "UNI-004"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-10",
+        "REQ-15",
+        "REQ-18"
+      ],
+      "acceptance": [
+        "AT-21",
+        "AT-31",
+        "AT-35"
+      ],
+      "source_refs": [
+        "ST-02"
+      ],
+      "status": "implemented",
+      "status_history": [
+        "planned",
+        "in_progress",
+        "implemented"
+      ],
+      "implemented_slices": [
+        "Immutable synthetic GRADE_APPEAL/GENERAL_SUPPORT definitions shared with form validation, state transitions and outcome rendering",
+        "Explicit submitted_at_or_created_at version selection with gap/overlap rejection and bound template versions",
+        "Authorized no-store workflow resolver validates exact snapshot source hashes, scope, effective/publication dates, review and build manifests; never silently switches a historical case to the newest source",
+        "Student/staff UI reads the same source/template binding and mandatory review definitions; no review-completed or execution authority accepted from the browser",
+        "Read-only live verification on retained candidate and compatibility clone; candidate business and measurement table rows unchanged",
+        "STUDENT_CERTIFICATE definition and outcome template share the resolver; new drafts capture public PDF/text hashes with explicitly unknown institutional effectivity, and preview/confirm/demo approval revalidate the binding",
+        "New service/certificate supplements preserve their own source snapshot, workflow/template, commit version, capture time and prior payload; resolver validates their history/actor/time/source without replacing the initial submission source",
+        "Three workflows use one strict no-store read-only package in student/staff panels; legacy missing provenance stays unresolved without read/startup backfill",
+        "Restart/replay, tampered supplement provenance, public PDF integrity and old-record compatibility verified on isolated fixtures; all retained candidate rows and recorder evidence preserved"
+      ],
+      "evidence": [
+        "services/api/src/campus247/domain/service_workflow.py",
+        "services/api/src/campus247/application/assistance/workflow.py",
+        "apps/web/src/features/assistance/WorkflowDefinitionPanel.tsx",
+        "infra/local/unified-ai-20261014-03/workflow-schemas-01.json",
+        "infra/local/unified-ai-20261014-03/workflow-tests-02.xml",
+        "infra/local/unified-ai-20261014-03/frontend-tests-01.xml",
+        "infra/local/unified-ai-20261014-03/frontend-build-01.json",
+        "infra/local/unified-ai-20261014-03/typescript-01.json",
+        "infra/local/unified-ai-20261014-03/workflow-compatibility-01.json",
+        "infra/local/unified-ai-20261014-03/runtime-verification-02.json",
+        "infra/local/unified-ai-20261014-03/browser-verification-01.json",
+        "docs/UNIFIED_AI_SESSION03_20261014.md",
+        "services/api/src/campus247/domain/certificate_workflow.py",
+        "services/api/src/campus247/application/document_request/workflow_binding.py",
+        "tests/api/test_unified_workflow_continuation.py",
+        "infra/local/unified-ai-20261014-04/backend-tests-03.xml",
+        "infra/local/unified-ai-20261014-04/backend-tests-04.xml",
+        "infra/local/unified-ai-20261014-04/frontend-tests-01.xml",
+        "infra/local/unified-ai-20261014-04/frontend-build-01.json",
+        "infra/local/unified-ai-20261014-04/typescript-01.json",
+        "infra/local/unified-ai-20261014-04/workflow-schemas-01.json",
+        "infra/local/unified-ai-20261014-04/workflow-compatibility-01.json",
+        "infra/local/unified-ai-20261014-04/runtime-verification-01.json",
+        "infra/local/unified-ai-20261014-04/browser-verification-01.json",
+        "infra/local/unified-ai-20261014-04/validation-01.json",
+        "docs/UNIFIED_AI_SESSION04_20261014.md"
+      ],
+      "dependency_note": "Direct human request defers baseline and authorizes continuing independent local technical work. UNI-003/004 full verification remains pending; passing this service slice does not retroactively verify them.",
+      "remaining_work": [
+        "UNI-005 full acceptance remains unverified: institutional forms/rules/effective dates and human baseline are unavailable; no source confidence or local tests establish official correctness",
+        "Mandatory review completion/evidence and staff preview execution remain assigned to UNI-028/031; the shared definition is not proof those reviews happened",
+        "UNI-006 may continue independent local storage/transaction work under the direct human continuation request; no retroactive dependency acceptance is inferred"
+      ],
+      "limitations": [
+        "Three local workflows bound; public certificate source integrity is checked, but institutional effectivity, eligibility, official fields/templates, fees and deadlines stay unknown",
+        "Legacy certificates without source capture and legacy supplements without source/history provenance remain unresolved; original payload/history/results/previews are retained",
+        "No human baseline, paired usefulness results or full UNI-003/004/005 verification claim",
+        "No new model calls in Session04 checks; the live counters were unchanged at observation, with caps and uncertain reservations retained"
+      ],
+      "implementation_outline": "Một bộ định nghĩa phục vụ sinh viên, cán bộ và validation; chọn phiên bản áp dụng theo mốc cấu hình; giữ mandatory reviews.",
+      "acceptance_summary": "Cùng input cho cùng checks; nguồn/phiên bản chưa xác định không tạo kết luận; template có binding."
+    },
+    {
+      "id": "UNI-006",
+      "phase": "U1",
+      "title": "Storage bền vững và transaction",
+      "scope": "repositories; bootstrap/app/settings; migrations bổ sung",
+      "depends_on": [
+        "UNI-004",
+        "UNI-005"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-04",
+        "REQ-12",
+        "REQ-13",
+        "REQ-19",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-03",
+        "AT-05",
+        "AT-07",
+        "AT-28",
+        "AT-33",
+        "AT-34"
+      ],
+      "source_refs": [
+        "AI-004"
+      ],
+      "status": "implemented",
+      "evidence": [
+        "services/api/src/campus247/application/assistance/state_storage.py",
+        "services/api/src/campus247/infrastructure/repositories/sqlite_actor_state.py",
+        "services/api/src/campus247/bootstrap/conversation_storage.py",
+        "tests/unit/assistance/test_actor_state_storage.py",
+        "tests/integration/test_unified_storage_transactions.py",
+        "tests/api/test_unified_storage_profile.py",
+        "services/api/src/campus247/infrastructure/repositories/sqlite_consents.py",
+        "tests/integration/test_durable_consent_storage.py",
+        "infra/local/unified-ai-20261014-05/backend-tests-02.xml",
+        "infra/local/unified-ai-20261014-05/backend-tests-03.xml",
+        "infra/local/unified-ai-20261014-05/backend-tests-04.xml",
+        "infra/local/unified-ai-20261014-05/backend-tests-05.xml",
+        "infra/local/unified-ai-20261014-05/backend-tests-06.xml",
+        "infra/local/unified-ai-20261014-05/migration-compatibility-01.json",
+        "infra/local/unified-ai-20261014-05/validation-01.json",
+        "infra/local/unified-ai-20261014-05/handoff01/ready.json",
+        "infra/local/unified-ai-20261014-05/runtime-verification-01.json",
+        "docs/UNIFIED_AI_SESSION05_20261014.md",
+        "services/api/src/campus247/application/assistance/durable_services.py",
+        "services/api/src/campus247/bootstrap/consent_storage.py",
+        "tests/integration/test_unified_durable_services.py",
+        "infra/local/unified-ai-20261014-06/backend-tests-01.xml",
+        "infra/local/unified-ai-20261014-06/backend-tests-02.xml",
+        "infra/local/unified-ai-20261014-06/backend-tests-03.xml",
+        "infra/local/unified-ai-20261014-06/migration-compatibility-01.json",
+        "infra/local/unified-ai-20261014-06/runtime-verification-01.json",
+        "infra/local/unified-ai-20261014-06/session-verification-01.json",
+        "docs/UNIFIED_AI_SESSION06_20261014.md",
+        "services/api/src/campus247/infrastructure/repositories/sqlite_auxiliary.py",
+        "services/api/src/campus247/infrastructure/repositories/held_history.py",
+        "services/api/src/campus247/bootstrap/actor_storage.py",
+        "services/api/src/campus247/bootstrap/run_storage.py",
+        "services/api/src/campus247/application/assistance/staff_drafts.py",
+        "services/api/src/campus247/presentation/staff_drafts.py",
+        "apps/web/src/features/assistance/StaffDraftEditor.tsx",
+        "apps/web/src/features/assistance/StaffDraftEditor.test.tsx",
+        "tests/integration/test_unified_storage_completion.py",
+        "infra/local/unified-ai-20261014-07/backend-tests-04.xml",
+        "infra/local/unified-ai-20261014-07/backend-tests-05.xml",
+        "infra/local/unified-ai-20261014-07/backend-tests-06.xml",
+        "infra/local/unified-ai-20261014-07/frontend-tests-01.json",
+        "infra/local/unified-ai-20261014-07/frontend-build-01.json",
+        "infra/local/unified-ai-20261014-07/migration-compatibility-02.json",
+        "infra/local/unified-ai-20261014-07/session-verification-02.json",
+        "docs/UNIFIED_AI_SESSION07_20261014.md"
+      ],
+      "implementation_outline": "Wiring conversation/settings/consent/grants/runs/drafts/evidence/receipts theo môi trường; indexes và isolation; không fallback in-memory âm thầm.",
+      "acceptance_summary": "Restart giữ dữ liệu đã commit; concurrency và DB failure có trạng thái đúng; migration fixture bảo toàn.",
+      "status_history": [
+        "planned",
+        "in_progress",
+        "implemented"
+      ],
+      "implemented_slices": [
+        "Internal typed SQLite actor-state foundation for preferences/consent/grant requests/draft proposals/evidence, scoped by tenant and owner; stored grants remain requests and do not grant authority",
+        "Atomic compare-and-swap current state plus immutable revision/audit binding plus stable idempotency receipt; rollback on audit/receipt failure, restart replay, bounded payloads and revision reads",
+        "Explicit conversation storage modes and main factory selection; supplied falsey repositories are retained, configured SQLite failures never become memory or empty successful history, HTTP dependency failures return 503",
+        "Additive conversation/run schema versions and indexes, canonical path revalidation and existing-file opens; migrations rehearsed on exclusive copies of held history/run snapshots with all original table rows preserved",
+        "Candidate API v5 uses a new isolated actor-state SQLite file; read-only profile endpoint reauthorizes and checks availability, reports preferences/grants product features disabled; existing business rows, frontend and model writers retained",
+        "Optional typed main-factory consent repository persists existing grant/withdrawal declarations through the same state/revision/receipt transaction; rechecks active synthetic identity/tenant, restores owner-only history and fails unavailable without memory fallback; tested on fixtures, not enabled in live writer",
+        "Session06 concrete internal settings service with defaults not claimed saved and signed exact confirmation bound to actor/tenant/session/client/version/payload; restart/CAS/idempotency verified, UI/prompt consumer disabled",
+        "Scoped grant-request lifecycle stores requested/expired/revoked observations, append-only revocation and stable replay; never active and never execution authority; unsupported personalization/notification consumers rejected",
+        "Immutable proposal_bundle stores own student DRAFT candidate plus server-resolved workflow evidence together in the actor-state transaction, binding business version/source hashes/dates/audience and revalidating on commit/read; original field values checked",
+        "Main CONSENT_STORAGE_MODE and candidate disabled/sqlite composition explicitly select durable consent on initialized files; source v6 fixture/clone endpoints restore choices and enforce owner/session scope, but live v5 remains unchanged",
+        "Every actor-state open checks schema and every current/history read or next commit verifies matching revision and receipt; missing initial receipts fail closed without repair",
+        "Session07 explicit actor/run configuration composes durable feedback, privacy requests and token-hash revocation with the same session service used by authentication/logout; initialized-file failures return unavailable without fallback",
+        "Candidate v7 reads owned retained history through a validated read-only adapter and stores feedback without dispatching to the model writer; final message/source projection and retention remain server validated",
+        "Private staff drafts persist manual text, assignment/queue/business/workflow/source observation and draft version in atomic state/revision/receipt commits; restart/CAS/reassignment checks retain old revisions without exposing them to another officer",
+        "StaffDraftEditor consumes the private draft API in service/certificate workspaces, serializes debounced autosave and exact retries, preserves unsaved text and shows CAS conflicts; explicit transfer into the existing response field reauthorizes and never submits an action",
+        "Conversation/run tenant metadata prevents cross-tenant reuse; nonempty legacy stores are never assigned a tenant by inference. Corrupt state keys, message timestamps, run events/tasks/cache fail closed and retain evidence",
+        "Actual two-process fixtures prove one preferences CAS commit or one run resume claim; 457 unique backend cases pass and compatibility rehearsal preserves 513 conversations,1310 messages and497 runs"
+      ],
+      "remaining_work": [
+        "Full AT-03/05/07/28/33/34 acceptance includes browser/device and deployed composition checks; deferred under the direct request to prioritize source code. Local tests are technical evidence, not human usefulness acceptance",
+        "Actor-state bundles and private drafts are versioned observations, not a cross-database business transaction; actual staff outcome/execution and linking proposal references to business receipts remain UNI-030/031",
+        "UNI-009/010/015: preferences affecting pipeline, consent purpose/history paging/retention, active grants and consume/revoke across readers/executors/cache/resume; stored requests/declarations remain without execution authority",
+        "UNI-007: legacy ownership/import/provenance/dedup rehearsal; UNI-028/031: review evidence/readiness and staff outcome/template/execution. Public certificate effective dates remain unknown; bundle service cannot invent dates to claim support",
+        "A coordinated local handoff must verify ownership/activity and preserve every DB/build; no browser test or user-facing restart in Session07",
+        "History/run source hardening and additive migrations are tested on clones; live writer8003 has not been restarted or migrated and remains on its previous loaded code",
+        "UNI-003/004/005/006 full verification remains pending; continue independent implementation without re-requesting the deferred human baseline"
+      ],
+      "limitations": [
+        "Settings/grant/proposal services remain internal, with no settings/grant prompt consumer or active grants. Private manual staff drafts have a UI consumer in the new build; source v7 auxiliary/consent APIs are tested on fixtures/clones, not active live",
+        "Development/testing may explicitly use ephemeral conversation mode; configured durable mode never falls back. Main default is not claimed durable",
+        "No migration of held history/run databases, no paid writer restart or new model calls, no production migration",
+        "Session07 has457 unique passing backend cases and12 earlier passing component cases; TypeScript/build succeeds. Browser tests are deferred by the user. Retained failures and pre-existing lint/diff findings are described in SESSION07"
+      ],
+      "dependency_note": "Direct human continuation permits independent local technical work; UNI-003/004/005 full verification remains deferred/pending."
+    },
+    {
+      "id": "UNI-007",
+      "phase": "U1",
+      "title": "Tương thích và chuyển dữ liệu có bảo toàn",
+      "scope": "student-chat compatibility; import/export service; fixture rehearsal",
+      "depends_on": [
+        "UNI-006"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-06",
+        "AT-50"
+      ],
+      "source_refs": [
+        "AI-009",
+        "AI-029"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION08_20261014.md", "tests/integration/test_unified_actor_features.py", "infra/local/unified-ai-20261014-08/backend-tests-07.xml"],
+      "implemented_scope": "Immutable legacy student-chat v1/v2 snapshots, read-only browser export adapter, server-configured owner/tenant/hash evidence, exact-byte export, classification/provenance, preview/confirmation, logical dedup and atomic receipt; no history or business overwrite.",
+      "remaining_verification": ["Browser/device import/export flow is deferred; its UI entry belongs to later consumer work", "Real legacy ownership evidence is not supplied; unknown owners fail closed", "No rollout or recovery drill against live data"],
+      "implementation_outline": "Xác minh legacy ownership, preview import, provenance, dedup và receipt; demo tách thật; không overwrite nguồn gốc.",
+      "acceptance_summary": "Unknown owner không import tùy ý; replay không trùng; dữ liệu gốc và build cũ được giữ."
+    },
+    {
+      "id": "UNI-008",
+      "phase": "U1",
+      "title": "Ngữ cảnh có giới hạn và phân tách hai phía",
+      "scope": "conversation/context/history; identity/source factories; context contracts",
+      "depends_on": [
+        "UNI-004",
+        "UNI-006"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-05",
+        "REQ-09",
+        "REQ-11",
+        "REQ-13",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-07",
+        "AT-11",
+        "AT-22",
+        "AT-27",
+        "AT-48"
+      ],
+      "source_refs": [
+        "AI-005"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION08_20261014.md", "services/api/src/campus247/application/assistance/scoped_context.py", "infra/local/unified-ai-20261014-08/backend-tests-06.xml", "infra/local/unified-ai-20261014-08/backend-tests-07.xml"],
+      "implemented_scope": "Fresh server-owned conversation boundary/resource version/source evidence; history opt-in and same student chat only; staff uses an authorized resource projection. 12KB content budget, manifest hash/expiry and recompose-on-use. No private memory, staff notes, legacy actions or tokens in model data.",
+      "remaining_verification": ["Browser route/field/panel/account-switch coverage deferred", "Staff chat and future task references fail closed until their role-aware consumers exist", "Load/throughput/p95 and real model behavior not measured"],
+      "implementation_outline": "Server lấy history cùng chat, task/resource refs và dữ liệu tối thiểu; tách private memory, notes và role; freshness/version/budgets.",
+      "acceptance_summary": "Chuyển vai trò/resource không rò ngữ cảnh; context có manifest/source; dữ liệu không tạo quyền."
+    },
+    {
+      "id": "UNI-009",
+      "phase": "U2",
+      "title": "Preferences và consent bền vững",
+      "scope": "privacy/consent; preference service/repository/routes",
+      "depends_on": [
+        "UNI-006"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-04",
+        "REQ-22",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-09",
+        "AT-44"
+      ],
+      "source_refs": [
+        "AI-012"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION08_20261014.md", "services/api/src/campus247/application/assistance/preferences.py", "apps/web/src/lib/assistant-state-service.ts", "infra/local/unified-ai-20261014-08/backend-tests-07.xml"],
+      "implemented_scope": "Confirmed account and chat settings (locale/style/verbosity/format/name/address/custom instructions), CAS/readback/receipts and bounded consent revision pages. Separate history/personalization/quality decisions; old declaration-only consent cannot activate new consumers. Main factory rereads consent/preferences before grounded generation; user instructions remain an untrusted data block subordinate to evidence/schema/policy.",
+      "remaining_verification": ["Settings UI is later UNI-015; no browser/relogin/offline UX verification", "Existing candidate-to-writer proxy is unchanged and does not consume these preferences; source composition is tested with deterministic providers", "No memory or training consumer is enabled"],
+      "implementation_outline": "Reply style, locale, tên/xưng hô, verbosity, format, custom instructions; chat override; tách history, personalization và feedback consent.",
+      "acceptance_summary": "Readback/reload đúng; failure không báo saved; personal instructions không vượt policy."
+    },
+    {
+      "id": "UNI-010",
+      "phase": "U2",
+      "title": "Grant và kiểm tra quyền tại mọi điểm dùng",
+      "scope": "authorization; source readers; tool executor; run resume/confirmation",
+      "depends_on": [
+        "UNI-004",
+        "UNI-006",
+        "UNI-009"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-08",
+        "REQ-09",
+        "REQ-12",
+        "REQ-19"
+      ],
+      "acceptance": [
+        "AT-07",
+        "AT-08",
+        "AT-18",
+        "AT-27",
+        "AT-34"
+      ],
+      "source_refs": [
+        "AI-013"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION08_20261014.md", "services/api/src/campus247/application/assistance/grants.py", "services/api/src/campus247/application/assistance/grant_consumers.py", "infra/local/unified-ai-20261014-08/backend-tests-07.xml"],
+      "implemented_scope": "Actor/tenant/role/units/session/resource-version/source-bound read/prepare grants with explicit confirmation, once/session/timed expiry, revoke, atomic use/CAS/receipt, exact operation replay and per-use reauthorization. New context cache, owner-resource read and proposal candidate consumers revalidate. Existing business writes retain independent ACL/preview/confirmation/idempotency; a read grant is rejected as a business confirmation.",
+      "remaining_verification": ["Browser pending/resume/revoke flows and live writer source transition deferred", "No new actor grant is injected into the retained writer process; its existing source-scope/cache/resume checks remain in place", "Grant use is atomic in actor SQLite, while business/evidence is a revalidated observation across stores; this is not a cross-database execution transaction"],
+      "implementation_outline": "Scope theo actor/queue/assignment/source/resource; một lần/phiên/thời hạn phù hợp; revoke, atomically consume và retry semantics.",
+      "acceptance_summary": "Read không cấp write; pending/resume/direct API/cache đều revalidate; token không vào model."
+    },
+    {
+      "id": "UNI-011",
+      "phase": "U2",
+      "title": "Runtime, adapter và context bridge chung",
+      "scope": "assistant-context/adapter; StudentRuntime; ChatPage; staff assistant integration",
+      "depends_on": [
+        "UNI-008",
+        "UNI-010"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-06",
+        "REQ-09",
+        "REQ-13",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-07",
+        "AT-11",
+        "AT-27"
+      ],
+      "source_refs": [
+        "AI-005",
+        "AI-006"
+      ],
+      "status": "implemented",
+      "status_history": ["planned", "in_progress", "implemented"],
+      "evidence": ["apps/web/src/lib/unified-assistant-runtime.tsx", "services/api/src/campus247/presentation/assistant_state.py", "infra/local/unified-ai-20261014-09/backend-tests-06.xml", "infra/local/unified-ai-20261014-09/backend-tests-07.xml", "docs/UNIFIED_AI_SESSION09_20261015.md"],
+      "implemented_slices": ["Shared account/tenant/role-bound runtime for ChatPage, student page/panel and resource/field/staff surfaces", "Refs-only server context projection with exact role/owner/version checks and explicit unsaved field limitations", "Current identity guards, retained per-actor local text, route context reset and no API-to-demo fallback"],
+      "limitations": ["No UI/browser or account-switch/offline acceptance run", "Staff model chat and admin audience consumers remain unsupported; no private notes/memory join", "Context projections stay in the local session; retained proxy model transport does not accept resource context"],
+      "implementation_outline": "Cùng state/history/task cho page/panel/form/field; mode rõ; context DTO allowlist, server resolve IDs; không đọc toàn DOM.",
+      "acceptance_summary": "Đổi route/account không lẫn; API lỗi không trả demo giả; context đúng ở từng field."
+    },
+    {
+      "id": "UNI-012",
+      "phase": "U2",
+      "title": "API lịch sử và metadata hội thoại",
+      "scope": "conversation application/presentation/repositories; stream result",
+      "depends_on": [
+        "UNI-006",
+        "UNI-010"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-12",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-03",
+        "AT-04",
+        "AT-05",
+        "AT-07"
+      ],
+      "source_refs": [
+        "AI-007"
+      ],
+      "status": "implemented",
+      "status_history": ["planned", "in_progress", "implemented"],
+      "evidence": ["services/api/src/campus247/application/conversation/catalog.py", "services/api/src/campus247/infrastructure/repositories/sqlite_conversations.py", "contracts/json-schema/assistance/unified-consumers-v1", "infra/local/unified-ai-20261014-09/backend-tests-06.xml", "infra/local/unified-ai-20261014-09/backend-tests-07.xml", "docs/UNIFIED_AI_SESSION09_20261015.md"],
+      "implemented_slices": ["Actor-owned catalog/title search and cursor pages with confirmed metadata CAS/idempotency/receipt overlays", "Native SQLite stable create/turn IDs, exact intent hashes and pending/interrupted/completed receipt states", "Final assistant metadata and completed receipt committed together; retention explicit and source history preserved"],
+      "limitations": ["Existing proxy writer cannot provide native stable create/turn receipts until a separately authorized composition", "Metadata actor store and held transcript are separate stores; no cross-database atomicity claim", "No live DB initialization or migration performed"],
+      "implementation_outline": "List owned chats, cursor messages, rename/pin/archive/version; client IDs, commit acknowledgements, final metadata và retention states.",
+      "acceptance_summary": "Phân trang/retry không thiếu/trùng; interrupted khác completed; lỗi không giả empty success."
+    },
+    {
+      "id": "UNI-013",
+      "phase": "U2",
+      "title": "Giao diện lịch sử và tiếp tục",
+      "scope": "AssistantWorkspace/Conversation; ChatPage; history client; staff surface",
+      "depends_on": [
+        "UNI-011",
+        "UNI-012"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-13"
+      ],
+      "acceptance": [
+        "AT-03",
+        "AT-04",
+        "AT-05",
+        "AT-10"
+      ],
+      "source_refs": [
+        "AI-008"
+      ],
+      "status": "implemented",
+      "status_history": ["planned", "in_progress", "implemented"],
+      "evidence": ["apps/web/src/features/assistance/UnifiedAssistantWorkspace.tsx", "apps/web/src/lib/unified-assistant-runtime.tsx", "infra/local/unified-ai-20261014-09/frontend-build-05.json", "docs/UNIFIED_AI_SESSION09_20261015.md"],
+      "implemented_slices": ["Real catalog consumer with new/select/title search/rename/pin/archive, sidebar and accessible drawer", "One-page-at-a-time message restore preserving local composer/citations and existing sessions on failure", "Explicit save/uncertain/receipt/retention states and reuse of existing versioned clarification resume"],
+      "limitations": ["No component/DOM/browser/E2E/mobile/offline/relogin verification", "Local context projection exchanges are explicitly unsaved", "Uncertain legacy proxy turns require history inspection or a new conversation; no automatic regeneration"],
+      "implementation_outline": "Search tiêu đề, new/rename/pin/archive; sidebar/mobile drawer; restore từng phần an toàn; saved/pending/error states.",
+      "acceptance_summary": "Tìm/open lại được qua UI và thiết bị cùng tài khoản; citations/status giữ đúng; không xóa chat khi new."
+    },
+    {
+      "id": "UNI-014",
+      "phase": "U2",
+      "title": "Renderer và nội dung trực quan",
+      "scope": "ChatPanel/AssistantConversation; staff renderer; generation output/policy",
+      "depends_on": [
+        "UNI-004",
+        "UNI-011"
+      ],
+      "requirements": [
+        "REQ-02",
+        "REQ-06",
+        "REQ-08",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-10",
+        "AT-23"
+      ],
+      "source_refs": [
+        "AI-010",
+        "AI-011"
+      ],
+      "status": "implemented",
+      "status_history": ["planned", "in_progress", "implemented"],
+      "evidence": ["apps/web/src/features/chat/ChatPanel.tsx", "services/api/src/campus247/application/assistance/consumer_contracts.py", "contracts/json-schema/assistance/unified-consumers-v1/AssistantDisplayContent.schema.json", "infra/local/unified-ai-20261014-09/backend-tests-07.xml", "infra/local/unified-ai-20261014-09/frontend-build-05.json", "docs/UNIFIED_AI_SESSION09_20261015.md"],
+      "implemented_slices": ["Shared Markdown/GFM renderer reusing current components across conversation/resource/staff/settings", "Strict steps/table/status/read-only proposal/navigation blocks; route/audience allowlists and no prose-derived CTA", "Raw markup skipped, no automatic image loading, existing SSE/final citation decoder retained, legacy text preserved with unverified status"],
+      "limitations": ["No rendered DOM, visual, keyboard, mobile or dark-mode acceptance", "Structured display schema is preparation/presentation only and does not authorize execution", "Unverified legacy citations are retained in storage but not promoted to a verified final map"],
+      "implementation_outline": "Markdown/GFM và safe components chung; short/steps/table/status/proposal; schema CTA; streaming, keyboard/mobile/dark.",
+      "acceptance_summary": "Câu ngắn vẫn gọn; tin cũ đọc được; unsafe markup không chạy; action không suy từ prose."
+    },
+    {
+      "id": "UNI-015",
+      "phase": "U2",
+      "title": "Settings và trung tâm quyền cho từng vai trò",
+      "scope": "assistant settings UI; PrivacyCenter; capability client",
+      "depends_on": [
+        "UNI-009",
+        "UNI-010",
+        "UNI-011",
+        "UNI-014"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-04",
+        "REQ-22",
+        "REQ-25",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-08",
+        "AT-09",
+        "AT-44"
+      ],
+      "source_refs": [
+        "AI-014"
+      ],
+      "status": "implemented",
+      "status_history": ["planned", "in_progress", "implemented"],
+      "evidence": ["apps/web/src/features/assistance/AssistantSettingsCenter.tsx", "services/api/src/campus247/application/assistance/grants.py", "services/api/src/campus247/presentation/assistant_state.py", "infra/local/unified-ai-20261014-09/backend-tests-06.xml", "infra/local/unified-ai-20261014-09/backend-tests-07.xml", "infra/local/unified-ai-20261014-09/frontend-build-05.json", "docs/UNIFIED_AI_SESSION09_20261015.md"],
+      "implemented_slices": ["Account/chat override settings with preview/exact confirmation/readback/receipt and preserved local inputs", "Separate history/personalization/quality consent under new .assistant-features.v1 notice", "Owned grant management with scope/expiry/last-use/locked reason/revoke and explicit read projection consumers", "Unsupported memory/tools/templates/staff model and old proxy preference consumers are explicit"],
+      "limitations": ["No UI/human usefulness acceptance", "Existing proxy writer still does not consume settings and is not restarted", "Prepare-draft use requires an existing typed proposal/workflow at the resource, rather than an automatic settings action", "No business authority or confirmation bypass introduced"],
+      "implementation_outline": "Reply/memory/tools/history; scope/expiry/last-used/revoke/locked reasons; staff layout và templates hợp lệ; xem trước lựa chọn.",
+      "acceptance_summary": "Settings ảnh hưởng đúng pipeline; quyền thực tế rõ; capability chưa có không báo dùng được."
+    },
+    {
+      "id": "UNI-016",
+      "phase": "U3",
+      "title": "Trung tâm điều phối multi-agent",
+      "scope": "multi_agent/orchestrator/contracts; single_agent controller; agent runs",
+      "depends_on": [
+        "UNI-004",
+        "UNI-005",
+        "UNI-008",
+        "UNI-010"
+      ],
+      "requirements": [
+        "REQ-05",
+        "REQ-08",
+        "REQ-09",
+        "REQ-13"
+      ],
+      "acceptance": [
+        "AT-12",
+        "AT-24",
+        "AT-25",
+        "AT-26"
+      ],
+      "source_refs": [
+        "CHAT-MULTI-AGENT-CENTER"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION10_20261015.md", "infra/local/unified-ai-20261015-10/"],
+      "implementation_scope": "Existing native chat orchestrator binds typed task coverage/goal/purpose/actor/tenant/role/session/budget/output; short deterministic resource document/verifier path uses the same run/task repository when explicitly composed. Proxy writer remains unchanged.",
+      "verification_remaining": "Dependency acceptance, human/UI usefulness, role-specific model consumers, real source/rule acceptance and production remain pending.",
+      "implementation_outline": "Phân task DAG có role/scope/resource/version/budget; select specialist theo nhu cầu; simple query đi đường ngắn; preserve goal coverage.",
+      "acceptance_summary": "DAG hợp lệ; không mất mục đích; có clarification/partial/abstain; không thêm agent không cần."
+    },
+    {
+      "id": "UNI-017",
+      "phase": "U3",
+      "title": "Specialist và công cụ có hợp đồng",
+      "scope": "agent/tools registry/executor; multi_agent service_adapter; role adapters",
+      "depends_on": [
+        "UNI-016"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-08",
+        "REQ-09",
+        "REQ-11"
+      ],
+      "acceptance": [
+        "AT-07",
+        "AT-23",
+        "AT-24",
+        "AT-27"
+      ],
+      "source_refs": [
+        "CHAT-MULTI-AGENT-CENTER"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION10_20261015.md", "infra/local/unified-ai-20261015-10/"],
+      "implementation_scope": "Existing research/verifier use server registry guards; surface document and granted prepare-candidate consumers use strict executor adapters with fresh scope checks before/after output. Typed clarification stays on the existing certificate route. No model confirm/approve/send/business write.",
+      "verification_remaining": "Staff model/private draft specialist and general document extraction are not composed; supported document reads and student candidates only.",
+      "implementation_outline": "Tận dụng research/verifier; thêm chức năng hiểu intent/tài liệu/draft dưới DTO typed và tool scope server; không expose confirm/approve cho model.",
+      "acceptance_summary": "Role không tự tạo tools/quyền; bad output/unauthorized tool bị chặn; internal notes không qua student agent."
+    },
+    {
+      "id": "UNI-018",
+      "phase": "U3",
+      "title": "Kiểm chứng evidence, claims và kết quả đề xuất",
+      "scope": "evidence_gate/citations/semantic_support; multi_agent verifier; output models",
+      "depends_on": [
+        "UNI-005",
+        "UNI-017"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-11",
+        "REQ-15"
+      ],
+      "acceptance": [
+        "AT-21",
+        "AT-22",
+        "AT-23",
+        "AT-25",
+        "AT-30"
+      ],
+      "source_refs": [
+        "AI-011",
+        "ST-03"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION10_20261015.md", "infra/local/unified-ai-20261015-10/"],
+      "implementation_scope": "Original sources are reopened after generation/verifier as well as on cache/resume; hash/locator/status/effective versions are bound. Existing workflow packages and proposals recheck applied source/rule/template/audience; source-derived field candidates require a literal supported source span.",
+      "verification_remaining": "Institutional effectivity, real documents, general semantic derivation and staff proposals remain unverified or fail closed; model agreement is insufficient.",
+      "implementation_outline": "Read lại source theo scope/version; verify material facts/criteria; detect conflicts/missing; bind source/rule/template vào proposal.",
+      "acceptance_summary": "Model agreement không thay source checks; không hợp nhất mâu thuẫn thành fact; sources mở được."
+    },
+    {
+      "id": "UNI-019",
+      "phase": "U3",
+      "title": "Task/run bền vững và tiếp tục công việc",
+      "scope": "agent_runs; run/task repositories; application workflow; task UI",
+      "depends_on": [
+        "UNI-006",
+        "UNI-010",
+        "UNI-016",
+        "UNI-018"
+      ],
+      "requirements": [
+        "REQ-09",
+        "REQ-12",
+        "REQ-13"
+      ],
+      "acceptance": [
+        "AT-08",
+        "AT-19",
+        "AT-20",
+        "AT-28"
+      ],
+      "source_refs": [
+        "AI-019"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION10_20261015.md", "infra/local/unified-ai-20261015-10/"],
+      "implementation_scope": "Typed checkpoints and atomic run transition receipts in the existing agent store; native clarification resume validates session/scope/sources and leases before dispatch. Optional resource runs bind case/draft/version and survive fresh-fixture restart/readback without business action replay. Shared source UI reads status/receipts only when capabilities exist.",
+      "verification_remaining": "Run and transcript stores are separate; proxy U3 resume and unbound legacy runs fail closed. No general business-action task replay or production restart verified.",
+      "implementation_outline": "Bind conversation/goal/draft/case/version, blockers/next action; checkpoint typed; CAS/leases/restart/resume không replay action.",
+      "acceptance_summary": "State sống qua restart; revalidate scope; completed theo receipt/state; checkpoint không chứa confirmation secrets."
+    },
+    {
+      "id": "UNI-020",
+      "phase": "U3",
+      "title": "Ngân sách, trace và lỗi phối hợp",
+      "scope": "agent budget/gateway/telemetry; run events; worker limits",
+      "depends_on": [
+        "UNI-016",
+        "UNI-017",
+        "UNI-019"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-24",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-26",
+        "AT-27",
+        "AT-28",
+        "AT-48"
+      ],
+      "source_refs": [
+        "AI-027"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION10_20261015.md", "infra/local/unified-ai-20261015-10/"],
+      "implementation_scope": "Shared existing model/tool/token/context/retry/deadline limits plus conservative cost reservation and SQLite run admission; metadata trace allowlist and strict checkpoint/readback; cache isolation includes session/goal/scope/resource/source/version and fresh reauthorization. Failure/cancel retains work and uncertainty.",
+      "verification_remaining": "No measured p95/throughput/load/cost billing, distributed global provider capacity, UI/browser or production acceptance; conservative reservation is not paid cost measurement.",
+      "implementation_outline": "Bound model/tool/context/retry/time/cost chung; metadata trace agent/task/evidence; dedup work/cache by scope; cancellation/partial results.",
+      "acceptance_summary": "Không loop vô hạn; failure giữ work và giới hạn; user thấy trạng thái hữu ích, không raw prompts/chain-of-thought."
+    },
+    {
+      "id": "UNI-021",
+      "phase": "U4",
+      "title": "Hiểu mục đích sinh viên và làm rõ",
+      "scope": "conversation understanding/followup; intent specialist; document_request assistant",
+      "depends_on": [
+        "UNI-005",
+        "UNI-011",
+        "UNI-018"
+      ],
+      "requirements": [
+        "REQ-05",
+        "REQ-07",
+        "REQ-08"
+      ],
+      "acceptance": [
+        "AT-12",
+        "AT-13",
+        "AT-14"
+      ],
+      "source_refs": [
+        "AI-015"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION11_20261015.md", "infra/local/unified-ai-20261015-11/", "services/api/src/campus247/application/document_request/student_preparation.py"],
+      "implementation_scope": "Shared deterministic intent specialist uses existing followup normalization and IntentProposal. Explicit goal/workflow/constraints and current authorized saved fields carry provenance; missing fields are grouped, ambiguous goals clarify and goal changes preserve the selected draft. Student HTTP and shared UI consumers are wired.",
+      "verification_remaining": "Conservative intent vocabulary and explicit field statements; no general language extraction, paid model, human usefulness or UI acceptance. Existing native/proxy writer capabilities remain distinct.",
+      "implementation_outline": "Outcome/purpose/resource/constraints/facts với provenance; hỏi chỉ missing đổi quyết định; goal change không ghi đè nháp.",
+      "acceptance_summary": "Đúng workflow với ca rõ; ca mơ hồ không tự chọn; không hỏi lại fact hợp lệ đã được phép."
+    },
+    {
+      "id": "UNI-022",
+      "phase": "U4",
+      "title": "Tự chuẩn bị bản nháp thủ tục",
+      "scope": "certificate/service application/gateways; form stores; draft specialist",
+      "depends_on": [
+        "UNI-019",
+        "UNI-021"
+      ],
+      "requirements": [
+        "REQ-05",
+        "REQ-07",
+        "REQ-08",
+        "REQ-12",
+        "REQ-13"
+      ],
+      "acceptance": [
+        "AT-13",
+        "AT-14",
+        "AT-15",
+        "AT-16",
+        "AT-20"
+      ],
+      "source_refs": [
+        "AI-016"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION11_20261015.md", "infra/local/unified-ai-20261015-11/"],
+      "implementation_scope": "Existing save_draft services create/revise after explicit review; existing proposal/workflow packages bind saved candidates. All owned draft candidates are enumerated without arbitrary selection. CAS, current source/template/profile binding, stable operation and draft receipt share the existing business transaction; original fields and attachments survive diffs.",
+      "verification_remaining": "Local synthetic only; public certificate source effectivity is unknown and is not fabricated to fit a synthetic proposal binding. No automatic submit or official eligibility claim. Browser recovery and human acceptance pending.",
+      "implementation_outline": "Tạo/mở đúng draft; điền sẵn dữ liệu có căn cứ; hướng dẫn phần thiếu; đề xuất diff cho nháp đã sửa; giữ resource/version.",
+      "acceptance_summary": "User không nhập lại field có nguồn; manual edits được giữ; nhiều draft không chọn bừa."
+    },
+    {
+      "id": "UNI-023",
+      "phase": "U4",
+      "title": "Trợ giúp trường, đính kèm và lỗi",
+      "scope": "VinUniForm; CertificateWorkspace/ServiceWorkspace; attachments/validation",
+      "depends_on": [
+        "UNI-022"
+      ],
+      "requirements": [
+        "REQ-06",
+        "REQ-07",
+        "REQ-08"
+      ],
+      "acceptance": [
+        "AT-15",
+        "AT-16",
+        "AT-17"
+      ],
+      "source_refs": [
+        "AI-017"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION11_20261015.md", "infra/local/unified-ai-20261015-11/"],
+      "implementation_scope": "Certificate/Service workspaces consume saved-field help and server field pointers; grouped validation errors preserve edited forms. TXT UTF-8 filename/byte/empty/null checks run in server schemas and UI source; only safe trimming is applied. VinUni keeps local drafts and exposes the supported server-form next step.",
+      "verification_remaining": "OCR unavailable and explicitly disclosed; no document authenticity inference. UI focus, mobile and file-selection behavior untested by request; no component/browser tests.",
+      "implementation_outline": "Field-level help, missing-group, safe formatting, format/size checks; OCR candidate nếu có runtime phù hợp; source-grounded errors.",
+      "acceptance_summary": "Sửa đúng chỗ; OCR không xác thực giấy tờ; required/domain validation ở server; không mất nháp."
+    },
+    {
+      "id": "UNI-024",
+      "phase": "U4",
+      "title": "Preview, xác nhận và kết quả sinh viên",
+      "scope": "confirmation/idempotency; certificate/service preview/confirm; student UI",
+      "depends_on": [
+        "UNI-010",
+        "UNI-018",
+        "UNI-022",
+        "UNI-023"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-07",
+        "REQ-08",
+        "REQ-12"
+      ],
+      "acceptance": [
+        "AT-08",
+        "AT-18",
+        "AT-19",
+        "AT-21"
+      ],
+      "source_refs": [
+        "AI-018"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION11_20261015.md", "infra/local/unified-ai-20261015-11/"],
+      "implementation_scope": "Existing preview/confirm tokens, expiry and stable submission keys retained. Added exact actor/tenant/session/target/version/queue/rule/template/base-form bindings plus profile and source-effectivity revalidation before execution. Existing business transaction supplies replay/audit/state; UI preserves preview until readback succeeds.",
+      "verification_remaining": "No production/crash drill on retained databases, no cross-store atomicity or model business-write authority. Synthetic backend receipt/state evidence only; UI recovery acceptance pending.",
+      "implementation_outline": "Bind payload/target/version/expiry; pre-execution revalidate; stable retry key và readback khi timeout; no false success.",
+      "acceptance_summary": "Không submit trước confirm; không duplicate sau crash; trạng thái dựa receipt, không prose."
+    },
+    {
+      "id": "UNI-025",
+      "phase": "U4",
+      "title": "Phủ thao tác sinh viên và mobile",
+      "scope": "registry; navigation/services/requests/schedule/rooms/privacy surfaces",
+      "depends_on": [
+        "UNI-002",
+        "UNI-013",
+        "UNI-014",
+        "UNI-015",
+        "UNI-024"
+      ],
+      "requirements": [
+        "REQ-02",
+        "REQ-06",
+        "REQ-07",
+        "REQ-13"
+      ],
+      "acceptance": [
+        "AT-02",
+        "AT-10",
+        "AT-11",
+        "AT-20"
+      ],
+      "source_refs": [
+        "AI-020"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION11_20261015.md", "infra/local/unified-ai-20261015-11/"],
+      "implementation_scope": "Student action support inventory is consumed by shared assistant navigation. Purpose/preparation survives route changes in the actor-scoped shared session and saved provenance; only server resource refs enter surface context. Unified schedule/rooms bypass legacy synthetic-success UI and give real next steps; legacy forms cannot submit through an uncomposed writer. Responsive wrapping and accessible field/error source edits included.",
+      "verification_remaining": "No mobile/accessibility/usefulness verification from build. Schedule/rooms/ticket handover have no new business consumer; native lacking business services returns unavailable. Runtime source handoff not performed.",
+      "implementation_outline": "Nối context/capability thật vào từng action trong inventory; ngoài scope có next step rõ; cùng purpose qua route.",
+      "acceptance_summary": "Mọi action trong scope pilot được test; toàn inventory có mức support trung thực; UI accessible."
+    },
+    {
+      "id": "UNI-026",
+      "phase": "U5",
+      "title": "Hiển thị độ tin cậy cán bộ bằng dữ liệu thật",
+      "scope": "StaffTicketQueue; staff response schemas; staff capability registry",
+      "depends_on": [
+        "UNI-001",
+        "UNI-014",
+        "UNI-018"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-14",
+        "REQ-15",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-22",
+        "AT-29",
+        "AT-31"
+      ],
+      "source_refs": [
+        "ST-01"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION12_20261015.md", "infra/local/unified-ai-20261015-12/"],
+      "implementation_scope": "Typed staff evidence states and explicit unavailable OCR/SLA/model capabilities; remove legacy fixed confidence/stamp/SLA claims and auto ticking. Uncomposed legacy business actions fail closed with manual next steps.",
+      "verification_remaining": "Full UI/mobile/usefulness and live institutional evidence not verified; one existing combined deadline fixture remains failing.",
+      "implementation_outline": "Tách demo, loại claims/confidence ghi cứng khỏi luồng thật bằng typed evidence state; chưa có check thì chưa xác minh.",
+      "acceptance_summary": "Không dùng số 99.8%/OCR stamp/SLA constants như facts; giữ dữ liệu và mandatory controls."
+    },
+    {
+      "id": "UNI-027",
+      "phase": "U5",
+      "title": "Bộ hồ sơ làm việc và provenance",
+      "scope": "staff application; StaffTicketWorkspace/Reviews; evidence repository",
+      "depends_on": [
+        "UNI-018",
+        "UNI-019",
+        "UNI-026"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-11",
+        "REQ-14",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-07",
+        "AT-22",
+        "AT-30",
+        "AT-36"
+      ],
+      "source_refs": [
+        "ST-03"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION12_20261015.md", "infra/local/unified-ai-20261015-12/"],
+      "implementation_scope": "Shared certificate/service internal staff dossier and UI consumer; authorized source open by exact resource/version/binding, record and workflow locators, profile/course snapshots, timeline, documents, findings and next action. Reviews/cache stay outside public projections.",
+      "verification_remaining": "Human evidence discovery/usefulness and production sources not accepted; no serving runtime handoff.",
+      "implementation_outline": "Summary purpose/facts/timeline/documents/criteria/source/next action; từng nhận định mở source locator/version; internal/public projections.",
+      "acceptance_summary": "Cán bộ tìm căn cứ ngay; summary thiếu/conflict không suy đoán; đúng case/student và scope."
+    },
+    {
+      "id": "UNI-028",
+      "phase": "U5",
+      "title": "Checklist và readiness theo workflow",
+      "scope": "staff-policy; domain criteria/workflow; findings UI/service",
+      "depends_on": [
+        "UNI-005",
+        "UNI-027"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-10",
+        "REQ-14",
+        "REQ-15"
+      ],
+      "acceptance": [
+        "AT-21",
+        "AT-30",
+        "AT-31"
+      ],
+      "source_refs": [
+        "ST-05"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION12_20261015.md", "infra/local/unified-ai-20261015-12/"],
+      "implementation_scope": "Deterministic checks and explicit version-bound officer reviews with five readiness states/reasons. AI proposals unavailable. Source errors do not create rejections; readiness grants no action authority or institutional approval.",
+      "verification_remaining": "Official criteria and end-to-end human acceptance pending; business result drafting/prechecks in UNI-031 remain planned.",
+      "implementation_outline": "Rule checks và AI proposals tách officer review; ready/needs verification/missing/waiting/blocked có reason; keep mandatory checks.",
+      "acceptance_summary": "Không tự tick/bypass review; failed source không tự từ chối; source/criteria version đúng."
+    },
+    {
+      "id": "UNI-029",
+      "phase": "U5",
+      "title": "Chuẩn bị trước và kiểm tra phần thay đổi",
+      "scope": "worker/outbox; findings dependency/cache; staff UI diff",
+      "depends_on": [
+        "UNI-020",
+        "UNI-027",
+        "UNI-028"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-11",
+        "REQ-14",
+        "REQ-16"
+      ],
+      "acceptance": [
+        "AT-21",
+        "AT-22",
+        "AT-32",
+        "AT-48"
+      ],
+      "source_refs": [
+        "ST-04"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION12_20261015.md", "infra/local/unified-ai-20261015-12/"],
+      "implementation_scope": "Bounded synchronous preparation on existing business transactions; durable checksummed dependency cache/review receipts, supplement delta and exact unchanged finding reuse. Profile/course/source/assignment/version drift invalidates dependent review/draft bindings; no worker or provider required.",
+      "verification_remaining": "No distributed worker/outbox recovery or load/production evidence. Existing model deadline/reservation fixture remains failed; safety/budget controls unchanged.",
+      "implementation_outline": "Dependencies data→criterion→finding→draft; cache by hashes/versions; invalidate tác động; compare supplement before/after.",
+      "acceptance_summary": "Kết quả stale bị chặn; recheck đủ phần ảnh hưởng; giữ checks khác chỉ khi hợp lệ; bounded costs."
+    },
+    {
+      "id": "UNI-030",
+      "phase": "U5",
+      "title": "Nháp cán bộ, assignment và cạnh tranh bền vững",
+      "scope": "useStaffDraft; staff claim/transfer/respond; repositories",
+      "depends_on": [
+        "UNI-006",
+        "UNI-010",
+        "UNI-019"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-12",
+        "REQ-19"
+      ],
+      "acceptance": [
+        "AT-08",
+        "AT-16",
+        "AT-28",
+        "AT-33",
+        "AT-34"
+      ],
+      "source_refs": [
+        "ST-06"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_SESSION12_20261015.md", "infra/local/unified-ai-20261015-12/"],
+      "implementation_scope": "Private server autosave CAS/receipt readback and input binding; business lock covers ownership check through private draft commit. Claim/transfer/respond and certificate actions revalidate session in the transaction; old assignment cannot use pending actions. Actual two-process claim/draft checks and restart readback passed on new fixtures; legacy payload bytes remain readable.",
+      "verification_remaining": "Browser tabs/reload UX/offline/account-switch/human acceptance pending. No business-action replay on reload, no serving runtime transition or production recovery claim.",
+      "implementation_outline": "Server autosave officer/case/version, saved/pending/error, CAS across tabs; durable claims kiểm soát nhiều process; preserve unsaved safeguards.",
+      "acceptance_summary": "Reload không mất saved drafts; không overwrite; assignment/revoke invalidates pending action."
+    },
+    {
+      "id": "UNI-031",
+      "phase": "U5",
+      "title": "Dự thảo kết quả và kiểm tra trước cán bộ thực hiện",
+      "scope": "staff respond/certificate/service; templates; previews/executor",
+      "depends_on": [
+        "UNI-018",
+        "UNI-028",
+        "UNI-030"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-10",
+        "REQ-12",
+        "REQ-18",
+        "REQ-19"
+      ],
+      "acceptance": [
+        "AT-18",
+        "AT-19",
+        "AT-21",
+        "AT-31",
+        "AT-35",
+        "AT-36"
+      ],
+      "source_refs": [
+        "ST-08",
+        "AI-021"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_A_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-a/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local synthetic typed staff outcome, exact preview/source/recipient binding, explicit review, durable receipt and replay. Numeric confirmation and stale certificate binding regressions pass final source retest.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Original process probes fail C namespace; baseline50ms timing unresolved; UI/institutional/pilot/production acceptance pending. See C final report03.",
+      "implementation_outline": "Structured outcome/facts/reasons; bind recipient/case/rule/template/version; human required reviews; transaction/audit/receipt consistency.",
+      "acceptance_summary": "Thông tin trọng yếu không hallucinate; internal note không gửi nhầm; đúng thẩm quyền; retry không action trùng."
+    },
+    {
+      "id": "UNI-032",
+      "phase": "U5",
+      "title": "Trợ lý ở mọi thao tác cán bộ và quản trị",
+      "scope": "staff queue/detail/checklist/editor/error/admin; registry/context bridge",
+      "depends_on": [
+        "UNI-002",
+        "UNI-011",
+        "UNI-015",
+        "UNI-027",
+        "UNI-031"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-05",
+        "REQ-06",
+        "REQ-14",
+        "REQ-18",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-02",
+        "AT-07",
+        "AT-11",
+        "AT-12",
+        "AT-31",
+        "AT-35"
+      ],
+      "source_refs": [
+        "AI-021",
+        "ST-05"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_A_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-a/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local synthetic staff action inventory and selected-resource assistant context; unsupported operations expose explicit limits.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Actual route/UI usability, institutional authority and full acceptance remain pending; source/build evidence only. See C final report03.",
+      "implementation_outline": "Interpret staff intent tied to selected cases/actions; same work context; approved templates/settings; assist every inventory action or explicit limit.",
+      "acceptance_summary": "Không copy hồ sơ sang chat; ambiguous multi-case clarifies; role boundaries và mandatory decisions giữ."
+    },
+    {
+      "id": "UNI-033",
+      "phase": "U6",
+      "title": "Vòng bổ sung có cấu trúc nối hai bên",
+      "scope": "supplement field/item APIs; student assistant/forms; staff draft/recheck",
+      "depends_on": [
+        "UNI-023",
+        "UNI-024",
+        "UNI-029",
+        "UNI-031"
+      ],
+      "requirements": [
+        "REQ-05",
+        "REQ-07",
+        "REQ-15",
+        "REQ-16",
+        "REQ-17"
+      ],
+      "acceptance": [
+        "AT-13",
+        "AT-17",
+        "AT-32",
+        "AT-36",
+        "AT-37"
+      ],
+      "source_refs": [
+        "ST-07"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_A_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-a/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local synthetic typed supplement/public checklist/student correction mapping and delta recheck on actual case consumers.",
+      "full_acceptance": "pending",
+      "verification_remaining": "UI round-trip, real institutional rules and human completion/usefulness remain pending. See C final report03.",
+      "implementation_outline": "Item IDs/criteria/reasons/accepted format; group known missing; staff confirm public request; student checklist; map response and delta checks.",
+      "acceptance_summary": "Không hỏi thừa/nhỏ giọt known missing; private note không chuyển; mục đã giải quyết được giữ."
+    },
+    {
+      "id": "UNI-034",
+      "phase": "U6",
+      "title": "Bàn giao và theo dõi work liên đơn vị",
+      "scope": "HandoverPanel/staff transfer; queues/task views; handover contract",
+      "depends_on": [
+        "UNI-019",
+        "UNI-031",
+        "UNI-033"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-11",
+        "REQ-13",
+        "REQ-17",
+        "REQ-21"
+      ],
+      "acceptance": [
+        "AT-08",
+        "AT-19",
+        "AT-34",
+        "AT-36",
+        "AT-38"
+      ],
+      "source_refs": [
+        "AI-025",
+        "ST-10"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_A_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-a/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local synthetic handover preview/confirmation, assignment revalidation and scoped public/internal projections.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Cross-unit UI/operational acceptance, official SLA and production recovery remain pending. See C final report03.",
+      "implementation_outline": "Selected summary done/open/evidence/next step và preview; reauthorize target/assignment; public/internal scope; no promise unverified SLA.",
+      "acceptance_summary": "Người nhận có đủ context được phép; không toàn bộ memory/history; transfer receipt/state đúng."
+    },
+    {
+      "id": "UNI-035",
+      "phase": "U6",
+      "title": "Trạng thái hồ sơ dùng chung và hiển thị theo quyền",
+      "scope": "case/task/event projections; student/staff clients; source scope",
+      "depends_on": [
+        "UNI-025",
+        "UNI-032",
+        "UNI-033",
+        "UNI-034"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-09",
+        "REQ-12",
+        "REQ-13",
+        "REQ-17",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-07",
+        "AT-11",
+        "AT-20",
+        "AT-27",
+        "AT-36",
+        "AT-37",
+        "AT-38"
+      ],
+      "source_refs": [
+        "AI-006",
+        "AI-021"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_A_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-a/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-a/integration-acks/personal-03.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Actual local case state with role projections and explicit-store memory/tracking resource-context composition; private memory remains actor scoped.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Not a main model writer/legacy-chat integration or distributed cross-store atomicity claim; UI/pilot/production pending. See C final report03.",
+      "implementation_outline": "Một business state/versions; role-specific views; source changes/revokes refresh affected projections; private memory không hợp nhất giữa actors.",
+      "acceptance_summary": "Hai bên thấy status nhất quán phần được phép; cross-role context/cache không rò hoặc quyết định từ snapshot cũ."
+    },
+    {
+      "id": "UNI-036",
+      "phase": "U7",
+      "title": "Chuẩn bị và thực hiện gộp có kiểm soát",
+      "scope": "batch proposal/service; staff selection/preflight; executor/receipts",
+      "depends_on": [
+        "UNI-010",
+        "UNI-020",
+        "UNI-029",
+        "UNI-031",
+        "UNI-035"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-08",
+        "REQ-12",
+        "REQ-18",
+        "REQ-20"
+      ],
+      "acceptance": [
+        "AT-08",
+        "AT-18",
+        "AT-19",
+        "AT-34",
+        "AT-39"
+      ],
+      "source_refs": [
+        "ST-09"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_A_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-a/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local synthetic exact batch targets/payloads, per-item checks, partial outcomes and idempotent receipt retry.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Full workload/load, UI/operator acceptance and production concurrency/recovery remain pending. See C final report03.",
+      "implementation_outline": "Exact target list/versions/individual payloads; prepare/check/confirm/execute if allowed; per-item authorization, partial outcomes và retry receipts.",
+      "acceptance_summary": "Không target drift/copy outcomes; stale item không chạy; đã commit không gửi lại; capability chưa có chỉ prepare."
+    },
+    {
+      "id": "UNI-037",
+      "phase": "U7",
+      "title": "Hàng đợi và ưu tiên có căn cứ",
+      "scope": "StaffQueue/staff-policy; routing/queue domain; task views",
+      "depends_on": [
+        "UNI-028",
+        "UNI-032",
+        "UNI-035"
+      ],
+      "requirements": [
+        "REQ-14",
+        "REQ-15",
+        "REQ-19",
+        "REQ-21",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-21",
+        "AT-31",
+        "AT-34",
+        "AT-40"
+      ],
+      "source_refs": [
+        "ST-05",
+        "ST-10"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_A_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-a/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local synthetic scoped readiness/priority grouping and routing suggestions with explicit source limits.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Official deadline/policy sources, queue workload and staff UI acceptance remain pending. See C final report03.",
+      "implementation_outline": "Ready/waiting/blocked groups, deadlines sourced, transparent priority policy; suggest routing without auto unauthorized assignment; preserve queue position.",
+      "acceptance_summary": "Không tự tạo SLA hoặc ưu tiên theo model score; duplicate candidates không auto merge/delete/reject."
+    },
+    {
+      "id": "UNI-038",
+      "phase": "U7",
+      "title": "Dashboard điểm nghẽn và cải tiến quy trình",
+      "scope": "telemetry/event aggregations; staff dashboard",
+      "depends_on": [
+        "UNI-020",
+        "UNI-033",
+        "UNI-034",
+        "UNI-037"
+      ],
+      "requirements": [
+        "REQ-16",
+        "REQ-17",
+        "REQ-21",
+        "REQ-24"
+      ],
+      "acceptance": [
+        "AT-40",
+        "AT-41",
+        "AT-48"
+      ],
+      "source_refs": [
+        "ST-10"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_A_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-a/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local synthetic scoped dashboard/timing and bottleneck projections with provenance and explicit unknown metrics.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Observed human effort/wait data, full workload statistics and dashboard UI acceptance remain pending. See C final report03.",
+      "implementation_outline": "Separate active/student wait/unit wait/system time; supplements/transfers/reopen/age/blockers; aggregation in scope và tối thiểu data.",
+      "acceptance_summary": "Không đánh giá throughput bỏ complexity; bottleneck có evidence; không tự đổi policy khi backlog cao."
+    },
+    {
+      "id": "UNI-039",
+      "phase": "U8",
+      "title": "Memory cá nhân của từng actor",
+      "scope": "memory repository/service/retrieval; bounded context; settings",
+      "depends_on": [
+        "UNI-008",
+        "UNI-009",
+        "UNI-010",
+        "UNI-019"
+      ],
+      "requirements": [
+        "REQ-03",
+        "REQ-08",
+        "REQ-22",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-07",
+        "AT-22",
+        "AT-27",
+        "AT-42"
+      ],
+      "source_refs": [
+        "AI-022"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_B_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-b/handoffs/uni039-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-b/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-a/integration-acks/personal-03.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local actor-scoped memory with provenance/validity and actual explicit-store resource-context reader; UI source present.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Main model writer/legacy chat not wired; temporary-chat consumer incomplete under040; UI/pilot/production remain pending. See C final report03.",
+      "implementation_outline": "Preferences/goals/confirmed facts có source/time/validity/scope; staff memory không tái dùng hồ sơ sinh viên khác; relevant-only context.",
+      "acceptance_summary": "Opt-in, isolation, update/contradiction/abstain đúng; source học vụ hiện hành không bị thay bằng memory."
+    },
+    {
+      "id": "UNI-040",
+      "phase": "U8",
+      "title": "Sửa, quên, chat tạm thời và riêng tư",
+      "scope": "memory UI/API; derived index/summary invalidation; conversation modes",
+      "depends_on": [
+        "UNI-007",
+        "UNI-012",
+        "UNI-015",
+        "UNI-039"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-03",
+        "REQ-22",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-06",
+        "AT-09",
+        "AT-43",
+        "AT-44"
+      ],
+      "source_refs": [
+        "AI-023"
+      ],
+      "status": "implemented",
+      "evidence": [
+        "docs/UNIFIED_AI_PARALLEL_B_20261015_01.md",
+        "infra/local/unified-ai-parallel-20261015-01/stream-b/handoffs/uni040-01.json",
+        "infra/local/unified-ai-parallel-20261015-01/stream-b/handoffs/final-01.json",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-memory-01/report.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-chat-02/report.json"
+      ],
+      "implementation_scope": "Persisted native modes and consent/opt-in memory consumer, late guard, correction/CAS/forget/history suppression, export/off and operational retention disclosure implemented and checked locally.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Real legacy/import ownership, real users, broad device/routes and deployment acceptance remain unverified. Temporary reader/writer/UI gap is closed in the native candidate.",
+      "implementation_outline": "Forget suppression tránh tái tạo từ history; CAS sửa; temporary không personal memory; retention/export/erasure disclosure đúng.",
+      "acceptance_summary": "Memory off không xóa history; forgotten item không về context; choices có hiệu lực server và không lẫn actors.",
+      "completion_progress": "Persisted server-owned native temporary/persistent modes; consent-gated passive memory, late revoke/correction/forget guard and history suppression; actual UI correction/forget/export/off/temporary reload verified locally. Legacy ownership/import and broader deployment acceptance remain pending."
+    },
+    {
+      "id": "UNI-041",
+      "phase": "U9",
+      "title": "Subscriptions và sự kiện bền vững",
+      "scope": "business events/outbox/worker; subscription repository/service",
+      "depends_on": [
+        "UNI-010",
+        "UNI-019",
+        "UNI-020",
+        "UNI-033",
+        "UNI-035"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-13",
+        "REQ-17",
+        "REQ-23"
+      ],
+      "acceptance": [
+        "AT-08",
+        "AT-21",
+        "AT-45",
+        "AT-46"
+      ],
+      "source_refs": [
+        "AI-024"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_B_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-b/handoffs/uni041-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-b/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-a/integration-acks/personal-03.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local durable subscriptions/status-feedback-supplement event consumer, bounded retry/dedup/quiet hours and delivery reauthorization on explicit stores.",
+      "full_acceptance": "pending",
+      "verification_remaining": "Deadline trigger has no sourced consumer and returns503; remote channels unavailable. Distributed recovery, actual workload, UI/pilot/production remain pending. See C final report03.",
+      "implementation_outline": "Selected resource/trigger/channel/expiry, new feedback/supplement/deadline sourced; dedup/retry/no-change/quiet hours; reauthorize delivery.",
+      "acceptance_summary": "Revoke/unsubscribe chặn delivery sau; restart không nhân; event không tự submit/approve."
+    },
+    {
+      "id": "UNI-042",
+      "phase": "U9",
+      "title": "Thông báo và next action hai bên",
+      "scope": "notification/task UI; channel adapters allowed; staff/student assistant",
+      "depends_on": [
+        "UNI-014",
+        "UNI-015",
+        "UNI-034",
+        "UNI-041"
+      ],
+      "requirements": [
+        "REQ-02",
+        "REQ-13",
+        "REQ-21",
+        "REQ-23",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-10",
+        "AT-36",
+        "AT-38",
+        "AT-45",
+        "AT-46"
+      ],
+      "source_refs": [
+        "AI-025"
+      ],
+      "status": "implemented",
+      "evidence": ["docs/UNIFIED_AI_PARALLEL_B_20261015_01.md", "infra/local/unified-ai-parallel-20261015-01/stream-b/handoffs/uni042-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-b/handoffs/final-01.json", "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json"],
+      "implementation_scope": "Local in-app inbox/next-action source with recipient/resource binding, stop controls, safe preview and permission checks; UI source builds.",
+      "full_acceptance": "pending",
+      "verification_remaining": "No component/browser/E2E/mobile tests; remote delivery, user usefulness and operational/production acceptance pending. See C final report03.",
+      "implementation_outline": "Reason/source/updated_at/next action/stop tracking; safe preview, channel privacy, open exact resource; handover links.",
+      "acceptance_summary": "Không spam/no-change; không lộ private data trong kênh chưa cấp; nguồn thiếu không hứa thời hạn."
+    },
+    {
+      "id": "UNI-043",
+      "phase": "U10",
+      "title": "Contract, quyền, lỗi và đối kháng toàn hệ",
+      "scope": "unit/API/integration/security suites; synthetic fixtures",
+      "depends_on": [
+        "UNI-024",
+        "UNI-035",
+        "UNI-036",
+        "UNI-040",
+        "UNI-042"
+      ],
+      "requirements": [
+        "REQ-04",
+        "REQ-08",
+        "REQ-09",
+        "REQ-12",
+        "REQ-24",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-07",
+        "AT-08",
+        "AT-18",
+        "AT-19",
+        "AT-23",
+        "AT-24",
+        "AT-25",
+        "AT-26",
+        "AT-27",
+        "AT-28",
+        "AT-31",
+        "AT-34",
+        "AT-39",
+        "AT-47",
+        "AT-50"
+      ],
+      "source_refs": [
+        "AI-026",
+        "ST-11"
+      ],
+      "status": "verified",
+      "evidence": [
+        "docs/UNIFIED_AI_ACCEPTANCE_C_20261015_01.md",
+        "tests/unified_final/",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/independent-06/command.json",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/findings/A-001-strict-confirmation-01.json",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/findings/A-001-strict-confirmation-02.json",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "infra/local/unified-ai-completion-20261015-01/checks/backend-08/command.json"
+      ],
+      "parallel_c_progress": "Final snapshot03 stable:859 unique backend cases,854 passed/5 original process-namespace failures; all75 C cases pass including15 exact schemas and4 separately scoped real-process probes. Numeric confirmation and certificate binding regressions pass final retest. Original failures and baseline50ms timing sensitivity retained; no green release gate.",
+      "parallel_c_final_evidence": [
+        "docs/UNIFIED_AI_PARALLEL_C_20261015_03.md",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/findings/A-B-002-process-namespace-02.json"
+      ],
+      "full_acceptance": "verified_local_synthetic_suite",
+      "implementation_outline": "Schema/state/readiness/grants/source-version, bad agent output/injection, stale approval, wrong recipient, concurrency/crash/batch faults; test từng task từ sớm.",
+      "acceptance_summary": "Không overall score che lỗi quyền; gold có nguồn; report command/exit/build; không đổi expected để pass.",
+      "completion_progress": "Final stable combined backend08:877/877 unique cases, no skipped/failed. Original5 process namespace probes now run in exact registered new fixtures; deterministic pre-dispatch deadline regression added without changing original50ms budget/assertions. Verified scope is local synthetic contract/security/fault suite, not production.",
+      "verification_scope": "Final source-stable877-case local synthetic backend suite including actual process probes. Does not certify production/institutional/human acceptance."
+    },
+    {
+      "id": "UNI-044",
+      "phase": "U10",
+      "title": "E2E xuyên sinh viên và cán bộ",
+      "scope": "browser candidate tests/mobile/accessibility; pilot scripts",
+      "depends_on": [
+        "UNI-025",
+        "UNI-032",
+        "UNI-033",
+        "UNI-035",
+        "UNI-043"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-05",
+        "REQ-06",
+        "REQ-07",
+        "REQ-08",
+        "REQ-13",
+        "REQ-17",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-01",
+        "AT-02",
+        "AT-03",
+        "AT-10",
+        "AT-11",
+        "AT-12",
+        "AT-14",
+        "AT-15",
+        "AT-19",
+        "AT-20",
+        "AT-31",
+        "AT-35",
+        "AT-37",
+        "AT-49"
+      ],
+      "source_refs": [
+        "AI-028"
+      ],
+      "status": "implemented",
+      "evidence": [
+        "docs/UNIFIED_AI_ACCEPTANCE_C_20261015_01.md",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-flow-09/report.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-flow-10/report.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-mobile-07/report.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-memory-01/report.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-chat-02/report.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-notifications-01/report.json"
+      ],
+      "parallel_c_progress": "UI round-trip, route/history/settings/context and fault scripts prepared. No component/DOM/browser/Playwright/E2E/visual/mobile tests run under current direct instruction.",
+      "full_acceptance": "pending",
+      "implementation_outline": "Goal→draft→confirm→staff review→supplement→student correction→staff result→receipt; history/settings/context across routes.",
+      "acceptance_summary": "Đúng build/API, real UI evidence, roles/data/receipt đúng; synthetic/browser pass chưa thay user pilot.",
+      "completion_progress": "Actual source-bound browser services round trip, source/claim/autosave/supplement/correction/delta/result/receipts; memory/chat/settings/notification and390px focus/labels/stable dark sampled contrast observed. Journey spans retained harness attempts09/10; real participants, all routes and full a11y pending."
+    },
+    {
+      "id": "UNI-045",
+      "phase": "U10",
+      "title": "Shadow evaluation và ích lợi của multi-agent",
+      "scope": "eval datasets; controller/agent run reports; staff review scripts",
+      "depends_on": [
+        "UNI-003",
+        "UNI-018",
+        "UNI-020",
+        "UNI-024",
+        "UNI-031",
+        "UNI-035"
+      ],
+      "requirements": [
+        "REQ-05",
+        "REQ-08",
+        "REQ-09",
+        "REQ-11",
+        "REQ-24"
+      ],
+      "acceptance": [
+        "AT-12",
+        "AT-22",
+        "AT-24",
+        "AT-25",
+        "AT-26",
+        "AT-30",
+        "AT-35",
+        "AT-47",
+        "AT-49"
+      ],
+      "source_refs": [
+        "AI-026",
+        "ST-11"
+      ],
+      "status": "needs_input",
+      "evidence": [
+        "scripts/unified_parallel_c_evaluate.py",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/fixtures/evaluation-smoke-03/report.json",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "infra/local/unified-ai-completion-20261015-01/fixtures/matched-comparison-01/report.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/provider-admission-01.json"
+      ],
+      "parallel_c_progress": "4 prepare-only smoke cases pass; matched-comparison04 runs actual single graph and selected-multi graph under3 synthetic source conditions with scripted models, all material gates pass. Actual031/035 consumers checked separately; expert/human review and real model benefit remain pending. Cost null; no paid dispatch/usefulness claim; all previous harness/gold failures retained.",
+      "parallel_c_final_evidence": [
+        "docs/UNIFIED_AI_PARALLEL_C_20261015_03.md",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/fixtures/matched-comparison-04/report.json"
+      ],
+      "full_acceptance": "pending",
+      "implementation_outline": "Prepare-only trên fixture/nguồn được phép; baseline simple/single vs selected multi; measure correct intent/facts/actions, latency/cost; expert review disagreements.",
+      "acceptance_summary": "Multi-agent được giữ ở nơi có evidence hữu ích; không majority vote thay truth; staff blind subsets giảm lệ thuộc gợi ý.",
+      "completion_progress": "Matched3 source conditions run actual single/multi graphs with scripted provider only. Full real-model campaign not admitted:34 available calls versus36 minimum reserve for selected-multi alone. Expert/blind review and usefulness evidence unavailable; no paid calls or quota changes."
+    },
+    {
+      "id": "UNI-046",
+      "phase": "U10",
+      "title": "Hiệu năng, chi phí và tải",
+      "scope": "instrumentation/budgets/context/DB/worker; load fixtures",
+      "depends_on": [
+        "UNI-020",
+        "UNI-029",
+        "UNI-036",
+        "UNI-038",
+        "UNI-039",
+        "UNI-041",
+        "UNI-043"
+      ],
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-16",
+        "REQ-20",
+        "REQ-24",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-26",
+        "AT-27",
+        "AT-28",
+        "AT-32",
+        "AT-39",
+        "AT-41",
+        "AT-48"
+      ],
+      "source_refs": [
+        "AI-027"
+      ],
+      "status": "implemented",
+      "evidence": [
+        "scripts/unified_parallel_c_load.py",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/fixtures/load-01/report.json",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "infra/local/unified-ai-completion-20261015-01/fixtures/concurrent-load-01/report.json",
+        "infra/local/unified-ai-completion-20261015-01/fixtures/extended-measure-01/report.json"
+      ],
+      "parallel_c_progress": "24 sequential restore/prepare fixture observations: p95=11.6286/40.8717ms. Case-measure01 adds3 first confirm-to-readback outcomes32.6971–41.7914ms (p95 null) and24 warm receipt reads over3 cases (p95=14.9242ms). Valid bounded fixtures only; full workload/queue/cache/production SLO/human effort pending; model USD null.",
+      "parallel_c_final_evidence": [
+        "docs/UNIFIED_AI_PARALLEL_C_20261015_03.md",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/fixtures/case-measure-01/report.json"
+      ],
+      "full_acceptance": "pending",
+      "implementation_outline": "Measure p95 restore/prepare/complete, throughput, valid outcomes/cost, queue bounds/caching; fault behavior; no secrets/raw private logs.",
+      "acceptance_summary": "Load không bypass checks; clear partial/failure; limits per run/user/service có hiệu lực; report baseline.",
+      "completion_progress": "Bounded concurrent24 triplets, queue8/24queries,23 warm cache hits and24 first-confirm/readback samples measured with preserved checks. Full production load/model costs/human effort unresolved; costs and active/wait observations null."
+    },
+    {
+      "id": "UNI-047",
+      "phase": "U10",
+      "title": "Pilot người dùng hai phía",
+      "scope": "student/staff task scripts; allowed participants/environment",
+      "depends_on": [
+        "UNI-044",
+        "UNI-045",
+        "UNI-046"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-03",
+        "REQ-05",
+        "REQ-06",
+        "REQ-07",
+        "REQ-08",
+        "REQ-14",
+        "REQ-15",
+        "REQ-16",
+        "REQ-17",
+        "REQ-18",
+        "REQ-24",
+        "REQ-25"
+      ],
+      "acceptance": [
+        "AT-10",
+        "AT-12",
+        "AT-30",
+        "AT-31",
+        "AT-35",
+        "AT-37",
+        "AT-41",
+        "AT-49"
+      ],
+      "source_refs": [
+        "AI-028",
+        "ST-12"
+      ],
+      "status": "needs_input",
+      "evidence": [
+        "docs/UNIFIED_AI_PILOT_C_20261015_01.md",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "infra/local/unified-ai-completion-20261015-01/pilot-session-template.json"
+      ],
+      "parallel_c_progress": "Matched student/staff/round-trip scenarios and measurement protocol prepared; participants, allowed pilot environment and real session data unavailable. No invitations/messages; pilot/usefulness not verified.",
+      "full_acceptance": "pending",
+      "implementation_outline": "Phiên thử độc lập và end-to-end; measure effort/corrections/completion/first-pass/supplement cycles; same complexity/data/conditions.",
+      "acceptance_summary": "Người dùng thực xác minh usefulness; chưa có participants thì not_verified; không gọi synthetic pass là usability.",
+      "completion_progress": "User delegated automatic technical work; no actual participants/expert/session observations supplied or reachable in authorized scope. Existing protocol retained; new empty template prepared. No invitations/messages, fabricated people, scores or pilot pass."
+    },
+    {
+      "id": "UNI-048",
+      "phase": "U11",
+      "title": "Diễn tập chuyển luồng và phục hồi",
+      "scope": "new fixture candidates; migration/import/wiring/feature config",
+      "depends_on": [
+        "UNI-007",
+        "UNI-043",
+        "UNI-047"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-08",
+        "REQ-12",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-03",
+        "AT-06",
+        "AT-19",
+        "AT-28",
+        "AT-50"
+      ],
+      "source_refs": [
+        "AI-029",
+        "ST-12"
+      ],
+      "status": "implemented",
+      "evidence": [
+        "docs/UNIFIED_AI_ACCEPTANCE_C_20261015_01.md",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/rehearsal-01/command.json",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "infra/local/unified-ai-completion-20261015-01/checks/ui-fallback-01/report.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/backend-08/command.json",
+        "infra/local/unified-ai-completion-20261015-01/preservation-02.json"
+      ],
+      "parallel_c_progress": "5 local fixture compatibility/import/restart/readback/unavailable checks pass and are included in final859 unique cases; separately scoped C real-process contention/restart probes pass. Four retained DB schema/all-table/row digests, paid/native metadata, guard and pre-existing Git entries preserved. Full rehearsal still requires043/047; feature-off/serving/production rehearsal not verified.",
+      "parallel_c_final_evidence": [
+        "docs/UNIFIED_AI_PARALLEL_C_20261015_03.md",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/preservation-04.json"
+      ],
+      "full_acceptance": "pending",
+      "implementation_outline": "Compatibility data/history/drafts/receipts, turn features off without losing work, source/runtime rehearsal; prepare exact deployment checklist.",
+      "acceptance_summary": "Old snapshots/data/protections giữ; failed feature có manual/readback path; production chưa thực hiện.",
+      "completion_progress": "Fresh feature-off frontend/backend manual path and same-fixture history/draft restoration tested; real-process probes and retained4DB audit pass. No serving transition, old data migration, distributed crash atomicity or production rehearsal."
+    },
+    {
+      "id": "UNI-049",
+      "phase": "U11",
+      "title": "Runbook và hướng dẫn sử dụng",
+      "scope": "docs student/staff/settings/runtime/verification",
+      "depends_on": [
+        "UNI-048"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-03",
+        "REQ-04",
+        "REQ-06",
+        "REQ-13",
+        "REQ-22",
+        "REQ-23",
+        "REQ-24",
+        "REQ-25",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-01",
+        "AT-02",
+        "AT-09",
+        "AT-44",
+        "AT-49",
+        "AT-50"
+      ],
+      "source_refs": [
+        "AI-030"
+      ],
+      "status": "implemented",
+      "evidence": [
+        "docs/UNIFIED_AI_RUNBOOK_C_20261015_01.md",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "docs/UNIFIED_AI_COMPLETION_RUNBOOK_20261015_01.md"
+      ],
+      "parallel_c_progress": "Runbook updated with observed final commands, stable snapshot03, guarded TypeScript/build pass and failed combined gate; explicit limits040/deadline/remote channels, retention/permissions/recovery. No serving launch claimed. Full048/UI/human operational acceptance pending; see C report03.",
+      "full_acceptance": "pending",
+      "implementation_outline": "Record proved launch/check commands, capabilities/limits/retention/permissions, support/recovery and evidence refs; tutorial theo từng vai trò.",
+      "acceptance_summary": "Tài liệu khớp bản kiểm chứng; no fake claims; user biết cách tiếp tục, sửa/quên/tắt và phục hồi.",
+      "completion_progress": "New runbook matches actual build/ports/commands, receipt-first retries, mode/retention/memory controls, feature-off path, known failures and limits; all old documents preserved. Real operator/pilot validation pending."
+    },
+    {
+      "id": "UNI-050",
+      "phase": "U11",
+      "title": "Đối soát phạm vi và bàn giao kế hoạch",
+      "scope": "unified master/backlog; requirement/acceptance coverage",
+      "depends_on": [
+        "UNI-049"
+      ],
+      "requirements": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-03",
+        "REQ-04",
+        "REQ-05",
+        "REQ-06",
+        "REQ-07",
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-11",
+        "REQ-12",
+        "REQ-13",
+        "REQ-14",
+        "REQ-15",
+        "REQ-16",
+        "REQ-17",
+        "REQ-18",
+        "REQ-19",
+        "REQ-20",
+        "REQ-21",
+        "REQ-22",
+        "REQ-23",
+        "REQ-24",
+        "REQ-25",
+        "REQ-26"
+      ],
+      "acceptance": [
+        "AT-01",
+        "AT-02",
+        "AT-03",
+        "AT-04",
+        "AT-05",
+        "AT-06",
+        "AT-07",
+        "AT-08",
+        "AT-09",
+        "AT-10",
+        "AT-11",
+        "AT-12",
+        "AT-13",
+        "AT-14",
+        "AT-15",
+        "AT-16",
+        "AT-17",
+        "AT-18",
+        "AT-19",
+        "AT-20",
+        "AT-21",
+        "AT-22",
+        "AT-23",
+        "AT-24",
+        "AT-25",
+        "AT-26",
+        "AT-27",
+        "AT-28",
+        "AT-29",
+        "AT-30",
+        "AT-31",
+        "AT-32",
+        "AT-33",
+        "AT-34",
+        "AT-35",
+        "AT-36",
+        "AT-37",
+        "AT-38",
+        "AT-39",
+        "AT-40",
+        "AT-41",
+        "AT-42",
+        "AT-43",
+        "AT-44",
+        "AT-45",
+        "AT-46",
+        "AT-47",
+        "AT-48",
+        "AT-49",
+        "AT-50"
+      ],
+      "source_refs": [
+        "AI-030"
+      ],
+      "status": "implemented",
+      "evidence": [
+        "docs/UNIFIED_AI_PARALLEL_C_20261015_01.md",
+        "docs/UNIFIED_AI_ACCEPTANCE_C_20261015_01.md",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/preservation-01.json",
+        "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+        "infra/local/unified-ai-completion-20261015-01/coverage.json",
+        "infra/local/unified-ai-completion-20261015-01/checks/final-source-binding.json",
+        "infra/local/unified-ai-completion-20261015-01/preservation-02.json"
+      ],
+      "parallel_c_progress": "Final A/B handoffs/ack and213 file/hash checks match; source snapshot03 has1069 stable files. REQ01–26/AT01–50 task mapping retained. Source031–039/041–042 implemented,040 partial; C043–050 in_progress. Final859/854/5 gate failed; TypeScript/build pass. UNI001–030 and complete raw session11/12 suffix preserved. UI/expert/pilot/institutional/production and full requirement closure pending.",
+      "parallel_c_final_evidence": [
+        "docs/UNIFIED_AI_PARALLEL_C_20261015_03.md",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/final-handoffs-review-03.json",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/reporting-final-04.json",
+        "infra/local/unified-ai-parallel-20261015-01/stream-c/handoffs/final-01.json"
+      ],
+      "full_acceptance": "pending",
+      "implementation_outline": "Verify requirements, tasks, source mapping, evidence and remaining gaps; status done chỉ theo phạm vi/evidence; next task rõ.",
+      "acceptance_summary": "Không claim production nếu chưa deploy; old tasks không chạy lại trùng; mọi yêu cầu có status và giới hạn trung thực.",
+      "completion_progress": "26REQ/50AT/50UNI/43source mappings reconciled with exact test IDs, evidence and limits. Current metadata supersedes historical gaps but preserves all session records. Overall full acceptance/production/pilot remains pending."
+    }
+  ],
+  "source_mapping": {
+    "AI-001": [
+      "UNI-001"
+    ],
+    "AI-002": [
+      "UNI-003"
+    ],
+    "AI-003": [
+      "UNI-004"
+    ],
+    "AI-004": [
+      "UNI-006"
+    ],
+    "AI-005": [
+      "UNI-008",
+      "UNI-011"
+    ],
+    "AI-006": [
+      "UNI-002",
+      "UNI-011",
+      "UNI-035"
+    ],
+    "AI-007": [
+      "UNI-012"
+    ],
+    "AI-008": [
+      "UNI-013"
+    ],
+    "AI-009": [
+      "UNI-007"
+    ],
+    "AI-010": [
+      "UNI-014"
+    ],
+    "AI-011": [
+      "UNI-014",
+      "UNI-018"
+    ],
+    "AI-012": [
+      "UNI-009"
+    ],
+    "AI-013": [
+      "UNI-010"
+    ],
+    "AI-014": [
+      "UNI-015"
+    ],
+    "AI-015": [
+      "UNI-021"
+    ],
+    "AI-016": [
+      "UNI-022"
+    ],
+    "AI-017": [
+      "UNI-023"
+    ],
+    "AI-018": [
+      "UNI-024"
+    ],
+    "AI-019": [
+      "UNI-019"
+    ],
+    "AI-020": [
+      "UNI-002",
+      "UNI-025"
+    ],
+    "AI-021": [
+      "UNI-002",
+      "UNI-031",
+      "UNI-032",
+      "UNI-035"
+    ],
+    "AI-022": [
+      "UNI-039"
+    ],
+    "AI-023": [
+      "UNI-040"
+    ],
+    "AI-024": [
+      "UNI-041"
+    ],
+    "AI-025": [
+      "UNI-034",
+      "UNI-042"
+    ],
+    "AI-026": [
+      "UNI-043",
+      "UNI-045"
+    ],
+    "AI-027": [
+      "UNI-020",
+      "UNI-046"
+    ],
+    "AI-028": [
+      "UNI-044",
+      "UNI-047"
+    ],
+    "AI-029": [
+      "UNI-007",
+      "UNI-048"
+    ],
+    "AI-030": [
+      "UNI-049",
+      "UNI-050"
+    ],
+    "CHAT-MULTI-AGENT-CENTER": [
+      "UNI-016",
+      "UNI-017"
+    ],
+    "ST-01": [
+      "UNI-001",
+      "UNI-003",
+      "UNI-026"
+    ],
+    "ST-02": [
+      "UNI-005"
+    ],
+    "ST-03": [
+      "UNI-018",
+      "UNI-027"
+    ],
+    "ST-04": [
+      "UNI-029"
+    ],
+    "ST-05": [
+      "UNI-028",
+      "UNI-032",
+      "UNI-037"
+    ],
+    "ST-06": [
+      "UNI-030"
+    ],
+    "ST-07": [
+      "UNI-033"
+    ],
+    "ST-08": [
+      "UNI-031"
+    ],
+    "ST-09": [
+      "UNI-036"
+    ],
+    "ST-10": [
+      "UNI-034",
+      "UNI-037",
+      "UNI-038"
+    ],
+    "ST-11": [
+      "UNI-043",
+      "UNI-045"
+    ],
+    "ST-12": [
+      "UNI-047",
+      "UNI-048"
+    ]
+  },
+  "completion_record_20261015_01": {
+    "date": "2026-10-15",
+    "namespace": "infra/local/unified-ai-completion-20261015-01",
+    "report": "docs/UNIFIED_AI_COMPLETION_20261015_01.md",
+    "runbook": "docs/UNIFIED_AI_COMPLETION_RUNBOOK_20261015_01.md",
+    "coverage": "infra/local/unified-ai-completion-20261015-01/coverage.json",
+    "backend": {
+      "unique": 877,
+      "passed": 877,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "source_stable": true,
+      "evidence": "infra/local/unified-ai-completion-20261015-01/checks/backend-08/command.json"
+    },
+    "frontend": {
+      "build_id": "I0Xq0uJY2BXxvGQBOUo-i",
+      "production_build_exit": 0,
+      "typescript_exit": 0,
+      "frontend": "http://localhost:3019",
+      "api": "http://localhost:8019",
+      "provider": "deterministic_fake",
+      "guard_unchanged": true
+    },
+    "ui_scope": "Actual Chromium headless synthetic two-role journey across09/10; selected memory/chat/notification/mobile390/feature-off; no full accessibility or human acceptance.",
+    "status_updates": {
+      "UNI-040": "implemented",
+      "UNI-043": "verified",
+      "UNI-044": "implemented",
+      "UNI-045": "needs_input",
+      "UNI-046": "implemented",
+      "UNI-047": "needs_input",
+      "UNI-048": "implemented",
+      "UNI-049": "implemented",
+      "UNI-050": "implemented"
+    },
+    "full_plan_acceptance": "pending",
+    "remaining": [
+      "Real model matched evaluation/expert blind review not admitted with34 available calls versus36 multi-only reserve",
+      "Real participants/sessions and usefulness measurements unavailable",
+      "Official institutional sources/templates/fees/deadlines, real legacy ownership, all routes/devices and production/distributed recovery unverified"
+    ],
+    "paid_calls": 0,
+    "user_pilot_sessions": 0,
+    "serving_transitions": 0,
+    "retained_database_mutations": 0,
+    "historical_session_records_preserved": true
+  },
+  "session06_record": {
+    "date": "2026-10-14",
+    "action": "Session06 continued UNI-006 with internal confirmed settings/grant requests/resource-bound proposal-evidence bundle services, explicit main/candidate durable consent composition and stronger revision/receipt reads. Verified on fresh fixtures/clones; retained live v5, frontend/build, writer/native processes and every held DB table.",
+    "implementation_tasks_completed": ["UNI-001", "UNI-002"],
+    "tasks_implemented_not_verified": ["UNI-003", "UNI-004", "UNI-005"],
+    "tasks_in_progress": ["UNI-006"],
+    "application_tests_run": true,
+    "test_summary": {"scope": "session06 only; latest result per classname/name from three reports, no repeated-run addition or historical totals", "backend_passed": 401, "frontend_passed": 0, "unique_total_passed": 401},
+    "frontend_build_id": "d7WLzedC5Vjq3fb11xvgM",
+    "user_trial_method": "Human said they have not tested and will do so later; human_declared sessions are not started by the agent",
+    "automation_smoke_session": "01a138e5-5aee-7ba8-9db7-a582d71a2b56",
+    "user_pilot_run": false,
+    "paid_model_calls": 0,
+    "paid_model_calls_scope": "No model dispatch by this work; paid/native counters unchanged at read-only host verification, with caps/uncertain reservations retained.",
+    "runtime_handoff": false,
+    "runtime_version": "unified-local-v5",
+    "source_candidate_version": "unified-local-v6",
+    "evidence_manifest": "infra/local/unified-ai-20261014-06/session-verification-01.json",
+    "browser_evidence": null,
+    "previous_session": "docs/UNIFIED_AI_SESSION05_20261014.md",
+    "previous_backlog_snapshot": "infra/local/unified-ai-20261014-06/source-before-07.snapshot",
+    "session_report": "docs/UNIFIED_AI_SESSION06_20261014.md",
+    "local_entry_url": "http://localhost:8006/login",
+    "production_changes": false,
+    "automation_created": false,
+    "next_action": "Continue UNI-006 intended durable consumer/environment composition and complete scoped acceptance; keep UNI-007/009/010/015/028/030/031 gaps explicit. Runtime transition requires verified activity/ownership and preserved data, not PID assumptions. Human baseline stays deferred; do not start human_declared sessions or infer production/human acceptance."
+  },
+  "session08_record": {
+    "date": "2026-10-14",
+    "action": "Session08 implemented UNI-007–010 as one source batch and ran combined backend/build verification without UI tests or runtime transition.",
+    "implementation_tasks_completed": ["UNI-001", "UNI-002"],
+    "tasks_implemented_not_verified": ["UNI-003", "UNI-004", "UNI-005", "UNI-006", "UNI-007", "UNI-008", "UNI-009", "UNI-010"],
+    "tasks_in_progress": [],
+    "application_tests_run": true,
+    "test_summary": {"backend_unique_passed": 516, "scope": "Latest outcome per classname/name in session08; 515-case combined run plus 107-case affected rerun including one new notice case. Reruns are not added.", "frontend_tests_run": false, "typescript_production_build": "passed"},
+    "source_candidate_version": "unified-local-v8",
+    "runtime_handoff": false,
+    "runtime_observation": "Read-only host verification retained in session-verification-02.json; no restart or reload attempted.",
+    "paid_model_calls": 0,
+    "user_pilot_run": false,
+    "production_changes": false,
+    "browser_evidence": null,
+    "evidence_manifest": "infra/local/unified-ai-20261014-08/session-verification-02.json",
+    "session_report": "docs/UNIFIED_AI_SESSION08_20261014.md",
+    "previous_session": "docs/UNIFIED_AI_SESSION07_20261014.md",
+    "previous_backlog_snapshot": "infra/local/unified-ai-20261014-08/source-before-07.snapshot",
+    "next_action": "Continue source work at UNI-011 while keeping full acceptance pending. UI/settings consumers, real ownership evidence, load/human measurements and any coordinated runtime transition remain explicit follow-up scope; preserve all retained data and running processes."
+  },
+  "session09_record": {
+    "date": "2026-10-15",
+    "action": "Session09 implemented UNI-011–015 together in local source; combined deterministic backend/contract and snapshot TypeScript/production checks, no UI test or runtime transition.",
+    "implementation_tasks_completed": ["UNI-001", "UNI-002"],
+    "tasks_implemented_not_verified": ["UNI-003", "UNI-004", "UNI-005", "UNI-006", "UNI-007", "UNI-008", "UNI-009", "UNI-010", "UNI-011", "UNI-012", "UNI-013", "UNI-014", "UNI-015"],
+    "tasks_in_progress": [],
+    "application_tests_run": true,
+    "test_summary": {"backend_unique_passed": 560, "scope": "Latest outcome per classname/name from session09 reports 01/06/07. 547-case first combined run, 560-case second combined run and 44-case affected rerun; repeated cases are not added.", "frontend_tests_run": false, "typescript_production_build": "passed"},
+    "source_candidate_version": "unified-local-v9",
+    "runtime_handoff": false,
+    "runtime_observation": "Read-only host GET observes unified-local-v5 at8006, frontend3006 build d7WLzedC5Vjq3fb11xvgM and existing writer8003; same runtime values as prior session08. Sandbox preflight network/listeners were unavailable, so those observations alone do not prove host absence.",
+    "paid_model_calls": 0,
+    "user_pilot_run": false,
+    "production_changes": false,
+    "browser_evidence": null,
+    "evidence_manifest": "infra/local/unified-ai-20261014-09/session-verification-03.json",
+    "session_report": "docs/UNIFIED_AI_SESSION09_20261015.md",
+    "previous_session": "docs/UNIFIED_AI_SESSION08_20261014.md",
+    "previous_backlog_snapshot": "infra/local/unified-ai-20261014-09/source-before-07.snapshot",
+    "next_action": "Next coding task UNI-016 only when assigned; this batch does not implement it. Full dependency, UI/human, device/offline, load and production acceptance remains pending. Retain all data/builds/runtimes and do not infer permission for a runtime transition."
+  },
+  "session10_record": {
+    "date": "2026-10-15",
+    "action": "Session10 implemented UNI-016–020 together in local source on existing orchestration/tool/evidence/run consumers; deterministic backend/contracts and fresh snapshot TypeScript/production build, without UI tests or runtime transition.",
+    "implementation_tasks_completed": ["UNI-001", "UNI-002"],
+    "tasks_implemented_not_verified": ["UNI-003", "UNI-004", "UNI-005", "UNI-006", "UNI-007", "UNI-008", "UNI-009", "UNI-010", "UNI-011", "UNI-012", "UNI-013", "UNI-014", "UNI-015", "UNI-016", "UNI-017", "UNI-018", "UNI-019", "UNI-020"],
+    "tasks_in_progress": [],
+    "application_tests_run": true,
+    "test_summary": {"backend_unique_passed": 608, "scope": "Latest outcome per classname/name in session10 reports 01–06; 596-case combined run followed by affected reruns 191/192/192/112/4. No rerun or historical addition.", "frontend_tests_run": false, "typescript_production_build": "passed"},
+    "frontend_build_id": "i97X0_zNsl8GHlI_SO2Aw",
+    "source_candidate_version": "unified-local-v10",
+    "runtime_handoff": false,
+    "runtime_observation": "Read-only host GET retains unified-local-v5 at8006, frontend3006 build d7WLzedC5Vjq3fb11xvgM and writer8003; same values as session09. New native U3/resource composition has not been loaded into that writer/runtime.",
+    "paid_model_calls": 0,
+    "user_pilot_run": false,
+    "production_changes": false,
+    "browser_evidence": null,
+    "evidence_manifest": "infra/local/unified-ai-20261015-10/session-verification-03.json",
+    "session_report": "docs/UNIFIED_AI_SESSION10_20261015.md",
+    "previous_session": "docs/UNIFIED_AI_SESSION09_20261015.md",
+    "previous_backlog_snapshot": "infra/local/unified-ai-20261015-10/source-before-07.snapshot",
+    "next_action": "Next coding task UNI-021. UNI-003–020 full acceptance remains pending; preserve all runtimes/data and do not infer deployment, paid-service, destructive or runtime-transition authority."
+  },
+  "parallel_c_record": {
+    "date": "2026-10-15",
+    "batch": "unified-ai-parallel-20261015-01",
+    "status": "independent_checkpoint_final_integration_pending",
+    "report": "docs/UNIFIED_AI_PARALLEL_C_20261015_01.md",
+    "source_task_statuses_001_042_unchanged": true,
+    "session11_and_session12_records_unchanged": true,
+    "C_scoped_backend_latest": {"unique": 48, "passed": 48, "scope": "43 C cases independent06 plus5 distinct rehearsal01 cases, latest classname/name; not historical or A+B totals", "final_integration": false},
+    "new_regression": "C-A-001 numeric confirmed1/1.0 committed in05; exact-validator source retest43/43 passed06; original failure retained; final owner revision/handoff pending",
+    "baseline_failure": "Session12 existing50ms deadline/reservation failure unresolved and not retested by C; no green release-gate claim",
+    "final_snapshot_build": "pending A/B immutable final handoffs and stable source hashes",
+    "ui_tests_run": false,
+    "pilot_run": false,
+    "human_usefulness_verified": false,
+    "paid_provider_calls": 0,
+    "serving_runtime_transition": false,
+    "production_changes": false,
+    "next_action": "Read new A033/035/final and B039–042/final handoffs plus integration acks; verify actual composition/hashes, extend actual-consumer regressions, create fresh final snapshot/fixtures, run combined backend/exact contracts and guarded TypeScript/build. UI/pilot/production remain pending under current scope."
+  },
+  "parallel_c_final_record": {
+    "date": "2026-10-15",
+    "batch": "unified-ai-parallel-20261015-01",
+    "status": "final_local_verification_recorded_release_gate_failed",
+    "report": "docs/UNIFIED_AI_PARALLEL_C_20261015_03.md",
+    "C_handoff": "infra/local/unified-ai-parallel-20261015-01/stream-c/handoffs/final-01.json",
+    "historical_parallel_c_record_retained": true,
+    "tasks001_030_and_session11_12_records_preserved": true,
+    "implemented_local_source_tasks": ["UNI-031", "UNI-032", "UNI-033", "UNI-034", "UNI-035", "UNI-036", "UNI-037", "UNI-038", "UNI-039", "UNI-041", "UNI-042"],
+    "partial_source_tasks": {"UNI-040": "Persistent temporary-chat mode reader/writer/UI missing; correction/CAS/forget/controls/export exist; unknown modes fail closed."},
+    "tasks043_050": "in_progress; full acceptance pending",
+    "source_snapshot": "infra/local/unified-ai-parallel-20261015-01/stream-c/snapshots/manifest-03.json",
+    "source_snapshot_files": 1069,
+    "owner_hash_review": "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/final-handoffs-review-03.json",
+    "owner_file_hash_checks_matched": 213,
+    "backend": {"unique": 859, "passed": 854, "failed": 5, "exit_code": 1, "source_stable": true, "C_cases_passed": 75, "exact_case_schemas_passed": 15, "release_gate": "failed", "evidence": "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/combined-03/command.json", "deduplication": "latest classname/name; no historical/rerun/A+B addition"},
+    "remaining_original_failures": "5 owner process probes reject C fixture namespace; guards/tests unchanged; separate4 C process passes do not replace failures. See C-AB-002 revision02.",
+    "baseline50ms": "Failed scoped01 and historical11/12, passed final03 unchanged. Timing sensitivity unresolved; assertions/thresholds/budget controls unchanged.",
+    "frontend": {"typecheck_exit": 0, "build_exit": 0, "build_id": "uunQdK30YZKwHBmdmoZkW", "guard_unchanged": true, "evidence": "infra/local/unified-ai-parallel-20261015-01/stream-c/checks/frontend-final-summary-03.json", "ui_tests_run": false},
+    "post_verification_metadata_edits": "C reports/acceptance/runbook and scoped master-backlog status/evidence only; verified implementation remains snapshot03. See reporting-final-04 checks and preservation-05.",
+    "ui_tests_run": false,
+    "pilot_run": false,
+    "human_usefulness_verified": false,
+    "paid_provider_calls": 0,
+    "serving_runtime_transition": false,
+    "production_changes": false,
+    "next_action": "Implement actual temporary-chat consumer under040 ownership; resolve original process-probe namespace harness and baseline50ms timing without weakening protections. UI/pilot/expert/institutional/production acceptance remains separate pending work."
+  },
+  "session11_record": {
+    "date": "2026-10-15",
+    "action": "Session11 implemented UNI-021–025 as one local source batch on existing student intent, proposal, workflow and business transaction consumers; combined backend/contracts and fresh TypeScript/production build checks.",
+    "tasks_implemented_this_session": ["UNI-021", "UNI-022", "UNI-023", "UNI-024", "UNI-025"],
+    "full_acceptance": "pending",
+    "application_tests_run": true,
+    "test_summary": {"backend_unique_passed": 647, "scope": "Latest outcome per classname/name from session11 reports02–04: 641-case and 646-case combined runs followed by 205-case affected verification. Reruns and historical totals are not added. A pre-existing 50ms deadline fixture failed in03 and passed unchanged in04; timing sensitivity remains recorded.", "frontend_tests_run": false, "typescript_production_build": "passed"},
+    "frontend_build_id": "1LtL1mfpy5AGl_UWEM7T9",
+    "source_candidate_version": "unified-local-v11",
+    "runtime_handoff": false,
+    "runtime_observation": "Current GET runtime/health returned URLError and listener inventory was empty, including host observation01. Current runtime version cannot be verified; session10 v5/build values are historical only. No restart/reload performed.",
+    "paid_model_calls": 0,
+    "user_pilot_run": false,
+    "production_changes": false,
+    "browser_evidence": null,
+    "evidence_manifest": "infra/local/unified-ai-20261015-11/session-verification-03.json",
+    "session_report": "docs/UNIFIED_AI_SESSION11_20261015.md",
+    "previous_session": "docs/UNIFIED_AI_SESSION10_20261015.md",
+    "previous_backlog_snapshot": "infra/local/unified-ai-20261015-11/source-before-07.snapshot",
+    "next_action": "Next coding task UNI-026; not implemented by this batch. Keep UNI-003–025 full acceptance pending, including UI/mobile/usefulness, official rules and production/runtime composition. Preserve retained data/builds/runtimes."
+  },
+  "last_session": {
+    "date": "2026-10-15",
+    "action": "Session12 implemented UNI-026–030 as one local/synthetic source batch, then combined backend/contracts and fresh snapshot TypeScript/production build verification.",
+    "tasks_implemented_this_session": ["UNI-026", "UNI-027", "UNI-028", "UNI-029", "UNI-030"],
+    "full_acceptance": "pending",
+    "application_tests_run": true,
+    "test_summary": {"backend_unique": 685, "backend_unique_passed": 684, "backend_unique_failed": 1, "backend_release_gate": "failed", "new_staff_cases_passed": 38, "final_affected_passed": 109, "scope": "Latest outcome per classname/name in session12 XML01–03. Initial combined 680 passed/2 failed; affected02 252 passed/1 failed; affected03 109 passed. Workflow 409 contract repaired. Existing 50ms deadline/reservation fixture failed01 and02; assertions/threshold/resources controls unchanged. Reruns and historical totals not added.", "frontend_tests_run": false, "typescript_production_build": "passed"},
+    "frontend_build_id": "tSviX_DAe4wx6NTzaQ-uR",
+    "source_candidate_version": "unified-local-v12",
+    "runtime_handoff": false,
+    "runtime_observation": "Current read-only GET8006/8003 returned URLError and netstat listener inventory was empty. Current serving version cannot be verified; historical values are not reused. No serving runtime transition.",
+    "paid_model_calls": 0,
+    "user_pilot_run": false,
+    "production_changes": false,
+    "browser_evidence": null,
+    "evidence_manifest": "infra/local/unified-ai-20261015-12/session-verification-02.json",
+    "test_outcomes": "infra/local/unified-ai-20261015-12/test-outcomes-02.json",
+    "session_report": "docs/UNIFIED_AI_SESSION12_20261015.md",
+    "previous_session": "docs/UNIFIED_AI_SESSION11_20261015.md",
+    "previous_backlog_snapshot": "infra/local/unified-ai-20261015-12/source-before-07.snapshot",
+    "next_action": "Next coding task UNI-031; not implemented. Keep UNI-003–030 full acceptance pending and retain the unresolved existing deadline fixture. Preserve all data/builds/runtimes and safety/budget controls."
+  }
+}

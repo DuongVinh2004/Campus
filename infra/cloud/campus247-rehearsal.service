@@ -1,0 +1,11 @@
+[Unit]
+Description=Campus 24/7 monthly restore drill (throw-away database, live data untouched)
+After=postgresql@17-campus247.service campus247-backup.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/campus247-rehearse
+# A drill must never slow the service down for real users.
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=3h

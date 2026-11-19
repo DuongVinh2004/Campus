@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 import asyncpg
 
 
-async def serve_worker(worker, database, heartbeat_file=None, *, once=False, interval=2, pulse_interval=10):
+async def serve_worker(worker, database, heartbeat_file=None, *, once=False, interval=2, pulse_interval=10, auto=None):
     # The caller resolves this exact destination within its workspace. Exclusive
     # creation preserves earlier worker evidence, including after PID reuse.
     stream = heartbeat_file.open("xb") if heartbeat_file else None
@@ -54,6 +54,11 @@ async def serve_worker(worker, database, heartbeat_file=None, *, once=False, int
                 await asyncio.sleep(delay)
                 delay = min(30, delay * 2)
                 continue
+            if auto is not None:
+                try:
+                    await auto.tick()  # documents move on by themselves: checks, release, index (see auto_publication.py)
+                except Exception:  # noqa: BLE001 -- the ingestion loop must keep running; the next tick retries
+                    pass
             state.update(state="RESOURCE_WAIT" if outcome == "RESOURCE_WAIT" else "IDLE",
                 last_outcome=outcome, dependency_error=None)
             delay = interval

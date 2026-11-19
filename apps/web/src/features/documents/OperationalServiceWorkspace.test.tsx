@@ -15,11 +15,17 @@ const actor = { display_name: "Sinh viên local", roles: ["STUDENT"] };
 function ready() { calls.get.mockImplementation((path: string) => Promise.resolve(path === "/v1/users/me" ? actor : { items: [] })); }
 
 describe("one main student service workspace", () => {
+  it("gives signed-out users a login route back to their request history", async () => {
+    calls.get.mockRejectedValue(new Error("Session unavailable"));
+    render(<OperationalServiceWorkspace />);
+    await screen.findByRole("alert");
+    expect(screen.getByRole("link", { name: "Lịch sử yêu cầu" }).getAttribute("href")).toBe("/login?redirect=%2Ftickets");
+  });
   it("shows all three preparations and the actual university connection limit", async () => {
     ready(); render(<OperationalServiceWorkspace />);
     await screen.findByText(/Sinh viên local/);
     expect(screen.getAllByRole("button", { name: "Chuẩn bị nháp" })).toHaveLength(3);
-    expect(screen.getByText(/Chưa kết nối hệ thống tiếp nhận của HUCE/)).toBeDefined();
+    expect(screen.getByText(/chưa được chuyển đến hệ thống tiếp nhận chính thức của HUCE/)).toBeDefined();
     fireEvent.click(screen.getAllByRole("button", { name: "Chuẩn bị nháp" })[0]);
     expect(screen.getByLabelText("Mục đích sử dụng")).toBeDefined();
     expect(screen.queryByRole("button", { name: "Xác nhận gửi" })).toBeNull();

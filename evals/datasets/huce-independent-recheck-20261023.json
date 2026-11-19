@@ -1,0 +1,9 @@
+[
+  {"name":"tuition_k64_final", "question":"Theo QĐ 924, học phí chương trình kỹ sư chính quy K64 năm học 2026-2027 là bao nhiêu đồng một tín chỉ?"},
+  {"name":"tuition_k64_holdout", "question":"Kỹ sư hệ chính quy khóa 63, năm học 2026-2027, mức học phí một tín chỉ là bao nhiêu?"},
+  {"name":"missing_conditions_final", "question":"Cho biết học phí CNTT của HUCE?"},
+  {"name":"conditions_followup_final", "question":"Cử nhân chính quy K71, năm học 2026-2027.", "followup":true},
+  {"name":"surcharge_followup_final", "question":"Còn phụ thu Anh ngữ cho khóa đó thì sao?", "followup":true},
+  {"name":"lab_damage_final", "question":"Theo nội quy phòng máy Trung tâm CNTT và CSDL HUCE, nếu đầu giờ phát hiện máy hỏng hoặc mất thiết bị thì sinh viên báo cho ai?"},
+  {"name":"password_final", "question":"Theo quy chế an toàn thông tin HUCE QĐ 2114, người sử dụng phải đổi mật khẩu tối thiểu bao lâu một lần?"}
+]

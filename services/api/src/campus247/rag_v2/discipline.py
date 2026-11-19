@@ -11,7 +11,15 @@ from campus247.rag_v2.types import Outcome
 
 _CONNECTIVES = frozenset({
     "and", "cac", "cho", "cua", "duoc", "khi", "mot", "neu", "nhung", "theo", "thi", "trong", "voi",
-    "bao", "bi", "co", "la", "de", "tai", "nay", "do"})
+    "bao", "bi", "co", "la", "de", "tai", "nay", "do",
+    # Adverbs that add no rule, level, number or consequence ("cũng bị giảm", "đều bị giảm").
+    "cung", "deu"})
+
+
+# A sentence that states a condition and its consequence ("... thì ...") is a general rule about whoever meets
+# the condition, not an accusation of one student. A clause quoted from an enumerated condition ("b) sinh viên đã
+# bị kỷ luật ...") carries its frame in the list marker. A bare "Sinh viên đã bị kỷ luật ..." stays blocked.
+CONDITIONAL_FRAME = re.compile(r"\b(?:nếu|khi|trường hợp|thì)\b|^\s*[a-zđ\d]{1,2}\)\s")
 
 
 def _fold(text: str) -> str:
@@ -24,6 +32,16 @@ def _squash(text: str) -> str:
     return re.sub(r"\s+", "", _fold(text))
 
 
+# "Theo Quyết định 1486," only says which document the rule comes from; it adds no rule, level or consequence. The number makes it a
+# reference. A bare "quyết định kỷ luật" is not one and stays subject to the word check.
+_REFERENCE = re.compile(r"\b(?:theo|căn cứ|tại)\s+(?:quyết định|quy chế|thông báo|văn bản|điều|khoản)\s+[\w/.\-]*\d[\w/.\-]*",
+                        re.IGNORECASE)
+
+
+def _without_references(sentence: str) -> str:
+    return _REFERENCE.sub(" ", sentence)
+
+
 def _meaningful_words(sentence: str) -> list[str]:
     return [w for w in re.findall(r"[a-z0-9]+", _fold(sentence))
             if w not in _CONNECTIVES and (len(w) >= 3 or w.isdigit())]
@@ -31,6 +49,8 @@ def _meaningful_words(sentence: str) -> list[str]:
 
 def _named_subject(sentence, titles):
     """An individual cannot become a generic rule by adding a conditional adjunct."""
+    # A leading connective is capitalised by grammar, not because it starts a name ("Theo Quyết định 1486, ...").
+    sentence = re.sub(r"^\s*(?:theo|căn cứ|tại|về|với|nếu|khi|đối với)\s+", "", sentence, flags=re.IGNORECASE)
     runs, run = [], []
     previous_end = 0
     for match in re.finditer(r"\b[^\W\d_]+\b", sentence):
@@ -90,7 +110,7 @@ def discipline_failure(outcome: Outcome, rows) -> str | None:
                 return "personal"
             accusation = (re.search(r"sinh viên (?:đã |sẽ |phải )?bị kỷ luật", text)
                           or re.search(r"\b(?:đã|sẽ|phải) (?:bị|chịu)(?: xử lý)? kỷ luật", text))
-            if accusation and not re.search(r"\b(?:nếu|khi|trường hợp)\b", text):
+            if accusation and not CONDITIONAL_FRAME.search(text):
                 return "accusation"
         sources = []
         for ref in statement.unit_ids:
@@ -123,7 +143,7 @@ def discipline_failure(outcome: Outcome, rows) -> str | None:
         source = _squash(" ".join(sources))
         numbers = set(re.findall(r"\d+", " ".join(sources)))
         if not all((word in numbers) if word.isdigit() else (word in source)
-                   for sentence in discipline_sentences for word in _meaningful_words(sentence)):
+                   for sentence in discipline_sentences for word in _meaningful_words(_without_references(sentence))):
             return "word_not_in_source"
     return None
 

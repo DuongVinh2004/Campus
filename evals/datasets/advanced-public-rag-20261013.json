@@ -1,0 +1,21 @@
+{
+  "description": "Câu diễn đạt tự nhiên để so sánh retrieval trên cùng snapshot HUCE. Parent positions được runner gắn lại với hash/ID nguồn. Không dùng làm bằng chứng production.",
+  "cases": [
+    {"id":"scholarship", "question":"Muốn được xét học bổng khuyến khích học tập thì em phải đáp ứng những yêu cầu nào?", "parents":[100], "answer_terms":["học tập","rèn luyện"]},
+    {"id":"transcript", "question":"Em cần bản ghi kết quả các môn để nộp hồ sơ, phải xin bảng điểm qua kênh nào?", "parents":[29,102], "answer_terms":["một cửa"]},
+    {"id":"library-group", "question":"Ở thư viện, nhóm em muốn ngồi trao đổi bài thì nên tới tầng nào?", "parents":[106], "answer_terms":["tầng 2"]},
+    {"id":"library-books", "question":"Em cần mượn giáo trình của trường, quầy phục vụ nằm tầng mấy?", "parents":[106], "answer_terms":["tầng 5"]},
+    {"id":"change-major", "question":"Sinh viên năm đầu có được đổi sang một ngành khác trong trường không?", "parents":[124], "answer_terms":["năm thứ nhất"]},
+    {"id":"exam-postpone", "question":"Bị ốm vào buổi thi học kỳ thì em có thể đề nghị hoãn thi như thế nào?", "parents":[118], "answer_terms":["thi"]},
+    {"id":"regrade-deadline", "question":"Sau khi công bố điểm thi, em còn bao nhiêu ngày làm việc để yêu cầu chấm lại?", "parents":[54], "answer_terms":["10","ngày"]},
+    {"id":"improve-score", "question":"Thi để nâng điểm mà kết quả thấp hơn lần trước thì nhà trường giữ điểm nào?", "parents":[118,99], "answer_terms":["cao nhất"]},
+    {"id":"passing-grade", "question":"Điểm chữ D có phải học lại không hay đã đạt học phần?", "parents":[118,99], "answer_terms":["đạt"]},
+    {"id":"credit-workload", "question":"Một tín chỉ cần tương đương bao nhiêu giờ học và tự nghiên cứu?", "parents":[112], "answer_terms":["50"]},
+    {"id":"parallel-programs", "question":"Em phải học tới năm mấy mới có thể bắt đầu thêm một chương trình thứ hai?", "parents":[126,102], "answer_terms":["năm thứ hai"]},
+    {"id":"temporary-leave", "question":"Nếu muốn tạm dừng việc học một thời gian thì có được giữ kết quả đã học không?", "parents":[123], "answer_terms":["bảo lưu"]},
+    {"id":"graduation", "question":"Để được xét tốt nghiệp, điểm trung bình tích lũy ít nhất phải là bao nhiêu?", "parents":[122,103], "answer_terms":["2.0"]},
+    {"id":"lost-card", "question":"Làm mất thẻ sinh viên rồi, em đăng ký cấp lại qua đâu?", "parents":[29], "answer_terms":["motcua.huce.edu.vn"]},
+    {"id":"dormitory-change", "question":"Trong ký túc xá, em có được tự ý đổi chỗ ở với bạn cùng trường không?", "parents":[63], "answer_terms":["không","tự ý"]},
+    {"id":"unaccented", "question":"em muon hoc them chuong trinh thu hai thi som nhat la nam nao", "parents":[126,102], "answer_terms":["năm thứ hai"]}
+  ]
+}

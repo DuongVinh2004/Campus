@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timezone
 
 import pytest
@@ -131,3 +132,89 @@ def test_failed_branch_requires_reason_code() -> None:
             candidate_count=0,
             duration_ms=700,
         )
+
+
+def context() -> RetrievalContext:
+    return RetrievalContext(
+        authorized_scope=authorized_scope(), locale="vi",
+        effective_at=datetime(2026, 10, 3, tzinfo=timezone.utc),
+        simulation_policy=SimulationPolicy.DENY, trace_id="synthetic-contract-trace",
+    )
+
+
+@pytest.mark.parametrize("field,value", [
+    ("authorized_scope", {"roles": ["SYSTEM_ADMIN"]}),
+    ("authorized_scope", None), ("simulation_policy", "ALLOW_LABELED"),
+    ("simulation_policy", True), ("effective_at", "2026-10-03T00:00:00Z"),
+    ("effective_at", None), ("locale", 123), ("trace_id", None),
+])
+def test_context_rejects_untyped_fields(field, value):
+    with pytest.raises(ValueError):
+        replace(context(), **{field: value})
+
+
+@pytest.mark.parametrize("field", ["roles", "audiences", "faculty_codes", "program_codes"])
+@pytest.mark.parametrize("value", ["STUDENT", ["STUDENT"], {"STUDENT"}, frozenset({True})])
+def test_scope_rejects_mutable_or_untyped_collections(field, value):
+    with pytest.raises(ValueError, match="frozenset of strings"):
+        replace(authorized_scope(), **{field: value})
+
+
+@pytest.mark.parametrize("field", ["roles", "audiences", "faculty_codes", "program_codes"])
+def test_every_empty_scope_is_rejected(field):
+    with pytest.raises(ValueError, match="must not be empty"):
+        replace(authorized_scope(), **{field: frozenset()})
+
+
+@pytest.mark.parametrize("mutation", [
+    "unknown_field", "unknown_scope_field", "string_roles", "mixed_roles",
+    "missing_scope", "missing_actor", "numeric_actor", "numeric_locale",
+    "numeric_time", "naive_time", "invalid_time", "empty_scope", "invalid_policy",
+])
+def test_deserialization_rejects_malformed_fields_without_echoing_input(mutation):
+    value = context().to_dict()
+    scope = value["authorized_scope"]
+    if mutation == "unknown_field":
+        value["unexpected"] = "private-input"
+    elif mutation == "unknown_scope_field":
+        scope["privileged"] = True
+    elif mutation == "string_roles":
+        scope["roles"] = "SYSTEM_ADMIN"
+    elif mutation == "mixed_roles":
+        scope["roles"] = ["STUDENT", 1]
+    elif mutation == "missing_scope":
+        del value["authorized_scope"]
+    elif mutation == "missing_actor":
+        del scope["actor_id"]
+    elif mutation == "numeric_actor":
+        scope["actor_id"] = 123
+    elif mutation == "numeric_locale":
+        value["locale"] = 123
+    elif mutation == "numeric_time":
+        value["effective_at"] = 123
+    elif mutation == "naive_time":
+        value["effective_at"] = "2026-10-03T00:00:00"
+    elif mutation == "invalid_time":
+        value["effective_at"] = "private-input"
+    elif mutation == "empty_scope":
+        scope["audiences"] = []
+    else:
+        value["simulation_policy"] = "private-input"
+    with pytest.raises(ValueError) as error:
+        RetrievalContext.from_dict(value)
+    assert str(error.value) == "invalid serialized retrieval context"
+
+
+def test_typed_context_is_immutable_and_round_trip_preserves_scope():
+    original = context()
+    assert RetrievalContext.from_dict(original.to_dict()) == original
+    with pytest.raises(FrozenInstanceError):
+        original.authorized_scope = authorized_scope()
+    with pytest.raises(AttributeError):
+        original.authorized_scope.roles.add("SYSTEM_ADMIN")
+
+
+@pytest.mark.parametrize("values", [["CT-101"], "CT-101", (True,)])
+def test_query_identifiers_require_typed_immutable_tuple(values):
+    with pytest.raises(ValueError, match="tuple of strings"):
+        RetrievalQuery("synthetic query", exact_identifiers=values)

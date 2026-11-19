@@ -38,11 +38,12 @@ EXTRA_DIRS = (Path("infra/local/multi-agent-integrated-20261013-01"), Path("infr
               Path("infra/local/learning-materials-20261104-01"))
 EXTRA_MAX_BYTES = 5_000_000
 SQLITE_STORES = ("conversations.sqlite3", "actor-state.sqlite3", "campus-ops.sqlite3", "action-idempotency.sqlite3",
-                 "write-previews.sqlite3")
+                 "write-previews.sqlite3", "source-reviews.sqlite3", "oidc.sqlite3", "answer-quality.sqlite3")
 LEDGER_KEEP = 3000
 LEDGER_SKIP = ("gateway-sidecar.token",)
 SKIP_SUFFIXES = (".png", ".log", ".sqlite3", ".sqlite3-wal", ".sqlite3-shm")
-SKIP_DIRS = ("frontend-", "resume-", "rehearsals", "backup-restore-")
+SKIP_DIRS = ("frontend-", "resume-", "rehearsals", "backup-restore-", "ops-metrics", "ops-alerts")
+STATUS_FILE = "LAST_BACKUP.json"
 # Plaintext passwords kept next to the hashed identity files on the development machine. A server only needs the hashes,
 # so these are left out unless --with-credentials is given (for example to rehearse logins with synthetic test accounts).
 CREDENTIAL_NAMES = ("bootstrap-password.txt",)
@@ -201,6 +202,27 @@ def backup(root: Path, out: Path, pg_bin: str | None, keep: int, with_credential
     return target
 
 
+def write_status(out: Path, *, ok: bool, started: float, folder: Path | None = None, error: str | None = None) -> dict:
+    """Record the outcome of the last backup attempt in `<out>/LAST_BACKUP.json` for the operations page and the alerts.
+
+    Atomic (temporary file, then replace). Holds no secret: only times, sizes, a checksum and the error's type name.
+    """
+    record: dict = {"ok": ok, "verified": ok, "finished_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    "duration_s": round(time.time() - started, 1)}
+    if folder is not None and (folder / "MANIFEST.json").exists():
+        record["folder"] = folder.name
+        record["bytes"] = sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())
+        record["manifest_sha256"] = sha256(folder / "MANIFEST.json")
+    if error:
+        record["error"] = error
+    out.mkdir(parents=True, exist_ok=True)
+    target = out / STATUS_FILE
+    temporary = target.with_suffix(".json.tmp")
+    temporary.write_text(json.dumps(record, indent=1), encoding="utf-8")
+    os.replace(temporary, target)
+    return record
+
+
 def verify(folder: Path) -> dict:
     manifest = json.loads((folder / "MANIFEST.json").read_text(encoding="utf-8"))
     if manifest.get("schema") != "campus247-backup-v1":
@@ -278,7 +300,7 @@ def restore(folder: Path, root: Path, pg_bin: str | None, force: bool, admin: li
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=("backup", "verify", "restore"))
+    parser.add_argument("command", choices=("backup", "verify", "restore", "status"))
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--out", type=Path)
     parser.add_argument("--backup", type=Path)
@@ -293,8 +315,22 @@ def main() -> None:
         if not args.out:
             parser.error("--out is required")
         args.out.mkdir(parents=True, exist_ok=True)
-        folder = backup(args.root, args.out, args.pg_bin, args.keep, args.with_credentials)
-        print(json.dumps({"backup": str(folder), "seconds": round(time.time() - started, 1), **verify(folder)["parts"]}))
+        folder = None
+        try:
+            folder = backup(args.root, args.out, args.pg_bin, args.keep, args.with_credentials)
+            parts = verify(folder)["parts"]
+        except BaseException as error:  # noqa: BLE001 -- record the failure for the alerts, then let it propagate unchanged
+            write_status(args.out, ok=False, started=started, folder=folder, error=type(error).__name__)
+            raise
+        write_status(args.out, ok=True, started=started, folder=folder)
+        print(json.dumps({"backup": str(folder), "seconds": round(time.time() - started, 1), **parts}))
+    elif args.command == "status":
+        if not args.out:
+            parser.error("--out is required")
+        try:
+            print((args.out / STATUS_FILE).read_text(encoding="utf-8"))
+        except OSError:
+            raise SystemExit(f"no {STATUS_FILE} in {args.out}: no backup has run yet") from None
     elif args.command == "verify":
         print(json.dumps({"ok": True, **verify(args.backup)}))
     else:

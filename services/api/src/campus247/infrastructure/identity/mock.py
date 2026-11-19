@@ -10,15 +10,18 @@ from typing import Any
 from identities import generate_identities
 from campus247.ports.identity import AccountState, IdentityContext, IdentityRole
 
-ALLOWED_ENVIRONMENTS = {"local", "development", "test", "demo-synthetic"}
+ALLOWED_ENVIRONMENTS = {"local", "development", "test", "testing", "demo-synthetic"}
 
 
 class SyntheticIdentityAdapter:
-    def __init__(self, secret_key: str, environment: str = "local") -> None:
+    def __init__(self, secret_key: str, environment: str = "local", *, tenant_id: str | None = None) -> None:
         if environment.lower() == "production" or environment.lower() not in ALLOWED_ENVIRONMENTS:
             raise ValueError(f"Synthetic identity adapter forbidden in environment: {environment}")
         self._secret = secret_key.encode("utf-8")
         self._environment = environment
+        if tenant_id is not None and (not isinstance(tenant_id, str) or not tenant_id.strip() or tenant_id != tenant_id.strip()):
+            raise ValueError("server-configured synthetic tenant must be nonempty")
+        self._tenant_id = tenant_id
         data = generate_identities()
         self._users = {u["id"]: u for u in data["records"]["user_identity"]}
         self._profiles = {p["user_id"]: p for p in data["records"]["student_profile"]}
@@ -86,4 +89,8 @@ class SyntheticIdentityAdapter:
             is_synthetic=True,
             student_code=prof["student_code"] if prof else None,
             faculty_code=prof["faculty_code"] if prof else None,
+            tenant_id=self._tenant_id,
+            session_id=payload.get("jti", ""),
+            unit_ids=tuple(r["scope_key"] for r in self._roles
+                           if r["user_id"] == uid and r["scope_type"] == "QUEUE"),
         )

@@ -1,0 +1,26 @@
+{
+  "kind": "development_authored_not_held_out",
+  "graph_id": "huce-policy-development-v1",
+  "questions": [
+    "Muốn xin giấy xác nhận sinh viên thì đăng ký và nhận kết quả thế nào?",
+    "Trong quy trình xác nhận, ai tiếp nhận và giấy được nhận tại đâu?",
+    "Xin giấy xác nhận sinh viên có phải chọn mẫu trong dịch vụ một cửa không?",
+    "Cựu sinh viên cần xác nhận ngành đào tạo có dịch vụ và quy trình nào?",
+    "Phúc khảo điểm thi đăng ký ở đâu và đóng lệ phí bằng kênh nào?",
+    "Thi vấn đáp hoặc thực hành có nằm trong quy trình phúc khảo không?",
+    "Nguồn quy định mức tiền lệ phí phúc khảo cụ thể là bao nhiêu?",
+    "Chuyển ngành cần đủ những điều kiện nào trong Điều 15?",
+    "Đạt điều kiện tuyển sinh thôi có đủ để được chuyển ngành không?",
+    "Chuyển ngành còn cần ý kiến của đơn vị chuyên môn và Hiệu trưởng không?",
+    "Hạng tốt nghiệp xuất sắc hoặc giỏi bị giảm một mức trong những trường hợp nào?",
+    "Phải vừa học lại quá 5% tín chỉ vừa bị cảnh cáo mới bị giảm hạng tốt nghiệp phải không?"
+  ],
+  "extraction_targets": [["certificate-process", "certificate-form"], ["appeal", "appeal-fee"]],
+  "max_live_query_runs": 12,
+  "max_live_extraction_runs": 2,
+  "reserved_repair_runs": 2,
+  "admission_calls_per_run": 12,
+  "max_reserved_provider_calls": 192,
+  "review_required": ["correctness", "completeness", "conditions", "audience", "temporal", "citation_entailment", "source_hash", "graph_events", "usage", "latency"],
+  "model_context_contains_gold": false
+}

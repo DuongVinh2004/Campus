@@ -1,10 +1,10 @@
 ---
 document_id: "DOC-DATA-002"
-version: "1.1.0"
+version: "1.2.0"
 status: "approved"
 owner: "Data Architect"
 approvers: ["Solution Architect", "Security Lead", "Privacy Lead"]
-last_updated: "2026-09-29"
+last_updated: "2026-10-03"
 ---
 
 # Data dictionary V1
@@ -202,10 +202,37 @@ Fields MUST conform to `handover.schema.json` for wire values. Persistent fields
 | `authority_level` | smallint | No | INTERNAL | 1..100; higher means more authoritative |
 | `approval_status` | enum | No | INTERNAL | `DRAFT`, `APPROVED`, `REJECTED` |
 | `is_synthetic` | boolean | No | INTERNAL | provenance marker |
-| `campus_scope` | varchar(64) | No | INTERNAL | V1 exact value `HUCE`; SQL authorization predicate |
-| `faculty_scope` | varchar(32)[] | No | INTERNAL | non-empty approved faculties; V1 includes `FIT` |
-| `program_scope` | varchar(64)[] | No | INTERNAL | empty means no program is authorized, never allow-all |
-| `audiences` | varchar(64)[] | No | INTERNAL | non-empty allowlisted roles/cohorts; SQL authorization predicate |
+| `campus_scope` | varchar(64) | No* | INTERNAL | V1 exact value `HUCE`; SQL authorization predicate |
+| `faculty_scope` | varchar(32)[] | No* | INTERNAL | non-empty approved faculties; V1 includes `FIT` |
+| `program_scope` | varchar(64)[] | No* | INTERNAL | empty means no program is authorized, never allow-all |
+| `audiences` | varchar(64)[] | No* | INTERNAL | non-empty allowlisted roles/cohorts; SQL authorization predicate |
+
+#### Ngoại lệ chuyển tiếp legacy cho FILTER-001
+
+`No*` giữ yêu cầu NOT NULL cho nguồn mới và nguồn đã được review scope. Chỉ
+những source tồn tại trước migration FILTER-001, chưa có scope metadata được
+knowledge owner phê duyệt, MAY giữ **cả bốn** field scope là NULL. Không cho phép
+tuple scope chỉ có một phần NULL hoặc dùng ngoại lệ này cho INSERT mới.
+
+Storage MUST reject nguồn mới thiếu scope; scope review MUST cung cấp toàn bộ
+tuple hợp lệ. Mọi faculty/audience phải thuộc approved allowlist và campus phải
+là `HUCE`; `program_scope` rỗng vẫn nghĩa không program nào được authorized.
+Update không liên quan scope MAY giữ tuple legacy NULL; thao tác review/enrich
+scope phải qua knowledge-owner authorization và audit hiện có, không được suy
+ra quyền từ title, owner_unit, approval_status hay ngày publish.
+
+Production SQL MUST exclude tuple legacy NULL và mọi missing/empty authorized
+intersection trước ranking/LIMIT. Ngoại lệ này chỉ biểu diễn metadata chưa biết
+trong storage, không cấp quyền retrieval. Migration MUST giữ nguyên mọi cột,
+vector, index và dữ liệu cũ; không tự backfill `HUCE`, `FIT`, `STUDENT`, `ALL`,
+program hoặc audience, không đổi approval/publication state để che thiếu scope.
+Chỉ thêm field/constraint/index phù hợp và dùng recovery forward-only.
+
+Approval evidence: direct human instruction ngày 2026-10-03, “tiếp tục theo đề
+xuất tốt nhất, phù hợp nhất”, sau proposal `B-FILTER-LEGACY-NULL` về legacy NULL
+và fail closed trong phiên triển khai. Approval chỉ áp dụng ngoại lệ chuyển tiếp
+này; không đổi production profile `rag-prod-v1.0.0`, model/revision/dimension,
+threshold, dependency, live provider hoặc quyền production/destructive operation.
 
 ### DATA-DIC-031 `document_version`
 
@@ -240,6 +267,16 @@ Fields MUST conform to `handover.schema.json` for wire values. Persistent fields
 | `embedding_model_version` | varchar(128) | Yes | INTERNAL | required when embedding non-null |
 | `embedding_dimension` | integer | Yes | INTERNAL | `1024` for `rag-prod-v1.0.0`; must match manifest |
 | `embedded_at` | timestamp | Yes | INTERNAL | required when embedding non-null |
+
+Physical compatibility mapping for current M1 preparation (DEC-022): migration
+`0013` stores the logical profile embedding in `embedding_rag_v1 vector(1024)`;
+the legacy `embedding vector(1536)` remains intact and is not eligible for the
+current 1024 profile. Model-version/dimension/timestamp metadata is all-or-none
+with `embedding_rag_v1`; the database checks exact current model revision and L2
+norm within float32 tolerance `1e-4`. Readers/writers must select storage through
+explicit profile binding; migration alone does not activate an index or wire a
+retriever. A better future model uses a new evaluated profile/storage mapping,
+not conversion or relabeling of old vectors.
 
 ### DATA-DIC-033 `retrieval_run`
 
@@ -306,6 +343,10 @@ Append-only fields: `id`, `occurred_at`, `actor_type`, `actor_id`, `action_code`
 ## 8. Acceptance evidence và failure behavior
 
 Implementation MUST cung cấp migration/schema evidence ánh xạ từng bảng/trường bắt buộc, constraint tests và data-classification review. Nếu kiểu cơ sở dữ liệu không thể biểu diễn một constraint, task MUST dừng với `DATA_CONSTRAINT_UNIMPLEMENTABLE`; không được tự giảm constraint hoặc đổi field nullability.
+
+Ngoại lệ nullability duy nhất được phê duyệt ở version 1.2.0 là tuple legacy
+scope trong DATA-DIC-030 như mô tả ở trên; implementation MUST chứng minh nguồn
+mới bị reject khi thiếu scope và nguồn legacy không thể là production candidate.
 
 Production filter semantics fail closed: source phải `APPROVED`, version phải `PUBLISHED`, `effective_from <= effective_at`, `effective_until > effective_at`; nếu `effective_until` null thì `applicability_reviewed_at` phải có giá trị. Campus, audience và faculty/program scope phải intersect với trusted authorized context; empty/missing scope không bao giờ là allow-all. Synthetic source chỉ được candidate khi profile và trusted context cùng cho phép simulation. Các predicate này phải nằm trong cùng SQL candidate relation trước lexical/vector ranking và `LIMIT`.
 

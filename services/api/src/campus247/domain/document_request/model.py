@@ -21,6 +21,7 @@ class DocumentRequestStatus(StrEnum):
     SUBMITTED = "SUBMITTED"
     VALIDATING = "VALIDATING"
     PROCESSING = "PROCESSING"
+    WAITING_STUDENT = "WAITING_STUDENT"
     READY = "READY"
     FULFILLED = "FULFILLED"
     REJECTED = "REJECTED"
@@ -116,6 +117,11 @@ class DocumentRequest:
             )
         return self._transition_to(DocumentRequestStatus.PENDING_CONFIRMATION)
 
+    def revise_draft(self) -> DocumentRequest:
+        if self.status not in (DocumentRequestStatus.DRAFT, DocumentRequestStatus.PENDING_CONFIRMATION):
+            raise InvalidDocumentRequestStateError(f"Cannot edit draft from state {self.status}")
+        return self._transition_to(DocumentRequestStatus.DRAFT)
+
     def confirm_submit(self, action_execution_id: str, ticket_id: str | None = None) -> DocumentRequest:
         self._check_terminal()
         if self.status != DocumentRequestStatus.PENDING_CONFIRMATION:
@@ -150,6 +156,16 @@ class DocumentRequest:
                 f"Cannot mark ready from state {self.status}"
             )
         return self._transition_to(DocumentRequestStatus.READY)
+
+    def request_supplement(self) -> DocumentRequest:
+        if self.status not in (DocumentRequestStatus.VALIDATING, DocumentRequestStatus.PROCESSING):
+            raise InvalidDocumentRequestStateError(f"Cannot request supplement from state {self.status}")
+        return self._transition_to(DocumentRequestStatus.WAITING_STUDENT)
+
+    def submit_supplement(self) -> DocumentRequest:
+        if self.status != DocumentRequestStatus.WAITING_STUDENT:
+            raise InvalidDocumentRequestStateError(f"Cannot supplement from state {self.status}")
+        return self._transition_to(DocumentRequestStatus.SUBMITTED)
 
     def fulfill(self) -> DocumentRequest:
         if self.status != DocumentRequestStatus.READY:

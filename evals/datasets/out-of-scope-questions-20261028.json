@@ -1,0 +1,239 @@
+{
+ "revision": "out-of-scope-questions-20261028",
+ "purpose": "Questions the served corpus should not answer (other institutions, unrelated topics, near-domain topics absent from the corpus, ambiguous or context-free questions). Used to measure the reranker score distribution and false admission before changing the relevance gate.",
+ "limitations": [
+  "Authored by the coding agent. Absence of the other-institution, unrelated and near-domain topics was checked by keyword search over the served corpus (Quy chế 1486, Sổ tay, thông báo, chương trình đào tạo); a paraphrase could still match unseen text.",
+  "Ambiguous and context-free questions have no gold section; the expected disposition is abstention or a clarification request.",
+  "Safety, privacy and prompt-injection behaviour is not covered here."
+ ],
+ "cases": [
+  {
+   "case_id": "oos-other_institution-01",
+   "kind": "other_institution",
+   "question": "Học phí Đại học Kinh tế Quốc dân năm 2026 là bao nhiêu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-other_institution-02",
+   "kind": "other_institution",
+   "question": "Điều kiện tốt nghiệp ở Harvard là gì?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-other_institution-03",
+   "kind": "other_institution",
+   "question": "Điểm chuẩn ngành Y khoa năm nay là bao nhiêu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-other_institution-04",
+   "kind": "other_institution",
+   "question": "Quy chế đào tạo của Đại học Y Hà Nội quy định thế nào về thi lại?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-other_institution-05",
+   "kind": "other_institution",
+   "question": "Học bổng của Đại học Kinh tế Quốc dân cần điều kiện gì?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-other_institution-06",
+   "kind": "other_institution",
+   "question": "Ký túc xá của Harvard có đắt không?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-01",
+   "kind": "unrelated",
+   "question": "Dự báo thời tiết Hà Nội ngày mai thế nào?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-02",
+   "kind": "unrelated",
+   "question": "Hướng dẫn nấu món phở bò truyền thống",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-03",
+   "kind": "unrelated",
+   "question": "Giá bitcoin hôm nay là bao nhiêu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-04",
+   "kind": "unrelated",
+   "question": "Nên mua cổ phiếu nào để có lãi?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-05",
+   "kind": "unrelated",
+   "question": "Vượt đèn đỏ bị phạt bao nhiêu tiền?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-06",
+   "kind": "unrelated",
+   "question": "Thủ tục xin giấy phép lái xe hạng A1 thế nào?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-07",
+   "kind": "unrelated",
+   "question": "Làm hộ chiếu ở đâu và mất bao lâu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-08",
+   "kind": "unrelated",
+   "question": "Mức lương tối thiểu vùng 1 hiện nay là bao nhiêu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-09",
+   "kind": "unrelated",
+   "question": "Cách tính thuế thu nhập cá nhân như thế nào?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-10",
+   "kind": "unrelated",
+   "question": "Trợ cấp thất nghiệp được hưởng trong bao lâu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-11",
+   "kind": "unrelated",
+   "question": "Cách trị đau đầu tại nhà?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-unrelated-12",
+   "kind": "unrelated",
+   "question": "Dịch bài thơ Truyện Kiều sang tiếng Anh giúp tôi",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent-01",
+   "kind": "near_domain_absent",
+   "question": "Học phí ngành Y của trường HUCE là bao nhiêu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent-02",
+   "kind": "near_domain_absent",
+   "question": "Sinh viên HUCE được tiêm chủng ở đâu?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent-03",
+   "kind": "near_domain_absent",
+   "question": "Thủ tục xin visa du học Mỹ cho sinh viên HUCE thế nào?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-near_domain_absent-04",
+   "kind": "near_domain_absent",
+   "question": "Mật khẩu wifi của trường là gì?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-01",
+   "kind": "ambiguous_short",
+   "question": "học phí",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-02",
+   "kind": "ambiguous_short",
+   "question": "điểm",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-03",
+   "kind": "ambiguous_short",
+   "question": "thủ tục",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-04",
+   "kind": "ambiguous_short",
+   "question": "giúp em với",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-05",
+   "kind": "ambiguous_short",
+   "question": "xin hỏi",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-06",
+   "kind": "ambiguous_short",
+   "question": "quy định",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-07",
+   "kind": "ambiguous_short",
+   "question": "khi nào",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-08",
+   "kind": "ambiguous_short",
+   "question": "ở đâu",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-09",
+   "kind": "ambiguous_short",
+   "question": "bao nhiêu",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-ambiguous_short-10",
+   "kind": "ambiguous_short",
+   "question": "được không",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-vague_domain-01",
+   "kind": "vague_domain",
+   "question": "Em bị trượt thì sao?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-vague_domain-02",
+   "kind": "vague_domain",
+   "question": "Cho em hỏi về chuyện lần trước",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-vague_domain-03",
+   "kind": "vague_domain",
+   "question": "Cái đó làm thế nào ạ?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-vague_domain-04",
+   "kind": "vague_domain",
+   "question": "Thầy cô bảo phải nộp giấy, giấy gì ạ?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-vague_domain-05",
+   "kind": "vague_domain",
+   "question": "Em quên rồi, hạn cuối là ngày mấy?",
+   "expect": "abstain_or_clarify"
+  },
+  {
+   "case_id": "oos-vague_domain-06",
+   "kind": "vague_domain",
+   "question": "Có được không thầy?",
+   "expect": "abstain_or_clarify"
+  }
+ ]
+}

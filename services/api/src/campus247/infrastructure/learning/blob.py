@@ -33,6 +33,32 @@ class FixtureHashScanner:
         require(digest in self.hashes, 503, "SCANNER_UNAVAILABLE", "Chỉ fixture tổng hợp đã chỉ định được kiểm tra trong chế độ này.")
 
 
+class PortScannerAdapter:
+    """Maps a shared FileScanner (ports.file_scanner) onto the learning errors; signature names stay out of user text."""
+
+    def __init__(self, scanner):
+        self.scanner, self.name = scanner, scanner.name
+
+    async def scan(self, path):
+        from campus247.ports.file_scanner import ScanRejected, ScannerUnavailable
+        try:
+            receipt = await self.scanner.scan(path)
+        except ScanRejected as failure:
+            record("learning.scan", result="rejected", code=failure.code, signature=failure.signature)
+            error = LearningError(422, "FILE_REJECTED", "Tệp chưa vượt qua kiểm tra an toàn.")
+            error.signature = failure.signature  # for audit and quarantine records only, never in the message
+            raise error from None
+        except ScannerUnavailable as failure:
+            record("learning.scan", result="unavailable", code=failure.code)
+            detail = ("Cơ sở dữ liệu nhận diện mã độc đã cũ; chưa thể kiểm tra tệp." if failure.code == "SCANNER_STALE"
+                      else "Bộ quét tệp chưa sẵn sàng; tài liệu chưa được công bố.")
+            raise LearningError(503, failure.code if failure.code == "SCANNER_STALE" else "SCANNER_UNAVAILABLE", detail) from None
+        return receipt
+
+    async def health(self):
+        return await self.scanner.health()
+
+
 class ClamAVScanner:
     name = "clamav"
 

@@ -7,7 +7,7 @@ from __future__ import annotations
 import hashlib
 import json
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
@@ -27,6 +27,9 @@ class StoredArtifact:
     byte_size: int
     media_type: str
     kind: str
+    # Receipt of the malware scan that cleared this original (None when no scanner is configured). It is evidence for
+    # the audit trail only: it is not stored in the artifact row and does not take part in comparisons.
+    scan: dict | None = field(default=None, compare=False)
 
 
 def checked_path(path: Path, workspace: Path) -> Path:

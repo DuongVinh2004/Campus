@@ -1,15 +1,15 @@
 ---
 document_id: "DOC-AGENT-009"
-version: "1.0.0"
+version: "1.1.0"
 status: "approved"
 owner: "Architecture and Security Governance"
 approvers: ["Architecture Lead", "Security Lead", "Product Owner"]
-last_updated: "2026-09-22"
+last_updated: "2026-10-07"
 ---
 
 # Approved Dependency and Runtime Allowlist
 
-Tài liệu này xác định danh mục ngôn ngữ, runtime và thư viện bên thứ ba được phép sử dụng trong Campus 24/7 (V1 — HUCE Demo) theo quyết định `TASK-DOC-STACK-001`. Toàn bộ dependency phải được ghim phiên bản (pinned) trong lockfiles (`uv.lock`, `pnpm-lock.yaml`). Mọi dependency ngoài danh mục này đều bị cấm trừ khi có ADR phê duyệt.
+Tài liệu này ghi baseline ngôn ngữ, runtime và thư viện của Campus 24/7 (V1 — HUCE Demo) theo `TASK-DOC-STACK-001`. [DEC-023](../00-governance/LOCAL_EXECUTION_AUTHORITY_DECISION_20261007.md) ủy quyền executor tự review và thêm dependency/tool/runtime cần thiết cho công việc local/synthetic đã giao, không cần xin ADR/approval mới chỉ để cài gói ngoài baseline. Trước sử dụng, ghi purpose, exact version/source/hash, license/security/compatibility và transitive closure; cập nhật allowlist/lockfile hoặc manifest môi trường cô lập. Lockfiles hiện có và historical receipts giữ nguyên cho tới scoped dependency change có evidence.
 
 ## 1. Runtimes & Package Managers
 

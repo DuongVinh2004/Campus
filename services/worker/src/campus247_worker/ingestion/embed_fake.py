@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+import os
 import random
 from typing import Sequence
 
@@ -15,10 +16,19 @@ from campus247.ports.embedding import (
 )
 
 
+def _require_test_profile() -> None:
+    if os.getenv("ENVIRONMENT", "development").strip().lower() != "test":
+        raise RuntimeError("fake embedding requires the explicit test profile")
+
+
+_require_test_profile()
+
+
 class DeterministicEmbeddingAdapter:
-    """Offline, deterministic embedding adapter that produces L2-normalized vectors."""
+    """Test fixture only; its output is never semantic quality/release evidence."""
 
     def __init__(self, dimension: int = 1536, batch_limit: int = 64) -> None:
+        _require_test_profile()
         self.dimension = dimension
         self._profile = EmbeddingProfile(
             model_id="test-only/deterministic-fake",
@@ -32,6 +42,7 @@ class DeterministicEmbeddingAdapter:
         return self._profile
 
     def embed_text(self, text: str) -> list[float]:
+        _require_test_profile()
         if not text or not text.strip():
             raise EmptyEmbeddingInputError("Cannot embed empty text")
         cleaned = validate_embedding_inputs((text,), self._profile)[0]
@@ -52,6 +63,7 @@ class DeterministicEmbeddingAdapter:
         return [round(x / norm, 6) for x in raw_vec]
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        _require_test_profile()
         cleaned = validate_embedding_inputs(texts, self._profile)
         return [self.embed_text(text) for text in cleaned]
 
@@ -59,6 +71,7 @@ class DeterministicEmbeddingAdapter:
         return validate_embedding_vector(self.embed_text(text), self._profile)
 
     def embed_documents(self, texts: Sequence[str]) -> EmbeddingBatch:
+        _require_test_profile()
         cleaned = validate_embedding_inputs(texts, self._profile)
         vectors = tuple(
             validate_embedding_vector(self.embed_text(text), self._profile)

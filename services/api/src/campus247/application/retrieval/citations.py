@@ -3,6 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 import hashlib
 from typing import Any, Sequence
+from campus247.domain.retrieval import RetrievalContext
+from campus247.domain.publication import VerifiedPublication
+from campus247.domain.curriculum import VerifiedCurriculumParent
 
 
 @dataclass(frozen=True)
@@ -23,20 +26,33 @@ class CitationRecord:
     effective_from: str | None = None
     effective_until: str | None = None
     simulation_label: bool = True
+    # Opaque server-side value, excluded from prompt/public citation conversion.
+    publication: VerifiedPublication | None = None
+    release_id: str | None = None
+    applicability_note: str | None = None
+    curriculum: VerifiedCurriculumParent | None = None
 
 
 class CitationBundle:
     """Server-side turn-scoped citation bundle mapping local IDs (CIT-001) to immutable chunks."""
 
-    def __init__(self, citations: dict[str, CitationRecord]) -> None:
+    def __init__(self, citations: dict[str, CitationRecord], *, context: RetrievalContext | None = None) -> None:
+        if context is not None and not isinstance(context, RetrievalContext):
+            raise ValueError("typed retrieval context required")
         self._citations = citations
+        self._context = context
+
+    @property
+    def context(self) -> RetrievalContext | None:
+        """Request-local trusted binding; never part of prompt/citation serialization."""
+        return self._context
 
     @property
     def citations(self) -> dict[str, CitationRecord]:
         return dict(self._citations)
 
     @classmethod
-    def build(cls, chunks: Sequence[dict[str, Any]]) -> CitationBundle:
+    def build(cls, chunks: Sequence[dict[str, Any]], *, context: RetrievalContext | None = None) -> CitationBundle:
         citations: dict[str, CitationRecord] = {}
         for idx, item in enumerate(chunks):
             cit_id = f"CIT-{idx + 1:03d}"
@@ -59,11 +75,15 @@ class CitationBundle:
                 page_end=item.get("page_end"),
                 effective_from=item.get("effective_from"),
                 effective_until=item.get("effective_until"),
-                simulation_label=True,
+                simulation_label=item.get("simulation_label", item.get("source_status") == "SYNTHETIC"),
+                publication=item.get("_verified_publication") if isinstance(item.get("_verified_publication"), VerifiedPublication) else None,
+                release_id=item.get("release_id"),
+                applicability_note=item.get("applicability_note"),
+                curriculum=item.get("_verified_curriculum") if isinstance(item.get("_verified_curriculum"), VerifiedCurriculumParent) else None,
             )
             citations[cit_id] = rec
 
-        return cls(citations=citations)
+        return cls(citations=citations, context=context)
 
     def resolve(self, citation_id: str) -> CitationRecord | None:
         return self._citations.get(citation_id)
@@ -74,6 +94,7 @@ class CitationBundle:
             sec_info = f" ({rec.section_path})" if rec.section_path else ""
             blocks.append(
                 f"[{cit_id}] Nguồn: {rec.title}{sec_info}\n"
-                f"Nội dung: {rec.content_text}"
+                + (f"Phạm vi bản nguồn: {rec.applicability_note}\n" if rec.applicability_note else "")
+                + f"Nội dung: {rec.content_text}"
             )
         return "\n\n".join(blocks)

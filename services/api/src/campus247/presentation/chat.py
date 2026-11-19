@@ -26,6 +26,7 @@ from campus247.application.conversation.stream_result import (
 from campus247.presentation.errors import create_problem_details
 from campus247.presentation.identity import get_current_identity
 from campus247.ports.identity import IdentityContext
+from campus247.observability.ops_metrics import OPS, TurnObserver
 from campus247.agent.state import AgentState
 from campus247.application.conversation.history import ConversationHistoryService
 from campus247.application.conversation.read import StoredMessageError, final_payload, public_message
@@ -144,8 +145,15 @@ def create_chat_router(
             return await open_stream(conversation_id, payload, request, identity)
         # Admission control: a turn starts within the wait bound or is told at once that the system is busy.
         # Checked after authentication and before anything is saved, so a refused turn leaves no trace.
+        observer = TurnObserver(OPS)  # counts the turn from here, so waiting for a slot is part of its time
+
+        def publish_load() -> None:
+            OPS.set_gauges(in_flight=admission.in_flight, waiting=admission.waiting, limit=admission.limit)
+
         slot = await admission.acquire()
+        publish_load()
         if slot is None:
+            OPS.record_admission_rejected()
             logging.getLogger("campus247.chat").warning(
                 "chat_admission_rejected in_flight=%d waiting=%d limit=%d rejected_total=%d",
                 admission.in_flight, admission.waiting, admission.limit, admission.rejected)
@@ -159,18 +167,23 @@ def create_chat_router(
             response = await open_stream(conversation_id, payload, request, identity)
         except BaseException:
             slot.release()
+            publish_load()
             raise
         if not isinstance(response, StreamingResponse):
             slot.release()  # refused before streaming (conflict, not found, ...): the turn never ran
+            publish_load()
             return response
         inner = response.body_iterator
 
         async def released_when_done():
             try:
                 async for chunk in inner:
+                    observer.feed(chunk)
                     yield chunk
             finally:
+                observer.finish()
                 slot.release()
+                publish_load()
                 close = getattr(inner, "aclose", None)
                 if close is not None:
                     await close()

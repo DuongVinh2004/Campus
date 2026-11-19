@@ -1,0 +1,19 @@
+THÔNG BÁO về mức học phí chương trình liên kết quốc tế năm học 2027-2028 (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)
+
+1. Học phí theo ngành và hệ đào tạo
+Học phí chương trình liên kết quốc tế được thu theo năm, theo ngành và theo hệ đào tạo như sau:
+
+Ngành | Hệ đào tạo | Học phí (đồng)/năm
+Khoa học dữ liệu | Liên kết 2+2 | 36.000.000
+Khoa học dữ liệu | Liên kết 3+1 | 42.000.000
+An ninh mạng | Liên kết 2+2 | 38.500.000
+Robot và trí tuệ nhân tạo ứng dụng | Liên kết 3+1 | 45.000.000
+
+2. Học phí theo khóa
+Khóa K71 đóng học phí theo năm học, khóa K72 đóng học phí theo học kỳ. Mức học phí mỗi học kỳ của khóa K72 bằng 55% mức học phí năm.
+
+3. Thời hạn nộp
+Sinh viên nộp học phí chậm nhất ngày 15/09/2027 đối với học kỳ 1. Nộp muộn bị tính phí 100.000 đồng mỗi tuần.
+
+4. Liên hệ
+Trung tâm Hợp tác quốc tế, email: htqt@kiemthu2-huce.example, điện thoại: 024 3869 4321.

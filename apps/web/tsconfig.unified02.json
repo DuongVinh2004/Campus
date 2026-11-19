@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.service-stage6-20261014.json",
+  "compilerOptions": { "incremental": false },
+  "include": ["next-env.d.ts", "src/app/services/page.tsx", "src/features/documents/ServiceWorkspace.tsx", "src/features/assistance/AssistanceContextPanel.tsx", "src/features/assistance/BaselineRecorder.tsx", "src/lib/unified-ai-contracts.ts"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
+}

@@ -100,6 +100,19 @@ def create_sidecar_app(gateway, token: str, cap: DailySpendCap | None = None):
     async def health():
         return {"status": "ok", **counters}
 
+    @app.get("/v1/status")
+    async def status(request: Request):
+        """Counters and today's spend against the daily cap, for the operations page and the alert rules. Read only."""
+        if not authorized(request):
+            return JSONResponse({"error": "unauthorized"}, status_code=401)
+        today = None
+        if cap is not None:
+            spent, calls = cap.today()
+            reached = bool(cap.usd_cap and spent >= cap.usd_cap or cap.call_cap and calls >= cap.call_cap)
+            today = {"usd": str(spent), "calls": calls, "usd_cap": str(cap.usd_cap), "call_cap": cap.call_cap,
+                     "cap_enabled": bool(cap.usd_cap or cap.call_cap), "cap_reached": reached}
+        return {"counters": dict(counters), "today": today}
+
     @app.get("/v1/capabilities")
     async def capabilities(request: Request):
         if not authorized(request):

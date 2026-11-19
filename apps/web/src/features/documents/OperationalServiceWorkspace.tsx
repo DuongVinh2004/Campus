@@ -2,10 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AppShell, type Role } from "@/components/AppShell";
+import { ChevronRight, FileText } from "lucide-react";
+import { AppShell } from "@/components/AppShell";
 import { ApiClient, ApiClientError } from "@/lib/api/client";
 import { assistantClientId } from "@/lib/assistant-state-service";
 import { ServiceCatalog } from "./ServiceCatalog";
+import { OPS_ENABLED, problemMessage, ticketsApi, type ServiceKind } from "@/lib/campus-ops-api";
+import { SubmittedTickets } from "../tickets/SubmittedTickets";
+import { chatDraftActorScope, useActorRouteState, useTabDraftOwner } from "../chat/route-drafts";
 
 type Kind = "STUDENT_CERTIFICATE" | "GRADE_APPEAL" | "GENERAL_SUPPORT";
 type Form = { kind: Kind; purpose: string; recipient: string; course: string; reason: string };
@@ -17,17 +21,44 @@ const blank = (kind: Kind): Form => ({ kind, purpose: "", recipient: "", course:
 const endpoint = "/v1/student-preparations";
 
 export function OperationalServiceWorkspace({ history = false }: { history?: boolean }) {
-  const [actor, setActor] = useState<{ display_name: string; roles: string[] } | null>(null);
-  const [rows, setRows] = useState<Draft[]>([]), [selected, setSelected] = useState<Draft | null>(null);
-  const [form, setForm] = useState<Form>(blank("GENERAL_SUPPORT"));
-  const [editing, setEditing] = useState(false), [showHistory, setShowHistory] = useState(history);
-  const [preview, setPreview] = useState<Preview | null>(null), [pending, setPending] = useState<Pending | null>(null);
-  const [reviewed, setReviewed] = useState(false), [busy, setBusy] = useState(true), [uncertain, setUncertain] = useState(false);
-  const [error, setError] = useState(""), [notice, setNotice] = useState("");
+  return <AppShell activeNav={history ? "tickets" : "services"} userRole="guest"><ScopedServiceContent history={history} /></AppShell>;
+}
+
+function ScopedServiceContent({ history }: { history: boolean }) {
+  const owner = useTabDraftOwner();
+  if (owner.enabled && !owner.scope) return <p role="status">Đăng nhập để mở hoặc tiếp tục bản nháp riêng.</p>;
+  return <ServiceContent key={owner.scope || "standalone"} history={history} ownerScope={owner.scope} />;
+}
+
+function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope: string | null }) {
+  type Actor = { user_id?: string; subject_id?: string; display_name: string; roles: string[] };
+  const [actor, setActor] = useState<Actor | null>(null);
+  const [rows, setRows] = useState<Draft[]>([]);
+  const prefix = history ? "student-preparation:tickets:" : "student-preparation:services:";
+  const [selected, setSelected] = useActorRouteState<Draft | null>(ownerScope, prefix + "selected", null);
+  const [entries, setEntries] = useActorRouteState<Record<string, { selected: Draft | null; form: Form }>>(ownerScope, prefix + "entries", () => ({}));
+  const [form, setForm] = useActorRouteState<Form>(ownerScope, prefix + "form", () => blank("GENERAL_SUPPORT"));
+  const [editing, setEditing] = useActorRouteState(ownerScope, prefix + "editing", false);
+  const [showHistory, setShowHistory] = useActorRouteState(ownerScope, prefix + "history", history);
+  const [preview, setPreview] = useActorRouteState<Preview | null>(ownerScope, prefix + "preview", null);
+  const [pending, setPending] = useActorRouteState<Pending | null>(ownerScope, prefix + "pending", null);
+  const [reviewed, setReviewed] = useActorRouteState(ownerScope, prefix + "reviewed", false);
+  const [uncertain, setUncertain] = useActorRouteState(ownerScope, prefix + "uncertain", false);
+  const [error, setError] = useActorRouteState(ownerScope, prefix + "error", "");
+  const [notice, setNotice] = useActorRouteState(ownerScope, prefix + "notice", "");
+  const [working, setWorking] = useActorRouteState(ownerScope, prefix + "working", false);
+  const [hasDraft, setHasDraft] = useActorRouteState(ownerScope, prefix + "has-draft", false);
+  const [initializing, setInitializing] = useState(true);
+  const busy = initializing || working;
   const [focusRequest, setFocusRequest] = useState(0);
+  const [confirmSubmitId, setConfirmSubmitId] = useState<string | null>(null);
+  const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [submitResult, setSubmitResult] = useState<{ ok: boolean; message: string; ticketId?: string } | null>(null);
+  const [ticketsRefresh, setTicketsRefresh] = useState(0);
   const formPanel = useRef<HTMLElement>(null);
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const student = actor?.roles.includes("STUDENT");
-  const role: Role = actor?.roles.some(r => ["KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"].includes(r)) ? "admin" : actor ? "student" : "guest";
   const api = () => new ApiClient();
 
   useEffect(() => {
@@ -41,75 +72,189 @@ export function OperationalServiceWorkspace({ history = false }: { history?: boo
     let active = true;
     void (async () => {
       try {
-        const user = await api().get<{ display_name: string; roles: string[] }>("/v1/users/me");
+        const user = await api().get<Actor>("/v1/users/me");
         if (!active) return;
-        setActor(user);
-        if (!user.roles.includes("STUDENT")) return;
+        if (ownerScope && chatDraftActorScope(user) !== ownerScope) throw new Error("Tài khoản đã thay đổi; bản nháp riêng được giữ để đối chiếu.");
+        if (!user.roles.includes("STUDENT")) { setActor(user); return; }
         const result = await api().get<{ items: Draft[] }>(endpoint);
         if (!active) return;
-        setRows(result.items);
         const params = new URLSearchParams(window.location.search);
-        if (params.get("request")) {
-          const draft = await api().get<Draft>(`${endpoint}/${encodeURIComponent(params.get("request")!)}`);
+        const requestId = params.get("request");
+        const kind = params.has("new") ? "STUDENT_CERTIFICATE" : params.get("kind");
+        const requestedKind = !requestId && kind && Object.hasOwn(titles, kind) ? kind as Kind : null;
+        const switchKind = requestedKind && (!hasDraft || form.kind !== requestedKind || selected !== null);
+        const switchRecord = requestId && (!hasDraft || selected?.id !== requestId);
+        const blocked = hasDraft && (switchKind || switchRecord) && (working || uncertain);
+        let requested: Draft | null = null;
+        if (switchRecord && !blocked) {
+          requested = await api().get<Draft>(`${endpoint}/${encodeURIComponent(requestId!)}`);
           if (!active) return;
-          setSelected(draft); setForm(draft.form); setEditing(true); setShowHistory(true);
-        } else if (params.has("new") || params.has("kind")) {
-          const kind = params.has("new") ? "STUDENT_CERTIFICATE" : params.get("kind");
-          if (kind && kind in titles) { setForm(blank(kind as Kind)); setEditing(true); }
+        }
+        if (ownerScope) {
+          const verified = await api().get<Actor>("/v1/users/me");
+          if (!active) return;
+          if (chatDraftActorScope(verified) !== ownerScope) throw new Error("Tài khoản đã thay đổi; bản nháp riêng được giữ để đối chiếu.");
+        }
+        setActor(user);
+        setRows(result.items);
+        if (blocked) { setError("Cần đọc lại kết quả lưu của bản nháp đang chờ trước khi chuyển sang hồ sơ khác."); return; }
+        if (hasDraft && !requested && !switchKind) return;
+        const retained = { ...entries, [selected?.id || "new:" + form.kind]: { selected, form } };
+        if (requested) {
+          const restored = retained[requested.id] || { selected: requested, form: requested.form };
+          setEntries(retained); setSelected(restored.selected); setForm(restored.form);
+          setEditing(true); setShowHistory(true); setHasDraft(true);
+          setPreview(null); setPending(null); setReviewed(false);
+        } else if (switchKind && requestedKind) {
+          const restored = retained["new:" + requestedKind] || { selected: null, form: blank(requestedKind) };
+          setEntries(retained); setSelected(restored.selected); setForm(restored.form);
+          setEditing(true); setHasDraft(true); setPreview(null); setPending(null); setReviewed(false);
         }
       } catch (e) { if (active) setError(e instanceof Error ? e.message : "Chưa đọc được hồ sơ"); }
-      finally { if (active) setBusy(false); }
+      finally { if (active) setInitializing(false); }
     })();
     return () => { active = false; };
   }, []);
 
-  function choose(kind: Kind) {
-    setSelected(null); setForm(blank(kind)); setEditing(true); setPreview(null); setPending(null); setReviewed(false); setError(""); setNotice("");
-    window.history.replaceState(window.history.state, "", `${window.location.pathname}?kind=${kind}`);
+  function activate(kind: Kind, row: Draft | null = null) {
+    if (busy || uncertain) return;
+    const retained = { ...entries, [selected?.id || "new:" + form.kind]: { selected, form } };
+    const next = retained[row?.id || "new:" + kind] || { selected: row, form: row?.form || blank(kind) };
+    setEntries(retained);
+    setHasDraft(true);
+    setSelected(next.selected); setForm(next.form); setEditing(true); setPreview(null); setPending(null); setReviewed(false); setError(""); setNotice("");
+    setFocusRequest(value => value + 1);
+    window.history.replaceState(window.history.state, "", row ? `${window.location.pathname}?request=${row.id}` : `${window.location.pathname}?kind=${kind}`);
   }
-  function edit(patch: Partial<Form>) { setForm(current => ({ ...current, ...patch })); setPreview(null); setPending(null); setReviewed(false); setNotice(""); }
+  function choose(kind: Kind) { activate(kind); }
+  // Sends a saved draft to the internal one-stop workflow. The key is derived from the draft id and version, so a
+  // retry (or a second click) of the same version replays the same ticket instead of creating a duplicate.
+  async function submitDraft(row: Draft) {
+    const lines = [
+      row.form.purpose.trim() && `Mục đích: ${row.form.purpose.trim()}`,
+      row.form.recipient.trim() && `Đơn vị nhận: ${row.form.recipient.trim()}`,
+      row.form.course.trim() && `Học phần: ${row.form.course.trim()}`,
+      row.form.reason.trim() && `Nội dung: ${row.form.reason.trim()}`,
+    ].filter(Boolean) as string[];
+    const summary = lines.join("\n");
+    if (summary.length < 10) {
+      setSubmitResult({ ok: false, message: "Nháp còn quá ngắn. Hãy mở nháp, bổ sung nội dung rồi lưu lại trước khi gửi." });
+      setConfirmSubmitId(null);
+      return;
+    }
+    setSubmittingId(row.id); setSubmitResult(null);
+    try {
+      const fields = Object.fromEntries(Object.entries({ purpose: row.form.purpose, recipient: row.form.recipient, course: row.form.course, reason: row.form.reason })
+        .filter(([, value]) => value.trim()).map(([key, value]) => [key, value.trim()]));
+      const ticket = await ticketsApi.submit({ service_kind: row.form.kind as ServiceKind, title: titles[row.form.kind], summary, fields }, `draft-${row.id}-v${row.version}`);
+      setSubmitResult({ ok: true, message: `Đã gửi hồ sơ ${ticket.code} đến bộ phận Một cửa. Theo dõi tiến trình ở mục “Hồ sơ đã gửi” bên dưới.`, ticketId: ticket.id });
+      setTicketsRefresh(value => value + 1);
+      window.dispatchEvent(new Event("campus:notifications-changed"));
+    } catch (e) {
+      setSubmitResult({ ok: false, message: problemMessage(e, "Chưa gửi được hồ sơ. Nháp của bạn vẫn được giữ nguyên.") });
+    } finally { setSubmittingId(null); setConfirmSubmitId(null); }
+  }
+  function edit(patch: Partial<Form>) { setHasDraft(true); setForm(current => ({ ...current, ...patch })); setPreview(null); setPending(null); setReviewed(false); setNotice(""); }
   async function prepare() {
-    setBusy(true); setError(""); setNotice("");
+    if (busy) return;
+    setWorking(true); setError(""); setNotice("");
     try {
       const result = await api().post<Preview>(`${endpoint}/preview`, { form, document_id: selected?.id ?? null, expected_version: selected?.version ?? 0 });
       setPreview(result); setReviewed(false);
       setPending({ preview_id: result.preview_id, confirmation_token: result.confirmation_token, client_id: assistantClientId(), confirmed: true });
     } catch (e) { setError(e instanceof Error ? e.message : "Chưa xem trước được; nội dung được giữ"); }
-    finally { setBusy(false); }
+    finally { setWorking(false); }
   }
   async function save() {
-    if (!pending || !reviewed) return;
-    setBusy(true); setError("");
+    if (!pending || !reviewed || busy) return;
+    setWorking(true); setUncertain(true); setError("");
     try {
       const result = await api().post<{ effect: string; document: Draft; receipt_id: string }>(`${endpoint}/save`, pending);
       if (result.effect !== "draft_saved" || result.document.id !== preview?.payload.id || result.document.sent_to_university !== false) throw new Error("Chưa xác nhận được kết quả lưu");
       setSelected(result.document); setForm(result.document.form);
+      setEntries(current => ({ ...current, [result.document.id]: { selected: result.document, form: result.document.form },
+        ...(!selected ? { ["new:" + result.document.form.kind]: { selected: null, form: blank(result.document.form.kind) } } : {}) }));
       setRows(current => [result.document, ...current.filter(r => r.id !== result.document.id)]);
       setPreview(null); setPending(null); setUncertain(false); setShowHistory(true);
       setNotice(`Đã lưu nháp · Biên nhận ${result.receipt_id}. Chưa gửi đến trường.`);
-      window.history.replaceState(window.history.state, "", `${window.location.pathname}?request=${result.document.id}`);
+      if (mounted.current) window.history.replaceState(window.history.state, "", `${window.location.pathname}?request=${result.document.id}`);
     } catch (e) {
       setUncertain(!(e instanceof ApiClientError && e.problem.status >= 400 && e.problem.status < 500));
       setError(e instanceof Error ? e.message : "Chưa rõ kết quả lưu; đọc lại bằng cùng mã lưu");
-    } finally { setBusy(false); }
+    } finally { setWorking(false); }
   }
 
-  return <AppShell activeNav={history ? "tickets" : "services"} userRole={role}>
+  const visibleRows = selected && !rows.some(row => row.id === selected.id) ? [selected, ...rows] : rows;
+
+  return <>
     <div className="campus-workflow space-y-5">
-      <header className="campus-page-heading"><div><h1 className="text-2xl font-semibold">{history ? "Hồ sơ của tôi" : "Dịch vụ học vụ"}</h1><p className="mt-2 text-sm">{actor?.display_name ? `${actor.display_name} · ` : ""}Dùng chung tài khoản, trợ lý và lịch sử trên Campus 24/7.</p></div></header>
-      <p className="campus-panel text-sm" role="status">Bạn có thể chuẩn bị, xem trước và lưu nháp riêng tại đây. Chưa kết nối hệ thống tiếp nhận của HUCE, xác thực hồ sơ sinh viên hoặc dữ liệu điểm; chưa có yêu cầu nào từ trang này được gửi đến trường.</p>
-      {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-red-800">{error} Nội dung đang soạn được giữ.</p>}
+      <header className="campus-page-heading"><div data-eyebrow="Dịch vụ một cửa"><h1 className="text-2xl font-semibold">{history ? "Hồ sơ của tôi" : "Dịch vụ học vụ"}</h1><p className="mt-2 text-sm">{actor?.display_name ? `${actor.display_name} · ` : ""}Dùng chung tài khoản, trợ lý và lịch sử trên Campus 24/7.</p></div></header>
+      <p className="campus-panel text-sm" role="status">Bạn có thể chuẩn bị, xem trước và lưu nháp riêng tại đây, rồi gửi vào hệ thống Một cửa nội bộ của Campus 24/7. Hồ sơ chưa được chuyển đến hệ thống tiếp nhận chính thức của HUCE; hệ thống cũng chưa xác thực hồ sơ sinh viên hoặc dữ liệu điểm.</p>
+      {error && <p role="alert" className="rounded-xl border border-[var(--color-danger-subtle)] bg-[var(--surface-subtle)] p-3 text-xs text-[var(--color-danger)]">{error} Nội dung đang soạn được giữ.</p>}
       {busy && <p role="status">Đang đọc hoặc lưu hồ sơ…</p>}
-      {notice && <p role="status" className="rounded-xl bg-green-50 p-3 text-green-800">{notice}</p>}
+      {notice && <p role="status" className="rounded-xl border border-[var(--color-success-subtle)] bg-[var(--surface-subtle)] p-3 text-xs text-[var(--color-success)]">{notice}</p>}
       {!actor && !busy && <Link href="/login" className="fluent-btn-primary">Đăng nhập</Link>}
       {actor && !student && <p>Tài khoản này quản trị nguồn. <Link href="/knowledge/sources" className="underline">Mở quản trị nguồn</Link> hoặc <Link href="/login" className="underline">đăng nhập tài khoản sinh viên</Link> để chuẩn bị hồ sơ cá nhân.</p>}
       {!editing && history && !!student && <Link href="/services" className="fluent-btn-primary w-fit">Chuẩn bị thủ tục mới</Link>}
       {!editing && !history && <ServiceCatalog preparationOnly authenticated={!!student} onChoose={choose} onCertificate={() => choose("STUDENT_CERTIFICATE")} onHistory={() => setShowHistory(true)} />}
-      {student && showHistory && <section className="campus-panel space-y-3"><h2 className="text-lg font-semibold">Nháp đã lưu của tôi</h2>{!rows.length && !busy && <p>Chưa có nháp đã lưu.</p>}<ul className="space-y-2">{rows.map(row => <li key={row.id}><button type="button" disabled={busy || uncertain} className="campus-record-option w-full rounded-xl border p-3 text-left" onClick={() => {
-        setSelected(row); setForm(row.form); setEditing(true); setPreview(null); setPending(null); setReviewed(false); setNotice(""); setError("");
-        setFocusRequest(value => value + 1);
-        window.history.replaceState(window.history.state, "", `${window.location.pathname}?request=${row.id}`);
-      }}><strong>{titles[row.form.kind]}</strong><span className="block truncate text-sm">{(row.form.reason.trim() || row.form.purpose).replace(/\s+/g, " ").trim().slice(0, 80)}</span><span className="block text-sm">Nháp · v{row.version} · Chưa gửi đến trường · {new Date(row.updated_at).toLocaleString("vi-VN")}</span></button></li>)}</ul></section>}
+      {student && showHistory && (
+        <section className="campus-panel space-y-4">
+          <h2 className="text-lg font-semibold">Nháp đã lưu của tôi</h2>
+          {!visibleRows.length && !busy && (
+            <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--border-color)] py-8 text-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[var(--color-primary)]">
+                <FileText className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <p className="text-sm text-[var(--text-secondary)]">Chưa có nháp đã lưu.</p>
+            </div>
+          )}
+          <ul className="space-y-3">
+            {visibleRows.map(row => (
+              <li key={row.id}>
+                <button
+                  type="button"
+                  disabled={busy || uncertain}
+                  className="campus-record-option group flex min-h-[56px] w-full items-center justify-between gap-3 rounded-[12px] border border-[var(--border-color)] bg-[var(--surface-card)] p-3.5 text-left transition hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={() => activate(row.form.kind, row)}
+                >
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <strong className="font-semibold">{titles[row.form.kind]}</strong>
+                    <span className="block truncate text-sm text-[var(--text-secondary)]">
+                      {(row.form.reason.trim() || row.form.purpose).replace(/\s+/g, " ").trim().slice(0, 80)}
+                    </span>
+                    <span className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-secondary)]">
+                      <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[var(--color-primary-light)] px-2 py-0.5 font-medium text-[var(--color-primary)]">
+                        <FileText className="h-3 w-3" aria-hidden="true" />
+                        <span>Nháp · v{row.version}</span>
+                      </span>
+                      <span>Chưa gửi đến trường · {new Date(row.updated_at).toLocaleString("vi-VN")}</span>
+                    </span>
+                  </div>
+                  <ChevronRight className="h-5 w-5 shrink-0 text-[var(--text-secondary)] transition-colors group-hover:text-[var(--color-primary)]" aria-hidden="true" />
+                </button>
+                {OPS_ENABLED && (
+                  <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
+                    {confirmSubmitId === row.id ? (
+                      <>
+                        <span className="text-sm text-[var(--text-secondary)]" role="status">Gửi hồ sơ này đến Một cửa? Sau khi gửi bạn không sửa được nội dung.</span>
+                        <button type="button" className="fluent-btn-primary min-h-[44px]" data-testid={`draft-submit-confirm-${row.id}`} disabled={submittingId === row.id} onClick={() => void submitDraft(row)}>
+                          {submittingId === row.id ? "Đang gửi…" : "Xác nhận gửi"}
+                        </button>
+                        <button type="button" className="fluent-btn-secondary min-h-[44px]" disabled={submittingId === row.id} onClick={() => setConfirmSubmitId(null)}>Hủy</button>
+                      </>
+                    ) : (
+                      <button type="button" className="fluent-btn-secondary min-h-[44px]" data-testid={`draft-submit-${row.id}`} disabled={busy || uncertain || !!submittingId}
+                        onClick={() => { setSubmitResult(null); setConfirmSubmitId(row.id); }}>Gửi hồ sơ</button>
+                    )}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+          {submitResult && <p role={submitResult.ok ? "status" : "alert"} className={"rounded-xl border p-3 text-sm " + (submitResult.ok ? "border-[var(--color-primary)] bg-[var(--color-primary-light)]" : "border-[var(--border-color)]")} data-testid="draft-submit-result">{submitResult.message}</p>}
+        </section>
+      )}
+      {student && history && OPS_ENABLED && <SubmittedTickets initialId={submitResult?.ticketId ?? null} refreshToken={ticketsRefresh} />}
       {student && editing && <section ref={formPanel} tabIndex={-1} aria-label="Biểu mẫu nháp" className="campus-panel space-y-4">
         <button type="button" className="fluent-btn-secondary" disabled={busy || uncertain} onClick={() => { setEditing(false); setPreview(null); setPending(null); }}>{history ? "← Hồ sơ của tôi" : "← Danh mục dịch vụ"}</button>
         <h2 className="text-xl font-semibold">Chuẩn bị {titles[form.kind].toLocaleLowerCase("vi")}</h2>
@@ -126,5 +271,5 @@ export function OperationalServiceWorkspace({ history = false }: { history?: boo
         <Link href="/chat" className="underline">Hỏi trợ lý về hướng dẫn và nguồn công khai</Link>
       </section>}
     </div>
-  </AppShell>;
+  </>;
 }

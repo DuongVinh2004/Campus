@@ -2,17 +2,17 @@ openapi: 3.1.2
 jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
 x-document-control:
   document_id: API-OAS-V1-001
-  version: 1.1.0
+  version: 1.2.1
   status: reviewed
   owner: API Architect
   approvers:
     - Solution Architect
     - Security Lead
     - Product Owner
-  last_updated: 2026-09-22
+  last_updated: 2026-10-12
 info:
   title: Campus 24/7 API
-  version: 1.1.0
+  version: 1.2.1
   description: >-
     Contract-first HTTP API skeleton for the single-institution HUCE Demo V1.
     All data is synthetic until real-data approvals exist. Write actions are
@@ -42,6 +42,168 @@ tags:
 security:
   - bearerAuth: []
 paths:
+  /v1/learning/capabilities:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1capabilities"
+  /v1/learning/terms:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1terms"
+  /v1/learning/courses:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1courses"
+  /v1/learning/admin/offerings:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1admin~1offerings"
+  /v1/learning/admin/eligible-actors:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1admin~1eligible-actors"
+  /v1/learning/offerings:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings"
+  /v1/learning/offerings/{offering_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings~1{offering_id}"
+  /v1/learning/offerings/{offering_id}/members:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings~1{offering_id}~1members"
+  /v1/learning/offerings/{offering_id}/sessions:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings~1{offering_id}~1sessions"
+  /v1/learning/sessions/{session_id}/materials:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1materials"
+  /v1/learning/materials/{material_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1materials~1{material_id}"
+  /v1/learning/materials/{material_id}/versions:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1materials~1{material_id}~1versions"
+  /v1/learning/versions/{version_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}"
+  /v1/learning/versions/{version_id}/session-contexts:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1session-contexts"
+  /v1/learning/versions/{version_id}/pages/{page_no}/me/feedback:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1pages~1{page_no}~1me~1feedback"
+  /v1/learning/sessions/{session_id}/page-feedback-window:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1page-feedback-window"
+  /v1/learning/sessions/{session_id}/page-feedback-summary:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1page-feedback-summary"
+  /v1/learning/me/page-feedback/{feedback_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1page-feedback~1{feedback_id}"
+  /v1/learning/sessions/{session_id}/page-explanations:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1page-explanations"
+  /v1/learning/page-explanations/{explanation_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1page-explanations~1{explanation_id}"
+  /v1/learning/versions/{version_id}/change-set:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1change-set"
+  /v1/learning/sessions/{session_id}/exit-tickets:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1exit-tickets"
+  /v1/learning/exit-tickets/{ticket_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1exit-tickets~1{ticket_id}"
+  /v1/learning/exit-tickets/{ticket_id}/me/submission:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1exit-tickets~1{ticket_id}~1me~1submission"
+  /v1/learning/exit-tickets/{ticket_id}/submissions:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1exit-tickets~1{ticket_id}~1submissions"
+  /v1/learning/exit-tickets/{ticket_id}/review:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1exit-tickets~1{ticket_id}~1review"
+  /v1/learning/me/idea-topics:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1idea-topics"
+  /v1/learning/me/idea-cards:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1idea-cards"
+  /v1/learning/me/idea-cards/{card_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1idea-cards~1{card_id}"
+  /v1/learning/me/idea-cards/{card_id}/recipients:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1idea-cards~1{card_id}~1recipients"
+  /v1/learning/me/idea-shares:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1idea-shares"
+  /v1/learning/shared-idea-cards:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1shared-idea-cards"
+  /v1/learning/shared-idea-cards/{share_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1shared-idea-cards~1{share_id}"
+  /v1/learning/me/idea-topics/{topic_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1idea-topics~1{topic_id}"
+  /v1/learning/me/idea-cards/{card_id}/shares:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1idea-cards~1{card_id}~1shares"
+  /v1/learning/me/idea-shares/{share_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1idea-shares~1{share_id}"
+  /v1/learning/versions/{version_id}/ocr-jobs:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1ocr-jobs"
+  /v1/learning/ocr-jobs/{job_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1ocr-jobs~1{job_id}"
+  /v1/learning/versions/{version_id}/accessible-text:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1accessible-text"
+  /v1/learning/ocr-releases/{release_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1ocr-releases~1{release_id}"
+  /v1/learning/versions/{version_id}/accessible-text/pages/{page_no}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1accessible-text~1pages~1{page_no}"
+  /v1/learning/versions/{version_id}/accessible-text/search:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1accessible-text~1search"
+  /v1/learning/upload-intents/{upload_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1upload-intents~1{upload_id}"
+  /v1/learning/me/reader-state/{version_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1reader-state~1{version_id}"
+  /v1/learning/me/bookmarks:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1bookmarks"
+  /v1/learning/me/notifications:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1notifications"
+  /v1/learning/me/annotations:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1annotations"
+  /v1/learning/versions/{version_id}/questions:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1questions"
+  /v1/learning/sessions/{session_id}/reading-instructions:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1reading-instructions"
+  /v1/learning/offerings/{offering_id}/presentations:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings~1{offering_id}~1presentations"
+  /v1/learning/presentations/{presentation_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1presentations~1{presentation_id}"
+  /v1/learning/offerings/{offering_id}/members/{member_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings~1{offering_id}~1members~1{member_id}"
+  /v1/learning/offerings/{offering_id}/archive:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings~1{offering_id}~1archive"
+  /v1/learning/sessions/{session_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}"
+  /v1/learning/offerings/{offering_id}/session-order:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings~1{offering_id}~1session-order"
+  /v1/learning/offerings/{offering_id}/materials:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1offerings~1{offering_id}~1materials"
+  /v1/learning/sessions/{session_id}/material-links:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1material-links"
+  /v1/learning/materials/{material_id}/upload-intents:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1materials~1{material_id}~1upload-intents"
+  /v1/learning/versions/{version_id}/publish:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1publish"
+  /v1/learning/versions/{version_id}/retract:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1retract"
+  /v1/learning/versions/{version_id}/cancel-publication:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1cancel-publication"
+  /v1/learning/me/bookmarks/{bookmark_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1bookmarks~1{bookmark_id}"
+  /v1/learning/me/notifications/{notification_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1notifications~1{notification_id}"
+  /v1/learning/me/annotations/{annotation_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1annotations~1{annotation_id}"
+  /v1/learning/me/annotations/{annotation_id}/share:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1me~1annotations~1{annotation_id}~1share"
+  /v1/learning/questions/{question_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1questions~1{question_id}"
+  /v1/learning/questions/{question_id}/replies:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1questions~1{question_id}~1replies"
+  /v1/learning/replies/{reply_id}/endorse:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1replies~1{reply_id}~1endorse"
+  /v1/learning/reading-instructions/{instruction_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1reading-instructions~1{instruction_id}"
+  /v1/learning/reading-instructions/{instruction_id}/seen:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1reading-instructions~1{instruction_id}~1seen"
+  /v1/learning/presentations/{presentation_id}/position:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1presentations~1{presentation_id}~1position"
+  /v1/learning/presentations/{presentation_id}/end:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1presentations~1{presentation_id}~1end"
+  /v1/learning/action-previews:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1action-previews"
+  /v1/learning/versions/{version_id}/publication-preview:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1publication-preview"
+  /v1/learning/upload-intents/{upload_id}/content:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1upload-intents~1{upload_id}~1content"
+  /v1/learning/upload-intents/{upload_id}/complete:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1upload-intents~1{upload_id}~1complete"
+  /v1/learning/upload-intents/{upload_id}/abort:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1upload-intents~1{upload_id}~1abort"
+  /v1/learning/versions/{version_id}/content:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1content"
+  /v1/learning/versions/{version_id}/download:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1download"
+  /v1/learning/presentations/{presentation_id}/events:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1presentations~1{presentation_id}~1events"
+  /v1/learning/versions/{version_id}/explain:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1versions~1{version_id}~1explain"
   /health/live:
     get:
       operationId: getLiveness
@@ -226,6 +388,41 @@ paths:
                 $ref: "#/components/schemas/MessagePage"
         "404": {$ref: "#/components/responses/Problem"}
         default: {$ref: "#/components/responses/Problem"}
+  /v1/conversations/{conversation_id}/messages/{message_id}/citations/{citation_id}/source:
+    get:
+      operationId: getConversationCitationSource
+      tags: [Conversations]
+      x-contract-id: API-CONV-005
+      x-requirement-ids: [REQ-F-CHAT-003, REQ-F-RAG-004]
+      x-control-ids: [SEC-CTRL-002, SEC-CTRL-013, SEC-CTRL-014]
+      x-test-ids: [TASK-TEST-AUTHZ-001, TASK-TEST-CONTRACT-001]
+      summary: Read the authorized original excerpt behind a persisted citation
+      description: >-
+        Owner-only, unexpired conversation and validated assistant final binding.
+        The server resolves source/version/chunk IDs from the stored citation,
+        rechecks current trusted actor grants and published/effective corpus scope,
+        verifies the original chunk checksum and citation metadata/quote, and audits
+        the decision. No inference, message writes, admin access or URI fetching.
+        This returns the complete cited chunk, not an unverified full document.
+      parameters:
+        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/MessageId"
+        - name: citation_id
+          in: path
+          required: true
+          schema: {$ref: "#/components/schemas/UuidV7"}
+      responses:
+        "200":
+          description: Authorized source excerpt. Cache-Control must be no-store.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CitationSource"}
+        "401": {$ref: "#/components/responses/Problem"}
+        "404": {$ref: "#/components/responses/Problem"}
+        "422": {$ref: "#/components/responses/Problem"}
+        "429": {$ref: "#/components/responses/Problem"}
+        "503": {$ref: "#/components/responses/Problem"}
+        default: {$ref: "#/components/responses/Problem"}
   /v1/conversations/{conversation_id}/messages:stream:
     post:
       operationId: streamConversationMessage
@@ -235,6 +432,8 @@ paths:
       x-control-ids: [SEC-CTRL-006, SEC-CTRL-013, SEC-CTRL-014]
       x-test-ids: [TASK-TEST-CONTRACT-001, TASK-TEST-SEC-001]
       summary: Submit a message and stream the assistant response using SSE
+      x-sse-event-schema:
+        $ref: "../../json-schema/chat/stream-event.schema.json"
       parameters:
         - $ref: "#/components/parameters/ConversationId"
         - $ref: "#/components/parameters/IdempotencyKey"
@@ -894,6 +1093,10 @@ paths:
     get:
       operationId: getCapabilities
       tags: [Capabilities]
+      x-contract-id: API-CAPABILITY-001
+      x-requirement-ids: [REQ-NF-REL-004]
+      x-control-ids: [SEC-CTRL-017, SEC-CTRL-020]
+      x-test-ids: [TASK-TEST-CONTRACT-001]
       summary: Discover agent tools and capability manifests
       responses:
         "200":
@@ -908,6 +1111,10 @@ paths:
     get:
       operationId: getOperationCapabilities
       tags: [Capabilities]
+      x-contract-id: API-CAPABILITY-002
+      x-requirement-ids: [REQ-NF-REL-004]
+      x-control-ids: [SEC-CTRL-017, SEC-CTRL-020]
+      x-test-ids: [TASK-TEST-CONTRACT-001]
       summary: Discover operation capabilities
       responses:
         "200":
@@ -920,6 +1127,10 @@ paths:
         default: {$ref: "#/components/responses/Problem"}
 components:
   securitySchemes:
+    cookieSession:
+      type: apiKey
+      in: cookie
+      name: auth_token
     bearerAuth:
       type: http
       scheme: bearer
@@ -1261,11 +1472,28 @@ components:
         sender_type: {type: string, enum: [USER, ASSISTANT, STAFF, SYSTEM]}
         content: {type: string, maxLength: 20000}
         content_format: {type: string, enum: [PLAIN_TEXT, MARKDOWN_SAFE]}
+        final_result:
+          description: Immutable validated assistant final result; absent on user and legacy messages.
+          $ref: "../../json-schema/chat/stream-event.schema.json#/$defs/completed"
         citations:
           type: array
           maxItems: 20
           items: {$ref: "../../json-schema/citations/citation.schema.json"}
         created_at: {type: string, format: date-time}
+    CitationSource:
+      type: object
+      additionalProperties: false
+      required: [conversation_id, message_id, citation, issuer, effective_from, effective_until, content_text, content_sha256, representation]
+      properties:
+        conversation_id: {$ref: "#/components/schemas/UuidV7"}
+        message_id: {$ref: "#/components/schemas/UuidV7"}
+        citation: {$ref: "../../json-schema/citations/citation.schema.json"}
+        issuer: {type: string, minLength: 1, maxLength: 300}
+        effective_from: {type: string, format: date-time}
+        effective_until: {type: [string, 'null'], format: date-time}
+        content_text: {type: string, minLength: 1, maxLength: 20000}
+        content_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+        representation: {type: string, const: CITED_CHUNK}
     MessagePage:
       type: object
       additionalProperties: false

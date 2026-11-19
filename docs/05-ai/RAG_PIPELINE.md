@@ -1,13 +1,23 @@
 ---
 document_id: "DOC-RAG-001"
-version: "1.1.0"
+version: "1.1.2"
 status: "approved"
 owner: "Knowledge Engineering Lead"
 approvers: ["AI Architecture Lead", "Knowledge Governance Lead", "Security Architect", "AI Quality Lead"]
-last_updated: "2026-09-29"
+last_updated: "2026-10-12"
 ---
 
 # RAG ingestion, retrieval, reranking, citation và evidence gate
+
+### Mở nguồn từ citation đã lưu
+
+Theo `API-CONV-005` và DEC-023, UI mở đoạn nguồn gốc qua read API gắn với
+conversation/message/citation đã lưu. Server MUST kiểm tra ownership, retention,
+final semantics, quyền actor hiện tại và cùng eligibility predicate của retrieval
+trước khi trả đoạn gốc. Checksum chunk, metadata, locator và quote phải khớp;
+nguồn bị thu hồi, hết hiệu lực hoặc ngoài scope không được mở dù citation cũ còn
+trong lịch sử. UI hiển thị plaintext, issuer/version/effective dates/locator và
+nhãn simulation; không biến synthetic URI thành URL điều hướng hoặc quyền admin.
 
 ## 1. Mục tiêu
 
@@ -31,6 +41,34 @@ Mọi giá trị production trong pipeline này thuộc profile bất biến `ra
 | Performance | p95 <=1,800 ms; p99 <=3,000 ms trên `TP-RAG`; error rate <1%; benchmark phải ghi hardware, concurrency, pool và memory |
 
 Profile thiếu field, mutable model revision, model/index mismatch hoặc artifact checksum mismatch MUST block startup/query. Unit tests MAY dùng deterministic fake nhưng fake/stub không hợp lệ làm production/release evidence.
+
+### 1.2 Local/synthetic M1 performance configuration
+
+Direct human decision ngày 12/10/2026 cho phép cấu hình hiệu năng hữu hạn để
+nghiệm thu M1. Các deadline 700/1,800ms và CPU4/5GiB là baseline lịch sử cho chu kỳ
+local mới. Production profile/TP-RAG SLO ở bảng trên giữ nguyên; không tuyên bố
+đạt latency cũ hoặc production readiness từ phép thử local.
+
+`RuntimeDeadlines` là overlay có revision riêng, chỉ trong development/testing
+với DEMO_MODE. Không đổi index/model identity, quality thresholds, EvidenceGate
+0.78, authorization, source filters, context/token/input limits hoặc test oracles.
+Semantic/reranker adapters và overall retrieval dùng cùng effective overlay.
+Native Session, model service, provider batch và controller đọc cùng cấu hình
+local JSON đã hash và ghi receipt trước chạy. Không có timeout vô hạn.
+
+Candidate `m1-local-20261012-v1`: native 1,000ms; adapter 1,400ms; retrieval
+3,300ms; native/provider active batch 600s; controller 900s. Native 100–3,000ms,
+adapter tối đa5,000ms và ít nhất native+200ms; retrieval tối đa12,000ms và ít nhất
+2×adapter+400ms; batch30–600s; controller bao trùm batch và tối đa1,200s.
+Resource/thread configuration hiện hành giữ nguyên để tách biến deadline.
+Sau full-stack v1 timeout với native Run khoảng1,031s, người dùng yêu cầu tăng
+tiếp. Candidate `m1-local-20261012-v2`: native1,600ms; adapter2,100ms;
+retrieval4,700ms; batch/controller giữ600/900s. Ledger và mọi failed USER/reservations
+được nối tiếp. Thời gian bị terminate không phải natural completion; candidate
+v2 vẫn phải qua real acceptance và bounded repeats trước khi ghi completed.
+QPC dùng đo; monotonic/Timer dùng enforcement, cancel/join trước release
+RunOptions. Receipt phải ghi natural completion, headroom, budgets và giới hạn
+phạm vi; cấu hình candidate chưa tự tạo acceptance evidence.
 
 ## 2. Source lifecycle
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from starlette.responses import JSONResponse
 
 from campus247.application.privacy.consent import (
@@ -13,12 +13,13 @@ from campus247.presentation.identity import get_current_identity
 
 
 class RecordConsentBody(BaseModel):
-    purpose: str
-    decision: str
-    notice_version: str
+    model_config = ConfigDict(extra="forbid")
+    purpose: str = Field(min_length=1, max_length=100)
+    decision: str = Field(min_length=1, max_length=100)
+    notice_version: str = Field(min_length=1, max_length=100)
 
 
-def create_privacy_router(consent_service: PrivacyConsentService) -> APIRouter:
+def create_privacy_router(consent_service: PrivacyConsentService, authorize=None) -> APIRouter:
     router = APIRouter(tags=["Privacy"])
 
     @router.get("/v1/privacy/notice")
@@ -50,6 +51,8 @@ def create_privacy_router(consent_service: PrivacyConsentService) -> APIRouter:
     @router.get("/v1/privacy/consents")
     async def list_my_consents(request: Request) -> JSONResponse:
         identity = get_current_identity(request)
+        if authorize is not None:
+            authorize(identity)
         consents = consent_service.list_user_consents(identity.subject_id)
 
         items = [
@@ -71,6 +74,8 @@ def create_privacy_router(consent_service: PrivacyConsentService) -> APIRouter:
     @router.post("/v1/privacy/consents")
     async def record_consent(body: RecordConsentBody, request: Request) -> JSONResponse:
         identity = get_current_identity(request)
+        if authorize is not None:
+            authorize(identity)
         try:
             record = consent_service.record_consent(
                 actor=identity,

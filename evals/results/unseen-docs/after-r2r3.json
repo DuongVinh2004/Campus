@@ -1,0 +1,524 @@
+{
+ "summary": {
+  "total": 47,
+  "good": 43,
+  "good_rate": 0.915,
+  "classes": {
+   "helpful": 38,
+   "wrong": 1,
+   "correct_stop": 5,
+   "off_target": 1,
+   "incomplete": 1,
+   "dead_end": 1
+  },
+  "by_kind": {
+   "abstain_missing": {
+    "correct_stop": 1
+   },
+   "abstain_scope": {
+    "correct_stop": 1
+   },
+   "contact": {
+    "helpful": 1
+   },
+   "deadline": {
+    "helpful": 4
+   },
+   "dimension_absent": {
+    "off_target": 1,
+    "incomplete": 1,
+    "dead_end": 1
+   },
+   "inference": {
+    "wrong": 1
+   },
+   "major_present": {
+    "helpful": 2
+   },
+   "out_of_scope": {
+    "correct_stop": 1
+   },
+   "prose": {
+    "helpful": 20
+   },
+   "row_scope_excluded": {
+    "correct_stop": 2
+   },
+   "table_row": {
+    "helpful": 11
+   }
+  }
+ },
+ "results": [
+  {
+   "id": "bl-01",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Thời gian bảo lưu tối đa là 2 học kỳ liên tiếp; tổng thời gian học tại trường không vượt quá 6 năm.",
+   "reason": null,
+   "scored_text": "Thời gian bảo lưu tối đa là 2 học kỳ liên tiếp; tổng thời gian học tại trường không vượt quá 6 năm.",
+   "class": "helpful"
+  },
+  {
+   "id": "bl-02",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Lệ phí xét hồ sơ bảo lưu là 200.000 đồng, nộp tại Phòng Tài chính - Kế toán.",
+   "reason": null,
+   "scored_text": "Lệ phí xét hồ sơ bảo lưu là 200.000 đồng, nộp tại Phòng Tài chính - Kế toán.",
+   "class": "helpful"
+  },
+  {
+   "id": "bl-03",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Hạn nộp đơn bảo lưu cho học kỳ 2 năm học 2027-2028 là ngày 10/01/2028.",
+   "reason": null,
+   "scored_text": "Hạn nộp đơn bảo lưu cho học kỳ 2 năm học 2027-2028 là ngày 10/01/2028.",
+   "class": "helpful"
+  },
+  {
+   "id": "bl-04",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên nộp đơn xin bảo lưu theo mẫu và giấy tờ chứng minh lý do tại Phòng Đào tạo, phòng A1-105.",
+   "reason": null,
+   "scored_text": "Sinh viên nộp đơn xin bảo lưu theo mẫu và giấy tờ chứng minh lý do tại Phòng Đào tạo, phòng A1-105.",
+   "class": "helpful"
+  },
+  {
+   "id": "bl-05",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Kết quả xét bảo lưu được thông báo trong vòng 7 ngày làm việc kể từ ngày nhận đủ hồ sơ.",
+   "reason": null,
+   "scored_text": "Kết quả xét bảo lưu được thông báo trong vòng 7 ngày làm việc kể từ ngày nhận đủ hồ sơ.",
+   "class": "helpful"
+  },
+  {
+   "id": "bl-06",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Tổng thời gian học tại trường không vượt quá 6 năm.",
+   "reason": null,
+   "scored_text": "Tổng thời gian học tại trường không vượt quá 6 năm.",
+   "class": "helpful"
+  },
+  {
+   "id": "bl-07",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên phải hoàn thành ít nhất 1 học kỳ trước khi nộp đơn bảo lưu, trừ trường hợp ốm đau nặng.",
+   "reason": null,
+   "scored_text": "Sinh viên phải hoàn thành ít nhất 1 học kỳ trước khi nộp đơn bảo lưu, trừ trường hợp ốm đau nặng.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-01",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên đại học chính quy cần điểm rèn luyện từ 80 điểm trở lên để xét học bổng khuyến khích học tập học kỳ 1 năm học 2027-2028.",
+   "reason": null,
+   "scored_text": "Sinh viên đại học chính quy cần điểm rèn luyện từ 80 điểm trở lên để xét học bổng khuyến khích học tập học kỳ 1 năm học 2027-2028.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-02",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học bổng loại Giỏi có mức 6.000.000 đồng/học kỳ, áp dụng cho sinh viên có điểm trung bình chung từ 3,2 đến dưới 3,6.",
+   "reason": null,
+   "scored_text": "Học bổng loại Giỏi có mức 6.000.000 đồng/học kỳ, áp dụng cho sinh viên có điểm trung bình chung từ 3,2 đến dưới 3,6.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-03",
+   "kind": "inference",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên đại học chính quy có điểm trung bình chung học kỳ từ 3,2 trở lên và điểm rèn luyện từ 80 điểm trở lên; không bị kỷ luật từ mức khiển trách trở lên trong học kỳ xét.\nHọc bổng loại Xuất sắc: điều kiện điểm trung bình chung từ 3,6 đến 4,0, mức 8.000.000 đồng/học kỳ.\nHọc bổng loại Giỏi: điều kiện điểm trung bình chung từ 3,2 đến dưới 3,6, mức 6.000.000 đồng/học kỳ.\nHọc bổng loại Khá: điều kiện điểm trung bình chung từ 2,5 đến dưới 3,2, mức 4.000.000 đồng/học kỳ.",
+   "reason": null,
+   "scored_text": "Sinh viên đại học chính quy có điểm trung bình chung học kỳ từ 3,2 trở lên và điểm rèn luyện từ 80 điểm trở lên; không bị kỷ luật từ mức khiển trách trở lên trong học kỳ xét.\nHọc bổng loại Xuất sắc: điều kiện điểm trung bình chung từ 3,6 đến 4,0, mức 8.000.000 đồng/học kỳ.\nHọc bổng loại Giỏi: điều kiện điểm trung bình chung từ 3,2 đến dưới 3,6, mức 6.000.000 đồng/học kỳ.\nHọc bổng loại Khá: điều kiện điểm trung bình chung từ 2,5 đến dưới 3,2, mức 4.000.000 đồng/học kỳ.",
+   "class": "wrong"
+  },
+  {
+   "id": "hb-04",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Sinh viên nộp hồ sơ xét học bổng khuyến khích học tập từ ngày 01/10/2027 đến hết ngày 15/10/2027 tại Phòng Công tác sinh viên.\nHồ sơ nộp sau thời hạn không được xét.\n\nMức này phụ thuộc vào học kỳ hoặc năm học. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Sinh viên nộp hồ sơ xét học bổng khuyến khích học tập từ ngày 01/10/2027 đến hết ngày 15/10/2027 tại Phòng Công tác sinh viên.\nHồ sơ nộp sau thời hạn không được xét.\n\nMức này phụ thuộc vào học kỳ hoặc năm học. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.\nHọc kỳ 1 năm học 2027-2028\nHọc kỳ 2 năm học 2027-2028",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-05",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học bổng của Công ty ABC dành cho sinh viên ngành Trí tuệ nhân tạo có mức 10.000.000 đồng mỗi năm.",
+   "reason": null,
+   "scored_text": "Học bổng của Công ty ABC dành cho sinh viên ngành Trí tuệ nhân tạo có mức 10.000.000 đồng mỗi năm.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-06",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Hồ sơ xét học bổng khuyến khích học tập gồm: Đơn đề nghị xét học bổng, bảng điểm học kỳ có xác nhận của khoa, và giấy xác nhận điểm rèn luyện.",
+   "reason": null,
+   "scored_text": "Hồ sơ xét học bổng khuyến khích học tập gồm: Đơn đề nghị xét học bổng, bảng điểm học kỳ có xác nhận của khoa, và giấy xác nhận điểm rèn luyện.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-07",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên nộp hồ sơ xét học bổng khuyến khích học tập từ ngày 01/10/2027 đến hết ngày 15/10/2027 tại Phòng Công tác sinh viên.\nPhòng Công tác sinh viên, điện thoại: 024 3869 7890, email: ctsv@kiemthu-huce.example.",
+   "reason": null,
+   "scored_text": "Sinh viên nộp hồ sơ xét học bổng khuyến khích học tập từ ngày 01/10/2027 đến hết ngày 15/10/2027 tại Phòng Công tác sinh viên.\nPhòng Công tác sinh viên, điện thoại: 024 3869 7890, email: ctsv@kiemthu-huce.example.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-08",
+   "kind": "abstain_scope",
+   "expected": "abstain",
+   "outcome": "refuse",
+   "text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "reason": "no_source",
+   "scored_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.\nQUYẾT ĐỊNH 1127/QĐ-ĐHXDHN (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)",
+   "class": "correct_stop"
+  },
+  {
+   "id": "hp-01",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ năm học 2027-2028.",
+   "reason": null,
+   "scored_text": "Chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ năm học 2027-2028.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-02",
+   "kind": "dimension_absent",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Nguồn chỉ nêu học phí thực hành theo ngành đối với khóa K70: ngành Trí tuệ nhân tạo là 650.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Nguồn chỉ nêu học phí thực hành theo ngành đối với khóa K70: ngành Trí tuệ nhân tạo là 650.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "class": "off_target"
+  },
+  {
+   "id": "hp-03",
+   "kind": "dimension_absent",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Năm học 2027-2028, chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ.\nHọc phí thực hành 600.000 đồng/tín chỉ cho ngành Quản lý đô thị và công trình chỉ áp dụng đối với khóa K70.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Năm học 2027-2028, chương trình đại trà áp dụng cho K68 đến K70 có mức học phí 610.000 đồng/tín chỉ.\nHọc phí thực hành 600.000 đồng/tín chỉ cho ngành Quản lý đô thị và công trình chỉ áp dụng đối với khóa K70.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "class": "incomplete"
+  },
+  {
+   "id": "hp-04",
+   "kind": "major_present",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Học phí thực hành ngành Kỹ thuật cấp thoát nước khóa K70 là 595.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Học phí thực hành ngành Kỹ thuật cấp thoát nước khóa K70 là 595.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-05",
+   "kind": "major_present",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Học phần thực hành, thí nghiệm của khóa K70 ngành Trí tuệ nhân tạo có mức học phí thực hành 650.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Học phần thực hành, thí nghiệm của khóa K70 ngành Trí tuệ nhân tạo có mức học phí thực hành 650.000 đồng/tín chỉ.\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.\nK70\nK69\nK68\nK66",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-06",
+   "kind": "row_scope_excluded",
+   "expected": "abstain",
+   "outcome": "refuse",
+   "text": "Mình đã tìm thấy nguồn nhưng chưa xác minh được phát biểu để trả lời.",
+   "reason": "unverified",
+   "scored_text": "Mình đã tìm thấy nguồn nhưng chưa xác minh được phát biểu để trả lời.",
+   "class": "correct_stop"
+  },
+  {
+   "id": "hp-07",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Chương trình tiên tiến áp dụng từ K69 có mức học phí 785.000 đồng/tín chỉ năm học 2027-2028.",
+   "reason": null,
+   "scored_text": "Chương trình tiên tiến áp dụng từ K69 có mức học phí 785.000 đồng/tín chỉ năm học 2027-2028.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-08",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Sinh viên học lại đóng học phí bằng 120% mức học phí của chương trình đang theo học.\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.",
+   "reason": null,
+   "scored_text": "Sinh viên học lại đóng học phí bằng 120% mức học phí của chương trình đang theo học.\n\nMức này phụ thuộc vào khóa hoặc năm học và ngành, hệ hoặc chương trình đào tạo. Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.\nK70\nK69\nK68\nK66",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-09",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Hạn nộp học phí học kỳ 2 năm học 2027-2028 là ngày 28/02/2028.",
+   "reason": null,
+   "scored_text": "Hạn nộp học phí học kỳ 2 năm học 2027-2028 là ngày 28/02/2028.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-10",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Nộp muộn bị tính phí chậm nộp 50.000 đồng mỗi tháng.",
+   "reason": null,
+   "scored_text": "Nộp muộn bị tính phí chậm nộp 50.000 đồng mỗi tháng.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-11",
+   "kind": "contact",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Phòng Tài chính - Kế toán, email: taichinh@kiemthu-huce.example, điện thoại: 024 3869 1234.",
+   "reason": null,
+   "scored_text": "Phòng Tài chính - Kế toán, email: taichinh@kiemthu-huce.example, điện thoại: 024 3869 1234.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-12",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Chương trình Kỹ sư chất lượng cao áp dụng từ K68 có mức học phí 548.000 đồng/tín chỉ năm học 2027-2028.",
+   "reason": null,
+   "scored_text": "Chương trình Kỹ sư chất lượng cao áp dụng từ K68 có mức học phí 548.000 đồng/tín chỉ năm học 2027-2028.",
+   "class": "helpful"
+  },
+  {
+   "id": "hp-13",
+   "kind": "dimension_absent",
+   "expected": "answer",
+   "outcome": "refuse",
+   "text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "reason": "no_source",
+   "scored_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.\nQUYẾT ĐỊNH 1127/QĐ-ĐHXDHN (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)\nHƯỚNG DẪN THỦ TỤC BẢO LƯU KẾT QUẢ HỌC TẬP (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)",
+   "class": "dead_end"
+  },
+  {
+   "id": "ktx-01",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Giá phòng 6 người là 450.000 đồng/tháng.",
+   "reason": null,
+   "scored_text": "Giá phòng 6 người là 450.000 đồng/tháng.",
+   "class": "helpful"
+  },
+  {
+   "id": "ktx-02",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên nộp đơn đăng ký ở ký túc xá tại Ban Quản lý ký túc xá trước ngày 15/08/2027.",
+   "reason": null,
+   "scored_text": "Sinh viên nộp đơn đăng ký ở ký túc xá tại Ban Quản lý ký túc xá trước ngày 15/08/2027.",
+   "class": "helpful"
+  },
+  {
+   "id": "ktx-03",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Mỗi sinh viên đặt cọc 500.000 đồng khi nhận phòng; khoản cọc được hoàn trả khi trả phòng đúng quy định.",
+   "reason": null,
+   "scored_text": "Mỗi sinh viên đặt cọc 500.000 đồng khi nhận phòng; khoản cọc được hoàn trả khi trả phòng đúng quy định.",
+   "class": "helpful"
+  },
+  {
+   "id": "ktx-04",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Cổng ký túc xá đóng lúc 23 giờ 00 và mở lại lúc 05 giờ 00 sáng hôm sau.",
+   "reason": null,
+   "scored_text": "Cổng ký túc xá đóng lúc 23 giờ 00 và mở lại lúc 05 giờ 00 sáng hôm sau.",
+   "class": "helpful"
+  },
+  {
+   "id": "ktx-05",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Khách đến thăm chỉ được vào ký túc xá đến 21 giờ 00 và phải đăng ký tại bàn trực.",
+   "reason": null,
+   "scored_text": "Khách đến thăm chỉ được vào ký túc xá đến 21 giờ 00 và phải đăng ký tại bàn trực.",
+   "class": "helpful"
+  },
+  {
+   "id": "ktx-06",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Vi phạm từ lần thứ ba bị buộc ra khỏi ký túc xá và không được đăng ký ở lại trong học kỳ kế tiếp.",
+   "reason": null,
+   "scored_text": "Vi phạm từ lần thứ ba bị buộc ra khỏi ký túc xá và không được đăng ký ở lại trong học kỳ kế tiếp.",
+   "class": "helpful"
+  },
+  {
+   "id": "ktx-07",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên thuộc diện chính sách được giảm 30% giá phòng.",
+   "reason": null,
+   "scored_text": "Sinh viên thuộc diện chính sách được giảm 30% giá phòng.",
+   "class": "helpful"
+  },
+  {
+   "id": "ktx-08",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Nấu ăn bằng bếp điện hoặc bếp gas trong phòng ở là hành vi bị cấm.",
+   "reason": null,
+   "scored_text": "Nấu ăn bằng bếp điện hoặc bếp gas trong phòng ở là hành vi bị cấm.",
+   "class": "helpful"
+  },
+  {
+   "id": "ktx-09",
+   "kind": "abstain_missing",
+   "expected": "abstain",
+   "outcome": "refuse",
+   "text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "reason": "no_source",
+   "scored_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.\nNỘI QUY KÝ TÚC XÁ SINH VIÊN (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)",
+   "class": "correct_stop"
+  },
+  {
+   "id": "lt-01",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học phần Cơ sở dữ liệu (IT3090) khóa K68 thi ngày 05/12/2027, giờ thi 07:30, phòng A2-201.",
+   "reason": null,
+   "scored_text": "Học phần Cơ sở dữ liệu (IT3090) khóa K68 thi ngày 05/12/2027, giờ thi 07:30, phòng A2-201.",
+   "class": "helpful"
+  },
+  {
+   "id": "lt-02",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học phần Cơ sở dữ liệu (IT3090) của khóa K69 thi ngày 06/12/2027, giờ thi 09:30, tại phòng A2-203.",
+   "reason": null,
+   "scored_text": "Học phần Cơ sở dữ liệu (IT3090) của khóa K69 thi ngày 06/12/2027, giờ thi 09:30, tại phòng A2-203.",
+   "class": "helpful"
+  },
+  {
+   "id": "lt-03",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Môn Mạng máy tính (IT3080), khóa K68, thi ngày 07/12/2027 lúc 13:30 tại phòng H3-301.",
+   "reason": null,
+   "scored_text": "Môn Mạng máy tính (IT3080), khóa K68, thi ngày 07/12/2027 lúc 13:30 tại phòng H3-301.",
+   "class": "helpful"
+  },
+  {
+   "id": "lt-04",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học phần Xác suất thống kê (MI2020) khóa K70 thi ngày 08/12/2027, giờ thi 07:30.\nPhòng thi học phần Xác suất thống kê (MI2020) khóa K70 là A2-402.",
+   "reason": null,
+   "scored_text": "Học phần Xác suất thống kê (MI2020) khóa K70 thi ngày 08/12/2027, giờ thi 07:30.\nPhòng thi học phần Xác suất thống kê (MI2020) khóa K70 là A2-402.",
+   "class": "helpful"
+  },
+  {
+   "id": "lt-05",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học phần Trí tuệ nhân tạo cơ bản (IT3190) khóa K69 thi ngày 10/12/2027, giờ thi 15:30, phòng thi H5-102.",
+   "reason": null,
+   "scored_text": "Học phần Trí tuệ nhân tạo cơ bản (IT3190) khóa K69 thi ngày 10/12/2027, giờ thi 15:30, phòng thi H5-102.",
+   "class": "helpful"
+  },
+  {
+   "id": "lt-06",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên đến muộn quá 15 phút kể từ khi bắt đầu giờ thi không được vào phòng thi.",
+   "reason": null,
+   "scored_text": "Sinh viên đến muộn quá 15 phút kể từ khi bắt đầu giờ thi không được vào phòng thi.",
+   "class": "helpful"
+  },
+  {
+   "id": "lt-07",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên không được mang điện thoại vào phòng thi.\nSinh viên vi phạm quy chế thi bị đình chỉ thi và nhận điểm 0 cho học phần đó.",
+   "reason": null,
+   "scored_text": "Sinh viên không được mang điện thoại vào phòng thi.\nSinh viên vi phạm quy chế thi bị đình chỉ thi và nhận điểm 0 cho học phần đó.",
+   "class": "helpful"
+  },
+  {
+   "id": "lt-08",
+   "kind": "row_scope_excluded",
+   "expected": "abstain",
+   "outcome": "refuse",
+   "text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "reason": "no_source",
+   "scored_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.\nQUYẾT ĐỊNH 1127/QĐ-ĐHXDHN (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)",
+   "class": "correct_stop"
+  },
+  {
+   "id": "lt-09",
+   "kind": "table_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học phần Cấp thoát nước đô thị (mã WS3010), khóa K68, thi ngày 12/12/2027, giờ thi 09:30, phòng B1-105.",
+   "reason": null,
+   "scored_text": "Học phần Cấp thoát nước đô thị (mã WS3010), khóa K68, thi ngày 12/12/2027, giờ thi 09:30, phòng B1-105.",
+   "class": "helpful"
+  },
+  {
+   "id": "oos-01",
+   "kind": "out_of_scope",
+   "expected": "oos",
+   "outcome": "refuse",
+   "text": "Câu hỏi này nằm ngoài phạm vi thông tin mình hỗ trợ.",
+   "reason": "out_of_scope",
+   "scored_text": "Câu hỏi này nằm ngoài phạm vi thông tin mình hỗ trợ.",
+   "class": "correct_stop"
+  }
+ ]
+}

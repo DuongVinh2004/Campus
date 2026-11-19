@@ -24,7 +24,12 @@ import {
 } from "lucide-react";
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { AnswerFeedback, type FeedbackRating } from "./AnswerFeedback";
+import { ThemeToggle } from "../../components/ThemeToggle";
+
 import { FAILED_GUIDANCE, type AgentProgress } from "./sse";
+
+/** An answer can only be rated once the server has stored it; until then its id is a local placeholder. */
+const SERVER_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface ChatCitation {
   id: string;
@@ -94,6 +99,7 @@ export interface ChatPanelProps {
   onComposerSettings?: () => void;
   onOpenHistory?: () => void;
   composerValue?: string;
+  initialDraft?: string;
   onComposerChange?: (value: string) => void;
   disabled?: boolean;
   audience?: "student" | "staff";
@@ -161,8 +167,37 @@ const OPERATIONAL_PROMPTS = [
   { title: "QĐ 2114: bảo vệ tài khoản", prompt: "Theo Quyết định 2114, người dùng cần bảo vệ tài khoản thế nào?" },
 ];
 
+// Starter questions grouped by what students actually come to ask; every one is answerable from the published sources.
+const STARTER_GROUPS: { label: string; items: { title: string; prompt: string }[] }[] = [
+  { label: "Học phí & miễn giảm", items: [
+    { title: "Học phí theo khóa và chương trình", prompt: "Tôi cần tra học phí CNTT theo khóa và chương trình" },
+    { title: "Giấy tờ để được miễn học phí", prompt: "Sinh viên khuyết tật cần giấy tờ gì để được miễn học phí?" },
+  ] },
+  { label: "Quy chế đào tạo", items: [
+    { title: "Cảnh báo học tập bao nhiêu lần thì buộc thôi học", prompt: "Bị cảnh báo học tập mấy lần thì buộc thôi học?" },
+    { title: "Số tín chỉ đăng ký mỗi học kỳ", prompt: "Khối lượng đăng ký tối thiểu và tối đa trong một học kỳ là bao nhiêu?" },
+    { title: "Điều kiện xếp loại tốt nghiệp giỏi", prompt: "Điểm tích lũy bao nhiêu thì xếp loại tốt nghiệp giỏi?" },
+  ] },
+  { label: "Đời sống sinh viên", items: [
+    { title: "Quay lại học sau khi nghỉ tạm thời", prompt: "Hết thời gian nghỉ học tạm thời thì nộp đơn nhập học lại ở đâu?" },
+    { title: "Khám bệnh ở Trạm Y tế trường", prompt: "Khám ở Trạm Y tế trường có cần mang thẻ BHYT không?" },
+    { title: "QĐ 2114: bảo vệ tài khoản", prompt: "Theo Quyết định 2114, người dùng cần bảo vệ tài khoản thế nào?" },
+  ] },
+];
+
 function displayText(text: string): string {
   return text.replace(/\[CIT-(\d{3})\]/g, (_, number: string) => `[${Number(number)}]`);
+}
+
+// The server ends some replies with a "next steps" block (fixed text and values from readable sources). It is shown
+// as buttons instead of a bullet list; any other reader of the stored text still sees plain bullets.
+const GUIDANCE_MARKER = "Gợi ý hỏi tiếp:";
+export function splitGuidance(text: string): { body: string; suggestions: string[] } {
+  const at = text.lastIndexOf("\n\n" + GUIDANCE_MARKER + "\n");
+  if (at < 0) return { body: text, suggestions: [] };
+  const items = text.slice(at + GUIDANCE_MARKER.length + 3).split("\n").map(line => line.trim())
+    .filter(line => line.startsWith("- ")).map(line => line.slice(2).trim()).filter(Boolean);
+  return items.length ? { body: text.slice(0, at), suggestions: items.slice(0, 5) } : { body: text, suggestions: [] };
 }
 
 async function copyToClipboard(text: string): Promise<boolean> {
@@ -383,10 +418,20 @@ export function ChatPanel({
   onClearMessages,
   citationCount,
   onOpenCitations,
-  historyContent, headerActions, hideHeader = false, chatContext, onComposerTools, onComposerSettings, onOpenHistory, composerValue, onComposerChange, disabled = false, audience, initialSidebarOpen = true,
+  historyContent, headerActions, hideHeader = false, chatContext, onComposerTools, onComposerSettings, onOpenHistory, composerValue, initialDraft = "", onComposerChange, disabled = false, audience, initialSidebarOpen = true,
 }: ChatPanelProps) {
   const operational = process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true";
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(initialDraft);
+  const [composerReady, setComposerReady] = useState(false);
+  const composerTouched = useRef(false);
+  const appliedDraft = useRef(initialDraft);
+  useEffect(() => { setComposerReady(true); }, []);
+  useEffect(() => {
+    if (appliedDraft.current === initialDraft) return;
+    appliedDraft.current = initialDraft;
+    // A delayed query seed must never replace an edit, explicit clear or send.
+    if (!composerTouched.current && initialDraft) setInput(initialDraft);
+  }, [initialDraft]);
   const [isMobile, setIsMobile] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(initialSidebarOpen);
@@ -434,6 +479,7 @@ export function ChatPanel({
     if (e) e.preventDefault();
     const trimmed = (composerValue ?? input).trim();
     if (!trimmed || isStreaming || disabled) return;
+    composerTouched.current = true;
     isNearBottomRef.current = true;
     onSendMessage?.(trimmed);
     if (!onComposerChange) setInput("");
@@ -450,6 +496,7 @@ export function ChatPanel({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    composerTouched.current = true;
     setInput(e.target.value);
     onComposerChange?.(e.target.value);
     if (textareaRef.current) {
@@ -464,7 +511,7 @@ export function ChatPanel({
   };
 
   const handleCopyMessage = async (content: string, id: string) => {
-    const success = await copyToClipboard(displayText(content));
+    const success = await copyToClipboard(splitGuidance(displayText(content)).body);
     if (success) {
       setCopiedMessageId(id);
       setTimeout(() => setCopiedMessageId(null), 2000);
@@ -607,6 +654,7 @@ export function ChatPanel({
               <span className="sr-only">Cổng thông tin & Trợ lý học vụ số — Trường Đại học Xây dựng Hà Nội</span>
             </div>}
             {headerActions}
+            <ThemeToggle className="campus-theme-toggle" />
 
             {Boolean(citationCount && citationCount > 0 && onOpenCitations) && (
               <button
@@ -657,10 +705,31 @@ export function ChatPanel({
                   Hỏi về học vụ HUCE. Trợ lý sử dụng nguồn hiện có và trích dẫn khi tìm được căn cứ.
                 </p>
 
-                {/* 2x2 Clean Prompt Cards */}
-                <div className="campus-prompt-suggestions">
-                  {(operational ? OPERATIONAL_PROMPTS : PROMPT_CARDS).map((promptCard) => {
-                    return (
+                {operational ? (
+                  <div className="campus-starters">
+                    {STARTER_GROUPS.map((group) => (
+                      <section key={group.label} className="campus-starter-group">
+                        <h2>{group.label}</h2>
+                        <div className="campus-prompt-suggestions">
+                          {group.items.map((promptCard) => (
+                            <button
+                              key={promptCard.prompt}
+                              type="button"
+                              aria-label={promptCard.title}
+                              disabled={disabled}
+                              onClick={() => handlePromptClick(promptCard.prompt)}
+                              className="campus-prompt-chip"
+                            >
+                              {promptCard.title}
+                            </button>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="campus-prompt-suggestions">
+                    {PROMPT_CARDS.map((promptCard) => (
                       <button
                         key={promptCard.prompt}
                         type="button"
@@ -671,9 +740,9 @@ export function ChatPanel({
                       >
                         {promptCard.title}
                       </button>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -772,11 +841,23 @@ export function ChatPanel({
                           </div>
                         ) : (
                           <div className="prose-content text-[15px] sm:text-[16px] leading-[1.75] text-slate-800 dark:text-slate-200">
-                            <AssistantContent content={displayText(message.content)} blocks={message.blocks} audience={audience} />
+                            <AssistantContent content={splitGuidance(displayText(message.content)).body} blocks={message.blocks} audience={audience} />
 
                             {isProvisional && (
                               <span className="inline-block w-2 h-4 ml-0.5 bg-blue-600 dark:bg-blue-400 animate-pulse align-middle" />
                             )}
+                          </div>
+                        )}
+
+                        {!isProvisional && !isFailed && !isStopped && splitGuidance(displayText(message.content)).suggestions.length > 0 && (
+                          <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Gợi ý hỏi tiếp" data-testid="guidance-chips">
+                            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mr-1">Gợi ý hỏi tiếp:</span>
+                            {splitGuidance(displayText(message.content)).suggestions.map(item => (
+                              <button key={item} type="button" disabled={isStreaming || disabled} onClick={() => handlePromptClick(item)}
+                                className="min-h-[36px] rounded-full border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 px-3.5 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50">
+                                {item}
+                              </button>
+                            ))}
                           </div>
                         )}
 
@@ -879,7 +960,7 @@ export function ChatPanel({
                                 <Copy className="w-4 h-4" />
                               )}
                             </button>
-                            {onFeedbackSubmit && <AnswerFeedback
+                            {onFeedbackSubmit && SERVER_ID.test(message.id) && <AnswerFeedback
                               answerId={message.id}
                               onFeedbackSubmit={onFeedbackSubmit}
                             />}
@@ -924,6 +1005,7 @@ export function ChatPanel({
                 ref={textareaRef}
                 id="chat-input"
                 value={composerValue ?? input}
+                disabled={!composerReady}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 aria-label="Đặt câu hỏi"

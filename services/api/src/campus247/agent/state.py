@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
+from campus247.application.conversation.history import HistoryContext
 
 
 class Route(StrEnum):
@@ -52,6 +53,12 @@ class NormalizedTurn:
     user_id: str
     query: str
     locale: str = "vi-VN"
+    history: HistoryContext | None = None
+    # Server callbacks only; never serialized as an executable model tool.
+    presentation: Any = None
+    context_guard: Any = None
+    coordination_guard: Any = None  # Server identity/session callback, never model data.
+    personal_memory: Any = None  # Fresh actor-bound passive data callback; never a writer/tool.
 
 
 @dataclass(frozen=True)
@@ -80,6 +87,10 @@ class DraftResponse:
     is_grounded: bool = False
     gate_decision: str = "abstain"
     gate_reasons: tuple[str, ...] = ()
+    grounded_claims: tuple[Any, ...] = ()
+    partial_note: str | None = None  # Fixed server text; never model-authored.
+    preface: str | None = None       # Fixed server text shown before the answer (scope caveat).
+    guidance: tuple[str, ...] = ()   # Server-derived next-step suggestions shown after the answer.
 
 
 @dataclass(frozen=True)
@@ -127,6 +138,10 @@ class ToolFlowState:
     coordinator_status: str | None = None
     idempotency_key: str | None = None
     correlation_id: str | None = None
+    search_question: str | None = None  # Validated accent restoration; never source facts or scope.
+    # The router's restatement of a messy question (typos, slang, filler removed). Accepted only after the code check
+    # that every number, code, name and negation of the original survived; never source facts or scope.
+    clean_question: str | None = None
 
 
 @dataclass(frozen=True)
@@ -150,6 +165,8 @@ class AgentState:
     step_count: int = 0
     confirmation_context: ConfirmationContext | None = None
     execution_context: ExecutionContext | None = None
+    agent_run_id: str | None = None
+    knowledge_snapshot: dict[str, Any] | None = None  # Server-bound release/generations; no executable data.
 
     def __post_init__(self) -> None:
         if self.schema_version != "1.0":

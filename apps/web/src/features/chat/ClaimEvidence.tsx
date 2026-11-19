@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangleIcon } from "../../components/Icons";
+import { AlertTriangle } from "lucide-react";
 
 export interface ClaimEvidenceProps {
   id?: string;
@@ -22,25 +22,11 @@ export function ClaimEvidence({
         id={id}
         data-testid="unsupported-claim"
         title="Nội dung chưa được kiểm chứng"
-        style={{
-          backgroundColor: "#fff1f2",
-          borderBottom: "1px dotted #ef4444",
-          color: "#9f1239",
-          position: "relative",
-          padding: "0 2px",
-          borderRadius: "2px",
-        }}
+        className="relative bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-b border-dotted border-rose-500 px-1 py-0.5 rounded text-sm inline"
       >
         {text}
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            marginLeft: "4px",
-            verticalAlign: "middle",
-          }}
-        >
-          <AlertTriangleIcon size={12} />
+        <span className="inline-flex items-center ml-1 align-middle text-rose-600 dark:text-rose-400">
+          <AlertTriangle className="w-3 h-3" />
         </span>
       </span>
     );
@@ -52,14 +38,9 @@ export function ClaimEvidence({
       {citationIndices.length > 0 && (
         <sup
           data-testid="citation-badges"
-          style={{
-            marginLeft: "2px",
-            display: "inline-flex",
-            gap: "2px",
-            userSelect: "none",
-          }}
+          className="ml-0.5 inline-flex gap-0.5 select-none align-super"
         >
-          {citationIndices.map((idx, i) => (
+          {citationIndices.map((idx) => (
             <React.Fragment key={idx}>
               <button
                 type="button"
@@ -68,21 +49,7 @@ export function ClaimEvidence({
                   onCitationClick?.(idx);
                 }}
                 aria-label={`Xem nguồn trích dẫn ${idx}`}
-                style={{
-                  background: "var(--color-primary-light, #eff6ff)",
-                  color: "var(--color-primary, #1e3a8a)",
-                  border: "none",
-                  borderRadius: "2px",
-                  padding: "0 3px",
-                  fontSize: "10px",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  lineHeight: 1,
-                  height: "14px",
-                }}
+                className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/60 dark:hover:bg-blue-800/80 text-blue-800 dark:text-blue-300 border-0 rounded px-1 text-[10px] font-semibold cursor-pointer inline-flex items-center justify-center leading-none h-3.5 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 {idx}
               </button>

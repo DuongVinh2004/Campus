@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { CalendarIcon, ClockIcon, BuildingIcon, FileTextIcon, AlertTriangleIcon } from "../../components/Icons";
+import { buildIcs } from "../../lib/ics";
+import {
+  Calendar,
+  Clock,
+  Building,
+  FileText,
+  AlertTriangle,
+  Download,
+  CalendarCheck2,
+} from "lucide-react";
 
 export interface ScheduleEntry {
   id: string;
@@ -8,6 +17,9 @@ export interface ScheduleEntry {
   dayOfWeek: string;
   date?: string;
   time: string;
+  /** ISO 8601 start and end; required for the entry to appear in the .ics export. */
+  startsAt?: string;
+  endsAt?: string;
   room: string;
   lecturer: string;
   type: "class" | "exam";
@@ -53,11 +65,20 @@ export function ScheduleView({
 
   const handleExportIcs = () => {
     if (typeof window === "undefined") return;
-    let ics = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//HUCE//Campus 24/7//VI\nCALSCALE:GREGORIAN\n";
-    entries.forEach((e) => {
-      ics += `BEGIN:VEVENT\nSUMMARY:${e.courseName} (${e.courseCode})\nLOCATION:${e.room}\nDESCRIPTION:Giảng viên: ${e.lecturer} - Loại: ${e.type === "exam" ? "Lịch thi" : "Lịch học"}\nEND:VEVENT\n`;
-    });
-    ics += "END:VCALENDAR";
+    const { text: ics } = buildIcs(
+      entries.flatMap((e) =>
+        e.startsAt && e.endsAt
+          ? [{
+              id: e.id,
+              title: `${e.courseName} (${e.courseCode})`,
+              startsAt: e.startsAt,
+              endsAt: e.endsAt,
+              location: e.room,
+              description: `Giảng viên: ${e.lecturer} - Loại: ${e.type === "exam" ? "Lịch thi" : "Lịch học"}`,
+            }]
+          : [],
+      ),
+    );
 
     try {
       const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
@@ -75,61 +96,46 @@ export function ScheduleView({
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div className="flex flex-col gap-6">
       {/* Header with Timezone & Provenance Info */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "16px",
-        }}
-      >
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 style={{ margin: "0 0 6px 0", fontSize: "20px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)", letterSpacing: "-0.3px" }}>
+          <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
             Thời khóa biểu & Lịch thi sinh viên
           </h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", fontSize: "13px", color: "var(--color-slate-600, #475569)" }}>
-            <span>Múi giờ: <strong>ICT (UTC+7)</strong></span>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--text-secondary)]">
+            <span>
+              Múi giờ: <strong className="font-semibold text-[var(--text-primary)]">ICT (UTC+7)</strong>
+            </span>
             <span>•</span>
-            <span>Nguồn: <strong>Cổng đào tạo HUCE (Dữ liệu mô phỏng)</strong></span>
+            <span>
+              Nguồn: <strong className="font-semibold text-[var(--text-primary)]">Cổng thông tin đào tạo Đại học Xây dựng Hà Nội (HUCE)</strong>
+            </span>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div className="flex flex-wrap items-center gap-3">
           {freshnessTimestamp && (
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "12px",
-                color: "var(--color-slate-700, #334155)",
-                backgroundColor: "#ffffff",
-                padding: "6px 14px",
-                borderRadius: "var(--radius-full, 9999px)",
-                border: "1px solid var(--color-slate-200, #e2e8f0)",
-                boxShadow: "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))",
-              }}
-            >
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--surface-card)] px-3.5 py-1.5 text-xs text-[var(--text-secondary)] shadow-xs">
               <span
+                className="h-2 w-2 rounded-full"
                 style={{
-                  width: "7px",
-                  height: "7px",
-                  borderRadius: "50%",
-                  backgroundColor: isStale || isDegraded ? "#f59e0b" : "#10b981",
+                  backgroundColor: isStale || isDegraded ? "var(--color-status-warning)" : "var(--color-status-success)",
                 }}
               />
               <span>
                 Đồng bộ lúc:{" "}
-                <strong>
+                <strong className="font-semibold text-[var(--text-primary)]">
                   {(() => {
                     const d = new Date(freshnessTimestamp);
-                    return isNaN(d.getTime()) 
-                      ? freshnessTimestamp 
-                      : d.toLocaleTimeString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit" }) + 
-                        " " + 
+                    return isNaN(d.getTime())
+                      ? freshnessTimestamp
+                      : d.toLocaleTimeString("vi-VN", {
+                          timeZone: "Asia/Ho_Chi_Minh",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }) +
+                        " " +
                         d.toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
                   })()}
                 </strong>
@@ -140,22 +146,10 @@ export function ScheduleView({
           <button
             type="button"
             onClick={handleExportIcs}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "6px 14px",
-              borderRadius: "var(--radius-full, 9999px)",
-              backgroundColor: "#ffffff",
-              border: "1px solid var(--color-slate-300, #cbd5e1)",
-              color: "var(--color-slate-700, #334155)",
-              fontSize: "12px",
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))",
-            }}
+            className="fluent-btn-secondary text-xs"
           >
-            <span>📥</span> Xuất lịch iCal (.ics)
+            <Download className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+            <span>Xuất lịch iCal (.ics)</span>
           </button>
         </div>
       </div>
@@ -164,68 +158,46 @@ export function ScheduleView({
       {nextEvent && (
         <section
           aria-labelledby="heading-next-spotlight"
-          style={{
-            backgroundColor: "#ffffff",
-            borderRadius: "var(--radius-lg, 14px)",
-            padding: "20px 24px",
-            border: "1px solid var(--color-primary-border, #bfdbfe)",
-            background: "linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%)",
-            boxShadow: "var(--shadow-ambient, 0 1px 3px rgba(15,23,42,0.04))",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "16px",
-          }}
+          className="fluent-card relative overflow-hidden border border-[var(--color-primary-border)] bg-[var(--color-primary-subtle)] p-5 shadow-xs"
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "var(--radius-md, 10px)",
-                backgroundColor: "#eff6ff",
-                color: "#1d4ed8",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              <ClockIcon size={24} />
-            </div>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                <span
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    color: "#1d4ed8",
-                    backgroundColor: "#dbeafe",
-                    padding: "2px 8px",
-                    borderRadius: "4px",
-                  }}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary)] text-[var(--color-on-primary)] shadow-xs">
+                <Clock className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="rounded-md bg-[var(--color-primary-light)] px-2 py-0.5 text-[11px] font-bold tracking-wider uppercase text-[var(--color-primary)]">
+                    {nextEvent.type === "exam" ? "Lịch thi kế tiếp" : "Tiết học kế tiếp"}
+                  </span>
+                  <span className="text-xs font-medium text-[var(--text-secondary)]">
+                    {nextEvent.dayOfWeek}
+                  </span>
+                </div>
+                <h3
+                  id="heading-next-spotlight"
+                  className="text-base font-bold text-[var(--text-primary)] sm:text-lg"
                 >
-                  {nextEvent.type === "exam" ? "Lịch thi kế tiếp" : "Tiết học kế tiếp"}
-                </span>
-                <span style={{ fontSize: "12px", color: "var(--color-slate-600, #475569)" }}>
-                  {nextEvent.dayOfWeek}
-                </span>
+                  Sự kiện kế tiếp: {nextEvent.courseName} ({nextEvent.courseCode})
+                </h3>
+                <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[var(--text-secondary)]">
+                  <span className="inline-flex items-center gap-1 font-semibold text-[var(--text-primary)]">
+                    <Building className="h-3.5 w-3.5 text-[var(--text-secondary)]" /> {nextEvent.room}
+                  </span>
+                  <span>•</span>
+                  <time dateTime={nextEvent.time} className="font-medium">
+                    {nextEvent.time}
+                  </time>
+                  <span>•</span>
+                  <span>{nextEvent.lecturer}</span>
+                </div>
               </div>
-              <h3 id="heading-next-spotlight" style={{ margin: 0, fontSize: "17px", fontWeight: 700, color: "var(--color-slate-900, #0f172a)" }}>
-                Sự kiện kế tiếp: {nextEvent.courseName} ({nextEvent.courseCode})
-              </h3>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginTop: "4px", fontSize: "13px", color: "var(--color-slate-600, #475569)" }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
-                  <BuildingIcon size={14} /> {nextEvent.room}
-                </span>
-                <span>•</span>
-                <time dateTime={nextEvent.time}>{nextEvent.time}</time>
-                <span>•</span>
-                <span>{nextEvent.lecturer}</span>
-              </div>
+            </div>
+
+            <div className="hidden sm:block">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-primary-border)] bg-[var(--surface-card)] px-3 py-1 text-xs font-medium text-[var(--color-primary)] shadow-xs">
+                <CalendarCheck2 className="h-3.5 w-3.5" /> Ca học sắp diễn ra
+              </span>
             </div>
           </div>
         </section>
@@ -235,31 +207,17 @@ export function ScheduleView({
       <div
         role="group"
         aria-label="Bộ lọc phân loại lịch"
-        style={{
-          display: "inline-flex",
-          backgroundColor: "var(--color-slate-100, #f1f5f9)",
-          padding: "4px",
-          borderRadius: "var(--radius-lg, 12px)",
-          gap: "4px",
-          alignSelf: "flex-start",
-          border: "1px solid var(--color-slate-200, #e2e8f0)",
-        }}
+        className="inline-flex self-start rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] p-1"
       >
         <button
           type="button"
           onClick={() => setFilter("all")}
           aria-pressed={filter === "all"}
-          style={{
-            padding: "8px 16px",
-            borderRadius: "var(--radius-md, 8px)",
-            border: "none",
-            backgroundColor: filter === "all" ? "#ffffff" : "transparent",
-            color: filter === "all" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-700, #334155)",
-            fontWeight: filter === "all" ? 600 : 500,
-            fontSize: "13px",
-            cursor: "pointer",
-            boxShadow: filter === "all" ? "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))" : "none",
-          }}
+          className={`rounded-lg px-4 py-1.5 text-xs font-medium transition ${
+            filter === "all"
+              ? "bg-[var(--surface-card)] font-semibold text-[var(--color-primary)] shadow-xs"
+              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+          }`}
         >
           Tất cả
         </button>
@@ -267,84 +225,42 @@ export function ScheduleView({
           type="button"
           onClick={() => setFilter("class")}
           aria-pressed={filter === "class"}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "8px 16px",
-            borderRadius: "var(--radius-md, 8px)",
-            border: "none",
-            backgroundColor: filter === "class" ? "#ffffff" : "transparent",
-            color: filter === "class" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-700, #334155)",
-            fontWeight: filter === "class" ? 600 : 500,
-            fontSize: "13px",
-            cursor: "pointer",
-            boxShadow: filter === "class" ? "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))" : "none",
-          }}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-medium transition ${
+            filter === "class"
+              ? "bg-[var(--surface-card)] font-semibold text-[var(--color-primary)] shadow-xs"
+              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+          }`}
         >
-          <CalendarIcon size={14} />
+          <Calendar className="h-3.5 w-3.5" />
           <span>Lịch học</span>
         </button>
         <button
           type="button"
           onClick={() => setFilter("exam")}
           aria-pressed={filter === "exam"}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "8px 16px",
-            borderRadius: "var(--radius-md, 8px)",
-            border: "none",
-            backgroundColor: filter === "exam" ? "#ffffff" : "transparent",
-            color: filter === "exam" ? "var(--color-primary, #1e3a8a)" : "var(--color-slate-700, #334155)",
-            fontWeight: filter === "exam" ? 600 : 500,
-            fontSize: "13px",
-            cursor: "pointer",
-            boxShadow: filter === "exam" ? "var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05))" : "none",
-          }}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-medium transition ${
+            filter === "exam"
+              ? "bg-[var(--surface-card)] font-semibold text-[var(--color-primary)] shadow-xs"
+              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+          }`}
         >
-          <FileTextIcon size={14} />
+          <FileText className="h-3.5 w-3.5" />
           <span>Lịch thi</span>
         </button>
       </div>
 
-      {/* Agenda Grouped Content Area (Accessible Scroll Region) */}
+      {/* Agenda Grouped Content Area */}
       {filteredEntries.length === 0 ? (
         <div
           role="status"
-          style={{
-            padding: "48px 24px",
-            textAlign: "center",
-            color: "var(--color-slate-600, #475569)",
-            backgroundColor: "#ffffff",
-            borderRadius: "var(--radius-xl, 16px)",
-            border: "1.5px dashed var(--color-slate-300, #cbd5e1)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "12px",
-          }}
+          className="campus-empty-state border border-dashed border-[var(--border-color)]"
         >
-          <div
-            style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "50%",
-              backgroundColor: "var(--color-slate-100, #f1f5f9)",
-              color: "var(--color-slate-500, #64748b)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CalendarIcon size={24} />
-          </div>
+          <Calendar aria-hidden="true" />
           <div>
-            <p style={{ margin: "0 0 4px 0", fontSize: "15px", fontWeight: 700, color: "var(--color-slate-800, #1e293b)" }}>
+            <p className="mb-1 text-sm font-bold text-[var(--text-primary)]">
               Chưa có lịch học hoặc lịch thi nào.
             </p>
-            <p style={{ margin: 0, fontSize: "13px", color: "var(--color-slate-500, #64748b)" }}>
+            <p className="text-xs text-[var(--text-secondary)]">
               Lịch học mới sẽ tự động cập nhật khi có thông báo chính thức từ phòng Đào tạo.
             </p>
           </div>
@@ -354,93 +270,53 @@ export function ScheduleView({
           role="region"
           aria-label="Lịch học sinh viên"
           tabIndex={0}
-          style={{
-            overflowX: "auto",
-            backgroundColor: "#ffffff",
-            borderRadius: "var(--radius-xl, 16px)",
-            border: "1px solid var(--color-slate-200, #e2e8f0)",
-            boxShadow: "var(--shadow-ambient, 0 1px 3px rgba(15,23,42,0.04))",
-            padding: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "20px",
-          }}
+          className="flex flex-col gap-6 overflow-x-auto fluent-card p-5 border border-[var(--border-color)] bg-[var(--surface-card)]"
         >
           {Object.entries(groupedByDay).map(([day, dayEntries]) => (
-            <div key={day} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <h4
-                style={{
-                  margin: 0,
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  color: "var(--color-primary, #1e3a8a)",
-                  paddingBottom: "6px",
-                  borderBottom: "1.5px solid var(--color-slate-200, #e2e8f0)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
+            <div key={day} className="flex flex-col gap-3">
+              <h4 className="flex items-center gap-2 border-b border-[var(--border-color)] pb-2 text-sm font-bold text-[var(--color-primary)]">
                 <span>{day}</span>
-                <span style={{ fontSize: "12px", fontWeight: 500, color: "var(--color-slate-500, #64748b)" }}>
+                <span className="text-xs font-normal text-[var(--text-secondary)]">
                   ({dayEntries.length} ca)
                 </span>
               </h4>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div className="flex flex-col gap-2.5">
                 {dayEntries.map((row) => {
                   const overlapping = hasOverlap(dayEntries, row);
                   return (
                     <article
                       key={row.id}
-                      style={{
-                        padding: "14px 16px",
-                        borderRadius: "8px",
-                        backgroundColor: overlapping ? "#fff1f2" : "var(--color-slate-50, #f8fafc)",
-                        border: overlapping ? "1px solid #fecdd3" : "1px solid var(--color-slate-200, #e2e8f0)",
-                        display: "flex",
-                        flexWrap: "wrap",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: "12px",
-                      }}
+                      className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3.5 transition-colors sm:p-4 ${
+                        overlapping
+                          ? "border-rose-200 bg-rose-50/70 dark:border-rose-900/60 dark:bg-rose-950/20"
+                          : "border-[var(--border-color)] bg-[var(--surface-subtle)] hover:bg-[var(--surface-card)]"
+                      }`}
                     >
-                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{ fontWeight: 700, color: "var(--color-primary, #1e3a8a)", fontSize: "14px" }}>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-bold text-[var(--color-primary)] text-sm">
                             {row.courseCode}
                           </span>
-                          <span style={{ fontWeight: 600, color: "var(--color-slate-900, #0f172a)", fontSize: "14px" }}>
+                          <span className="font-semibold text-[var(--text-primary)] text-sm">
                             {row.courseName}
                           </span>
                           {overlapping && (
-                            <span
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "4px",
-                                fontSize: "11px",
-                                fontWeight: 700,
-                                padding: "2px 6px",
-                                borderRadius: "4px",
-                                backgroundColor: "#fee2e2",
-                                color: "#991b1b",
-                              }}
-                            >
-                              <AlertTriangleIcon size={12} />
+                            <span className="inline-flex items-center gap-1 rounded bg-rose-100 px-2 py-0.5 text-[11px] font-bold text-rose-800 dark:bg-rose-950/80 dark:text-rose-300">
+                              <AlertTriangle className="h-3 w-3 text-rose-600" />
                               <span>Trùng ca học</span>
                             </span>
                           )}
                         </div>
 
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", fontSize: "13px", color: "var(--color-slate-600, #475569)" }}>
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                            <ClockIcon size={14} />
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--text-secondary)]">
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
                             <time dateTime={row.time}>{row.time}</time>
                           </span>
                           <span>•</span>
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
-                            <BuildingIcon size={14} /> {row.room}
+                          <span className="inline-flex items-center gap-1 font-medium text-[var(--text-primary)]">
+                            <Building className="h-3.5 w-3.5 text-[var(--text-secondary)]" /> {row.room}
                           </span>
                           <span>•</span>
                           <span>{row.lecturer}</span>
@@ -448,15 +324,11 @@ export function ScheduleView({
                       </div>
 
                       <span
-                        style={{
-                          padding: "3px 10px",
-                          borderRadius: "var(--radius-full, 9999px)",
-                          fontSize: "12px",
-                          backgroundColor: row.type === "exam" ? "#fef2f2" : "#f0fdfa",
-                          color: row.type === "exam" ? "#991b1b" : "#065f46",
-                          border: `1px solid ${row.type === "exam" ? "#fecaca" : "#a7f3d0"}`,
-                          fontWeight: 600,
-                        }}
+                        className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+                          row.type === "exam"
+                            ? "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400"
+                            : "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-400"
+                        }`}
                       >
                         {row.type === "exam" ? "Lịch thi" : "Lịch học"}
                       </span>

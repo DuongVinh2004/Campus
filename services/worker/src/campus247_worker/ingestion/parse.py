@@ -38,9 +38,17 @@ class DocumentParser:
         lines = [line.rstrip() for line in normalized.splitlines()]
         canonical_text = "\n".join(lines).strip()
         canonical_hash = f"sha256:{hashlib.sha256(canonical_text.encode('utf-8')).hexdigest()}"
+        # Character locators belong to the canonical text, after outer trimming.
+        lines = canonical_text.splitlines()
 
-        # Extract title from first # heading or default
-        doc_title = "Untitled Document"
+        # Source metadata supplies the title when text has no level-one heading.
+        # It labels the locator; it never changes the canonical source or offsets.
+        metadata_title = (metadata or {}).get("title")
+        doc_title = (
+            unicodedata.normalize("NFC", metadata_title.strip())
+            if isinstance(metadata_title, str) and metadata_title.strip()
+            else "Untitled Document"
+        )
         sections: list[ParsedSection] = []
 
         heading_pattern = re.compile(r"^(#{1,3})\s+(.*)$")
@@ -63,22 +71,24 @@ class DocumentParser:
 
                 # Flush previous section if any content
                 if current_sec_title and current_sec_lines:
-                    sec_text = "\n".join(current_sec_lines).strip()
+                    raw_section = canonical_text[current_sec_start:current_offset]
+                    sec_text = raw_section.strip()
                     if sec_text:
+                        content_start = current_sec_start + len(raw_section) - len(raw_section.lstrip())
                         sec_path = f"{doc_title} > {current_sec_title}" if doc_title != current_sec_title else doc_title
                         sections.append(
                             ParsedSection(
                                 section_title=current_sec_title,
                                 section_path=sec_path,
                                 content=sec_text,
-                                char_start=current_sec_start,
-                                char_end=current_offset,
+                                char_start=content_start,
+                                char_end=content_start + len(sec_text),
                             )
                         )
 
                 current_sec_title = heading_text
                 current_sec_lines = []
-                current_sec_start = current_offset
+                current_sec_start = current_offset + line_len
             else:
                 if line.strip():
                     current_sec_lines.append(line)
@@ -87,16 +97,18 @@ class DocumentParser:
 
         # Flush final section
         if current_sec_title and current_sec_lines:
-            sec_text = "\n".join(current_sec_lines).strip()
+            raw_section = canonical_text[current_sec_start:]
+            sec_text = raw_section.strip()
             if sec_text:
+                content_start = current_sec_start + len(raw_section) - len(raw_section.lstrip())
                 sec_path = f"{doc_title} > {current_sec_title}" if doc_title != current_sec_title else doc_title
                 sections.append(
                     ParsedSection(
                         section_title=current_sec_title,
                         section_path=sec_path,
                         content=sec_text,
-                        char_start=current_sec_start,
-                        char_end=len(canonical_text),
+                        char_start=content_start,
+                        char_end=content_start + len(sec_text),
                     )
                 )
 

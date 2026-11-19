@@ -75,7 +75,7 @@ class PrivacyOperationRecord:
     requester_note: str | None = None
 
 
-VALID_PURPOSES = {"QUALITY_FEEDBACK", "OPTIONAL_PERSONALIZATION", "DATA_PORTABILITY", "ACCOUNT_CLOSURE", "SERVICE_DELIVERY"}
+VALID_PURPOSES = {"QUALITY_FEEDBACK", "OPTIONAL_PERSONALIZATION", "DATA_PORTABILITY", "ACCOUNT_CLOSURE", "SERVICE_DELIVERY", "CONVERSATION_HISTORY"}
 VALID_DECISIONS = {"GRANTED", "WITHDRAWN"}
 VALID_OPERATIONS = {"EXPORT", "CORRECTION", "ERASURE"}
 ALLOWED_SCOPES = {"ACCOUNT_CONTEXT", "CONVERSATION_CONTENT", "REQUEST_METADATA", "AUDIT_METADATA", "TICKETS", "BOOKINGS"}
@@ -106,10 +106,12 @@ class PrivacyConsentService:
         self,
         active_notice: PrivacyNoticeConfig | None = None,
         audit_writer: AuditWriter | None = None,
+        repository=None,
     ) -> None:
         self._active_notice = active_notice
         self._audit_writer = audit_writer or AuditWriter()
         self._consents: list[ConsentRecord] = []
+        self._repository = repository
 
     def get_active_notice(self) -> PrivacyNoticeConfig:
         if not self._active_notice:
@@ -117,9 +119,13 @@ class PrivacyConsentService:
         return self._active_notice
 
     def list_user_consents(self, user_id: str) -> list[ConsentRecord]:
+        if self._repository is not None:
+            return self._repository.list_user_consents(user_id)
         return [c for c in self._consents if c.user_id == user_id]
 
     def has_active_consent(self, user_id: str, purpose: str) -> bool:
+        if self._repository is not None:
+            return self._repository.has_active_consent(user_id,purpose)
         matching = [c for c in self._consents if c.user_id == user_id and c.purpose == purpose]
         if not matching:
             return False
@@ -142,6 +148,11 @@ class PrivacyConsentService:
 
         if decision not in VALID_DECISIONS:
             raise ValueError(f"Unknown consent decision: {decision}")
+
+        if self._repository is not None:
+            # The durable repository writes state, revision/audit and receipt
+            # atomically; avoid a second process-local success audit afterward.
+            return self._repository.record_consent(actor,purpose,decision,notice_version)
 
         now = datetime.now(timezone.utc)
         record = ConsentRecord(
