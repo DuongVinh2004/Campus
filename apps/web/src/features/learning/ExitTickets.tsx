@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, type MessageKey } from "@/lib/i18n";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import {
   LearningGateway,
@@ -18,34 +19,36 @@ import { useActorRouteState,useTabDraftOwner } from "../chat/route-drafts";
 
 const gateway = new LearningGateway();
 const emptyTime: LearningExitWallInput = { local: "" };
-const labels: Record<LearningExitTicket["state"], string> = {
-  DRAFT: "Bản nháp",
-  SCHEDULED: "Chưa mở",
-  OPEN: "Đang nhận bài",
-  CLOSED: "Đã đóng",
-  CANCELLED: "Đã hủy",
-  SOURCE_UNAVAILABLE: "Nguồn học liệu không còn khả dụng",
+const labels: Record<LearningExitTicket["state"], MessageKey> = {
+  DRAFT: "etx.1",
+  SCHEDULED: "etx.2",
+  OPEN: "etx.3",
+  CLOSED: "etx.4",
+  CANCELLED: "etx.5",
+  SOURCE_UNAVAILABLE: "etx.6",
 };
 
 export function ExitTicketTimes({ ticket }: { ticket: LearningVisibleExitTicket }) {
+  const t = useT();
   const wall = (value: LearningExitWallTime) => <time dateTime={value.utc}>
     {value.local.replace("T", " ")} ({utcOffsetLabel(value.offset_minutes)})
   </time>;
   return <dl className={styles.exitTimes}>
-    <div><dt>Múi giờ lớp</dt><dd>{ticket.zone_id}</dd></div>
-    <div><dt>Mở</dt><dd>{wall(ticket.opens)}</dd></div>
-    <div><dt>Đóng</dt><dd>{wall(ticket.closes)}</dd></div>
+    <div><dt>{t("etx.7")}</dt><dd>{ticket.zone_id}</dd></div>
+    <div><dt>{t("etx.8")}</dt><dd>{wall(ticket.opens)}</dd></div>
+    <div><dt>{t("etx.9")}</dt><dd>{wall(ticket.closes)}</dd></div>
   </dl>;
 }
 
 export function ExitTicketPreviewDetails({ preview }: { preview: NonNullable<LearningPreview["exit_ticket"]> }) {
+  const t = useT();
   return <div className={styles.stack}>
-    <p>Trạng thái sau xác nhận · {labels[preview.state]}</p>
+    <p>{t("etx.34", { s: t(labels[preview.state]) })}</p>
     {preview.state !== "SOURCE_UNAVAILABLE" && <>
-      <p>Trang {preview.page_no} · {preview.question}</p>
+      <p>{t("etx.35", { p: preview.page_no })} · {preview.question}</p>
       <ExitTicketTimes ticket={preview} />
     </>}
-    <p>Tại lúc xem trước, thao tác ảnh hưởng {preview.students} sinh viên và {preview.submissions} bài đã nộp.</p>
+    <p>{t("etx.36", { a: preview.students, b: preview.submissions })}</p>
   </div>;
 }
 
@@ -66,6 +69,7 @@ export function exitWallPayload(value: LearningExitWallInput, zoneId: string): L
 export function ExitWallField({ label, zoneId, value, onChange }: {
   label: string; zoneId: string; value: LearningExitWallInput; onChange: (value: LearningExitWallInput) => void;
 }) {
+  const t = useT();
   const errorId = useId();
   const candidates = timeCandidates(value.local, zoneId);
   const invalid = !!value.local && candidates.length === 0;
@@ -75,12 +79,12 @@ export function ExitWallField({ label, zoneId, value, onChange }: {
         aria-invalid={invalid || undefined} aria-describedby={invalid ? errorId : undefined}
         onChange={event => onChange({ local: event.target.value })} />
     </label>
-    {invalid && <p id={errorId} role="alert">Giờ này không tồn tại trong múi giờ của lớp.</p>}
-    {candidates.length > 1 && <label>Độ lệch UTC cho {label.toLowerCase()}
+    {invalid && <p id={errorId} role="alert">{t("etx.10")}</p>}
+    {candidates.length > 1 && <label>{t("etx.37", { l: label.toLowerCase() })}
       <select required value={value.offset_minutes ?? ""} onChange={event => onChange({
         local: value.local, ...(event.target.value ? { offset_minutes: Number(event.target.value) } : {}),
       })}>
-        <option value="">Chọn độ lệch cho giờ bị lặp</option>
+        <option value="">{t("etx.11")}</option>
         {candidates.map(candidate => <option key={candidate.utc} value={candidate.offsetMinutes}>
           {utcOffsetLabel(candidate.offsetMinutes)}
         </option>)}
@@ -120,6 +124,7 @@ export function ExitTicketDraftForm({ materials, instructions, zoneId, source, d
   draftScope?:string;
   controlledValues?:ExitFormValues;onValuesChange?:(patch:Partial<ExitFormValues>)=>void;embedded?:boolean;pinnedInstructions?:ExitPinnedInstruction[];
 }) {
+  const t = useT();
   const owner=useTabDraftOwner();
   const [retainedValues,setValues]=useActorRouteState<ExitFormValues>(draftScope?owner.scope:null,JSON.stringify(["exit-ticket-form",draftScope]),()=>initialExitFormValues(draft,source));
   const values=controlledValues??retainedValues;
@@ -137,29 +142,29 @@ export function ExitTicketDraftForm({ materials, instructions, zoneId, source, d
     onSave(exitDraftPayload(values,materials,instructions,zoneId,draft,pinnedInstructions));
   }
   const fields=<>
-    <label>Phiên bản nguồn<select required value={versionId} onChange={event => {
+    <label>{t("etx.13")}<select required value={versionId} onChange={event => {
       update({versionId:event.target.value,page:1,instruction:''});
     }}>
-      <option value="">Chọn phiên bản đã công bố</option>
-      {versions.map(version => <option value={version.id} key={version.id}>{version.title} · Bản {version.version_no}</option>)}
+      <option value="">{t("etx.14")}</option>
+      {versions.map(version => <option value={version.id} key={version.id}>{version.title} · {t("etx.38", { v: version.version_no })}</option>)}
     </select></label>
-    <label>Trang nguồn<input type="number" min={1} max={activeVersion?.page_count ?? 1} required value={page}
+    <label>{t("etx.15")}<input type="number" min={1} max={activeVersion?.page_count ?? 1} required value={page}
       onChange={event => setPage(Number(event.target.value))} /></label>
     {source && versions.some(version => version.id === source.versionId) && <button type="button" onClick={() => {
       update({versionId:source.versionId,page:source.page,...(versionId!==source.versionId?{instruction:''}:{})});
-    }}>Dùng trang đang đọc</button>}
-    <label>Câu hỏi vận dụng<textarea required maxLength={1000} rows={3} value={question}
+    }}>{t("etx.16")}</button>}
+    <label>{t("etx.17")}<textarea required maxLength={1000} rows={3} value={question}
       onChange={event => setQuestion(event.target.value)} /></label>
-    <ExitWallField label="Giờ mở" zoneId={zoneId} value={opens} onChange={setOpens} />
-    <ExitWallField label="Giờ đóng" zoneId={zoneId} value={closes} onChange={setCloses} />
-    {reversed && <p role="alert">Giờ đóng phải sau giờ mở.</p>}
-    <label>Chỉ dẫn đọc gắn kèm<select value={instruction} onChange={event => setInstruction(event.target.value)}>
-      <option value="">Không gắn chỉ dẫn đọc</option>
-      {options.map(option => <option key={option.value} value={option.value}>{option.title} · Lần {option.revision}</option>)}
+    <ExitWallField label={t("etx.18")} zoneId={zoneId} value={opens} onChange={setOpens} />
+    <ExitWallField label={t("etx.19")} zoneId={zoneId} value={closes} onChange={setCloses} />
+    {reversed && <p role="alert">{t("etx.12")}</p>}
+    <label>{t("etx.20")}<select value={instruction} onChange={event => setInstruction(event.target.value)}>
+      <option value="">{t("etx.21")}</option>
+      {options.map(option => <option key={option.value} value={option.value}>{option.title} · {t("etx.39", { r: option.revision })}</option>)}
     </select></label>
-    {instruction&&!bound&&<p role="alert">Chỉ dẫn đọc không còn phù hợp với nguồn đã chọn. Hãy kiểm tra lại; nháp vẫn được giữ.</p>}
-    <div className={styles.row}><button disabled={busy || !valid}>Lưu bản nháp</button>
-      <button type="button" disabled={busy} onClick={onCancel}>Quay lại</button></div>
+    {instruction&&!bound&&<p role="alert">{t("etx.22")}</p>}
+    <div className={styles.row}><button disabled={busy || !valid}>{t("etx.23")}</button>
+      <button type="button" disabled={busy} onClick={onCancel}>{t("etx.24")}</button></div>
   </>;
   return embedded?<div className={styles.stack}>{fields}</div>:<form onSubmit={submit} className={styles.stack}><fieldset disabled={busy} className={styles.stack}>{fields}</fieldset></form>;
 }
@@ -169,6 +174,7 @@ export function SessionExitTickets({ actorId, sessionId, materials, instructions
   canManage: boolean; source?: { versionId: string; page: number }; refresh: number;
   onRows: (actorId: string, sessionId: string, tickets: LearningExitTicket[]) => void; onSelect: (id: string) => void;
 }) {
+  const t = useT();
   const [rows, setRows] = useState<LearningExitTicket[] | null>(null);
   const owner=useTabDraftOwner();
   const draftKey=JSON.stringify(["session-exit-draft",actorId,sessionId]);
@@ -198,7 +204,7 @@ export function SessionExitTickets({ actorId, sessionId, materials, instructions
         setReadError(""); setRows(tickets);setRowsScope(readScope);onRows(actorId, sessionId, tickets);
       }).catch(caught => {
         if (controller.signal.aborted || generation !== listGeneration.current) return;
-        setReadError(caught instanceof Error ? caught.message : "Chưa tải được phiếu ra lớp.");
+        setReadError(caught instanceof Error ? caught.message : t("etx.25"));
         setRows([]);setRowsScope(readScope);onRows(actorId, sessionId, []);
       });
     };
@@ -224,25 +230,25 @@ export function SessionExitTickets({ actorId, sessionId, materials, instructions
       const next = [ticket, ...(scopedRows ?? []).filter(item => item.id !== ticket.id)];
       setRows(next);setRowsScope(readScope);onRows(actorId, sessionId, next); onSelect(ticket.id);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Chưa tạo được phiếu.");
+      setError(caught instanceof Error ? caught.message : t("etx.26"));
     } finally {
       setBusy(false);
     }
   }
 
-  if(owner.enabled&&!owner.scope)return <p role="status">Đang kiểm tra tài khoản trước khi mở nháp phiếu…</p>;
-  return <section className={styles.stack} aria-label="Phiếu ra lớp theo buổi">
-    <h3 id="learning-exit-tickets-heading" tabIndex={-1}>Phiếu ra lớp</h3>
+  if(owner.enabled&&!owner.scope)return <p role="status">{t("etx.27")}</p>;
+  return <section className={styles.stack} aria-label={t("etx.28")}>
+    <h3 id="learning-exit-tickets-heading" tabIndex={-1}>{t("etx.29")}</h3>
     {readError && <p role="alert">{readError}</p>}
-    {scopedRows === null && <p role="status">Đang tải phiếu ra lớp…</p>}
-    {!readError && scopedRows?.length === 0 && <p>Buổi này chưa có phiếu ra lớp.</p>}
+    {scopedRows === null && <p role="status">{t("etx.30")}</p>}
+    {!readError && scopedRows?.length === 0 && <p>{t("etx.31")}</p>}
     {scopedRows && scopedRows.length > 0 && <ul className={styles.list}>{scopedRows.map(ticket => <li key={ticket.id} className={styles.material}>
-      <p>{labels[ticket.state]}{ticket.state !== "SOURCE_UNAVAILABLE" && ` · Trang ${ticket.page_no}`}</p>
+      <p>{t(labels[ticket.state])}{ticket.state !== "SOURCE_UNAVAILABLE" && ` · ${t("etx.35", { p: ticket.page_no })}`}</p>
       <button type="button" onClick={() => onSelect(ticket.id)}>
-        {ticket.state === "SOURCE_UNAVAILABLE" ? "Xem phiếu đã mất nguồn" : ticket.question}
+        {ticket.state === "SOURCE_UNAVAILABLE" ? t("etx.32") : ticket.question}
       </button>
     </li>)}</ul>}
-    {canManage && !creating && <button type="button" onClick={() => setCreating(true)}>Tạo phiếu ra lớp</button>}
+    {canManage && !creating && <button type="button" onClick={() => setCreating(true)}>{t("etx.33")}</button>}
     {canManage && creating && <ExitTicketDraftForm materials={materials} instructions={instructions} zoneId={zoneId}
       source={source} busy={busy} draftScope={JSON.stringify([actorId,sessionId,formRevision])} onSave={draft => void create(draft)} onCancel={() => setCreating(false)} />}
     {error && <p role="alert">{error}</p>}
@@ -250,6 +256,7 @@ export function SessionExitTickets({ actorId, sessionId, materials, instructions
 }
 
 export function ExitTicketStatus({ ticket }: { ticket: LearningExitTicket }) {
-  return <p role="status">{labels[ticket.state]}</p>;
+  const t = useT();
+  return <p role="status">{t(labels[ticket.state])}</p>;
 }
 
