@@ -1,4 +1,5 @@
 import React from "react";
+import { useT } from "@/lib/i18n";
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { CitationSource, type CitationSourceBinding } from "./CitationSource";
 import { useSourceReviewStates } from "../../lib/use-source-review-states";
@@ -35,23 +36,24 @@ export function CitationDrawer({
   onClose,
   onReportIssue,
 }: CitationDrawerProps) {
+  const t = useT();
   const reviewStates = useSourceReviewStates(citations.flatMap((cite) => (cite.sourceId ? [cite.sourceId] : [])), isOpen);
   const getValidityBadge = (status?: string) => {
     switch (status) {
       case "stale":
         return {
-          text: "Văn bản cần đối chiếu",
+          text: t("c3CitationDrawer.24"),
           className: "badge badge-warning",
         };
       case "conflicting":
         return {
-          text: "Có nội dung mâu thuẫn",
+          text: t("c3CitationDrawer.25"),
           className: "badge badge-danger",
         };
       case "active":
       default:
         return {
-          text: process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true" ? "Nguồn trong câu trả lời — mở để kiểm tra lại" : "Văn bản đang hiệu lực",
+          text: process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true" ? t("c3CitationDrawer.26") : t("c3CitationDrawer.27"),
           className: "badge badge-success",
         };
     }
@@ -88,17 +90,17 @@ export function CitationDrawer({
             </div>
             <div style={{ minWidth: 0, overflowWrap: "anywhere" }}>
               <h2 id="citation-drawer-title" style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--color-text-main, #0f172a)" }}>
-                Nguồn trích dẫn & Bằng chứng
+                {t("c3CitationDrawer.28")}
               </h2>
               <span style={{ fontSize: "11px", color: "var(--color-text-muted, #64748b)" }}>
-                Kiểm chứng căn cứ văn bản và thời hiệu
+                {t("c3CitationDrawer.29")}
               </span>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Đóng"
+            aria-label={t("c3CitationDrawer.30")}
             style={{
               minHeight: "44px",
               minWidth: "44px",
@@ -122,7 +124,7 @@ export function CitationDrawer({
         <div style={{ flex: 1, minWidth: 0, overflowY: "auto", overflowX: "hidden", display: "flex", flexDirection: "column", gap: "16px" }}>
           {citations.length === 0 ? (
             <div style={{ textAlign: "center", padding: "36px 16px", color: "var(--color-text-muted, #64748b)", fontSize: "13px" }}>
-              Không có nguồn trích dẫn nào cho câu trả lời này.
+              {t("c3CitationDrawer.31")}
             </div>
           ) : (
             citations.map((cite) => {
@@ -141,11 +143,11 @@ export function CitationDrawer({
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
                       <ShieldCheckIcon size={16} />
                       <h3 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "var(--color-text-muted, #64748b)" }}>
-                        Tài liệu hạn chế truy cập
+                        {t("c3CitationDrawer.32")}
                       </h3>
                     </div>
                     <div style={{ fontSize: "12px", color: "var(--color-text-muted, #64748b)" }}>
-                      Bạn không có quyền truy cập xem chi tiết tài liệu này.
+                      {t("c3CitationDrawer.33")}
                     </div>
                   </article>
                 );
@@ -153,8 +155,8 @@ export function CitationDrawer({
 
               const isPublicSnapshot = cite.documentRef.startsWith("public-");
               const badge = isPublicSnapshot
-                ? { text: "Nguồn HUCE", className: "badge badge-success" }
-                : cite.isSimulation ? { text: "Nguồn mô phỏng", className: "badge badge-warning" } : getValidityBadge(cite.validityStatus);
+                ? { text: t("c3CitationDrawer.34"), className: "badge badge-success" }
+                : cite.isSimulation ? { text: t("c3CitationDrawer.35"), className: "badge badge-warning" } : getValidityBadge(cite.validityStatus);
               return (
                 <article
                   key={cite.id}
@@ -178,28 +180,28 @@ export function CitationDrawer({
                     </span>
                     {cite.sourceId && reviewStates[cite.sourceId] === "OVERDUE" && (
                       <span className="badge badge-warning" style={{ maxWidth: "100%", whiteSpace: "normal", lineHeight: 1.5 }}>
-                        Nguồn quá hạn rà soát — nên đối chiếu văn bản gốc
+                        {t("c3CitationDrawer.36")}
                       </span>
                     )}
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "12px", color: "var(--color-text-muted, #475569)", marginBottom: "10px" }}>
                     {!isPublicSnapshot && <div>
-                      {process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true" ? "Phiên bản nguồn:" : "Mã văn bản:"} <strong style={{ color: "var(--color-text-main, #1e293b)" }}>{cite.documentRef}</strong>
+                      {process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true" ? t("c3CitationDrawer.37") : t("c3CitationDrawer.38")} <strong style={{ color: "var(--color-text-main, #1e293b)" }}>{cite.documentRef}</strong>
                     </div>}
                     {cite.authority && (
                       <div>
-                        Cơ quan ban hành: <span style={{ color: "var(--color-text-main, #1e293b)" }}>{cite.authority}</span>
+                        {t("cite.1")} <span style={{ color: "var(--color-text-main, #1e293b)" }}>{cite.authority}</span>
                       </div>
                     )}
                     {cite.locator && (
                       <div>
-                        Vị trí trích lục: <span style={{ color: "var(--color-text-main, #1e293b)" }}>{cite.locator}</span>
+                        {t("cite.2")} <span style={{ color: "var(--color-text-main, #1e293b)" }}>{cite.locator}</span>
                       </div>
                     )}
                     {cite.effectiveDate && (
                       <div>
-                        Ngày hiệu lực: <span style={{ color: "var(--color-text-main, #1e293b)" }}>{cite.effectiveDate}</span>
+                        {t("cite.3")} <span style={{ color: "var(--color-text-main, #1e293b)" }}>{cite.effectiveDate}</span>
                       </div>
                     )}
                   </div>
@@ -239,12 +241,12 @@ export function CitationDrawer({
                           textDecoration: "none",
                         }}
                       >
-                        <span>Mở văn bản gốc</span>
+                        <span>{t("c3CitationDrawer.39")}</span>
                         <ArrowRightIcon size={13} />
                       </a>
                     ) : !cite.sourceBinding ? (
                       <span style={{ fontSize: "11px", color: "var(--color-text-muted, #64748b)" }}>
-                        Lưu trữ nội bộ HUCE
+                        {t("c3CitationDrawer.40")}
                       </span>
                     ) : null}
 
@@ -266,7 +268,7 @@ export function CitationDrawer({
                         }}
                       >
                         <AlertTriangleIcon size={12} />
-                        <span>Báo lỗi nguồn</span>
+                        <span>{t("c3CitationDrawer.41")}</span>
                       </button>
                     )}
                   </div>

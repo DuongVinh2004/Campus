@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useT } from "@/lib/i18n";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 
 export type FeedbackRating = "helpful" | "not_helpful";
@@ -9,6 +10,7 @@ export interface AnswerFeedbackProps {
 }
 
 export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackProps) {
+  const t = useT();
   const [selectedRating, setSelectedRating] = useState<FeedbackRating | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -24,7 +26,7 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
       }
       setSubmitted(true);
     } catch {
-      setErrorMessage("Không thể gửi đánh giá. Vui lòng thử lại.");
+      setErrorMessage(t("c3AnswerFeedback.1"));
     } finally {
       setIsSubmitting(false);
     }
@@ -36,7 +38,7 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
         aria-live="polite"
         className="text-xs text-emerald-600 dark:text-emerald-400 py-1 font-medium"
       >
-        Cảm ơn bạn đã phản hồi!
+        {t("c3AnswerFeedback.2")}
       </div>
     );
   }
@@ -44,12 +46,12 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
   return (
     <div className="flex flex-col gap-1 mt-2">
       <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-        <span>Câu trả lời có hữu ích không?</span>
+        <span>{t("c3AnswerFeedback.3")}</span>
         <button
           type="button"
           onClick={() => handleVote("helpful")}
           disabled={isSubmitting}
-          aria-label="Hữu ích"
+          aria-label={t("c3AnswerFeedback.4")}
           aria-pressed={selectedRating === "helpful"}
           className={`min-h-[36px] px-3.5 py-1.5 text-xs font-medium rounded-full inline-flex items-center gap-1.5 transition-colors cursor-pointer border ${
             selectedRating === "helpful"
@@ -58,13 +60,13 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
           } ${isSubmitting ? "cursor-not-allowed opacity-60" : ""}`}
         >
           <ThumbsUp className="w-3.5 h-3.5" />
-          <span>Hữu ích</span>
+          <span>{t("c3AnswerFeedback.4")}</span>
         </button>
         <button
           type="button"
           onClick={() => handleVote("not_helpful")}
           disabled={isSubmitting}
-          aria-label="Chưa hữu ích"
+          aria-label={t("c3AnswerFeedback.5")}
           aria-pressed={selectedRating === "not_helpful"}
           className={`min-h-[36px] px-3.5 py-1.5 text-xs font-medium rounded-full inline-flex items-center gap-1.5 transition-colors cursor-pointer border ${
             selectedRating === "not_helpful"
@@ -73,7 +75,7 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
           } ${isSubmitting ? "cursor-not-allowed opacity-60" : ""}`}
         >
           <ThumbsDown className="w-3.5 h-3.5" />
-          <span>Chưa hữu ích</span>
+          <span>{t("c3AnswerFeedback.5")}</span>
         </button>
       </div>
 
@@ -89,7 +91,7 @@ export function AnswerFeedback({ answerId, onFeedbackSubmit }: AnswerFeedbackPro
               onClick={() => handleVote(selectedRating)}
               className="text-xs underline bg-transparent border-0 text-rose-600 dark:text-rose-400 cursor-pointer px-1 py-0.5 font-medium hover:text-rose-700 dark:hover:text-rose-300"
             >
-              Thử lại
+              {t("c3AnswerFeedback.6")}
             </button>
           )}
         </div>

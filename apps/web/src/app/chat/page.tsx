@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/lib/i18n";
 import { CAMPUS_API_BASE_URL } from "@/lib/api/base-url";
 import { ApiCertificateGateway, CERTIFICATE_DEMO } from "../../lib/data/api/certificate-gateway";
 import { CertificateWorkspace } from "../../features/documents/CertificateWorkspace";
@@ -23,7 +24,6 @@ import { assistantClientId } from "../../lib/assistant-state-service";
 import { useOptionalUnifiedAssistant } from "@/lib/unified-assistant-runtime";
 import { UnifiedAssistantWorkspace } from "@/features/assistance/UnifiedAssistantWorkspace";
 
-const BUSY_GUIDANCE = "Hệ thống đang bận, thử lại sau ít giây. Câu hỏi của bạn chưa được gửi đi.";
 
 const API_BASE_URL = CAMPUS_API_BASE_URL;
 const MULTI_AGENT = process.env.NEXT_PUBLIC_MULTI_AGENT === "true";
@@ -59,6 +59,7 @@ function UnifiedChatPage() {
 }
 
 function ExistingChatPage() {
+  const t = useT();
   const [initialDraft, setInitialDraft] = useState("");
   const [certificateIntent, setCertificateIntent] = useState(false);
   const [certificateOpen, setCertificateOpen] = useState(false);
@@ -150,7 +151,7 @@ function ExistingChatPage() {
           });
           if (!current()) return;
           if (response.status === 401) {
-            setStatus("unauthorized"); setErrorMessage("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+            setStatus("unauthorized"); setErrorMessage(t("cpage.1"));
             return;
           }
           if (!response.ok) throw new Error("History unavailable");
@@ -192,7 +193,7 @@ function ExistingChatPage() {
         throw new Error("History page limit");
       } catch {
         if (historyControllerRef.current === controller) {
-          setStatus("error"); setErrorMessage("Không thể khôi phục lịch sử đã xác nhận. Hãy tải lại hoặc mở cuộc trò chuyện mới.");
+          setStatus("error"); setErrorMessage(t("cpage.2"));
         }
       } finally {
         window.clearTimeout(deadline);
@@ -215,13 +216,13 @@ function ExistingChatPage() {
     if (SERVICE_DEMO) {
       void new ApiServiceGateway().propose(content).then(proposal => {
         if (proposal.intent) setServiceIntent(proposal.intent);
-      }).catch(() => setCertificateError("Chưa thể chuẩn bị dịch vụ. Kiểm tra phiên đăng nhập hoặc mở Phúc khảo & hỗ trợ."));
+      }).catch(() => setCertificateError(t("cpage.3")));
     }
     if (CERTIFICATE_DEMO) {
       setCertificateError("");
       void new ApiCertificateGateway().propose(content).then(proposal => {
         if (proposal.intent === "STUDENT_CERTIFICATE") setCertificateIntent(true);
-      }).catch(() => setCertificateError("Chưa thể chuẩn bị hồ sơ. Hãy kiểm tra đăng nhập hoặc mở mục Thủ tục & Yêu cầu."));
+      }).catch(() => setCertificateError(t("cpage.4")));
     }
     const attempt = Symbol("chat-attempt");
     attemptRef.current = attempt;
@@ -292,7 +293,7 @@ function ExistingChatPage() {
 
     const stopAttempt = () => {
       if (!current() || stream?.terminal) return;
-      showAssistant("Đã dừng — câu trả lời chưa được xác nhận. Kiểm tra lịch sử trước khi gửi thao tác mới.", "stopped");
+      showAssistant(t("cpage.5"), "stopped");
       setCitations([]);
       setIsDrawerOpen(false);
       attemptRef.current = null;
@@ -323,12 +324,12 @@ function ExistingChatPage() {
 
         if (convRes.status === 401) {
           setStatus("unauthorized");
-          setErrorMessage("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+          setErrorMessage(t("cpage.1"));
           return;
         }
 
         if (!convRes.ok) {
-          throw new Error(`Không thể khởi tạo phiên trò chuyện (Mã lỗi ${convRes.status})`);
+          throw new Error(t("cpm.1", { status: convRes.status }));
         }
 
         const convData = await convRes.json();
@@ -348,7 +349,7 @@ function ExistingChatPage() {
         const pending = await fetch(pendingPath, { headers: authHeaders, credentials: "include", cache: "no-store", signal: controller.signal });
         if (!current()) return;
         if (pending.status === 401) {
-          setStatus("unauthorized"); setErrorMessage("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."); return;
+          setStatus("unauthorized"); setErrorMessage(t("cpage.1")); return;
         }
         if (pending.ok) {
           const run = await pending.json();
@@ -357,7 +358,7 @@ function ExistingChatPage() {
             body: JSON.stringify({ expected_version: run.version, content }), signal: controller.signal });
           if (!current()) return;
           if (resumed.status === 401) {
-            setStatus("unauthorized"); setErrorMessage("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."); return;
+            setStatus("unauthorized"); setErrorMessage(t("cpage.1")); return;
           }
           if (!resumed.ok) throw new Error("Resume unavailable");
           const data = await resumed.json();
@@ -394,7 +395,7 @@ function ExistingChatPage() {
 
       if (response.status === 401) {
         setStatus("unauthorized");
-        setErrorMessage("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        setErrorMessage(t("cpage.1"));
         return;
       }
 
@@ -402,18 +403,18 @@ function ExistingChatPage() {
         // Admission control: the server refused the turn before saving anything, so nothing was sent and
         // retrying the same question is safe.
         setStatus("error");
-        setErrorMessage(BUSY_GUIDANCE);
+        setErrorMessage(t("cpage2.1"));
         setCitations([]);
-        showAssistant(BUSY_GUIDANCE, "failed");
+        showAssistant(t("cpage2.1"), "failed");
         return;
       }
 
       if (!response.ok) {
-        throw new Error(`Máy chủ phản hồi lỗi: ${response.status}`);
+        throw new Error(t("cpm.2", { status: response.status }));
       }
 
       if (!response.body) {
-        throw new Error("Không nhận được luồng dữ liệu từ máy chủ");
+        throw new Error(t("cpage.6"));
       }
 
       reader = response.body.getReader();
@@ -444,7 +445,7 @@ function ExistingChatPage() {
     } catch (err: unknown) {
       if (!current() || stream?.terminal) return;
       if (controller.signal.aborted) {
-        showAssistant("Đã dừng — câu trả lời chưa được xác nhận. Kiểm tra lịch sử trước khi gửi thao tác mới.", "stopped");
+        showAssistant(t("cpage.5"), "stopped");
         setCitations([]);
         return;
       }
@@ -472,26 +473,26 @@ function ExistingChatPage() {
   return (
     <AppShell activeNav="chat" publicKnowledge>
       <div className="flex flex-col h-full w-full relative overflow-hidden bg-white dark:bg-[#212121]">
-        {waitingClarification && <p role="status" className="border-b bg-blue-50 px-3 py-2 text-sm text-blue-800 dark:bg-blue-950/40 dark:text-blue-200">Thông tin bạn gửi tiếp sẽ dùng để làm rõ yêu cầu đang chờ.</p>}
-        {SERVICE_DEMO && serviceIntent && <div className="p-3 border-b text-sm"><p>Đề xuất dịch vụ chưa gửi. Chọn thông tin cần chia sẻ, sửa bản nháp rồi xem trước và xác nhận.</p>
-          <Link className="fluent-btn-primary mt-2" href={`/services?kind=${serviceIntent}`}>Chuẩn bị {serviceIntent === "GRADE_APPEAL" ? "phúc khảo" : "hỗ trợ chung"} từ hội thoại</Link></div>}
+        {waitingClarification && <p role="status" className="border-b bg-blue-50 px-3 py-2 text-sm text-blue-800 dark:bg-blue-950/40 dark:text-blue-200">{t("cpage2.2")}</p>}
+        {SERVICE_DEMO && serviceIntent && <div className="p-3 border-b text-sm"><p>{t("cpage2.3")}</p>
+          <Link className="fluent-btn-primary mt-2" href={`/services?kind=${serviceIntent}`}>{serviceIntent === "GRADE_APPEAL" ? t("cpm.3") : t("cpm.4")}</Link></div>}
         {CERTIFICATE_DEMO && (certificateIntent || certificateError) && <div className="p-3 border-b text-sm">
           {certificateError && <p role="alert">{certificateError}</p>}
-          {certificateIntent && <><p>Bạn cần giấy xác nhận để làm gì và nộp cho đơn vị nào? Chuẩn bị bản nháp để xem và sửa trước khi gửi.</p>
-            <button className="fluent-btn-primary mt-2" onClick={() => setCertificateOpen(true)}>Chuẩn bị hồ sơ từ hội thoại</button></>}
+          {certificateIntent && <><p>{t("cpage2.4")}</p>
+            <button className="fluent-btn-primary mt-2" onClick={() => setCertificateOpen(true)}>{t("cpage2.5")}</button></>}
         </div>}
-        {certificateOpen && <AccessibleDialog open onClose={() => setCertificateOpen(false)} labelledBy="chat-certificate-title" className="campus-request-dialog"><h2 id="chat-certificate-title" className="sr-only">Chuẩn bị hồ sơ giấy xác nhận</h2>
-          <button className="fluent-btn-secondary m-4" onClick={() => setCertificateOpen(false)}>Quay lại hội thoại</button>
+        {certificateOpen && <AccessibleDialog open onClose={() => setCertificateOpen(false)} labelledBy="chat-certificate-title" className="campus-request-dialog"><h2 id="chat-certificate-title" className="sr-only">{t("cpage2.6")}</h2>
+          <button className="fluent-btn-secondary m-4" onClick={() => setCertificateOpen(false)}>{t("cpage2.7")}</button>
           <CertificateWorkspace embedded />
         </AccessibleDialog>}
 
         {(status === "unauthorized" || status === "loading" || (status === "error" && historyBlockedRef.current)) && (
           <div className="p-3 bg-amber-50 dark:bg-amber-950/60 border-b border-amber-200 dark:border-amber-900 shrink-0">
             {status === "unauthorized" ? <p role="alert" className="text-sm">
-              {errorMessage} <a className="underline" href={sessionLoginHref()}>Đăng nhập lại</a>
+              {errorMessage} <a className="underline" href={sessionLoginHref()}>{t("cpage2.8")}</a>
             </p> : <AsyncState
               status={status}
-              errorMessage={errorMessage || "Phiên đăng nhập không hợp lệ hoặc đã hết hạn."}
+              errorMessage={errorMessage || t("cpage.7")}
               onRetry={() => {
                 if (historyBlockedRef.current) switchConversation(activeConversationId, false);
                 else { setStatus("success"); conversationIdRef.current = null; }

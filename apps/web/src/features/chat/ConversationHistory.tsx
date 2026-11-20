@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import React, { useEffect, useRef, useState } from "react";
 import { CAMPUS_API_BASE_URL } from "@/lib/api/base-url";
 import { sessionLoginHref } from "./local-session";
@@ -8,6 +9,7 @@ interface ConversationSummary { id: string; title: string }
 const UUID7 = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 export function ConversationHistory({ activeId, revision, onSelect }: { activeId: string | null; revision: number; onSelect?: (id: string) => void }) {
+  const t = useT();
   const [items, setItems] = useState<ConversationSummary[]>([]);
   const [state, setState] = useState<"loading" | "success" | "error" | "expired" | "forbidden">("loading");
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -71,8 +73,8 @@ export function ConversationHistory({ activeId, revision, onSelect }: { activeId
   }, [revision]);
 
   return <section data-conversation-history className="mb-4 min-w-0">
-    <h2 className="mb-1 px-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Lịch sử</h2>
-    <nav aria-label="Lịch sử hội thoại" className="space-y-1">
+    <h2 className="mb-1 px-3 text-xs font-semibold text-slate-500 dark:text-slate-400">{t("c3ConversationHistory.7")}</h2>
+    <nav aria-label={t("c3ConversationHistory.8")} className="space-y-1">
       {items.map(item => <a key={item.id} href={`/chat?conversation_id=${encodeURIComponent(item.id)}`}
         onClick={event => {
           if (!onSelect || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -82,17 +84,17 @@ export function ConversationHistory({ activeId, revision, onSelect }: { activeId
         className={`block min-h-11 break-words rounded-xl px-3 py-2 text-sm ${item.id === activeId
           ? "bg-slate-200/70 font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100"
           : "text-slate-600 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:bg-slate-800/50"}`}>
-        {item.title.trim() || "Hội thoại chưa có tiêu đề"}
+        {item.title.trim() || t("c3ConversationHistory.9")}
       </a>)}
     </nav>
-    {state === "loading" && <p role="status" className="px-3 text-xs">Đang tải lịch sử…</p>}
-    {state === "success" && !items.length && <p className="px-3 text-xs">Chưa có hội thoại đã lưu.</p>}
-    {state === "error" && <p role="status" className="px-3 text-xs">Chưa tải được lịch sử. Bạn vẫn có thể trò chuyện.</p>}
-    {state === "forbidden" && <p role="status" className="px-3 text-xs">Tài khoản này không có quyền xem danh sách hội thoại.</p>}
-    {state === "expired" && <p role="status" className="px-3 text-xs">Phiên đăng nhập đã hết hạn. <a className="underline" href={sessionLoginHref()}>Đăng nhập lại</a>.</p>}
-    {moreError && <p role="status" className="px-3 text-xs">Chưa tải được phần lịch sử tiếp theo. Bạn có thể thử lại.</p>}
+    {state === "loading" && <p role="status" className="px-3 text-xs">{t("c3ConversationHistory.10")}</p>}
+    {state === "success" && !items.length && <p className="px-3 text-xs">{t("c3ConversationHistory.11")}</p>}
+    {state === "error" && <p role="status" className="px-3 text-xs">{t("c3ConversationHistory.12")}</p>}
+    {state === "forbidden" && <p role="status" className="px-3 text-xs">{t("c3ConversationHistory.13")}</p>}
+    {state === "expired" && <p role="status" className="px-3 text-xs">{t("sess.1")} <a className="underline" href={sessionLoginHref()}>{t("sess.2")}</a>.</p>}
+    {moreError && <p role="status" className="px-3 text-xs">{t("c3ConversationHistory.14")}</p>}
     {nextCursor && <button type="button" disabled={loadingMore} onClick={() => loadMore.current()}
-      className="min-h-11 rounded-xl px-3 py-2 text-sm underline">{loadingMore ? "Đang tải thêm…" : "Tải thêm hội thoại"}</button>}
+      className="min-h-11 rounded-xl px-3 py-2 text-sm underline">{loadingMore ? t("c3ConversationHistory.15") : t("c3ConversationHistory.16")}</button>}
     {/* Quick prompts are suggestions; selection belongs to conversation links. */}
     <style>{`.campus-chat-history [data-conversation-history] ~ div > button {
       background-color: transparent; font-weight: 400; color: var(--color-text-muted);
