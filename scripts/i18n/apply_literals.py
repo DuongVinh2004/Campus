@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-WEB = Path(r"C:\Users\Duong Vinh\Vinh\apps\web\src")
+WEB = Path(__file__).resolve().parents[2] / "apps/web/src"
 target, mapping_path, prefix = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
 mapping = json.loads(mapping_path.read_text(encoding="utf-8"))
 raw = target.read_bytes().decode("utf-8")
