@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, type MessageKey } from "@/lib/i18n";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { LearningGateway, type LearningMaterial, type LearningPageExplanation } from "../../lib/data/api/learning-gateway";
 import styles from "./learning.module.css";
@@ -8,9 +9,9 @@ import {LearningMetadataForm} from './LearningMetadataForm';
 
 const gateway = new LearningGateway();
 export const explanationLabels = {
-  RETEACH: "Giảng lại",
-  ADD_EXAMPLE: "Bổ sung ví dụ",
-  CORRECTION: "Đính chính",
+  RETEACH: "pex.1",
+  ADD_EXAMPLE: "pex.2",
+  CORRECTION: "pex.3",
 } as const;
 type ExplanationEditor={editing?:LearningPageExplanation;versionId:string;page:number;category:LearningPageExplanation["category"];body:string};
 const emptyEditor:ExplanationEditor={versionId:"",page:1,category:"RETEACH",body:""};
@@ -21,6 +22,8 @@ export function PageExplanations({ actorId, sessionId, materials, canManage, rea
   onPublish: (draft: LearningPageExplanation) => Promise<unknown>;
   onOpen: (versionId: string, page: number) => void;
 }) {
+  const t = useT();
+  const translatedLabels = Object.fromEntries(Object.entries(explanationLabels).map(([k, v]) => [k, t(v)]));
   const [rows, setRows] = useState<LearningPageExplanation[]>();
   const owner=useTabDraftOwner();
   const scopeKey=JSON.stringify(["page-explanations",actorId,sessionId]);
@@ -67,7 +70,7 @@ export function PageExplanations({ actorId, sessionId, materials, canManage, rea
       .catch(caught => { if (!controller.signal.aborted) {
         setRows(undefined);
         setRowsScope(undefined);
-        setError(caught instanceof Error ? caught.message : "Chưa đọc được lời giải chung.");
+        setError(caught instanceof Error ? caught.message : t("pex.4"));
       } });
     return () => controller.abort();
   }, [actorId, path, refresh,readScope]);
@@ -81,7 +84,7 @@ export function PageExplanations({ actorId, sessionId, materials, canManage, rea
       await work(signal);
       if (!signal?.aborted) { setNotice(success); setRefresh(value => value + 1); }
     } catch (caught) {
-      if (!signal?.aborted) setError(caught instanceof Error ? caught.message : "Chưa lưu được lời giải chung.");
+      if (!signal?.aborted) setError(caught instanceof Error ? caught.message : t("pex.5"));
     } finally {
       if (lifecycle.current?.signal === signal) setBusy(false);
     }
@@ -100,82 +103,82 @@ export function PageExplanations({ actorId, sessionId, materials, canManage, rea
       if (signal.aborted) return;
       setAttempts(current=>{if(current[fingerprint]!==key)return current;const {[fingerprint]:saved,...remaining}=current;return remaining;});
       setEditors(current=>{if(current.entries[editorKey]!==submitted)return current;const {[editorKey]:saved,...remaining}=current.entries;return {active:current.active===editorKey?"new":current.active,entries:remaining};});
-    }, "Đã lưu bản nháp.");
+    }, t("pex.6"));
   }
 
-  if(owner.enabled&&!owner.scope)return <p role="status">Đang kiểm tra tài khoản trước khi mở nháp lời giải…</p>;
-  return <section aria-label="Lời giải chung theo buổi">
-    <h3>Lời giải chung theo buổi</h3>
-    {!visibleRows&&!error&&<p role="status">Đang đọc lời giải chung…</p>}
-    {visibleRows?.length === 0 && <p>Chưa có lời giải chung.</p>}
+  if(owner.enabled&&!owner.scope)return <p role="status">{t("pex.7")}</p>;
+  return <section aria-label={t("pex.8")}>
+    <h3>{t("pex.8")}</h3>
+    {!visibleRows&&!error&&<p role="status">{t("pex.9")}</p>}
+    {visibleRows?.length === 0 && <p>{t("pex.10")}</p>}
     {!!visibleRows?.length && <ul className={styles.list}>{visibleRows.map(row => <li key={row.id}>
-      <strong>{explanationLabels[row.category]}</strong> · {row.status === "DRAFT" ? "Bản nháp" : "Đã công bố"}
+      <strong>{t(explanationLabels[row.category])}</strong> · {row.status === "DRAFT" ? t("pex.11") : t("pex.12")}
       <p style={{ whiteSpace: "pre-wrap" }}>{row.body}</p>
       <button type="button" onClick={() => onOpen(row.version_id, row.page_no)}>Mở trang nguồn {row.page_no}</button>
       {row.status === "DRAFT" && canManage && <>
         <button type="button" disabled={busy} onClick={() => {
           setEditors(current=>({active:row.id,entries:{...current.entries,[row.id]:current.entries[row.id]??{editing:row,versionId:row.version_id,page:row.page_no,category:row.category,body:row.body}}}));
-        }}>Sửa bản nháp</button>
+        }}>{t("pex.13")}</button>
         <button type="button" disabled={busy || editing?.id === row.id}
-          onClick={() => void perform(() => onPublish(row), "Đã công bố lời giải chung.")}>Xem trước công bố</button>
+          onClick={() => void perform(() => onPublish(row), t("pex.14"))}>{t("pex.15")}</button>
       </>}
     </li>)}</ul>}
-    {canManage && !!sources.length && editing && freshEditing && <section className={styles.stack} aria-label="Sửa lời giải chung">
-      <h4>Sửa lời giải chung</h4>
-      <p>Nguồn: {sources.find(row=>row.id===editing.version_id)?.title??'Bài giảng'} · Trang {editing.page_no}</p>
+    {canManage && !!sources.length && editing && freshEditing && <section className={styles.stack} aria-label={t("pex.16")}>
+      <h4>{t("pex.16")}</h4>
+      <p>Nguồn: {sources.find(row=>row.id===editing.version_id)?.title??t("pex.17")} · Trang {editing.page_no}</p>
       <LearningMetadataForm key={`${owner.scope}:${sessionId}:${editing.id}`} actorId={actorId} draftId={`page-explanation:${sessionId}:${editing.id}`} className={styles.stack} disabled={busy}
       initialValues={{body:freshEditing.body,category:freshEditing.category}} basis={{revision:freshEditing.revision}}
-      fieldLabels={{body:'Nội dung lời giải',category:'Hành động'}} valueLabels={{category:explanationLabels}}
+      fieldLabels={{body:t("pex.22"),category:t("pex.21")}} valueLabels={{category:translatedLabels}}
       toPayload={({values,basis})=>({...values,revision:basis.revision})}
       onRead={async signal=>{
         const latest=await gateway.list<LearningPageExplanation>(path,signal,headers);
         const row=latest.find(row=>row.id===editing.id);
-        if(!row||row.status!=='DRAFT'||row.version_id!==editing.version_id||row.page_no!==editing.page_no)throw new Error('Lời giải hoặc quyền đọc nguồn đã thay đổi. Nháp vẫn được giữ.');
+        if(!row||row.status!=='DRAFT'||row.version_id!==editing.version_id||row.page_no!==editing.page_no)throw new Error(t("pex.29"));
         return {values:{body:row.body,category:row.category},basis:{revision:row.revision}};
       }}
       onSave={async(payload,key)=>{
         const signal=lifecycle.current?.signal;
-        if(!signal||signal.aborted)throw new Error('Đã rời trang; nháp vẫn được giữ.');
+        if(!signal||signal.aborted)throw new Error(t("pex.30"));
         setBusy(true);setError('');setNotice('');
         try{
           await gateway.write(`/page-explanations/${editing.id}`,payload,'PATCH',key,headers,signal);
-          if(signal.aborted)throw new Error('Đã rời trang; kiểm tra lời giải đã lưu trước khi gửi lại.');
-          setRefresh(value=>value+1);setNotice('Đã lưu bản nháp.');
+          if(signal.aborted)throw new Error(t("pex.31"));
+          setRefresh(value=>value+1);setNotice(t("pex.6"));
         }finally{if(lifecycle.current?.signal===signal)setBusy(false);}
       }}>{(values,change)=><>
-        <label>Hành động<select value={values.category} onChange={event=>change('category',event.target.value)}>{Object.entries(explanationLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
-        <label>Nội dung lời giải<textarea required maxLength={5000} rows={6} value={values.body} onChange={event=>change('body',event.target.value)}/></label>
-        <p>Chỉ ghi nội dung giảng dạy cho cả lớp. Giữ riêng danh tính, số lượt báo và suy đoán về người gửi.</p>
+        <label>{t("pex.21")}<select value={values.category} onChange={event=>change('category',event.target.value)}>{Object.entries(explanationLabels).map(([value,label])=><option key={value} value={value}>{t(label as MessageKey)}</option>)}</select></label>
+        <label>{t("pex.22")}<textarea required maxLength={5000} rows={6} value={values.body} onChange={event=>change('body',event.target.value)}/></label>
+        <p>{t("pex.23")}</p>
         <div className={styles.row}>
-        <button disabled={!values.body.trim()}>Lưu bản nháp lời giải</button>
-        <button type="button" onClick={()=>setEditors(current=>({...current,active:'new'}))}>Bỏ sửa</button>
+        <button disabled={!values.body.trim()}>{t("pex.24")}</button>
+        <button type="button" onClick={()=>setEditors(current=>({...current,active:'new'}))}>{t("pex.25")}</button>
         </div>
       </>}</LearningMetadataForm></section>}
     {canManage && !!sources.length && !editing && <form className={styles.stack} onSubmit={save}>
-      <h4>{editing ? "Sửa lời giải chung" : "Soạn lời giải chung"}</h4>
+      <h4>{editing ? t("pex.16") : t("pex.18")}</h4>
       <div className={styles.form}>
       {!editing && readerIsLinked && <button type="button" disabled={busy}
-        onClick={() => { setVersionId(readerSource.versionId); setPage(readerSource.page); }}>Dùng trang đang đọc</button>}
-      <label>Phiên bản nguồn <select required value={versionId} disabled={busy || !!editing}
+        onClick={() => { setVersionId(readerSource.versionId); setPage(readerSource.page); }}>{t("pex.19")}</button>}
+      <label>{t("pex.27")} <select required value={versionId} disabled={busy || !!editing}
         onChange={event => { setVersionId(event.target.value); setPage(1); }}>
-        <option value="">Chọn phiên bản</option>
+        <option value="">{t("pex.20")}</option>
         {sources.map(item => <option key={item.id} value={item.id}>{item.title} · Bản {item.version_no}</option>)}
       </select></label>
-      <label>Trang nguồn <input type="number" required min={1} max={source?.page_count ?? 1} value={page}
+      <label>{t("pex.28")} <input type="number" required min={1} max={source?.page_count ?? 1} value={page}
         disabled={busy || !!editing} onChange={event => setPage(Number(event.target.value))} /></label>
-      <label>Hành động <select value={category} disabled={busy}
+      <label>{t("pex.21")} <select value={category} disabled={busy}
         onChange={event => setCategory(event.target.value as LearningPageExplanation["category"])}>
-        {Object.entries(explanationLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+        {Object.entries(explanationLabels).map(([value, label]) => <option key={value} value={value}>{t(label as MessageKey)}</option>)}
       </select></label>
       </div>
-      <label>Nội dung lời giải <textarea value={body} required maxLength={5000} rows={6} disabled={busy}
+      <label>{t("pex.22")} <textarea value={body} required maxLength={5000} rows={6} disabled={busy}
         onChange={event => setBody(event.target.value)} /></label>
-      <p>Chỉ ghi nội dung giảng dạy cho cả lớp. Giữ riêng danh tính, số lượt báo và suy đoán về người gửi.</p>
-      <button disabled={busy || !body.trim() || !versionId}>Lưu bản nháp lời giải</button>
-      {editing && <button type="button" disabled={busy} onClick={() => setEditors(current=>({...current,active:"new"}))}>Bỏ sửa</button>}
+      <p>{t("pex.23")}</p>
+      <button disabled={busy || !body.trim() || !versionId}>{t("pex.24")}</button>
+      {editing && <button type="button" disabled={busy} onClick={() => setEditors(current=>({...current,active:"new"}))}>{t("pex.25")}</button>}
     </form>}
     {error && <p role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
-    <button type="button" disabled={busy} onClick={() => { setError(""); setRefresh(value => value + 1); }}>Tải lại lời giải chung</button>
+    <button type="button" disabled={busy} onClick={() => { setError(""); setRefresh(value => value + 1); }}>{t("pex.26")}</button>
   </section>;
 }

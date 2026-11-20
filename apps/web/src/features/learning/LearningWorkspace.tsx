@@ -866,7 +866,7 @@ export function LearningWorkspace() {
     <AccessibleDialog open={!!management} onClose={cancelManagement} preventClose={managementSubmitting} labelledBy="learning-management-title" className={styles.dialog}>
       <h2 id="learning-management-title">{management?.title}</h2>{management?.context.offering && <p>Lớp của thao tác: {management.context.offering}.{management.context.session&&` Buổi: ${management.context.session}.`}</p>}
       {management?.preview.page_explanation ? <div>
-        <p>{explanationLabels[management.preview.page_explanation.category]} · Trang {management.preview.page_explanation.page_no}</p>
+        <p>{t(explanationLabels[management.preview.page_explanation.category])} · Trang {management.preview.page_explanation.page_no}</p>
         <p style={{ whiteSpace: "pre-wrap" }}>{management.preview.page_explanation.body}</p>
         <p>Lời giải này sẽ hiển thị cho thành viên còn quyền đọc tài liệu trong buổi.</p>
       </div> : management?.preview.change_set ? <ChangeDetails change={management.preview.change_set} />
