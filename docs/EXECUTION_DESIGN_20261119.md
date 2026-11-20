@@ -532,3 +532,7 @@ Còn lại thật sự: E5 (phát hành thử, cần worker và ≥ 2 GB RAM tr�
 Runtime 8015 **đang chạy bản mới** (snapshot `frontend-knowledge-eall-20261120-01`, thay `frontend-knowledge-qa-20261118-04`) với ClamAV bật, worker nhập liệu bật, model server 18081/18082, gateway 8025, Postgres 55437, đúng cấu hình thường (không còn công tắc kiểm tải). Còn lại do kiểm thử: hai tài liệu "QA-scan-check sạch" ở trạng thái `AWAITING_REVIEW` (không phát hành; chủ sở hữu không thể tự từ chối tài liệu mình gửi, cần quản trị viên thứ hai), học viên local đã ghi danh vào "Lớp SQL 20261104-03".
 
 Chưa làm vì cần quyết định hoặc đầu vào: mục 6 (OIDC, kênh cảnh báo thật, tải restic/Keycloak, push web, văn bản đồng ý P2, ngân sách gate hằng tuần, migration 0032, xóa thư mục `.pytest-tmp-*`, push/merge) và sửa lỗi tt-06 của bộ giữ lại 2 bằng cơ chế chung (đụng RAG).
+
+### E14, tiếp (20/11): màn hình đã chuyển sang tiếng Anh
+
+Đã có tiếng Anh cho: điều hướng và ô tìm kiếm, khung và trang đăng nhập (cả trang đăng nhập vận hành, trước đây thiếu nút đổi ngôn ngữ), **hộp thư thông báo**, **màn hình phòng học** (khoảng 80 chuỗi, gồm chuỗi có tham số), **thời khóa biểu theo tuần**. Mỗi màn có một test tiếng Anh; web 157 tệp / 965 test đạt, `tsc` sạch. Phương pháp và công cụ trích/thay chữ nằm ở `scripts/i18n/` (README) để các màn còn lại làm cơ học: **chat (`ChatPanel`, ~110 dòng), phiếu hỗ trợ/dịch vụ, học liệu, quản trị tri thức, trang chủ**. Câu trả lời của chatbot giữ tiếng Việt (B4.1: truy hồi tiếng Anh kém hơn).
