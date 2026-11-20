@@ -31,24 +31,16 @@ import {
   type BusyInterval,
   type RoomKind,
 } from "@/lib/campus-ops-api";
+import { useT, type MessageKey } from "@/lib/i18n";
 
-const FEATURE_LABELS: Record<string, string> = {
-  WIFI: "Wi‑Fi",
-  MAY_CHIEU: "Máy chiếu",
-  DIEU_HOA: "Điều hòa",
-  MICRO: "Micro",
-  SAN_KHAU: "Sân khấu",
-  MAY_TINH: "Máy tính",
-  MAN_HINH: "Màn hình",
-  BANG_TRANG: "Bảng trắng",
+// Labels are message keys, translated where they are shown (this file's text lives in lib/i18n).
+const FEATURE_KEYS: Record<string, MessageKey> = {
+  MAY_CHIEU: "rooms.22", DIEU_HOA: "rooms.23", SAN_KHAU: "rooms.24", MAY_TINH: "rooms.25", MAN_HINH: "rooms.26", BANG_TRANG: "rooms.27",
 };
+const FEATURE_PLAIN: Record<string, string> = { WIFI: "Wi‑Fi", MICRO: "Micro" };
 
-const KIND_LABELS: Record<RoomKind, string> = {
-  lecture: "Giảng đường",
-  lab: "Phòng máy",
-  meeting: "Phòng họp nhóm",
-  study: "Phòng học nhóm",
-  hall: "Hội trường",
+const KIND_KEYS: Record<RoomKind, MessageKey> = {
+  lecture: "rooms.7", lab: "rooms.8", meeting: "rooms.9", study: "rooms.10", hall: "rooms.11",
 };
 
 function getHcmToday(): string {
@@ -128,6 +120,7 @@ function isRoomBusy(busyList: BusyInterval[] | undefined, start: string, end: st
 }
 
 export function RoomFinder() {
+  const t = useT();
   const [roomList, setRoomList] = useState<RoomList | null>(null);
   const [roomsLoading, setRoomsLoading] = useState(true);
   const [roomsError, setRoomsError] = useState<string | null>(null);
@@ -267,11 +260,11 @@ export function RoomFinder() {
   const handlePreview = async () => {
     if (!dialogRoom) return;
     if (purpose.trim().length < 3 || purpose.trim().length > 200) {
-      setPreviewError("Mục đích sử dụng phải từ 3 đến 200 ký tự.");
+      setPreviewError(t("rooms.28"));
       return;
     }
     if (attendees < 1 || attendees > dialogRoom.capacity) {
-      setPreviewError(`Số người phải từ 1 đến ${dialogRoom.capacity}.`);
+      setPreviewError(t("rooms3.1", { max: dialogRoom.capacity }));
       return;
     }
     setPreviewLoading(true);
@@ -342,9 +335,9 @@ export function RoomFinder() {
   return (
     <div data-testid="room-finder" className="space-y-8">
       <header className="campus-page-heading">
-        <div data-eyebrow="Không gian học tập">
-          <h1 className="text-2xl font-semibold">Phòng học</h1>
-          <p>Tìm phòng trống, xem lịch theo ngày và đặt phòng học nhóm hoặc sự kiện.</p>
+        <div data-eyebrow={t("rooms.29")}>
+          <h1 className="text-2xl font-semibold">{t("rooms.1")}</h1>
+          <p>{t("rooms.2")}</p>
         </div>
       </header>
 
@@ -354,16 +347,16 @@ export function RoomFinder() {
           className="flex items-center gap-3 rounded-lg border border-[var(--border-color)] bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-secondary)]"
         >
           <Info className="h-4 w-4 shrink-0 text-[var(--color-primary)]" aria-hidden="true" />
-          <span>Dữ liệu phòng là dữ liệu mô phỏng nội bộ, chưa kết nối hệ thống quản lý phòng của HUCE.</span>
+          <span>{t("rooms.3")}</span>
         </div>
       )}
 
       <section className="campus-panel space-y-4">
-        <h2 className="text-base font-semibold text-[var(--text-primary)]">Bộ lọc tìm kiếm</h2>
+        <h2 className="text-base font-semibold text-[var(--text-primary)]">{t("rooms.4")}</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label htmlFor="search-input" className="block text-xs font-medium text-[var(--text-secondary)]">
-              Từ khóa tìm kiếm
+              {t("rooms2.1")}
             </label>
             <div className="relative mt-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" />
@@ -372,7 +365,7 @@ export function RoomFinder() {
                 type="text"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Mã hoặc tên phòng..."
+                placeholder={t("rooms.30")}
                 className="min-h-[44px] w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] pl-9 pr-3 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               />
             </div>
@@ -380,7 +373,7 @@ export function RoomFinder() {
 
           <div>
             <label htmlFor="building-select" className="block text-xs font-medium text-[var(--text-secondary)]">
-              Tòa nhà
+              {t("rooms2.2")}
             </label>
             <select
               id="building-select"
@@ -388,10 +381,10 @@ export function RoomFinder() {
               onChange={(e) => setBuilding(e.target.value)}
               className="mt-1 min-h-[44px] w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-3 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
             >
-              <option value="">Tất cả tòa nhà</option>
+              <option value="">{t("rooms.5")}</option>
               {roomList?.buildings.map((b) => (
                 <option key={b} value={b}>
-                  Tòa {b}
+                  {t("rooms3.2", { b })}
                 </option>
               ))}
             </select>
@@ -399,7 +392,7 @@ export function RoomFinder() {
 
           <div>
             <label htmlFor="kind-select" className="block text-xs font-medium text-[var(--text-secondary)]">
-              Loại phòng
+              {t("rooms2.3")}
             </label>
             <select
               id="kind-select"
@@ -407,18 +400,18 @@ export function RoomFinder() {
               onChange={(e) => setKind(e.target.value as RoomKind | "")}
               className="mt-1 min-h-[44px] w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-3 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
             >
-              <option value="">Tất cả loại phòng</option>
-              <option value="lecture">Giảng đường</option>
-              <option value="lab">Phòng máy</option>
-              <option value="meeting">Phòng họp nhóm</option>
-              <option value="study">Phòng học nhóm</option>
-              <option value="hall">Hội trường</option>
+              <option value="">{t("rooms.6")}</option>
+              <option value="lecture">{t("rooms.7")}</option>
+              <option value="lab">{t("rooms.8")}</option>
+              <option value="meeting">{t("rooms.9")}</option>
+              <option value="study">{t("rooms.10")}</option>
+              <option value="hall">{t("rooms.11")}</option>
             </select>
           </div>
 
           <div>
             <label htmlFor="min-capacity-input" className="block text-xs font-medium text-[var(--text-secondary)]">
-              Sức chứa tối thiểu
+              {t("rooms2.4")}
             </label>
             <input
               id="min-capacity-input"
@@ -435,7 +428,7 @@ export function RoomFinder() {
         <div className="grid grid-cols-1 gap-4 border-t border-[var(--border-color)] pt-4 sm:grid-cols-3">
           <div>
             <label htmlFor="date-input" className="block text-xs font-medium text-[var(--text-secondary)]">
-              Ngày kiểm tra lịch
+              {t("rooms2.5")}
             </label>
             <div className="relative mt-1">
               <Calendar className="absolute left-3 top-3 h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" />
@@ -453,7 +446,7 @@ export function RoomFinder() {
 
           <div>
             <label htmlFor="start-time-select" className="block text-xs font-medium text-[var(--text-secondary)]">
-              Giờ bắt đầu
+              {t("rooms2.6")}
             </label>
             <div className="relative mt-1">
               <Clock className="absolute left-3 top-3 h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" />
@@ -474,7 +467,7 @@ export function RoomFinder() {
 
           <div>
             <label htmlFor="end-time-select" className="block text-xs font-medium text-[var(--text-secondary)]">
-              Giờ kết thúc
+              {t("rooms2.7")}
             </label>
             <div className="relative mt-1">
               <Clock className="absolute left-3 top-3 h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" />
@@ -493,7 +486,7 @@ export function RoomFinder() {
             </div>
             {isTimeInvalid && (
               <p className="mt-1 text-xs text-red-600" role="alert">
-                Giờ kết thúc phải sau giờ bắt đầu.
+                {t("rooms2.8")}
               </p>
             )}
           </div>
@@ -503,14 +496,14 @@ export function RoomFinder() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-            Danh sách phòng học {roomList?.items ? `(${roomList.items.length})` : ""}
+            {t("rooms3.3")} {roomList?.items ? `(${roomList.items.length})` : ""}
           </h2>
         </div>
 
         {roomsLoading && (
           <div role="status" className="campus-panel py-12 text-center text-sm text-[var(--text-secondary)]">
             <RefreshCw className="mx-auto mb-2 h-6 w-6 animate-spin text-[var(--color-primary)]" aria-hidden="true" />
-            <span>Đang tải danh sách phòng…</span>
+            <span>{t("rooms.12")}</span>
           </div>
         )}
 
@@ -523,7 +516,7 @@ export function RoomFinder() {
               onClick={fetchRooms}
               className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
             >
-              Thử lại
+              {t("rooms2.9")}
             </button>
           </div>
         )}
@@ -531,9 +524,9 @@ export function RoomFinder() {
         {!roomsLoading && !roomsError && roomList?.items.length === 0 && (
           <div className="campus-panel py-12 text-center space-y-2">
             <Info className="mx-auto h-8 w-8 text-[var(--text-secondary)]" aria-hidden="true" />
-            <p className="text-base font-semibold text-[var(--text-primary)]">Không tìm thấy phòng phù hợp</p>
+            <p className="text-base font-semibold text-[var(--text-primary)]">{t("rooms.13")}</p>
             <p className="text-sm text-[var(--text-secondary)]">
-              Vui lòng thử thay đổi từ khóa, tòa nhà hoặc tiêu chí sức chứa.
+              {t("rooms2.10")}
             </p>
           </div>
         )}
@@ -548,11 +541,11 @@ export function RoomFinder() {
 
               let disabledReason = "";
               if (isMaintenance) {
-                disabledReason = "Phòng đang bảo trì, không thể đặt";
+                disabledReason = t("rooms.31");
               } else if (isTimeInvalid) {
-                disabledReason = "Giờ kết thúc phải sau giờ bắt đầu";
+                disabledReason = t("rooms.32");
               } else if (busy) {
-                disabledReason = "Phòng đã có lịch trong khung giờ được chọn";
+                disabledReason = t("rooms.33");
               }
 
               return (
@@ -572,25 +565,25 @@ export function RoomFinder() {
                           {room.display_name}
                         </h3>
                         <p className="text-xs text-[var(--text-secondary)]">
-                          Tòa {room.building} · Tầng {room.floor}
+                          {t("rooms3.4", { building: room.building, floor: room.floor })}
                         </p>
                       </div>
                       <span className="inline-flex shrink-0 items-center gap-1 rounded bg-[var(--surface-subtle)] px-2 py-1 text-xs text-[var(--text-secondary)]">
                         <Users className="h-3 w-3" aria-hidden="true" />
-                        {room.capacity} chỗ
+                        {t("rooms3.5", { n: room.capacity })}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--text-secondary)]">
                       <span className="rounded border border-[var(--border-color)] px-2 py-0.5 font-medium">
-                        {KIND_LABELS[room.kind] || room.kind}
+                        {KIND_KEYS[room.kind] ? t(KIND_KEYS[room.kind]) : room.kind}
                       </span>
                       {room.features.map((f) => (
                         <span
                           key={f}
                           className="rounded bg-[var(--color-primary-light)] px-2 py-0.5 font-medium text-[var(--color-primary)]"
                         >
-                          {FEATURE_LABELS[f] || f}
+                          {FEATURE_KEYS[f] ? t(FEATURE_KEYS[f]) : (FEATURE_PLAIN[f] || f)}
                         </span>
                       ))}
                     </div>
@@ -599,36 +592,36 @@ export function RoomFinder() {
                       {isMaintenance ? (
                         <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800 border border-amber-200">
                           <Wrench className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                          Đang bảo trì
+                          {t("rooms2.11")}
                         </span>
                       ) : busy ? (
                         <span className="inline-flex items-center gap-1 rounded-md bg-red-50 px-2.5 py-1 text-xs font-medium text-red-800 border border-red-200">
                           <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                          Đã có lịch
+                          {t("rooms2.12")}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800 border border-emerald-200">
                           <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                          Trống trong khung giờ này
+                          {t("rooms2.13")}
                         </span>
                       )}
                     </div>
 
                     <div className="space-y-1 pt-2">
                       <div className="flex items-center justify-between text-[11px] text-[var(--text-secondary)]">
-                        <span>Lịch bận (07:00–21:00)</span>
+                        <span>{t("rooms.14")}</span>
                         <div className="flex items-center gap-2">
                           <span className="flex items-center gap-1">
                             <span className="inline-block h-2 w-2 rounded-full bg-[var(--color-primary)]" />
-                            Đã đặt
+                            {t("rooms2.14")}
                           </span>
                           <span className="flex items-center gap-1">
                             <span className="inline-block h-2 w-2 rounded-full bg-slate-400" />
-                            Giờ học
+                            {t("rooms2.15")}
                           </span>
                           <span className="flex items-center gap-1">
                             <span className="inline-block h-2 w-2 rounded-full bg-amber-600" />
-                            Giờ thi
+                            {t("rooms2.16")}
                           </span>
                         </div>
                       </div>
@@ -665,11 +658,11 @@ export function RoomFinder() {
                       type="button"
                       data-testid={`room-book-${room.room_code}`}
                       disabled={cannotBook}
-                      title={cannotBook ? disabledReason : "Đặt phòng này"}
+                      title={cannotBook ? disabledReason : t("rooms.34")}
                       onClick={(e) => openBookingDialog(room, e.currentTarget)}
                       className="min-h-[44px] w-full rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                     >
-                      Đặt phòng
+                      {t("rooms2.17")}
                     </button>
                   </div>
                 </div>
@@ -691,15 +684,15 @@ export function RoomFinder() {
             <div className="flex items-start justify-between border-b border-[var(--border-color)] pb-3">
               <div>
                 <h3 id="booking-dialog-title" className="text-lg font-semibold text-[var(--text-primary)]">
-                  Đặt phòng học
+                  {t("rooms2.18")}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)]">
-                  {dialogRoom.display_name} ({dialogRoom.room_code}) · Ngày {date} · {start} - {end}
+                  {dialogRoom.display_name} ({dialogRoom.room_code}) · {t("rooms3.6", { date, start, end })}
                 </p>
               </div>
               <button
                 type="button"
-                aria-label="Đóng"
+                aria-label={t("rooms.35")}
                 onClick={closeBookingDialog}
                 className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
@@ -711,9 +704,9 @@ export function RoomFinder() {
               <div className="space-y-4 py-4 text-center">
                 <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" aria-hidden="true" />
                 <div className="space-y-1">
-                  <h4 className="text-base font-semibold text-[var(--text-primary)]">Đặt phòng thành công!</h4>
+                  <h4 className="text-base font-semibold text-[var(--text-primary)]">{t("rooms.15")}</h4>
                   <p className="text-sm text-[var(--text-secondary)]">
-                    Mã lượt đặt của bạn: <strong className="text-[var(--text-primary)]">{bookingSuccessCode}</strong>
+                    {t("rooms3.7")} <strong className="text-[var(--text-primary)]">{bookingSuccessCode}</strong>
                   </p>
                 </div>
                 <button
@@ -721,28 +714,28 @@ export function RoomFinder() {
                   onClick={closeBookingDialog}
                   className="min-h-[44px] w-full rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                 >
-                  Hoàn tất
+                  {t("rooms2.19")}
                 </button>
               </div>
             ) : (
               <div className="space-y-4">
                 <div>
                   <label htmlFor="purpose-input" className="block text-xs font-medium text-[var(--text-secondary)]">
-                    Mục đích sử dụng (bắt buộc, 3–200 ký tự)
+                    {t("rooms2.20")}
                   </label>
                   <textarea
                     id="purpose-input"
                     rows={3}
                     value={purpose}
                     onChange={(e) => setPurpose(e.target.value)}
-                    placeholder="VD: Họp nhóm làm bài tập lớn môn Kiến trúc công trình..."
+                    placeholder={t("rooms.36")}
                     className="mt-1 min-h-[80px] w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] p-3 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="attendees-input" className="block text-xs font-medium text-[var(--text-secondary)]">
-                    Số người tham gia (1 - {dialogRoom.capacity})
+                    {t("rooms3.8", { max: dialogRoom.capacity })}
                   </label>
                   <input
                     id="attendees-input"
@@ -763,7 +756,7 @@ export function RoomFinder() {
 
                 {preview && preview.problems.length > 0 && (
                   <div role="alert" className="rounded-lg bg-red-50 p-3 text-xs text-red-700 border border-red-200 space-y-1">
-                    <p className="font-semibold">Không thể xác nhận lượt đặt:</p>
+                    <p className="font-semibold">{t("rooms.16")}</p>
                     <ul className="list-disc pl-4 space-y-0.5">
                       {preview.problems.map((p, idx) => (
                         <li key={idx}>{p}</li>
@@ -774,7 +767,7 @@ export function RoomFinder() {
 
                 {preview && preview.can_confirm && (
                   <div className="rounded-lg bg-emerald-50 p-3 text-xs text-emerald-800 border border-emerald-200 space-y-1">
-                    <p className="font-semibold">Lịch phòng hợp lệ!</p>
+                    <p className="font-semibold">{t("rooms.17")}</p>
                     {preview.notice && <p>{preview.notice}</p>}
                     <p className="text-[11px] text-emerald-700">
                       {formatHold(preview.expires_at)}
@@ -784,8 +777,8 @@ export function RoomFinder() {
 
                 {networkUncertain && (
                   <div role="alert" className="rounded-lg bg-amber-50 p-3 text-xs text-amber-800 border border-amber-200 space-y-2">
-                    <p className="font-semibold">Kết quả chưa xác định do gián đoạn kết nối.</p>
-                    <p>Vui lòng kiểm tra danh sách lượt đặt trước khi thử lại.</p>
+                    <p className="font-semibold">{t("rooms.18")}</p>
+                    <p>{t("rooms.19")}</p>
                     <button
                       type="button"
                       onClick={() => {
@@ -794,7 +787,7 @@ export function RoomFinder() {
                       }}
                       className="min-h-[44px] w-full rounded bg-amber-600 px-3 py-2 text-xs font-medium text-white hover:bg-amber-700"
                     >
-                      Kiểm tra lượt đặt của tôi
+                      {t("rooms2.21")}
                     </button>
                   </div>
                 )}
@@ -813,7 +806,7 @@ export function RoomFinder() {
                     onClick={handlePreview}
                     className="min-h-[44px] w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                   >
-                    {previewLoading ? "Đang kiểm tra…" : "Xem trước"}
+                    {previewLoading ? t("rooms.37") : t("rooms.38")}
                   </button>
 
                   <button
@@ -823,7 +816,7 @@ export function RoomFinder() {
                     onClick={handleConfirm}
                     className="min-h-[44px] w-full rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                   >
-                    {confirmLoading ? "Đang xác nhận…" : "Xác nhận đặt phòng"}
+                    {confirmLoading ? t("rooms.39") : t("rooms.40")}
                   </button>
                 </div>
               </div>
@@ -836,12 +829,12 @@ export function RoomFinder() {
         <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
           <div className="flex items-center gap-2">
             <Layers className="h-5 w-5 text-[var(--color-primary)]" aria-hidden="true" />
-            <h2 className="text-base font-semibold text-[var(--text-primary)]">Lượt đặt của tôi</h2>
+            <h2 className="text-base font-semibold text-[var(--text-primary)]">{t("rooms.20")}</h2>
           </div>
           <button
             type="button"
             onClick={fetchMine}
-            aria-label="Làm mới lượt đặt của tôi"
+            aria-label={t("rooms.41")}
             className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           >
             <RefreshCw className={`h-4 w-4 ${mineLoading ? "animate-spin" : ""}`} aria-hidden="true" />
@@ -856,7 +849,7 @@ export function RoomFinder() {
 
         {mineLoading && myBookings.length === 0 && (
           <div role="status" className="py-6 text-center text-sm text-[var(--text-secondary)]">
-            Đang tải lượt đặt của bạn…
+            {t("rooms2.22")}
           </div>
         )}
 
@@ -868,14 +861,14 @@ export function RoomFinder() {
               onClick={fetchMine}
               className="min-h-[44px] px-4 py-1.5 rounded-lg border border-[var(--border-color)] text-xs font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)]"
             >
-              Thử lại
+              {t("rooms2.9")}
             </button>
           </div>
         )}
 
         {!mineLoading && !mineError && myBookings.length === 0 && (
           <div className="py-8 text-center text-sm text-[var(--text-secondary)]">
-            Bạn chưa có lượt đặt phòng nào. Hãy chọn phòng ở danh sách phía trên để đặt.
+            {t("rooms2.23")}
           </div>
         )}
 
@@ -888,28 +881,28 @@ export function RoomFinder() {
                   <div className="space-y-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-semibold text-sm text-[var(--text-primary)]">
-                        Mã: {b.code}
+                        {t("rooms3.9")} {b.code}
                       </span>
                       {isConfirmed ? (
                         <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800 border border-emerald-200">
                           <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
-                          Đã xác nhận
+                          {t("rooms2.24")}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 border border-slate-200">
                           <XCircle className="h-3 w-3" aria-hidden="true" />
-                          Đã hủy
+                          {t("rooms2.25")}
                         </span>
                       )}
                     </div>
                     <p className="text-xs text-[var(--text-primary)] font-medium">
-                      {b.room_name} ({b.room_code}) · Tòa {b.building}
+                      {b.room_name} ({b.room_code}) · {t("rooms3.10", { b: b.building })}
                     </p>
                     <p className="text-xs text-[var(--text-secondary)]">
                       {formatHcmDateTime(b.starts_at)} - {formatHcmDateTime(b.ends_at)}
                     </p>
                     <p className="text-xs text-[var(--text-secondary)] italic break-words">
-                      Mục đích: {b.purpose} ({b.attendees} người)
+                      {t("rooms3.11", { purpose: b.purpose, n: b.attendees })}
                     </p>
                   </div>
 
@@ -917,14 +910,14 @@ export function RoomFinder() {
                     <div className="shrink-0">
                       {cancellingCode === b.code ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-[var(--text-secondary)]">Hủy lượt đặt này?</span>
+                          <span className="text-xs text-[var(--text-secondary)]">{t("rooms.21")}</span>
                           <button
                             type="button"
                             disabled={cancelLoading}
                             onClick={() => handleCancelBooking(b.id)}
                             className="min-h-[44px] px-3 py-1.5 rounded-lg bg-red-600 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
                           >
-                            Có
+                            {t("rooms2.26")}
                           </button>
                           <button
                             type="button"
@@ -932,7 +925,7 @@ export function RoomFinder() {
                             onClick={() => setCancellingCode(null)}
                             className="min-h-[44px] px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-xs font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)]"
                           >
-                            Không
+                            {t("rooms2.27")}
                           </button>
                         </div>
                       ) : (
@@ -942,7 +935,7 @@ export function RoomFinder() {
                           onClick={() => setCancellingCode(b.code)}
                           className="min-h-[44px] px-3 py-1.5 rounded-lg border border-red-300 bg-red-50 text-xs font-medium text-red-700 hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                         >
-                          Hủy đặt
+                          {t("rooms2.28")}
                         </button>
                       )}
                     </div>
