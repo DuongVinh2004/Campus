@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "../../lib/i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
@@ -68,6 +69,7 @@ function linkPath(destination:ReaderLink) {
 }
 
 export function LearningWorkspace() {
+  const t = useT();
   const [capabilities, setCapabilities] = useState<LearningCapabilities | null>(null);
   const [initializationAttempt, setInitializationAttempt] = useState(0);
   const pptxEnabled = capabilities?.pptx_available === true;
@@ -139,7 +141,7 @@ export function LearningWorkspace() {
       publicationGeneration.current++;publicationPending.current=false;
       for(const controller of managementRequests.current)controller.abort();
       catalogRequest.current?.abort();
-      if(!confirmingManagement.current)currentManagement.current?.reject(new Error("Đã rời trang xem trước; bản đang soạn vẫn được giữ."));
+      if(!confirmingManagement.current)currentManagement.current?.reject(new Error(t("lwx.1")));
     };
   },[]);
   const readerId = reader?.version_id || reader?.id;
@@ -171,7 +173,7 @@ export function LearningWorkspace() {
         const ideaShare = new URLSearchParams(window.location.search).get("idea_share");
         if (!destination && ideaShare && uuid.test(ideaShare)) setLoginTarget(`/learning?idea_share=${ideaShare}`);
         const response = await fetch("/v1/users/me", { credentials: "include", cache: "no-store", signal: controller.signal });
-        if (!response.ok) throw new Error(response.status === 401 ? "Hãy đăng nhập để truy cập học liệu của bạn." : "Chưa kiểm tra được phiên đăng nhập.");
+        if (!response.ok) throw new Error(response.status === 401 ? t("lwx.2") : t("lwx.3"));
         const actor = await response.json(); const isAdmin = actor.roles?.includes("SYSTEM_ADMIN") === true;
         const gateway = new LearningGateway(undefined, actor.user_id || actor.subject_id || undefined);
         const caps = await gateway.capabilities(controller.signal);
@@ -185,8 +187,8 @@ export function LearningWorkspace() {
         if(destination) {
           try {
             const metadata=await gateway.reader(destination.version_id,controller.signal);
-            if(!rows.some(item=>item.id===metadata.offering_id&&item.capabilities.read))throw new Error("Lớp của bài giảng không còn trong phạm vi được phép xem.");
-            if(destination.page_no&&destination.page_no>metadata.page_count)throw new Error("Trang trong liên kết không có ở phiên bản này.");
+            if(!rows.some(item=>item.id===metadata.offering_id&&item.capabilities.read))throw new Error(t("lwx.4"));
+            if(destination.page_no&&destination.page_no>metadata.page_count)throw new Error(t("lwx.5"));
             const contexts = caps.session_contexts === true ? await gateway.sessionContexts(destination.version_id, controller.signal) : [];
             const sourceSessionId = contexts.find(context => context.id === destination.session_id)?.id
               ?? (contexts.length === 1 ? contexts[0].id : undefined);
@@ -195,10 +197,10 @@ export function LearningWorkspace() {
             };
             first=metadata.offering_id;
           } catch(caught) {
-            if(!controller.signal.aborted)setError(caught instanceof LearningApiError&&caught.status===404?"Phiên bản trong liên kết không còn được cung cấp.":errorText(caught));
+            if(!controller.signal.aborted)setError(caught instanceof LearningApiError&&caught.status===404?t("lwx.6"):errorText(caught));
           }
         } else if(new URLSearchParams(window.location.search).has("version_id")) {
-          setError("Liên kết học liệu không hợp lệ.");
+          setError(t("lwx.7"));
         }
         if (!controller.signal.aborted) { setOfferings(rows); setOfferingId(first); }
       } catch (caught) { if (!controller.signal.aborted) setError(errorText(caught)); }
@@ -281,11 +283,11 @@ export function LearningWorkspace() {
     if (update.event_type === "EXIT_TICKET_UPDATED" && update.exit_ticket_id && update.session_id) {
       if (update.offering_id && update.offering_id !== offeringId) {
         const rows = await gateway.offerings(admin);
-        if (!rows.some(row => row.id === update.offering_id && row.capabilities.exit_tickets)) throw new Error("Phiếu ra lớp hiện không khả dụng.");
+        if (!rows.some(row => row.id === update.offering_id && row.capabilities.exit_tickets)) throw new Error(t("lwx.8"));
         pendingExitSession.current = { offeringId: update.offering_id, sessionId: update.session_id };
         setOfferings(rows); setOfferingId(update.offering_id);
       } else {
-        if (!exitEnabled || !sessions.some(row => row.id === update.session_id)) throw new Error("Phiếu ra lớp hiện không khả dụng.");
+        if (!exitEnabled || !sessions.some(row => row.id === update.session_id)) throw new Error(t("lwx.8"));
         setSessionId(update.session_id);
       }
       selectExitTicket(update.exit_ticket_id, update.session_id);
@@ -314,8 +316,8 @@ export function LearningWorkspace() {
     });
   }
   async function reviewedWrite<T>(path: string, payload: Record<string, unknown>, action: string, title: string, method = "POST"): Promise<T> {
-    if(currentManagement.current||managementRequests.current.size||currentPublication.current||publicationPending.current)throw new Error("Hãy hoàn tất hoặc quay lại bản xem trước đang mở.");
-    if(!session.canAccess.current)throw new Error("Hãy kiểm tra lại tài khoản trước khi tiếp tục.");
+    if(currentManagement.current||managementRequests.current.size||currentPublication.current||publicationPending.current)throw new Error(t("lwx.9"));
+    if(!session.canAccess.current)throw new Error(t("lwx.10"));
     const target = path.split("/").filter(part=>/^[0-9a-f]{8}-[0-9a-f-]{27}$/.test(part)).at(-1);
     const requestedActor = action.startsWith("exit-") || action.startsWith("ocr-") ? actorId : undefined;
     const body = { action, target_id: target, payload };
@@ -325,12 +327,12 @@ export function LearningWorkspace() {
     try{
       preview=await gateway.write<LearningPreview>("/action-previews",body,"POST",undefined,
         requestedActor?{"X-Campus-Reader-Actor":requestedActor}:{},controller.signal);
-      if(controller.signal.aborted||!managementLifetime.current)throw new Error("Đã rời trang xem trước; bản đang soạn vẫn được giữ.");
+      if(controller.signal.aborted||!managementLifetime.current)throw new Error(t("lwx.1"));
     }finally{managementRequests.current.delete(controller);}
     setManagementConfirmed(false);
     return new Promise<T>((resolve, reject) => {const next={ action,title, path, payload, method, preview, actorId: requestedActor,context, resolve:(value:unknown)=>resolve(value as T),reject };currentManagement.current=next;setManagement(next);});
   }
-  function cancelManagement() { management?.reject(new Error("Đã hủy thao tác; dữ liệu chưa được thay đổi.")); currentManagement.current=null;setManagement(null); }
+  function cancelManagement() { management?.reject(new Error(t("lwx.11"))); currentManagement.current=null;setManagement(null); }
   async function confirmManagement() {
     if (!management || !managementConfirmed || confirmingManagement.current || !session.canAccess.current) return;
     confirmingManagement.current=true;setManagementSubmitting(true);
@@ -348,7 +350,7 @@ export function LearningWorkspace() {
   async function openVersion(versionId: string, pageNo?: number, noteId?:string, sourceSessionId?:string, citation?: ReaderSelection) {
     await flushReaderState();
     const metadata = await gateway.reader(versionId);
-    if(pageNo&&pageNo>metadata.page_count)throw new Error("Trang trong liên kết không có ở phiên bản này.");
+    if(pageNo&&pageNo>metadata.page_count)throw new Error(t("lwx.5"));
     const [saved, marks] = await Promise.all([
       gateway.request<{ revision?: number; state?: ReaderState } & Partial<ReaderState>>(
         `/me/reader-state/${versionId}`, { headers: { "X-Campus-Reader-Actor": actorId } },
@@ -379,7 +381,7 @@ export function LearningWorkspace() {
     if (source.offering_id !== offeringId) {
       await flushReaderState();
       const available = await gateway.offerings(admin);
-      if (!available.some(item => item.id === source.offering_id && item.capabilities.read)) throw new Error("Nguồn hiện không khả dụng.");
+      if (!available.some(item => item.id === source.offering_id && item.capabilities.read)) throw new Error(t("lwx.12"));
       pendingNavigation.current = { version_id: source.version_id, offering_id: source.offering_id, page_no: source.page_no, citation };
       setOfferings(available); setOfferingId(source.offering_id);
       return;
@@ -442,7 +444,7 @@ export function LearningWorkspace() {
       const marks = await gateway.list<Bookmark>(`/me/bookmarks?version_id=${readerId}`);
       if (readerEpoch.current !== readerGeneration) return;
       setBookmarks(marks);
-      setNotice("Đã đánh dấu trang.");
+      setNotice(t("lwx.13"));
     } catch (caught) {
       setError(errorText(caught));
       throw caught;
@@ -466,7 +468,7 @@ export function LearningWorkspace() {
       setReaderGeneration(++readerEpoch.current);
     }
     setSyncIssue(readerId);
-    setNotice("Đã đồng bộ vị trí đọc bạn chọn.");
+    setNotice(t("lwx.14"));
   }
   useEffect(() => {
     const reconnect = () => {
@@ -488,7 +490,7 @@ export function LearningWorkspace() {
       if (controller.signal.aborted)return;
       if(caught instanceof LearningApiError&&caught.status===401){ void session.check(); return; }
       if(caught instanceof LearningApiError&&[403,404].includes(caught.status)){
-        setReader(null);setError(caught.status===404?"Phiên bản này không còn được cung cấp.":errorText(caught));
+        setReader(null);setError(caught.status===404?t("lwx.15"):errorText(caught));
       }
     }).finally(() => { inflight = false; }); };
     // A focus also re-checks the account, which briefly leaves the "ready" state and tears this effect down.
@@ -506,8 +508,8 @@ export function LearningWorkspace() {
   },[anchorId,annotations,readerId,readerPage]);
 
   async function publishPreview(versionId: string, action: "publish" | "retract" | "cancel-publication", scheduledAt?: string, replacementId?: string) {
-    if(currentManagement.current||managementRequests.current.size)throw new Error("Hãy hoàn tất hoặc quay lại bản xem trước đang mở.");
-    if(!session.canAccess.current)throw new Error("Hãy kiểm tra lại tài khoản trước khi tiếp tục.");
+    if(currentManagement.current||managementRequests.current.size)throw new Error(t("lwx.9"));
+    if(!session.canAccess.current)throw new Error(t("lwx.10"));
     const generation=++publicationGeneration.current;publicationPending.current=true;
     const material=materials.find(item=>item.versions.some(version=>version.id===versionId));
     const version=material?.versions.find(item=>item.id===versionId);
@@ -546,17 +548,17 @@ export function LearningWorkspace() {
   }
   async function applyPublication() {
     if (!preview || !confirmed) return;
-    if (Date.parse(preview.preview.expires_at) <= Date.now()) throw new Error("Bản xem trước đã hết hạn. Hãy tạo lại.");
+    if (Date.parse(preview.preview.expires_at) <= Date.now()) throw new Error(t("lwx.16"));
     await gateway.write(`/versions/${preview.versionId}/${preview.action}`, {
       preview_id: preview.preview.preview_id, confirmation_token: preview.preview.confirmation_token,
       ...(preview.scheduledAt ? { scheduled_at: preview.scheduledAt } : {}),
       ...(preview.replacementId ? { replacement_version_id: preview.replacementId } : {}),
       ...(preview.preview.change_set ? { change_set_revision: preview.preview.change_set.revision } : {}),
     }, "POST", `learning-publication:${preview.preview.preview_id}`);
-    setPreview(null); await reloadMaterials(); setNotice("Đã cập nhật trạng thái công bố trên máy chủ.");
+    setPreview(null); await reloadMaterials(); setNotice(t("lwx.17"));
   }
   async function upload(draft:UploadDraft,file:File,signal:AbortSignal,onIntent:(id:string)=>void,materialId?:string) {
-    if(!session.canAccess.current)throw new Error("Hãy kiểm tra lại tài khoản trước khi tiếp tục.");
+    if(!session.canAccess.current)throw new Error(t("lwx.10"));
     let targetId=materialId??draft.targetId;
     if(!targetId){
       draft.creating=true;
@@ -588,23 +590,23 @@ export function LearningWorkspace() {
   return <><LearningSessionNotice state={session.state} onCheck={() => void session.check()} />
     <PreservedActivity mode={session.state === "ready" ? "visible" : "hidden"}>
     <AppShell activeNav="learning" userRole={role}><div className={styles.workspace}>
-    <header className={styles.heading}><div><h1>Học liệu theo buổi học</h1><p className={styles.muted}>Bài giảng của lớp, tài liệu từng buổi và vị trí đọc của bạn.</p></div><button disabled={busy || loading} onClick={() => {
+    <header className={styles.heading}><div><h1>{t("lwx.18")}</h1><p className={styles.muted}>{t("lwx.19")}</p></div><button disabled={busy || loading} onClick={() => {
       if (!capabilities || capabilities.enabled === false || capabilities.available === false) {
         setError(""); setLoading(true); setInitializationAttempt(value => value + 1); return;
       }
-      void run(async () => { setOfferings(await gateway.offerings(admin)); if (sessionId) await reloadMaterials(); setNotice("Đã tải lại trạng thái."); });
-    }}>Tải lại</button></header>
-    {error && <div role="alert" className={`${styles.alert} ${styles.error}`}>{error} {role==="guest"&&<Link href={`/login?redirect=${encodeURIComponent(loginTarget)}`}>Đăng nhập</Link>}</div>}
+      void run(async () => { setOfferings(await gateway.offerings(admin)); if (sessionId) await reloadMaterials(); setNotice(t("lwx.20")); });
+    }}>{t("lwx.21")}</button></header>
+    {error && <div role="alert" className={`${styles.alert} ${styles.error}`}>{error} {role==="guest"&&<Link href={`/login?redirect=${encodeURIComponent(loginTarget)}`}>{t("lwx.22")}</Link>}</div>}
     {notice && <p role="status" className={styles.alert}>{notice}</p>}
-    {busy&&<p role="status">Đang xử lý yêu cầu…</p>}
-    {loading ? <p role="status">Đang kiểm tra quyền và tải lớp học…</p> : capabilities && (capabilities.enabled === false || capabilities.available === false) ? <p>Dịch vụ học liệu chưa được bật hoặc chưa sẵn sàng.</p> : <>
-      <section className={styles.panel} aria-label="Chọn lớp học phần">
+    {busy&&<p role="status">{t("lwx.23")}</p>}
+    {loading ? <p role="status">{t("lwx.24")}</p> : capabilities && (capabilities.enabled === false || capabilities.available === false) ? <p>{t("lwx.25")}</p> : <>
+      <section className={styles.panel} aria-label={t("lwx.26")}>
         <div className={styles.offeringControl}>
           <label className={styles.offeringLabelField}>
-            <span className={styles.offeringLabel}>Lớp học phần</span>
+            <span className={styles.offeringLabel}>{t("lwx.27")}</span>
             <div className={styles.selectWrapper}>
               <select
-                aria-label="Lớp học phần"
+                aria-label={t("lwx.27")}
                 disabled={!offerings.length}
                 className={styles.offeringSelect}
                 value={offeringId}
@@ -616,10 +618,10 @@ export function LearningWorkspace() {
                   });
                 }}
               >
-                <option value="">Chọn lớp</option>
+                <option value="">{t("lwx.28")}</option>
                 {offerings.map(item => (
                   <option key={item.id} value={item.id}>
-                    {item.title || item.section_code} · {item.status === "ARCHIVED" ? "Đã lưu trữ" : "Đang học"}
+                    {item.title || item.section_code} · {item.status === "ARCHIVED" ? t("lwx.29") : t("lwx.30")}
                   </option>
                 ))}
               </select>
@@ -632,8 +634,8 @@ export function LearningWorkspace() {
               <BookOpen className={styles.emptyIcon} size={22} />
             </div>
             <div className={styles.emptyContent}>
-              <p className={styles.emptyTitle}>Chưa có lớp học phần được phân công cho tài khoản này.</p>
-              <p className={styles.emptyDesc}>Lớp học phần do giảng viên hoặc nhà trường phân công, trang sẽ hiển thị khi có.</p>
+              <p className={styles.emptyTitle}>{t("lwx.31")}</p>
+              <p className={styles.emptyDesc}>{t("lwx.32")}</p>
             </div>
           </div>
         )}
@@ -670,20 +672,20 @@ export function LearningWorkspace() {
         {activeMembers.length > 0 && <ul>{activeMembers.map(item=><li key={item.id} className={styles.row}><span>{label(item)} · {item.role === "INSTRUCTOR" ? "Giảng viên" : "Sinh viên"} · {item.status === "INACTIVE" ? "Ngưng phân công" : "Đang tham gia"}</span><button disabled={busy} onClick={()=>void run(async()=>{await reviewedWrite(`/offerings/${offeringId}/members/${item.id}`,{status:item.status === "INACTIVE" ? "ACTIVE" : "INACTIVE",revision:item.revision},"update_member",item.status === "INACTIVE" ? "Khôi phục phân công" : "Ngưng quyền truy cập lớp","PATCH");await refreshCatalogs();})}>{item.status === "INACTIVE" ? "Khôi phục" : "Ngưng phân công"}</button></li>)}</ul>}
         {offeringId && offering?.status === "ACTIVE" && <button disabled={busy} onClick={()=>void run(async()=>{await reviewedWrite(`/offerings/${offeringId}/archive`,{revision:(offering as LearningOffering & {revision:number}).revision},"archive_offering","Lưu trữ lớp học phần");setOfferings(await gateway.offerings(true));})}>Lưu trữ lớp học phần</button>}
       </div></details>}
-      {offering && <div className={styles.columns}><aside className={`${styles.panel} ${styles.stack}`}><h2>Buổi học</h2>{offering.status === "ARCHIVED" && <p>Lớp đã lưu trữ. Bạn vẫn có thể đọc tài liệu được phép.</p>}
-        {!offering.capabilities.read ? <p>Tài khoản có quyền quản trị metadata lớp, chưa được phân công đọc học liệu.</p> : !sessions.length ? <p>Chưa có buổi học.</p> : <nav aria-label="Danh sách buổi học" className={styles.sessions}>{sessions.map(item=><button key={item.id} aria-pressed={item.id===sessionId} onClick={()=>void run(async()=>{await flushReaderState();setSessionId(item.id);})}>{item.sequence_no}. {item.title}</button>)}</nav>}
+      {offering && <div className={styles.columns}><aside className={`${styles.panel} ${styles.stack}`}><h2>{t("lwx.33")}</h2>{offering.status === "ARCHIVED" && <p>{t("lwx.34")}</p>}
+        {!offering.capabilities.read ? <p>{t("lwx.35")}</p> : !sessions.length ? <p>{t("lwx.36")}</p> : <nav aria-label={t("lwx.37")} className={styles.sessions}>{sessions.map(item=><button key={item.id} aria-pressed={item.id===sessionId} onClick={()=>void run(async()=>{await flushReaderState();setSessionId(item.id);})}>{item.sequence_no}. {item.title}</button>)}</nav>}
         {manageable && <LearningMetadataForm actorId={actorId} draftId={`new-session:${offeringId}`} className={styles.stack} disabled={busy}
           initialValues={{title:""}} basis={{sequence_no:Math.max(0,...sessions.map(item=>item.sequence_no))+1}}
           toPayload={({values,basis})=>({title:values.title.trim(),description:"",sequence_no:basis.sequence_no,starts_at:null})}
           onSave={async(payload,key)=>{
-            if(!session.canAccess.current)throw new Error("Hãy kiểm tra lại tài khoản trước khi tiếp tục.");
+            if(!session.canAccess.current)throw new Error(t("lwx.10"));
             const created=await gateway.write<LearningSession>(`/offerings/${offeringId}/sessions`,payload,"POST",key);
             if(currentWorkspace.current.actorId===actorId&&currentWorkspace.current.offeringId===offeringId){
               const rows=await gateway.sessions(offeringId);
               if(currentWorkspace.current.actorId===actorId&&currentWorkspace.current.offeringId===offeringId){setSessions(rows);setSessionId(created.id);}
             }
           }}>{(values,change)=><><label>Tên buổi mới<input name="title" required maxLength={200} value={values.title} onChange={event=>change("title",event.target.value)}/></label><button>Thêm buổi</button></>}</LearningMetadataForm>}
-      </aside><section className={`${styles.panel} ${styles.stack}`} aria-label="Học liệu buổi học"><div className={styles.row}><h2>{activeSession?.title || "Chọn một buổi học"}</h2><span>{materials.length} tài liệu</span></div>
+      </aside><section className={`${styles.panel} ${styles.stack}`} aria-label={t("lwx.38")}><div className={styles.row}><h2>{activeSession?.title || t("lwx.39")}</h2><span>{materials.length} tài liệu</span></div>
         {manageable && <p id="learning-class-timezone" className={styles.muted}>Múi giờ của lớp {timeZone}</p>}
         {manageable && activeSession && <details><summary>Chỉnh sửa buổi học</summary>
           <LearningMetadataForm actorId={actorId} draftId={`session:${activeSession.id}`} className={styles.form} disabled={busy}
@@ -709,13 +711,13 @@ export function LearningWorkspace() {
           </>}</LearningMetadataForm><div className={styles.row}><button disabled={busy||sessions[0]?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,-1))}>Đưa buổi lên</button><button disabled={busy||sessions.at(-1)?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,1))}>Đưa buổi xuống</button></div>
         </details>}
         {manageable&&sessionId&&<details onToggle={event=>{if(event.currentTarget.open)void run(async()=>{const lists=await Promise.all(sessions.map(item=>gateway.materials(item.id)));const unique=new Map(lists.flat().map(item=>[item.id,item]));setLinkCandidates([...unique.values()].filter(item=>!materials.some(current=>current.id===item.id)));});}}><summary>Dùng lại bài giảng của buổi khác</summary><form className={styles.form} onSubmit={event=>{event.preventDefault();const id=formValue(event.currentTarget,"material_id");void run(async()=>{await reviewedWrite(`/sessions/${sessionId}/material-links`,{material_ids:[...materials.map(item=>item.id),id]},"material_links","Liên kết bài giảng vào buổi này","PUT");await reloadMaterials();});}}><label>Tài liệu trong cùng lớp<select aria-label="Tài liệu trong cùng lớp" name="material_id" required><option value="">Chọn tài liệu</option>{linkCandidates.map(item=><option key={item.id} value={item.id}>{item.title}</option>)}</select></label><button disabled={busy||!linkCandidates.length}>Thêm liên kết</button></form></details>}
-        {sessionId && !materials.length && <p>Buổi này chưa có tài liệu được phép xem.</p>}
+        {sessionId && !materials.length && <p>{t("lwx.40")}</p>}
         <ul className={styles.list}>{materials.map(item=><li key={item.id} className={styles.material}><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}<p className={styles.muted}>{item.visibility === "HIDDEN" ? "Đang ẩn" : item.current_published_version_id ? "Đã công bố" : "Chưa công bố"}</p>
-          {item.current_published_version_id && <button disabled={busy} onClick={()=>void run(()=>openVersion(item.current_published_version_id!,undefined,undefined,sessionId))}>Đọc bài giảng</button>}
-          <details><summary>Lịch sử phiên bản</summary>{item.versions?.length ? item.versions.map(version=><div className={styles.version} key={version.id}>
+          {item.current_published_version_id && <button disabled={busy} onClick={()=>void run(()=>openVersion(item.current_published_version_id!,undefined,undefined,sessionId))}>{t("lwx.41")}</button>}
+          <details><summary>{t("lwx.42")}</summary>{item.versions?.length ? item.versions.map(version=><div className={styles.version} key={version.id}>
             <span>Phiên bản {version.version_no} · {stateLabel(version.processing_state)} · {stateLabel(version.publication_state)}</span>
-            {version.source_media_type==='application/vnd.openxmlformats-officedocument.presentationml.presentation'&&<span>PowerPoint · Đọc bằng bản PDF chuyển đổi</span>}
-            {['FAILED','REJECTED'].includes(version.processing_state)&&<p role="alert">{version.error_detail||'Chưa chuẩn bị được bản xem. Bài chưa thể công bố.'}</p>}
+            {version.source_media_type==='application/vnd.openxmlformats-officedocument.presentationml.presentation'&&<span>{t("lwx.44")}</span>}
+            {['FAILED','REJECTED'].includes(version.processing_state)&&<p role="alert">{version.error_detail||t("lwx.45")}</p>}
             {version.publication_state==="QUARANTINED"&&<p role="alert">Tệp này bị cách ly vì không vượt qua kiểm tra an toàn nên đã được ẩn khỏi sinh viên và không thể mở hay công bố. Hãy kiểm tra tệp rồi tải lên một bản mới.</p>}
             {version.processing_state === "READY" && version.publication_state!=="QUARANTINED" && <button disabled={busy} onClick={()=>void run(()=>openVersion(version.id,undefined,undefined,sessionId))}>{version.publication_state === "PUBLISHED" ? "Mở" : "Xem trước"}</button>}
             {manageable && version.processing_state === "READY" && version.publication_state!=="QUARANTINED" && <><button disabled={busy} onClick={()=>void run(()=>publishPreview(version.id,version.publication_state === "PUBLISHED" ? "retract" : "publish"))}>{version.publication_state === "PUBLISHED" ? "Thu hồi" : "Công bố"}</button>
@@ -735,7 +737,7 @@ export function LearningWorkspace() {
                     key, { "X-Campus-Reader-Actor": actorId })}
               />}
             </>}
-          </div>) : <p>Chưa có phiên bản.</p>}</details>
+          </div>) : <p>{t("lwx.43")}</p>}</details>
           {manageable && <details><summary>Chỉnh sửa thông tin học liệu</summary><LearningMetadataForm actorId={actorId} draftId={`material:${item.id}`} className={styles.form} disabled={busy}
             initialValues={{title:item.title,description:item.description??"",visibility:item.visibility}} basis={{revision:item.revision}}
             fieldLabels={{title:'Tiêu đề',description:'Mô tả',visibility:'Hiển thị'}}
@@ -756,7 +758,7 @@ export function LearningWorkspace() {
               }
             }}>{(values,change)=><><label>Tiêu đề<input name="title" value={values.title} onChange={event=>change("title",event.target.value)} required/></label><label>Mô tả<textarea name="description" value={values.description} onChange={event=>change("description",event.target.value)}/></label><label>Hiển thị<select aria-label="Hiển thị" name="visibility" value={values.visibility} onChange={event=>change("visibility",event.target.value)}><option value="VISIBLE">Hiển thị trong lớp</option><option value="HIDDEN">Ẩn với sinh viên</option></select></label><button>Xem trước thay đổi</button></>}</LearningMetadataForm></details>}
           {manageable&&<div className={styles.row}><button disabled={busy||materials[0]?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,-1))}>Đưa bài lên</button><button disabled={busy||materials.at(-1)?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,1))}>Đưa bài xuống</button></div>}
-          {manageable && <details><summary>Tải phiên bản mới</summary><LearningUploadForm actorId={actorId} draftId={`version-upload:${item.id}`} existing accept={uploadAccept} pptxEnabled={pptxEnabled} disabled={busy}
+          {manageable && <details><summary>{t("lwx.55")}</summary><LearningUploadForm actorId={actorId} draftId={`version-upload:${item.id}`} existing accept={uploadAccept} pptxEnabled={pptxEnabled} disabled={busy}
             maxBytes={capabilities?.max_file_bytes||capabilities?.limits?.max_file_bytes||50*1024*1024} onUpload={(draft,file,signal,onIntent)=>upload(draft,file,signal,onIntent,item.id)} onAccepted={acceptedUpload}
             onCancelIntent={id=>gateway.write(`/upload-intents/${id}/abort`,{})}/></details>}
         </li>)}</ul>
@@ -789,8 +791,8 @@ export function LearningWorkspace() {
         />}
       </section></div>}
       {(reader || exitTicketId) && <div className={reader && exitTicketId ? styles.exitReaderColumns : undefined}>
-      {reader && <section id="learning-reader" tabIndex={-1} className={styles.reader} aria-label="Trình đọc bài giảng">
-        <div className={styles.row}><h2>{reader.title}</h2><span>Phiên bản {reader.version_no}</span><button onClick={()=>void run(async()=>{await flushReaderState();setReader(null);})}>Đóng trình đọc</button></div>
+      {reader && <section id="learning-reader" tabIndex={-1} className={styles.reader} aria-label={t("lwx.46")}>
+        <div className={styles.row}><h2>{reader.title}</h2><span>Phiên bản {reader.version_no}</span><button onClick={()=>void run(async()=>{await flushReaderState();setReader(null);})}>{t("lwx.47")}</button></div>
         {readerId && reader.capabilities.page_feedback && actorId && <StudentPageFeedback
           key={`${actorId}:${readerId}:${readerGeneration}`} actorId={actorId} versionId={readerId}
           versionNumber={reader.version_no} pageNo={readerPage} sourceSessionId={readerSessionId} timeZone={timeZone}
@@ -805,15 +807,15 @@ export function LearningWorkspace() {
         <button disabled={busy} onClick={()=>void run(async()=>{
           const note=annotations.find(item=>item.id===anchorId&&item.version_id===readerId&&item.page_no===readerPage);
           const url=new URL(linkPath({version_id:readerId!,page_no:readerPage,anchor_id:note?.id,session_id:readerSessionId}),window.location.origin);
-          await navigator.clipboard.writeText(url.href);setNotice("Đã sao chép liên kết trang của phiên bản này.");
-        })}>Sao chép liên kết trang</button>
+          await navigator.clipboard.writeText(url.href);setNotice(t("lwx.48"));
+        })}>{t("lwx.49")}</button>
         {reader.publication_state==="PUBLISHED"&&reader.current_published_version_id&&reader.current_published_version_id!==readerId&&
-          <div className={styles.alert}><p role="status">Bạn đang đọc một phiên bản khác với bản hiện hành.</p><button disabled={busy} onClick={()=>void run(()=>openVersion(reader.current_published_version_id!,undefined,undefined,readerSessionId))}>Mở bản hiện hành</button></div>}
-        {syncIssue === "conflict" && <div role="alert" className={styles.alert}><p>Vị trí đọc đã thay đổi trên thiết bị khác. Chọn vị trí muốn giữ.</p><button disabled={busy} onClick={()=>void run(()=>resolveReaderConflict(false))}>Dùng vị trí đã đồng bộ</button><button disabled={busy} onClick={()=>void run(()=>resolveReaderConflict(true))}>Giữ vị trí trên thiết bị này</button></div>}
-        {syncIssue === "retry" && <div role="status" className={styles.alert}>Vị trí đọc chưa đồng bộ.<button disabled={busy} onClick={() => void flushReaderState()}>Thử lưu lại vị trí</button></div>}
+          <div className={styles.alert}><p role="status">{t("lwx.50")}</p><button disabled={busy} onClick={()=>void run(()=>openVersion(reader.current_published_version_id!,undefined,undefined,readerSessionId))}>Mở bản hiện hành</button></div>}
+        {syncIssue === "conflict" && <div role="alert" className={styles.alert}><p>{t("lwx.51")}</p><button disabled={busy} onClick={()=>void run(()=>resolveReaderConflict(false))}>Dùng vị trí đã đồng bộ</button><button disabled={busy} onClick={()=>void run(()=>resolveReaderConflict(true))}>Giữ vị trí trên thiết bị này</button></div>}
+        {syncIssue === "retry" && <div role="status" className={styles.alert}>{t("lwx.52")}<button disabled={busy} onClick={() => void flushReaderState()}>{t("lwx.53")}</button></div>}
         <LearningPresentation key={`${reader.offering_id||offeringId}:${reader.version_id||reader.id}`} offeringId={reader.offering_id||offeringId} versionId={reader.version_id||reader.id} actorId={actorId} canManage={reader.capabilities.manage} pageNo={readerPage} onPresentation={setPresentation}/>
         {readerId && reader.capabilities.idea_cards && <button type="button"
-          onClick={() => beginIdea({ version_id: readerId, page_no: readerPage, anchor: { kind: "PAGE" } })}>Dẫn cả trang vào phiếu ý tưởng</button>}
+          onClick={() => beginIdea({ version_id: readerId, page_no: readerPage, anchor: { kind: "PAGE" } })}>{t("lwx.54")}</button>}
         {actorId && readerId && (reader.capabilities.accessible_text || reader.capabilities.manage_accessible_text)
           ? <AccessibleText key={`ocr:${actorId}:${readerId}`} actorId={actorId} versionId={readerId} pageCount={reader.page_count} sourcePage={readerPage}
             canRead={!!reader.capabilities.accessible_text} canManage={!!reader.capabilities.manage_accessible_text}
@@ -838,7 +840,7 @@ export function LearningWorkspace() {
       />}
     </>}
     <AccessibleDialog open={!!preview} onClose={()=>setPreview(null)} preventClose={busy} labelledBy="learning-publication-title" className={styles.dialog}>
-      <h2 id="learning-publication-title">Xác nhận {preview?.action === "retract" ? "thu hồi" : preview?.action === "cancel-publication" ? "hủy lịch công bố" : "công bố"} học liệu</h2>
+      <h2 id="learning-publication-title">{t("lwx.57")} {preview?.action === "retract" ? "thu hồi" : preview?.action === "cancel-publication" ? "hủy lịch công bố" : "công bố"} học liệu</h2>
       <p>Lớp {preview?.context.offeringTitle}. Buổi {preview?.context.sessionTitle}.</p>
       <p>{preview?.context.materialTitle} · Phiên bản {preview?.context.versionNo}.</p>
       <p>{preview?.action === "retract" ? "Sinh viên sẽ không mở được phiên bản này qua cả liên kết cũ sau khi thu hồi."
@@ -859,7 +861,7 @@ export function LearningWorkspace() {
         </select>
       </label>}
       <label><span><input type="checkbox" checked={confirmed} disabled={busy} onChange={event=>setConfirmed(event.target.checked)}/> Tôi đã kiểm tra lớp, tài liệu và tác động của thao tác.</span></label>
-      <div className={styles.row}><button disabled={busy} onClick={()=>setPreview(null)}>Quay lại</button><button disabled={busy||!confirmed} onClick={()=>void run(applyPublication)}>Xác nhận</button></div>
+      <div className={styles.row}><button disabled={busy} onClick={()=>setPreview(null)}>{t("lwx.56")}</button><button disabled={busy||!confirmed} onClick={()=>void run(applyPublication)}>{t("lwx.57")}</button></div>
     </AccessibleDialog>
     <AccessibleDialog open={!!management} onClose={cancelManagement} preventClose={managementSubmitting} labelledBy="learning-management-title" className={styles.dialog}>
       <h2 id="learning-management-title">{management?.title}</h2>{management?.context.offering && <p>Lớp của thao tác: {management.context.offering}.{management.context.session&&` Buổi: ${management.context.session}.`}</p>}
@@ -889,7 +891,7 @@ export function LearningWorkspace() {
         } as Record<string,string>)[management?.action??'']??'Kiểm tra nội dung, phạm vi và tác động của thao tác trước khi xác nhận.'}</p>
       </>}
       <label><span><input type="checkbox" checked={managementConfirmed} onChange={event=>setManagementConfirmed(event.target.checked)}/> Tôi đã kiểm tra thông tin và tác động.</span></label>
-      <div className={styles.row}><button disabled={managementSubmitting} onClick={cancelManagement}>Quay lại</button><button disabled={managementSubmitting||!managementConfirmed} onClick={()=>void confirmManagement()}>Xác nhận thay đổi</button></div>
+      <div className={styles.row}><button disabled={managementSubmitting} onClick={cancelManagement}>{t("lwx.56")}</button><button disabled={managementSubmitting||!managementConfirmed} onClick={()=>void confirmManagement()}>Xác nhận thay đổi</button></div>
     </AccessibleDialog>
   </div></AppShell></PreservedActivity></>;
 }

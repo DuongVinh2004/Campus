@@ -35,10 +35,11 @@ def main():
         call = f't("{key}")'
         quoted = f'"{vi}"'
         done = 0
-        if quoted in text:
-            text = re.sub(r'=' + re.escape(quoted), "={" + call + "}", text)
-            text = text.replace(quoted, call)
-            done = 1
+        for q in (quoted, f"'{vi}'"):
+            if q in text:
+                text = re.sub(r'=' + re.escape(q), "={" + call + "}", text)
+                text = text.replace(q, call)
+                done = 1
         if vi in text:
             # plain JSX text: only when the surrounding characters are markup
             pat = re.compile(r"(?<=[>\s])" + re.escape(vi) + r"(?=\s*<|\s*$|\s*\{)", re.M)
