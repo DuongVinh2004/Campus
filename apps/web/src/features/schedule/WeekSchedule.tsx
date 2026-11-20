@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, type MessageKey } from "@/lib/i18n";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertCircle,
@@ -92,17 +93,10 @@ function calcDaysLeft(targetIso: string): number {
   return Math.round((targetDateUtc - nowDateUtc) / 86400000);
 }
 
-const DAY_NAMES = [
-  "Thứ Hai",
-  "Thứ Ba",
-  "Thứ Tư",
-  "Thứ Năm",
-  "Thứ Sáu",
-  "Thứ Bảy",
-  "Chủ nhật",
-];
+const DAY_KEYS: MessageKey[] = ["week.28", "week.29", "week.30", "week.31", "week.32", "week.33", "week.34"];
 
 export function WeekSchedule() {
+  const t = useT();
   const [refDate, setRefDate] = useState<Date>(() => new Date());
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
   const [upcomingItems, setUpcomingItems] = useState<ScheduleItem[]>([]);
@@ -145,13 +139,13 @@ export function WeekSchedule() {
 
   const monVn = new Date(mondayEpoch + VN_OFFSET_MS);
   const sunVn = new Date(mondayEpoch + 6 * 86400000 + VN_OFFSET_MS);
-  const weekLabel = `Tuần ${weekNumber} · ${pad(monVn.getUTCDate())}/${pad(monVn.getUTCMonth() + 1)} – ${pad(sunVn.getUTCDate())}/${pad(sunVn.getUTCMonth() + 1)}/${sunVn.getUTCFullYear()}`;
+  const weekLabel = `${t("weekx.1", { n: weekNumber })} · ${pad(monVn.getUTCDate())}/${pad(monVn.getUTCMonth() + 1)} – ${pad(sunVn.getUTCDate())}/${pad(sunVn.getUTCMonth() + 1)}/${sunVn.getUTCFullYear()}`;
 
   // Chuẩn bị 7 ngày
   const nowParts = getVnParts(new Date());
   const todayKey = `${nowParts.year}-${pad(nowParts.month + 1)}-${pad(nowParts.date)}`;
 
-  const weekDays = DAY_NAMES.map((name, idx) => {
+  const weekDays = DAY_KEYS.map((dayKey, idx) => {
     const dayEpoch = mondayEpoch + idx * 86400000;
     const vn = new Date(dayEpoch + VN_OFFSET_MS);
     const key = `${vn.getUTCFullYear()}-${pad(vn.getUTCMonth() + 1)}-${pad(vn.getUTCDate())}`;
@@ -160,7 +154,7 @@ export function WeekSchedule() {
       .filter((item) => getVnDateKey(item.starts_at) === key)
       .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
     return {
-      dayName: name,
+      dayName: t(dayKey),
       key,
       dateFormatted,
       isToday: key === todayKey,
@@ -193,7 +187,7 @@ export function WeekSchedule() {
       );
       setUpcomingItems(sortedUpcoming);
     } catch (err) {
-      setErrorMessage(problemMessage(err, "Không thể tải lịch học. Vui lòng thử lại."));
+      setErrorMessage(problemMessage(err, t("week.35")));
     } finally {
       setIsLoading(false);
     }
@@ -268,7 +262,7 @@ export function WeekSchedule() {
   const handleStartTimeChange = (val: string) => {
     setFormStartTime(val);
     if (formEndTime && val && formEndTime <= val) {
-      setTimeError("Giờ kết thúc phải sau giờ bắt đầu");
+      setTimeError(t("week.9"));
     } else {
       setTimeError(null);
     }
@@ -277,7 +271,7 @@ export function WeekSchedule() {
   const handleEndTimeChange = (val: string) => {
     setFormEndTime(val);
     if (formStartTime && val && val <= formStartTime) {
-      setTimeError("Giờ kết thúc phải sau giờ bắt đầu");
+      setTimeError(t("week.9"));
     } else {
       setTimeError(null);
     }
@@ -286,19 +280,19 @@ export function WeekSchedule() {
   const handleSaveEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formTitle.trim()) {
-      setFormError("Vui lòng nhập tên sự kiện.");
+      setFormError(t("week.36"));
       return;
     }
     if (formTitle.trim().length > 120) {
-      setFormError("Tên sự kiện tối đa 120 ký tự.");
+      setFormError(t("week.37"));
       return;
     }
     if (!formDate || !formStartTime || !formEndTime) {
-      setFormError("Vui lòng nhập đầy đủ ngày và thời gian.");
+      setFormError(t("week.38"));
       return;
     }
     if (formEndTime <= formStartTime) {
-      setTimeError("Giờ kết thúc phải sau giờ bắt đầu");
+      setTimeError(t("week.9"));
       return;
     }
 
@@ -325,7 +319,7 @@ export function WeekSchedule() {
       closeDialog();
       await loadData();
     } catch (err) {
-      setFormError(problemMessage(err, "Không thể lưu sự kiện. Vui lòng thử lại."));
+      setFormError(problemMessage(err, t("week.39")));
     } finally {
       setIsSaving(false);
     }
@@ -339,7 +333,7 @@ export function WeekSchedule() {
       setDeletingId(null);
       await loadData();
     } catch (err) {
-      setErrorMessage(problemMessage(err, "Không thể xóa sự kiện. Vui lòng thử lại."));
+      setErrorMessage(problemMessage(err, t("week.40")));
     } finally {
       setIsDeleting(false);
     }
@@ -352,9 +346,9 @@ export function WeekSchedule() {
     <div className="campus-page min-w-0 space-y-6">
       {/* Tiêu đề trang */}
       <header className="campus-page-heading">
-        <div data-eyebrow="Thời khóa biểu · Học kỳ I 2026–2027">
-          <h1 className="text-2xl font-semibold">Lịch học</h1>
-          <p>Thời khóa biểu, lịch thi và kế hoạch học tập theo tuần.</p>
+        <div data-eyebrow={t("weekx.2")}>
+          <h1 className="text-2xl font-semibold">{t("week.1")}</h1>
+          <p>{t("week.2")}</p>
         </div>
         <nav>
           <button
@@ -364,7 +358,7 @@ export function WeekSchedule() {
             className="inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-[var(--color-on-primary)] transition-colors hover:bg-[var(--color-primary-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           >
             <Plus className="h-4 w-4 shrink-0" aria-hidden="true" />
-            Thêm sự kiện
+            {t("week.10")}
           </button>
         </nav>
       </header>
@@ -377,7 +371,7 @@ export function WeekSchedule() {
         >
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" aria-hidden="true" />
           <p className="min-w-0 break-words leading-relaxed">
-            Lịch học và lịch thi là dữ liệu mô phỏng nội bộ, chưa kết nối Cổng đào tạo HUCE.
+            {t("week.11")}
           </p>
         </div>
       )}
@@ -396,7 +390,7 @@ export function WeekSchedule() {
                 className="inline-flex min-h-[44px] items-center gap-1 rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
                 <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
-                Tuần trước
+                {t("week.12")}
               </button>
               <button
                 type="button"
@@ -404,7 +398,7 @@ export function WeekSchedule() {
                 onClick={handleToday}
                 className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-3.5 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
-                Hôm nay
+                {t("week.4")}
               </button>
               <button
                 type="button"
@@ -412,7 +406,7 @@ export function WeekSchedule() {
                 onClick={handleNextWeek}
                 className="inline-flex min-h-[44px] items-center gap-1 rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
-                Tuần sau
+                {t("week.13")}
                 <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
               </button>
             </div>
@@ -429,7 +423,7 @@ export function WeekSchedule() {
               className="campus-panel flex flex-col items-center justify-center p-12 text-center text-sm text-[var(--text-secondary)]"
             >
               <RefreshCw className="mb-3 h-6 w-6 animate-spin text-[var(--color-primary)]" aria-hidden="true" />
-              <span>Đang tải lịch học…</span>
+              <span>{t("week.3")}</span>
             </div>
           )}
 
@@ -446,7 +440,7 @@ export function WeekSchedule() {
                 onClick={() => void loadData()}
                 className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 py-2 text-sm font-medium text-[var(--color-on-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
-                Thử lại
+                {t("week.14")}
               </button>
             </div>
           )}
@@ -458,10 +452,10 @@ export function WeekSchedule() {
                 <div className="campus-empty-state p-6 text-center" role="status">
                   <Calendar className="mx-auto h-10 w-10 text-[var(--color-primary)]" aria-hidden="true" />
                   <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">
-                    Không có lịch học hoặc sự kiện trong tuần này.
+                    {t("week.15")}
                   </p>
                   <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                    Dùng nút chuyển tuần để xem thời gian khác, hoặc nhấn &quot;Thêm sự kiện&quot; để tạo lịch cá nhân.
+                    {t("weekx.3")}
                   </p>
                 </div>
               )}
@@ -478,12 +472,12 @@ export function WeekSchedule() {
                     <div className="campus-timetable-date">
                       <span className="campus-timetable-dow">{day.dayName}</span>
                       <span className="campus-timetable-dom">{day.dateFormatted}</span>
-                      {day.isToday && <span className="campus-timetable-today">Hôm nay</span>}
+                      {day.isToday && <span className="campus-timetable-today">{t("week.4")}</span>}
                     </div>
 
                     {/* Danh sách thẻ sự kiện trong ngày */}
                     {day.events.length === 0 ? (
-                      <p className="campus-timetable-empty">Không có lịch</p>
+                      <p className="campus-timetable-empty">{t("week.5")}</p>
                     ) : (
                       <div className="campus-timetable-events">
                         {day.events.map((item) => {
@@ -503,19 +497,19 @@ export function WeekSchedule() {
                                 {isClass && (
                                   <span className="inline-flex items-center gap-1 rounded bg-[var(--color-primary-light)] px-1.5 py-0.5 font-medium text-[var(--color-primary)]">
                                     <BookOpen className="h-3 w-3 shrink-0" aria-hidden="true" />
-                                    Lớp học
+                                    {t("week.16")}
                                   </span>
                                 )}
                                 {isExam && (
                                   <span className="inline-flex items-center gap-1 rounded border border-[var(--border-color)] bg-[var(--surface-card)] px-1.5 py-0.5 font-medium text-[var(--text-primary)]">
                                     <GraduationCap className="h-3 w-3 shrink-0 text-amber-500" aria-hidden="true" />
-                                    Lịch thi
+                                    {t("week.17")}
                                   </span>
                                 )}
                                 {isPersonal && (
                                   <span className="inline-flex items-center gap-1 rounded border border-[var(--border-color)] bg-[var(--surface-card)] px-1.5 py-0.5 font-medium text-[var(--text-secondary)]">
                                     <User className="h-3 w-3 shrink-0" aria-hidden="true" />
-                                    Cá nhân
+                                    {t("week.18")}
                                   </span>
                                 )}
 
@@ -563,7 +557,7 @@ export function WeekSchedule() {
                                   {deletingId === item.id ? (
                                     <div className="mt-2 space-y-1.5 border-t border-[var(--border-color)] pt-2">
                                       <p className="text-[11px] font-medium text-red-600">
-                                        Xác nhận xóa sự kiện này?
+                                        {t("week.19")}
                                       </p>
                                       <div className="flex items-center gap-2">
                                         <button
@@ -572,7 +566,7 @@ export function WeekSchedule() {
                                           onClick={() => void handleDeleteItem(item.id)}
                                           className="inline-flex min-h-[44px] items-center justify-center rounded bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] disabled:opacity-50"
                                         >
-                                          {isDeleting ? "Đang xóa…" : "Xác nhận xóa"}
+                                          {isDeleting ? t("week.41") : t("week.42")}
                                         </button>
                                         <button
                                           type="button"
@@ -580,7 +574,7 @@ export function WeekSchedule() {
                                           onClick={() => setDeletingId(null)}
                                           className="inline-flex min-h-[44px] items-center justify-center rounded border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
                                         >
-                                          Hủy
+                                          {t("week.20")}
                                         </button>
                                       </div>
                                     </div>
@@ -592,7 +586,7 @@ export function WeekSchedule() {
                                         className="inline-flex min-h-[44px] items-center gap-1 rounded border border-[var(--border-color)] bg-[var(--surface-card)] px-2.5 py-1 text-xs font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
                                       >
                                         <Edit2 className="h-3 w-3 shrink-0" aria-hidden="true" />
-                                        Sửa
+                                        {t("week.21")}
                                       </button>
                                       <button
                                         type="button"
@@ -600,7 +594,7 @@ export function WeekSchedule() {
                                         className="inline-flex min-h-[44px] items-center gap-1 rounded border border-[var(--border-color)] bg-[var(--surface-card)] px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
                                       >
                                         <Trash2 className="h-3 w-3 shrink-0" aria-hidden="true" />
-                                        Xóa
+                                        {t("week.22")}
                                       </button>
                                     </div>
                                   )}
@@ -624,18 +618,18 @@ export function WeekSchedule() {
           className="campus-panel space-y-6 lg:col-span-1 min-w-0"
         >
           <div>
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Sắp tới</h2>
-            <p className="mt-1 text-xs text-[var(--text-secondary)]">Kế hoạch trong 30 ngày tới</p>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">{t("week.6")}</h2>
+            <p className="mt-1 text-xs text-[var(--text-secondary)]">{t("week.7")}</p>
           </div>
 
           {/* 4 mục kế tiếp */}
           <div className="space-y-3">
             <h3 className="text-xs font-semibold uppercase text-[var(--text-secondary)]">
-              Mục kế tiếp
+              {t("week.23")}
             </h3>
             {nextItems.length === 0 ? (
               <p className="text-xs italic text-[var(--text-secondary)]">
-                Không có sự kiện sắp tới.
+                {t("week.24")}
               </p>
             ) : (
               <ul className="space-y-2.5">
@@ -671,19 +665,19 @@ export function WeekSchedule() {
           <div className="border-t border-[var(--border-color)] pt-4 space-y-3">
             <div className="flex items-center gap-1.5 text-xs font-semibold uppercase text-[var(--text-secondary)]">
               <GraduationCap className="h-4 w-4 text-[var(--color-primary)]" aria-hidden="true" />
-              <span>Lịch thi sắp tới</span>
+              <span>{t("week.8")}</span>
             </div>
 
             {examItems.length === 0 ? (
               <p className="text-xs italic text-[var(--text-secondary)]">
-                Chưa có lịch thi trong 30 ngày tới.
+                {t("week.25")}
               </p>
             ) : (
               <ul className="space-y-2.5">
                 {examItems.map((exam) => {
                   const daysLeft = calcDaysLeft(exam.starts_at);
                   const countdownText =
-                    daysLeft <= 0 ? "Hôm nay · còn 0 ngày" : `còn ${daysLeft} ngày`;
+                    daysLeft <= 0 ? t("weekx.4") : t("weekx.5", { n: daysLeft });
 
                   return (
                     <li
@@ -737,12 +731,12 @@ export function WeekSchedule() {
           <div className="w-full max-w-lg rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] p-6 shadow-xl space-y-4">
             <div className="flex items-center justify-between">
               <h2 id="event-dialog-title" className="text-lg font-semibold text-[var(--text-primary)]">
-                {editingItem ? "Sửa sự kiện cá nhân" : "Thêm sự kiện cá nhân"}
+                {editingItem ? t("week.43") : t("week.44")}
               </h2>
               <button
                 type="button"
                 onClick={closeDialog}
-                aria-label="Đóng hộp thoại"
+                aria-label={t("week.45")}
                 className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
@@ -756,7 +750,7 @@ export function WeekSchedule() {
                   htmlFor="event-title"
                   className="block text-sm font-medium text-[var(--text-primary)]"
                 >
-                  Tên sự kiện <span className="text-red-500">*</span>
+                  {t("weekx.6")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="event-title"
@@ -765,7 +759,7 @@ export function WeekSchedule() {
                   required
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
-                  placeholder="Ví dụ: Ôn tập nhóm, Nộp đồ án..."
+                  placeholder={t("week.46")}
                   className="mt-1 block min-h-[44px] w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-subtle)] px-3 py-2 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
                 />
               </div>
@@ -776,7 +770,7 @@ export function WeekSchedule() {
                   htmlFor="event-date"
                   className="block text-sm font-medium text-[var(--text-primary)]"
                 >
-                  Ngày <span className="text-red-500">*</span>
+                  {t("weekx.7")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="event-date"
@@ -795,7 +789,7 @@ export function WeekSchedule() {
                     htmlFor="event-start-time"
                     className="block text-sm font-medium text-[var(--text-primary)]"
                   >
-                    Giờ bắt đầu <span className="text-red-500">*</span>
+                    {t("weekx.8")} <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="event-start-time"
@@ -811,7 +805,7 @@ export function WeekSchedule() {
                     htmlFor="event-end-time"
                     className="block text-sm font-medium text-[var(--text-primary)]"
                   >
-                    Giờ kết thúc <span className="text-red-500">*</span>
+                    {t("weekx.9")} <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="event-end-time"
@@ -833,14 +827,14 @@ export function WeekSchedule() {
                   htmlFor="event-location"
                   className="block text-sm font-medium text-[var(--text-primary)]"
                 >
-                  Địa điểm
+                  {t("week.26")}
                 </label>
                 <input
                   id="event-location"
                   type="text"
                   value={formLocation}
                   onChange={(e) => setFormLocation(e.target.value)}
-                  placeholder="Ví dụ: Thư viện, Tầng 3 H1..."
+                  placeholder={t("week.47")}
                   className="mt-1 block min-h-[44px] w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-subtle)] px-3 py-2 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
                 />
               </div>
@@ -851,13 +845,13 @@ export function WeekSchedule() {
                   htmlFor="event-note"
                   className="block text-sm font-medium text-[var(--text-primary)]"
                 >
-                  Ghi chú
+                  {t("week.27")}
                 </label>
                 <textarea
                   id="event-note"
                   value={formNote}
                   onChange={(e) => setFormNote(e.target.value)}
-                  placeholder="Nội dung cần chuẩn bị hoặc lưu ý..."
+                  placeholder={t("week.48")}
                   rows={3}
                   className="mt-1 block w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-subtle)] px-3 py-2 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
                 />
@@ -876,7 +870,7 @@ export function WeekSchedule() {
                   onClick={closeDialog}
                   className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                 >
-                  Hủy
+                  {t("week.20")}
                 </button>
                 <button
                   type="submit"
@@ -884,7 +878,7 @@ export function WeekSchedule() {
                   disabled={isSaving}
                   className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 py-2 text-sm font-medium text-[var(--color-on-primary)] hover:bg-[var(--color-primary-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] disabled:opacity-50"
                 >
-                  {isSaving ? "Đang lưu…" : editingItem ? "Cập nhật" : "Lưu sự kiện"}
+                  {isSaving ? t("week.49") : editingItem ? t("week.50") : t("week.51")}
                 </button>
               </div>
             </form>
