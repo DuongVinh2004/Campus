@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, type MessageKey } from "@/lib/i18n";
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -15,12 +16,12 @@ import {
   type AppNotification,
 } from "@/lib/campus-ops-api";
 
-function formatRelativeTime(isoString: string): string {
+function formatRelativeTime(isoString: string, t: (key: MessageKey, params?: Record<string, string | number>) => string): string {
   const date = new Date(isoString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   if (Number.isNaN(diffMs) || diffMs < 0) {
-    return "vừa xong";
+    return t("inbox.justNow");
   }
 
   const diffSec = Math.floor(diffMs / 1000);
@@ -28,10 +29,10 @@ function formatRelativeTime(isoString: string): string {
   const diffHours = Math.floor(diffMin / 60);
 
   if (diffMin < 1) {
-    return "vừa xong";
+    return t("inbox.justNow");
   }
   if (diffMin < 60) {
-    return `${diffMin} phút trước`;
+    return t("inbox.minutesAgo", { n: diffMin });
   }
 
   const toDayString = (d: Date) =>
@@ -50,13 +51,13 @@ function formatRelativeTime(isoString: string): string {
   const yesterdayStr = toDayString(yesterday);
 
   if (diffHours < 24 && notifStr === todayStr) {
-    return `${diffHours} giờ trước`;
+    return t("inbox.hoursAgo", { n: diffHours });
   }
   if (notifStr === yesterdayStr) {
-    return "hôm qua";
+    return t("inbox.yesterday");
   }
   if (diffHours < 24) {
-    return `${diffHours} giờ trước`;
+    return t("inbox.hoursAgo", { n: diffHours });
   }
 
   const formatter = new Intl.DateTimeFormat("en-GB", {
@@ -98,6 +99,7 @@ function getNotificationIcon(kind: string) {
 }
 
 export function NotificationsInbox() {
+  const t = useT();
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [items, setItems] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -199,16 +201,16 @@ export function NotificationsInbox() {
   return (
     <div className="campus-page min-w-0 space-y-6" data-testid="notifications-inbox">
       <header className="campus-page-heading">
-        <div data-eyebrow="Hộp thư của bạn">
-          <h1 className="text-2xl font-semibold">Thông báo</h1>
-          <p>Theo dõi cập nhật về yêu cầu học vụ, phòng học và thời khóa biểu.</p>
+        <div data-eyebrow={t("inbox.eyebrow")}>
+          <h1 className="text-2xl font-semibold">{t("inbox.title")}</h1>
+          <p>{t("inbox.subtitle")}</p>
         </div>
       </header>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border-color)] pb-4">
         <div
           role="tablist"
-          aria-label="Bộ lọc thông báo"
+          aria-label={t("inbox.filterLabel")}
           className="inline-flex rounded-lg border border-[var(--border-color)] bg-[var(--surface-subtle)] p-1"
         >
           <button
@@ -223,7 +225,7 @@ export function NotificationsInbox() {
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
           >
-            Tất cả
+            {t("inbox.all")}
           </button>
           <button
             type="button"
@@ -237,7 +239,7 @@ export function NotificationsInbox() {
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
           >
-            Chưa đọc ({unreadCount})
+            {t("inbox.unread", { count: unreadCount })}
           </button>
         </div>
 
@@ -249,7 +251,7 @@ export function NotificationsInbox() {
           className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-subtle)] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
         >
           <CheckCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
-          Đánh dấu tất cả đã đọc
+          {t("inbox.markAll")}
         </button>
       </div>
 
@@ -262,7 +264,7 @@ export function NotificationsInbox() {
             className="h-6 w-6 animate-spin text-[var(--color-primary)] mb-2"
             aria-hidden="true"
           />
-          <p>Đang tải…</p>
+          <p>{t("inbox.loading")}</p>
         </div>
       )}
 
@@ -277,7 +279,7 @@ export function NotificationsInbox() {
             onClick={() => loadNotifications(true)}
             className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 py-2.5 text-sm font-medium text-[var(--color-on-primary)] transition-colors hover:bg-[var(--color-primary-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           >
-            Thử lại
+            {t("inbox.retry")}
           </button>
         </div>
       )}
@@ -286,18 +288,16 @@ export function NotificationsInbox() {
         <div className="campus-empty-state">
           <Bell className="h-6 w-6" aria-hidden="true" />
           <p className="text-base font-semibold text-[var(--text-primary)]">
-            {filter === "unread" ? "Không còn thông báo chưa đọc" : "Chưa có thông báo"}
+            {filter === "unread" ? t("inbox.emptyUnread") : t("inbox.empty")}
           </p>
           <p className="max-w-md text-sm text-[var(--text-secondary)]">
-            {filter === "unread"
-              ? "Bạn đã đọc hết mọi cập nhật. Chuyển sang tab \"Tất cả\" để xem lại các thông báo trước đó."
-              : "Các thông báo về xử lý hồ sơ sinh viên, mượn phòng học và lịch học sẽ hiển thị tại đây khi có phát sinh."}
+            {filter === "unread" ? t("inbox.emptyUnreadHint") : t("inbox.emptyHint")}
           </p>
         </div>
       )}
 
       {items.length > 0 && (
-        <div className="space-y-3" role="feed" aria-label="Danh sách thông báo">
+        <div className="space-y-3" role="feed" aria-label={t("inbox.feed")}>
           {error && (
             <div
               role="alert"
@@ -309,7 +309,7 @@ export function NotificationsInbox() {
                 onClick={() => loadNotifications(false)}
                 className="inline-flex min-h-[44px] items-center px-3 font-medium text-[var(--color-primary)] hover:underline"
               >
-                Thử lại
+                {t("inbox.retry")}
               </button>
             </div>
           )}
@@ -336,7 +336,7 @@ export function NotificationsInbox() {
                           className="h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"
                           aria-hidden="true"
                         />
-                        Mới
+                        {t("inbox.new")}
                       </span>
                     )}
                   </div>
@@ -349,7 +349,7 @@ export function NotificationsInbox() {
                       title={formatFullTime(item.created_at)}
                       className="text-xs text-[var(--text-secondary)]"
                     >
-                      {formatRelativeTime(item.created_at)}
+                      {formatRelativeTime(item.created_at, t)}
                     </time>
                   </div>
                 </div>
