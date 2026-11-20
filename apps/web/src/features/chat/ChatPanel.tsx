@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
+import { useT } from "@/lib/i18n";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -60,6 +61,7 @@ export type AssistantBlock =
 export function AssistantContent({ content, blocks = [], audience, components }: {
   content: string; blocks?: AssistantBlock[]; audience?: "student" | "staff"; components?: Components;
 }) {
+  const t = useT();
   const text = (value: unknown): value is string => typeof value === "string" && value.length <= 4000;
   const safe = (Array.isArray(blocks) ? blocks : []).slice(0, 12).filter(block => block && (
     block.type === "steps" ? Array.isArray(block.items) && block.items.length <= 20 && block.items.every(text)
@@ -69,12 +71,12 @@ export function AssistantContent({ content, blocks = [], audience, components }:
             : block.type === "navigation" && block.audience === audience && text(block.label) && (audience === "student" ? ["/services", "/my-requests", "/privacy", "/student/certificate", "/student/complaint"] : ["/staff", "/privacy"]).includes(block.path)));
   return <div className="min-w-0 break-words text-sm leading-7">
     <ReactMarkdown skipHtml remarkPlugins={[remarkGfm]} components={{ ...STATIC_MARKDOWN_COMPONENTS, ...components,
-      img: ({ alt }) => <span>{alt || "Hình ảnh không được tải tự động"}</span>,
+      img: ({ alt }) => <span>{alt || t("chat.43")}</span>,
     }}>{content}</ReactMarkdown>
     {safe.map((block, index) => <div key={index} className="my-3">{block.type === "steps" ? <ol className="list-decimal pl-5">{block.items.map((item, i) => <li key={i}>{item}</li>)}</ol>
       : block.type === "table" ? <div className="overflow-x-auto"><table className="min-w-full"><thead><tr>{block.columns.map((cell, i) => <th key={i} className="p-2 text-left">{cell}</th>)}</tr></thead><tbody>{block.rows.map((row, i) => <tr key={i}>{row.map((cell, j) => <td key={j} className="border-t p-2">{cell}</td>)}</tr>)}</tbody></table></div>
-        : block.type === "status" ? <p role="status">{({ pending: "Đang chờ", completed: "Hoàn tất", interrupted: "Gián đoạn", error: "Lỗi" })[block.state]} · {block.text}</p>
-          : block.type === "proposal" ? <div className="rounded-xl border p-3"><p className="font-semibold">{block.title} · Chưa áp dụng</p>{block.changes.map((change, i) => <p key={i}>{change.field}: {change.before} → {change.after}</p>)}</div>
+        : block.type === "status" ? <p role="status">{({ pending: t("chat2.1"), completed: t("chat2.2"), interrupted: t("chat2.3"), error: t("chat2.4") })[block.state]} · {block.text}</p>
+          : block.type === "proposal" ? <div className="rounded-xl border p-3"><p className="font-semibold">{block.title} · {t("chatm.1")}</p>{block.changes.map((change, i) => <p key={i}>{change.field}: {change.before} → {change.after}</p>)}</div>
             : <a href={block.path} className="inline-flex min-h-11 items-center rounded-lg border px-3">{block.label}</a>}</div>)}
   </div>;
 }
@@ -213,6 +215,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 function CodeBlock({ children, language }: { children: string; language?: string }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -226,15 +229,15 @@ function CodeBlock({ children, language }: { children: string; language?: string
   return (
     <div className="my-3 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950 text-slate-200 font-mono text-xs shadow-md">
       <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 text-slate-400 text-[11px]">
-        <span className="font-semibold uppercase tracking-wider">{language || "mã nguồn"}</span>
+        <span className="font-semibold uppercase tracking-wider">{language || t("chat2.5")}</span>
         <button
           type="button"
           onClick={handleCopy}
           className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
-          aria-label={copied ? "Đã sao chép mã" : "Sao chép mã"}
+          aria-label={copied ? t("chat.47") : t("chat.24")}
         >
           {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-          <span>{copied ? "Đã sao chép" : "Sao chép mã"}</span>
+          <span>{copied ? t("chat.23") : t("chat.24")}</span>
         </button>
       </div>
       <div className="p-4 overflow-x-auto">
@@ -247,6 +250,7 @@ function CodeBlock({ children, language }: { children: string; language?: string
 }
 
 function ActionSuggestions({ content }: { content: string }) {
+  const t = useT();
   const contentLower = content.toLowerCase();
   const isProcedural =
     contentLower.includes("một cửa") ||
@@ -266,7 +270,7 @@ function ActionSuggestions({ content }: { content: string }) {
   return (
     <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
       <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-        <span>Gợi ý hành động:</span>
+        <span>{t("chat.1")}</span>
       </div>
       <div className="flex flex-wrap gap-2">
         {isProcedural && (
@@ -276,7 +280,7 @@ function ActionSuggestions({ content }: { content: string }) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-850 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-700 hover:text-emerald-700 dark:text-slate-200 dark:hover:text-emerald-300 border border-slate-200 dark:border-slate-700/80 text-xs font-medium transition-all group shadow-2xs"
           >
             <span>📝</span>
-            <span>Nộp hồ sơ Một cửa trực tuyến</span>
+            <span>{t("chat.2")}</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
           </a>
         )}
@@ -287,7 +291,7 @@ function ActionSuggestions({ content }: { content: string }) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-850 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-slate-700 hover:text-blue-700 dark:text-slate-200 dark:hover:text-blue-300 border border-slate-200 dark:border-slate-700/80 text-xs font-medium transition-all group shadow-2xs"
           >
             <span>📅</span>
-            <span>Xem thời khóa biểu & lịch thi</span>
+            <span>{t("chat.3")}</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
           </a>
         )}
@@ -298,7 +302,7 @@ function ActionSuggestions({ content }: { content: string }) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-850 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-slate-700 hover:text-purple-700 dark:text-slate-200 dark:hover:text-purple-300 border border-slate-200 dark:border-slate-700/80 text-xs font-medium transition-all group shadow-2xs"
           >
             <span>🏢</span>
-            <span>Thông tin thư viện & phòng tự học</span>
+            <span>{t("chat.4")}</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
           </a>
         )}
@@ -420,6 +424,7 @@ export function ChatPanel({
   onOpenCitations,
   historyContent, headerActions, hideHeader = false, chatContext, onComposerTools, onComposerSettings, onOpenHistory, composerValue, initialDraft = "", onComposerChange, disabled = false, audience, initialSidebarOpen = true,
 }: ChatPanelProps) {
+  const t = useT();
   const operational = process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true";
   const [input, setInput] = useState(initialDraft);
   const [composerReady, setComposerReady] = useState(false);
@@ -521,7 +526,7 @@ export function ChatPanel({
   const historySidebar = (
         <aside
           role="complementary"
-          aria-label="Thanh bên cuộc trò chuyện"
+          aria-label={t("chat.38")}
           className="campus-chat-history fixed md:static inset-y-0 left-0 w-[260px] h-full shrink-0 bg-[var(--surface-card)] dark:bg-[var(--surface-card)] border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between p-3 select-none transition-all z-40 md:z-20 shadow-xl md:shadow-none"
         >
           <div className="flex-1 min-h-0 flex flex-col gap-2">
@@ -532,14 +537,14 @@ export function ChatPanel({
                   C
                 </div>
                 <span id="chat-history-title" className="font-semibold text-sm tracking-tight text-slate-900 dark:text-slate-100">
-                  Trợ lý học vụ
+                  {t("chat.30")}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSidebarOpen(false)}
-                title="Đóng thanh bên"
-                aria-label="Đóng thanh bên"
+                title={t("chat.39")}
+                aria-label={t("chat.39")}
                 className="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors cursor-pointer"
               >
                 <PanelLeft className="w-4 h-4" />
@@ -553,14 +558,14 @@ export function ChatPanel({
               className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium transition-colors cursor-pointer text-slate-800 dark:text-slate-200 shadow-2xs shrink-0"
             >
               <SquarePen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>Đoạn chat mới</span>
+              <span>{t("chat.5")}</span>
             </button>
 
             {/* Scrollable Conversation History */}
             <div className="flex-1 overflow-y-auto space-y-1 pt-2">
               {historyContent}
               <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 px-3 uppercase tracking-wider block mb-1">
-                Chủ đề thường hỏi
+                {t("chat.31")}
               </span>
               <div className="space-y-0.5">
                 {(operational ? OPERATIONAL_PROMPTS.map(item => item.prompt) : QUICK_TOPICS).map((title, idx) => (
@@ -589,10 +594,10 @@ export function ChatPanel({
                 AI
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs truncate">Hỏi đáp học vụ HUCE</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs truncate">{t("chat.6")}</span>
                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  {operational ? "Phạm vi phục vụ giới hạn" : "Trực tuyến"}
+                  {operational ? t("chat.41") : t("chat.42")}
                 </span>
               </div>
             </div>
@@ -615,8 +620,8 @@ export function ChatPanel({
                 <button
                   type="button"
                   onClick={onOpenHistory || (() => setIsSidebarOpen(true))}
-                  title={onOpenHistory ? "Lịch sử" : "Mở thanh bên"}
-                  aria-label={onOpenHistory ? "Lịch sử" : "Mở thanh bên"}
+                  title={onOpenHistory ? t("chat.25") : t("chat.40")}
+                  aria-label={onOpenHistory ? t("chat.25") : t("chat.40")}
                   className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
                 >
                   <PanelLeft className="w-4 h-4" />
@@ -625,8 +630,8 @@ export function ChatPanel({
                   <button
                     type="button"
                     onClick={onClearMessages}
-                    title="Đoạn chat mới"
-                    aria-label="Đoạn chat mới"
+                    title={t("chat.5")}
+                    aria-label={t("chat.5")}
                     className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
                   >
                     <SquarePen className="w-4 h-4" />
@@ -638,7 +643,7 @@ export function ChatPanel({
             {/* Model Pill */}
             <div className={`items-center gap-1.5 px-3 py-1.5 rounded-xl whitespace-nowrap shrink-0 ${headerActions ? "hidden sm:flex" : "flex"}`}>
               <span className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                Trợ lý học vụ
+                {t("chat.30")}
               </span>
               <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.5 rounded-md">
                 HUCE
@@ -650,8 +655,8 @@ export function ChatPanel({
           <div className="flex items-center gap-2">
             {!headerActions && <div className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-medium">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>Trợ lý AI Campus 24/7</span>
-              <span className="sr-only">Cổng thông tin & Trợ lý học vụ số — Trường Đại học Xây dựng Hà Nội</span>
+              <span>{t("chat.7")}</span>
+              <span className="sr-only">{t("chat.8")}</span>
             </div>}
             {headerActions}
             <ThemeToggle className="campus-theme-toggle" />
@@ -660,11 +665,11 @@ export function ChatPanel({
               <button
                 type="button"
                 onClick={onOpenCitations}
-                aria-label={`Xem ${citationCount} nguồn trích dẫn`}
+                aria-label={t("chatm.2", { n: citationCount ?? 0 })}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shadow-2xs"
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span className={headerActions ? "hidden sm:inline" : undefined}>Nguồn trích dẫn</span>
+                <span className={headerActions ? "hidden sm:inline" : undefined}>{t("chat.9")}</span>
                 <span className="bg-blue-600 text-white rounded-full px-1.5 py-0.5 text-[10px] font-bold">
                   {citationCount}
                 </span>
@@ -675,10 +680,10 @@ export function ChatPanel({
               <button
                 type="button"
                 onClick={onHandover}
-                aria-label="Gặp cán bộ"
+                aria-label={t("chat.10")}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shadow-2xs"
               >
-                <span>Gặp cán bộ</span>
+                <span>{t("chat.10")}</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
             )}
@@ -691,7 +696,7 @@ export function ChatPanel({
           ref={scrollAreaRef}
           onScroll={handleScroll}
           role="log"
-          aria-label="Lịch sử đối thoại"
+          aria-label={t("chat.26")}
           className="campus-chat-log flex-1 overflow-y-auto w-full px-4 flex flex-col"
         >
           <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-center py-6">
@@ -699,10 +704,10 @@ export function ChatPanel({
             {messages.length === 0 && (
               <div className="campus-chat-welcome my-auto flex flex-col items-center text-center py-6 max-w-2xl mx-auto w-full">
                 <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-800 dark:text-slate-100 mb-2">
-                  Bạn cần hỗ trợ gì?
+                  {t("chat.32")}
                 </h1>
                 <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md leading-relaxed mb-6">
-                  Hỏi về học vụ HUCE. Trợ lý sử dụng nguồn hiện có và trích dẫn khi tìm được căn cứ.
+                  {t("chat.33")}
                 </p>
 
                 {operational ? (
@@ -775,11 +780,11 @@ export function ChatPanel({
                       <article
                         key={message.id}
                         role="article"
-                        aria-label={`Tin nhắn của bạn: ${message.content.slice(0, 30)}...`}
+                        aria-label={t("chatm.3", { text: message.content.slice(0, 30) })}
                         className="flex flex-col items-end w-full"
                       >
                         <div className="flex items-center gap-2 mb-1.5 text-xs font-semibold text-slate-400 dark:text-slate-500">
-                          <span>Bạn</span>
+                          <span>{t("chat.11")}</span>
                           {message.timestamp && <span className="text-[11px] font-normal">• {message.timestamp}</span>}
                         </div>
                         <div className="campus-chat-user-bubble max-w-[85%] sm:max-w-[70%] px-5 py-3 rounded-2xl rounded-tr-xs bg-[#155E63] text-white text-[15px] leading-relaxed break-words shadow-sm">
@@ -793,34 +798,34 @@ export function ChatPanel({
                     <article
                       key={message.id}
                       role="article"
-                      aria-label={`Tin nhắn của trợ lý: ${message.content.slice(0, 30)}...`}
+                      aria-label={t("chatm.4", { text: message.content.slice(0, 30) })}
                       className="campus-assistant-message flex flex-col items-start w-full"
                     >
                       {/* Assistant Header */}
                       {isProvisional && message.agentProgress && (
                         <div role="status" aria-live="polite" className="mb-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200">
-                          <p>{({ planning: "Đang xác định thông tin cần tra cứu", researching: "Đang tìm và đọc nguồn", verifying: "Đang kiểm chứng nguồn và điều kiện", reviewing: "Đang kiểm tra phần thông tin còn thiếu", synthesizing: "Đang tổng hợp phần có căn cứ", waiting_user: "Cần bạn bổ sung thông tin", failed: "Chưa hoàn tất xử lý", completed: "Đã hoàn tất xử lý", cancelled: "Đã dừng xử lý", partial: "Mới xác minh được một phần", interrupted: "Xử lý bị gián đoạn; công việc đã lưu được giữ", uncertain: "Chưa xác định kết quả; cần đọc receipt trước khi tiếp tục" })[message.agentProgress.phase]}</p>
-                          {message.agentProgress.tasks.length > 0 && <p className="mt-1 opacity-80">{message.agentProgress.tasks.filter(task => ["succeeded", "partial"].includes(task.status)).length}/{message.agentProgress.tasks.length} phần đã tra cứu · {message.agentProgress.sourceCount} nguồn đã đọc</p>}
+                          <p>{({ planning: t("chat2.6"), researching: t("chat2.7"), verifying: t("chat2.8"), reviewing: t("chat2.9"), synthesizing: t("chat2.10"), waiting_user: t("chat2.11"), failed: t("chat2.12"), completed: t("chat2.13"), cancelled: t("chat2.14"), partial: t("chat2.15"), interrupted: t("chat2.16"), uncertain: t("chat2.17") })[message.agentProgress.phase]}</p>
+                          {message.agentProgress.tasks.length > 0 && <p className="mt-1 opacity-80">{t("chatm.5", { done: message.agentProgress.tasks.filter(task => ["succeeded", "partial"].includes(task.status)).length, total: message.agentProgress.tasks.length, sources: message.agentProgress.sourceCount })}</p>}
                         </div>
                       )}
                       <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                         <div className="w-7 h-7 rounded-md bg-[#155E63] text-white flex items-center justify-center shrink-0 shadow-xs">
                           <Bot className="w-4 h-4" />
                         </div>
-                        <span className="text-slate-900 dark:text-slate-200 font-semibold">Trợ lý AI</span>
+                        <span className="text-slate-900 dark:text-slate-200 font-semibold">{t("chat.12")}</span>
                         {message.timestamp && <span className="text-[11px] font-normal text-slate-400">• {message.timestamp}</span>}
                         {isProvisional && (
                           <span role="status" className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                            • Nội dung tạm — đang kiểm tra
+                            {t("chat.34")}
                           </span>
                         )}
                         {isAbstained && (
                           <span role="status" className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
-                            {message.responseClass === "clarification_request" ? "• Hỏi làm rõ" : "• Chưa đủ căn cứ"}
+                            {message.responseClass === "clarification_request" ? t("chat.51") : t("chat.52")}
                           </span>
                         )}
-                        {message.responseClass === "partial_answer" && <span role="status" className="text-xs text-amber-700 dark:text-amber-300">• Có căn cứ cho một phần</span>}
+                        {message.responseClass === "partial_answer" && <span role="status" className="text-xs text-amber-700 dark:text-amber-300">{t("chat.13")}</span>}
                         {message.status === "unknown" && (
                           <span role="status" className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-800">
                             • UNKNOWN
@@ -828,7 +833,7 @@ export function ChatPanel({
                         )}
                         {isStopped && (
                           <span role="status" className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
-                            • Đã dừng — chưa xác nhận
+                            {t("chat.35")}
                           </span>
                         )}
                       </div>
@@ -850,8 +855,8 @@ export function ChatPanel({
                         )}
 
                         {!isProvisional && !isFailed && !isStopped && splitGuidance(displayText(message.content)).suggestions.length > 0 && (
-                          <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Gợi ý hỏi tiếp" data-testid="guidance-chips">
-                            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mr-1">Gợi ý hỏi tiếp:</span>
+                          <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label={t("chat2.18")} data-testid="guidance-chips">
+                            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mr-1">{t("chatm.6")}</span>
                             {splitGuidance(displayText(message.content)).suggestions.map(item => (
                               <button key={item} type="button" disabled={isStreaming || disabled} onClick={() => handlePromptClick(item)}
                                 className="min-h-[36px] rounded-full border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 px-3.5 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50">
@@ -865,14 +870,14 @@ export function ChatPanel({
                         {!isProvisional && !isFailed && !isStopped && message.citations && message.citations.length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-1.5 items-center">
                             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
-                              <FileText className="w-3 h-3 text-blue-600 dark:text-blue-400" /> Nguồn:
+                              <FileText className="w-3 h-3 text-blue-600 dark:text-blue-400" /> {t("chatm.7")}
                             </span>
                             {message.citations.map((citation) => (
                               <button
                                 key={citation.id}
                                 type="button"
                                 onClick={() => onCitationClick?.(citation.id)}
-                                aria-label={`Xem nguồn trích dẫn [${citation.index}]: ${citation.title}`}
+                                aria-label={t("chatm.8", { index: citation.index, title: citation.title })}
                                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700/80 text-xs font-medium transition-colors cursor-pointer shadow-2xs"
                               >
                                 <span className="font-bold text-blue-600 dark:text-blue-400">[{citation.index}]</span>
@@ -884,7 +889,7 @@ export function ChatPanel({
 
                         {/* Agentic Actions */}
                         {!operational && !isFailed && !isAbstained && !isProvisional && !isStopped && (
-                          <span className="sr-only">Điều hướng chỉ xuất hiện khi có schema hợp lệ.</span>
+                          <span className="sr-only">{t("chat.14")}</span>
                         )}
 
                         {/* Recovery & Action Toolbar */}
@@ -893,14 +898,14 @@ export function ChatPanel({
                             <button
                               type="button"
                               onClick={() => onRetry(message.id)}
-                              aria-label="Thử lại"
+                              aria-label={t("chat.15")}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/80 dark:hover:bg-rose-900 text-rose-800 dark:text-rose-200 text-xs font-semibold transition-colors cursor-pointer"
                             >
                               <RefreshCw className="w-3.5 h-3.5" />
-                              <span>Thử lại</span>
+                              <span>{t("chat.15")}</span>
                             </button>
                             <span className="text-xs text-slate-500 dark:text-slate-400">
-                              Chưa thể hoàn tất câu trả lời
+                              {t("chat.36")}
                             </span>
                           </div>
                         )}
@@ -910,14 +915,14 @@ export function ChatPanel({
                             <button
                               type="button"
                               onClick={onHandover}
-                              aria-label="Chuyển cán bộ"
+                              aria-label={t("chat.16")}
                               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shadow-2xs"
                             >
-                              <span>Chuyển cán bộ</span>
+                              <span>{t("chat.16")}</span>
                               <ArrowRight className="w-3.5 h-3.5" />
                             </button>
                             <span className="text-xs text-slate-500 dark:text-slate-400">
-                              Chuyển tiếp câu hỏi tới một cửa số
+                              {t("chatm.9")}
                             </span>
                           </div>
                         )}
@@ -925,11 +930,11 @@ export function ChatPanel({
                         {/* Next steps when the assistant could not ground an answer */}
                         {isAbstained && message.responseClass !== "clarification_request" && !isProvisional && (
                           <div role="note" className="campus-abstain-help mt-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-3 text-sm text-slate-600 dark:text-slate-300">
-                            <p className="m-0 font-medium text-slate-800 dark:text-slate-100">Bạn có thể thử</p>
+                            <p className="m-0 font-medium text-slate-800 dark:text-slate-100">{t("chat.17")}</p>
                             <ul className="m-0 mt-1 list-disc pl-5 leading-relaxed">
-                              <li>Hỏi cụ thể hơn: nêu khóa hoặc năm học, ngành, tên văn bản hay mã học phần.</li>
-                              <li>Tách câu hỏi nhiều ý thành từng câu riêng.</li>
-                              <li>Với việc cần kết quả chính thức, liên hệ Phòng Đào tạo HUCE.</li>
+                              <li>{t("chat.18")}</li>
+                              <li>{t("chat.19")}</li>
+                              <li>{t("chat.20")}</li>
                             </ul>
                             {operational && (
                               <div className="mt-2 flex flex-wrap gap-2">
@@ -951,8 +956,8 @@ export function ChatPanel({
                               type="button"
                               onClick={() => handleCopyMessage(message.content, message.id)}
                               className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
-                              aria-label={copiedMessageId === message.id ? "Đã sao chép câu trả lời" : "Sao chép câu trả lời"}
-                              title={copiedMessageId === message.id ? "Đã sao chép" : "Sao chép"}
+                              aria-label={copiedMessageId === message.id ? t("chat.48") : t("chat.49")}
+                              title={copiedMessageId === message.id ? t("chat.23") : t("chat.50")}
                             >
                               {copiedMessageId === message.id ? (
                                 <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -984,7 +989,7 @@ export function ChatPanel({
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600 dark:bg-blue-400" />
                 </span>
-                <span>Trợ lý đang trả lời...</span>
+                <span>{t("chat.21")}</span>
               </div>
             )}
           </div>
@@ -997,9 +1002,9 @@ export function ChatPanel({
               onSubmit={handleSubmit}
               className="campus-composer-bar"
             >
-              {onComposerTools && <button type="button" className="campus-composer-add" aria-label="Tiện ích học vụ" title="Tiện ích học vụ" onClick={onComposerTools}><PanelsTopLeft size={19} aria-hidden="true" /></button>}
+              {onComposerTools && <button type="button" className="campus-composer-add" aria-label={t("chat.44")} title={t("chat.44")} onClick={onComposerTools}><PanelsTopLeft size={19} aria-hidden="true" /></button>}
               <label htmlFor="chat-input" className="sr-only">
-                Đặt câu hỏi
+                {t("chat.27")}
               </label>
               <textarea
                 ref={textareaRef}
@@ -1008,19 +1013,19 @@ export function ChatPanel({
                 disabled={!composerReady}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                aria-label="Đặt câu hỏi"
-                placeholder="Hỏi Campus 24/7"
+                aria-label={t("chat.27")}
+                placeholder={t("chat.28")}
                 rows={1}
                 className="w-full max-h-44 min-h-[44px] bg-transparent text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-[15px] leading-relaxed resize-none focus:outline-none border-0 p-0"
               />
 
-              {onComposerSettings && <button type="button" className="campus-composer-settings" aria-label="Tùy chọn trả lời" title="Tùy chọn trả lời" onClick={onComposerSettings}><span>Tùy chọn</span><ChevronDown size={14} aria-hidden="true" /></button>}
+              {onComposerSettings && <button type="button" className="campus-composer-settings" aria-label={t("chat.45")} title={t("chat.45")} onClick={onComposerSettings}><span>{t("chat.22")}</span><ChevronDown size={14} aria-hidden="true" /></button>}
                   {isStreaming ? (
                     <button
                       type="button"
                       onClick={onStopStreaming}
-                      aria-label="Dừng trả lời"
-                      title="Dừng trả lời"
+                      aria-label={t("chat.46")}
+                      title={t("chat.46")}
                       className="campus-composer-send"
                     >
                       <Square className="w-3.5 h-3.5 fill-current" />
@@ -1029,8 +1034,8 @@ export function ChatPanel({
                     <button
                       type="submit"
                       disabled={disabled || !(composerValue ?? input).trim()}
-                      aria-label="Gửi"
-                      title="Gửi"
+                      aria-label={t("chat.29")}
+                      title={t("chat.29")}
                       className="campus-composer-send"
                     >
                       <ArrowUp className="w-5 h-5" aria-hidden="true" />
@@ -1039,7 +1044,7 @@ export function ChatPanel({
             </form>
 
             <p className="mt-1.5 mb-1 text-center text-[11px] text-slate-400 dark:text-slate-500">
-              Campus 24/7 AI có thể mắc lỗi. Hãy kiểm tra các thông tin quan trọng.
+              {t("chat.37")}
             </p>
           </div>
         </div>
