@@ -57,3 +57,13 @@ def without_terms(query: str, terms: Iterable[str]) -> tuple[str, list[str]]:
     for start, end in sorted(spans, reverse=True):
         query = query[:start] + " " + query[end:]
     return " ".join(query.split()), list(dict.fromkeys(re.sub(r"^(?:chuyên\s+ngành|chuyen\s+nganh|ngành|nganh)\s+", "", s, flags=re.IGNORECASE) for s in shown))
+
+
+def names_only_other_majors(text: str, vocabulary: Vocabulary) -> bool:
+    """True when every clause of the statement names a major, so the statement is about those majors and not a general rule.
+
+    A statement that states the general rule and then one exception ("... 8 tuần; sinh viên ngành Kiến trúc ... 10 tuần") has a clause
+    that names no major: it is a general rule with an exception and must be judged without the names the sources do not carry.
+    """
+    clauses = [c for c in re.split(r"[;\n]+|\.(?=\s|$)", text) if c.strip()]
+    return bool(clauses) and all(vocabulary.terms_in(c) for c in clauses)
