@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, type MessageKey } from "@/lib/i18n";
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
   LearningApiError, LearningGateway,
@@ -15,8 +16,8 @@ type TextPage = { release_id: string; version_id: string; page_no: number; block
 type Mode = "PDF" | "TEXT" | "REVIEW";
 type OpenSource = (page: number, anchor?: LearningOcrAnchor, focus?: boolean) => void;
 
-function message(error: unknown) {
-  return error instanceof Error ? error.message : "Chưa đọc được bản chữ hỗ trợ.";
+function message(error: unknown, t: (key: MessageKey) => string) {
+  return error instanceof Error ? error.message : t("atx.1");
 }
 
 function isUnavailable(error: unknown) {
@@ -24,6 +25,7 @@ function isUnavailable(error: unknown) {
 }
 
 function ReadingBlock({ block }: { block: LearningOcrBlock }) {
+  const t = useT();
   if (block.type === "HEADING") {
     const Heading = block.level === 2 ? "h2" : block.level === 4 ? "h4" : "h3";
     return <Heading>{block.text}</Heading>;
@@ -33,23 +35,24 @@ function ReadingBlock({ block }: { block: LearningOcrBlock }) {
     return <List>{block.items?.map((item, index) => <li key={index}>{item}</li>)}</List>;
   }
   if (block.type === "TABLE") {
-    return <div className={styles.ocrTable} tabIndex={0} role="region" aria-label="Bảng dữ liệu đã đối chiếu">
-      <table><caption>Bảng dữ liệu đã đối chiếu</caption>
+    return <div className={styles.ocrTable} tabIndex={0} role="region" aria-label={t("atx.2")}>
+      <table><caption>{t("atx.2")}</caption>
         <thead><tr>{block.headers?.map((cell, index) => <th key={index} scope="col">{cell}</th>)}</tr></thead>
         <tbody>{block.rows?.map((row, index) => <tr key={index}>{row.map((cell, cellIndex) => <td key={cellIndex}>{cell}</td>)}</tr>)}</tbody>
       </table>
     </div>;
   }
-  if (block.type === "FORMULA") return <p><strong>Mô tả công thức:</strong> {block.text}</p>;
-  if (block.type === "FIGURE") return <p><strong>Mô tả hình:</strong> {block.text}</p>;
+  if (block.type === "FORMULA") return <p><strong>{t("atx.3")}</strong> {block.text}</p>;
+  if (block.type === "FIGURE") return <p><strong>{t("atx.4")}</strong> {block.text}</p>;
   return <p>{block.text}</p>;
 }
 
 export function OcrReleasePreview({ value }: { value: NonNullable<LearningPreview["ocr_release"]> }) {
+  const t = useT();
   return <div className={styles.stack}>
-    <p>{value.operation === "PUBLISH" ? "Trang sẽ được công bố" : "Trang sẽ bị rút khỏi bản chữ"} · {value.pages.join(", ")}.</p>
+    <p>{value.operation === "PUBLISH" ? t("atx.5") : t("atx.6")} · {value.pages.join(", ")}.</p>
     <p>{value.pages.length}/{value.page_count} trang trong phiên bản PDF này.</p>
-    {value.operation === "PUBLISH" && value.pages.length < value.page_count && <p>Các trang còn lại đọc bằng ảnh PDF gốc.</p>}
+    {value.operation === "PUBLISH" && value.pages.length < value.page_count && <p>{t("atx.7")}</p>}
   </div>;
 }
 
@@ -57,6 +60,7 @@ export function AccessibleText({ actorId, versionId, pageCount, sourcePage, canR
   actorId: string; versionId: string; pageCount: number; sourcePage: number; canRead: boolean; canManage: boolean;
   published: boolean; onSource: OpenSource; confirmWrite: ConfirmOcrWrite; children: ReactNode;
 }) {
+  const t = useT();
   const panelId = useId();
   const originalId = useId();
   const heading = useRef<HTMLHeadingElement>(null);
@@ -100,7 +104,7 @@ export function AccessibleText({ actorId, versionId, pageCount, sourcePage, canR
       }).catch(error => {
         if (controller.signal.aborted || current !== generation) return;
         setRelease(null); setPage(undefined); setSearch(undefined);
-        setManifestFailure(isUnavailable(error) ? "" : message(error));
+        setManifestFailure(isUnavailable(error) ? "" : message(error, t));
       });
     };
     load();
@@ -129,7 +133,7 @@ export function AccessibleText({ actorId, versionId, pageCount, sourcePage, canR
       if (isUnavailable(error)) {
         setRelease(null); setSearch(undefined); fetchManifest();
       }
-      setFailure(message(error));
+      setFailure(message(error, t));
     });
     return () => controller.abort();
   }, [actorId, fetchManifest, pageAvailable, pageNo, path, releaseId, versionId, visibleMode]);
@@ -185,7 +189,7 @@ export function AccessibleText({ actorId, versionId, pageCount, sourcePage, canR
     } catch (error) {
       if (!controller.signal.aborted) {
         if (isUnavailable(error)) { setRelease(null); setPage(undefined); fetchManifest(); }
-        setFailure(message(error));
+        setFailure(message(error, t));
       }
     } finally {
       if (!controller.signal.aborted) setSearching(false);
@@ -196,33 +200,33 @@ export function AccessibleText({ actorId, versionId, pageCount, sourcePage, canR
   const currentSearch = search?.release_id === releaseId ? search : undefined;
   const split = visibleMode !== "PDF";
   return <div className={styles.stack}>
-    <nav aria-label="Cách đọc tài liệu" className={styles.row}>
-      <button type="button" aria-pressed={visibleMode === "PDF"} aria-controls={originalId} onClick={() => show("PDF")}>Ảnh PDF gốc</button>
-      {release && <button type="button" aria-pressed={visibleMode === "TEXT"} aria-controls={panelId} onClick={() => show("TEXT")}>Bản chữ hỗ trợ</button>}
-      {canManage && <button type="button" aria-pressed={visibleMode === "REVIEW"} onClick={() => show("REVIEW")}>Quản lý bản chữ</button>}
+    <nav aria-label={t("atx.8")} className={styles.row}>
+      <button type="button" aria-pressed={visibleMode === "PDF"} aria-controls={originalId} onClick={() => show("PDF")}>{t("atx.9")}</button>
+      {release && <button type="button" aria-pressed={visibleMode === "TEXT"} aria-controls={panelId} onClick={() => show("TEXT")}>{t("atx.10")}</button>}
+      {canManage && <button type="button" aria-pressed={visibleMode === "REVIEW"} onClick={() => show("REVIEW")}>{t("atx.11")}</button>}
       {split && mobilePane === "original" && <button type="button" className={styles.ocrMobileOnly} onClick={() => show(visibleMode)}>
-        {visibleMode === "TEXT" ? "Về bản chữ" : "Về phần duyệt bản chữ"}
+        {visibleMode === "TEXT" ? t("atx.12") : t("atx.13")}
       </button>}
     </nav>
-    {canRead && published && release === null && <p role="status">Chưa có bản chữ hỗ trợ đang công bố cho phiên bản này.</p>}
+    {canRead && published && release === null && <p role="status">{t("atx.14")}</p>}
     {manifestFailure && canRead && published && <p role="alert">{manifestFailure}</p>}
     {failure && visibleMode === "TEXT" && <p role="alert">{failure}</p>}
     <div className={split ? styles.ocrColumns : undefined} data-ocr-pane={split ? mobilePane : undefined}>
       <div id={originalId} className={styles.ocrOriginal}>{children}</div>
-      {visibleMode === "TEXT" && release && <section id={panelId} className={`${styles.panel} ${styles.stack} ${styles.ocrTextPane}`} aria-label="Đọc bản chữ hỗ trợ" lang="vi">
-        <h3 tabIndex={-1} ref={heading}>Bản chữ hỗ trợ</h3>
-        <p>{release.available_pages.length}/{release.page_count} trang đã công bố. {release.missing_page_count > 0 && "Trang còn thiếu có thể mở ở ảnh PDF gốc."}</p>
-        <label>Trang bản chữ<select value={pageNo} onChange={event => selectPage(Number(event.target.value))}>
+      {visibleMode === "TEXT" && release && <section id={panelId} className={`${styles.panel} ${styles.stack} ${styles.ocrTextPane}`} aria-label={t("atx.15")} lang="vi">
+        <h3 tabIndex={-1} ref={heading}>{t("atx.10")}</h3>
+        <p>{release.available_pages.length}/{release.page_count} trang đã công bố. {release.missing_page_count > 0 && t("atx.16")}</p>
+        <label>{t("atx.17")}<select value={pageNo} onChange={event => selectPage(Number(event.target.value))}>
           {!pageAvailable && <option value={pageNo}>Trang {pageNo} · Chưa có bản chữ</option>}
           {release.available_pages.map(page => <option key={page} value={page}>Trang {page}</option>)}
         </select></label>
         <button type="button" onClick={() => sourceAt(pageNo)}>Mở ảnh gốc trang {pageNo}</button>
         <form className={styles.stack} onSubmit={event => void find(event)}>
-          <label>Tìm trong bản chữ<input type="search" value={query} maxLength={120} onChange={event => setQuery(event.target.value)} /></label>
-          <button disabled={searching || !query.trim()}>Tìm bản chữ</button>
+          <label>{t("atx.18")}<input type="search" value={query} maxLength={120} onChange={event => setQuery(event.target.value)} /></label>
+          <button disabled={searching || !query.trim()}>{t("atx.19")}</button>
         </form>
-        {searching && <p role="status">Đang tìm bản chữ…</p>}
-        {currentSearch && <section aria-label="Kết quả tìm bản chữ">
+        {searching && <p role="status">{t("atx.20")}</p>}
+        {currentSearch && <section aria-label={t("atx.21")}>
           <p role="status">{currentSearch.hits.length} kết quả{currentSearch.limit_reached ? " đầu tiên" : ""}.</p>
           <ul className={styles.list}>{currentSearch.hits.map((hit, index) => <li key={`${hit.page_no}:${hit.block_id}`}>
             <button type="button" onClick={() => selectPage(hit.page_no, hit)}>Kết quả {index + 1} · Trang {hit.page_no}</button>
@@ -230,7 +234,7 @@ export function AccessibleText({ actorId, versionId, pageCount, sourcePage, canR
         </section>}
         {!pageAvailable && <p role="status">Trang {pageNo} chưa có bản chữ đã duyệt.</p>}
         {pageAvailable && !currentPage && !failure && <p role="status">Đang đọc bản chữ trang {pageNo}…</p>}
-        {currentPage?.blocks.length === 0 && <p>Trang này không có khối chữ đã ghi nhận.</p>}
+        {currentPage?.blocks.length === 0 && <p>{t("atx.22")}</p>}
         {currentPage?.blocks.map((block, index) => <div key={block.id} id={textBlockId(pageNo, block.id)} tabIndex={-1} className={styles.ocrBlock}>
           <ReadingBlock block={block} />
           <button type="button" onClick={() => sourceAt(pageNo, block.anchor)}>
