@@ -138,7 +138,7 @@ Sửa lỗi phát hiện trong lúc làm:
 
 Chưa làm / bị chặn:
 
-- Tài liệu tri thức trong hàng chờ duyệt: cần tải tài liệu công khai thật từ huce.edu.vn — chờ chủ dự án cho phép tải.
+- Hàng chờ tri thức: chủ dự án duyệt tải 4 thông báo công khai của Phòng CTSV (PDF trên Google Drive, ~5,7 MB, lưu ở `.tooling/huce-ctsv-docs-20261121/`); `ctv.demo01` đã gửi cả 4 ở chế độ REVIEW (`scripts/seed_demo_knowledge_queue.py`). Chúng nằm ở "Đang xử lý" cho tới khi worker xử lý tài liệu được bật (runtime đang chạy `--defer-worker`), rồi chờ một người khác duyệt. File 1, 3, 4 là bản scan có lớp chữ OCR chất lượng thấp; tên tệp hiển thị là `doc-N.pdf`.
 - Bàn giao ca (`/v1/handovers`): runtime 8015 chặn đường này và kho của nó chỉ nằm trong bộ nhớ, nên không seed được bền vững.
 - Đồng ý quyền riêng tư, bộ nhớ/theo dõi của trợ lý: trang vận hành không có thao tác tạo; để trống.
 - Một phiên bản tài liệu (`IT3090/66IT1`, đề cương) kẹt ở trạng thái quét do lỗi trên; đã tải lại phiên bản mới, bản kẹt giữ làm lịch sử.
