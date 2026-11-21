@@ -1,0 +1,12 @@
+# Every change is owned by the maintainer unless a more specific rule below says otherwise.
+# Later rules take precedence. Review is requested automatically; whether it is required is set by branch protection.
+*                              @DuongVinh2004
+
+# Safety-critical areas: identity and authorization, confirmation of write actions, grounding and refusal, CI.
+/services/api/src/campus247/infrastructure/identity/   @DuongVinh2004
+/services/api/src/campus247/application/authorization/ @DuongVinh2004
+/services/api/src/campus247/agent/                     @DuongVinh2004
+/services/api/migrations/                              @DuongVinh2004
+/contracts/                                            @DuongVinh2004
+/.github/                                              @DuongVinh2004
+/SECURITY.md                                           @DuongVinh2004

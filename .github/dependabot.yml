@@ -1,0 +1,62 @@
+# Dependabot keeps dependencies and CI actions current. Updates arrive as pull requests that must pass the same
+# required CI checks as any other change. Weekly cadence and grouped minor/patch updates keep the volume small.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+    labels: [dependencies, ci]
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm # pnpm workspace (pnpm-lock.yaml)
+    directories: [/, /apps/web, /infra/cdk]
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels: [dependencies, web]
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: uv # pyproject.toml + uv.lock (runtime dependencies are exact-pinned)
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels: [dependencies, api]
+    groups:
+      python-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker
+    directory: /infra/cloud/docker
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(infra)"
+    labels: [dependencies, infra]
+
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(infra)"
+    labels: [dependencies, infra]
