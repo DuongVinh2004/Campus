@@ -24,6 +24,7 @@ from campus247.application.learning.practice import (
 from campus247.domain.learning import LearningError, require
 from campus247.domain.shared.values import generate_uuid7
 
+PRACTICE_COLLECTIONS = ("practice_sets", "practice_items", "practice_attempts", "practice_reviews")  # PostgreSQL: migration 0032
 PRACTICE_READS = {"practice_sets", "practice_set", "practice_session", "practice_stats"}
 PRACTICE_WRITES = {"practice-set-create", "practice-item-save", "practice-set-publish", "practice-attempt-save"}
 KINDS = ("single_choice", "multi_choice", "short_answer")
