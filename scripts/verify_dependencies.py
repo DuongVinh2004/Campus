@@ -21,9 +21,13 @@ RUNTIME = ">=3.12,<3.14"
 # require new approval.
 # Owner approval in chat on 2026-11-16: the 2026-11-03 candidate plus tzdata==2026.6 (pure data package, needed for time-zone
 # aware tests on Windows). Earlier reference: DIRECT-HUMAN-2026-11-03-STACK-002 (sha256 251e0a8f...ce46, 133 packages).
-APPROVAL_REFERENCE = "DIRECT-HUMAN-2026-11-16-TZDATA-001"
-APPROVED_CANDIDATE_SHA256 = "edd5ac6ca92357cc9938e219a108cca24858aa7e3d4fc86e47adcf3265dad452"
+APPROVAL_REFERENCE = "DIRECT-HUMAN-2026-11-21-SECURITY-UPDATES-001"
+APPROVED_CANDIDATE_SHA256 = "beb290369b0e1397ef564abb953aa7b9907c3ec8bbd657855617bc8a832b51ce"
 APPROVED_ADDITIONAL_PACKAGE_COUNT = 134
+# Owner approval in chat on 2026-11-21 ("Duyệt nâng cấp"): security updates only, the 2026-11-16 candidate with these
+# exact version changes and no added or removed package: pypdf 6.19.0->6.21.4, langgraph 1.2.12->1.2.14 (direct pins);
+# pillow 12.3.0->13.0.0, certifi 2026.7.22->2026.10.18, brotli 1.2.0->1.2.1, langgraph-sdk 0.4.5->0.4.6 (transitive).
+# The OpenTelemetry 0.66b0 prerelease approval below is unchanged: opentelemetry-api 1.45.2 needs 0.66b2 and stays open.
 # Explicit human approval on 2026-10-05 for only these prereleases within the
 # hash-bound candidate. A name allowlist alone never enables this exception.
 APPROVED_OTEL_PRERELEASES = frozenset((name, "0.66b0") for name in (
