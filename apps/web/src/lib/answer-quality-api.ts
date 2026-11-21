@@ -19,10 +19,15 @@ export interface AnswerQualityReport {
   gaps: { days: number; minimum_count: number; clusters: GapCluster[] };
 }
 
+export interface StudentGapReports {
+  total: number; samples: { id: number; at: string; expires_at: string; question: string }[];
+}
+
 const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });
 
 export const answerQualityApi = {
   report: (days = 30) => client().get<AnswerQualityReport>(`/v1/knowledge/answer-quality?days=${days}`),
+  studentReports: () => client().get<StudentGapReports>("/v1/knowledge/gap-reports"),
   decide: (clusterKey: string, body: { action: GapAction; note: string; release_ref?: string }) =>
     client().post<{ cluster_key: string; action: GapAction }>(`/v1/knowledge/answer-quality/gaps/${encodeURIComponent(clusterKey)}/decision`, body),
 };
