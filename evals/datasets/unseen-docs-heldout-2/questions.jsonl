@@ -1,0 +1,18 @@
+{"id":"tt-01","doc":"quy-che-thuc-tap","kind":"prose","question":"Sinh viên cần tích lũy tối thiểu bao nhiêu tín chỉ để được đăng ký thực tập?","expected":"answer","required":["100 tín chỉ"],"forbidden":[]}
+{"id":"tt-02","doc":"quy-che-thuc-tap","kind":"cross_reference","question":"Sinh viên đang bị đình chỉ học tập có được đăng ký thực tập không?","expected":"answer","required":["Điều 6"],"forbidden":[]}
+{"id":"tt-03","doc":"quy-che-thuc-tap","kind":"prose","question":"Thực tập ngành Kiến trúc kéo dài tối thiểu bao nhiêu tuần?","expected":"answer","required":["10 tuần"],"forbidden":[]}
+{"id":"tt-04","doc":"quy-che-thuc-tap","kind":"prose","question":"Điểm báo cáo trước hội đồng chiếm bao nhiêu phần trăm điểm thực tập?","expected":"answer","required":["60%"],"forbidden":["40%"]}
+{"id":"tt-05","doc":"quy-che-thuc-tap","kind":"deadline","question":"Phải nộp phiếu đề xuất đơn vị thực tập trước ngày bắt đầu bao lâu?","expected":"answer","required":["3 tuần"],"forbidden":[]}
+{"id":"tt-06","doc":"quy-che-thuc-tap","kind":"general_rule_applies","question":"Sinh viên ngành Cầu đường thực tập tối thiểu bao nhiêu tuần?","expected":"answer","required":["8 tuần"],"forbidden":["10 tuần"]}
+{"id":"hb-01","doc":"hoc-bong-hai-tang","kind":"table_cell","question":"Học bổng loại giỏi nhóm ngành Công nghệ thông tin là bao nhiêu mỗi học kỳ?","expected":"answer","required":["9.000.000"],"forbidden":["7.000.000","8.000.000"]}
+{"id":"hb-02","doc":"hoc-bong-hai-tang","kind":"table_cell","question":"Sinh viên Kiến trúc và quy hoạch đạt loại xuất sắc nhận bao nhiêu tiền?","expected":"answer","required":["10.000.000"],"forbidden":["9.000.000","11.000.000"]}
+{"id":"hb-03","doc":"hoc-bong-hai-tang","kind":"table_cell","question":"Mức học bổng loại khá của Kỹ thuật xây dựng?","expected":"answer","required":["5.000.000"],"forbidden":["6.000.000"]}
+{"id":"hb-04","doc":"hoc-bong-hai-tang","kind":"prose","question":"Học bổng loại xuất sắc yêu cầu điểm trung bình học kỳ tối thiểu bao nhiêu?","expected":"answer","required":["3,60"],"forbidden":[]}
+{"id":"hb-05","doc":"hoc-bong-hai-tang","kind":"prose","question":"Mỗi lớp được xét tối đa bao nhiêu suất loại xuất sắc?","expected":"answer","required":["3 suất"],"forbidden":[]}
+{"id":"hb-06","doc":"hoc-bong-hai-tang","kind":"abstain_scope","question":"Học bổng loại xuất sắc của nhóm ngành Quản lý xây dựng là bao nhiêu?","expected":"abstain","required":[],"forbidden":["9.000.000","10.000.000","11.000.000"]}
+{"id":"dk-01","doc":"dang-ky-hoc-phan","kind":"deadline","question":"Đợt 1 đăng ký học phần học kỳ 2 kết thúc lúc nào?","expected":"answer","required":["10/01/2028"],"forbidden":[]}
+{"id":"dk-02","doc":"dang-ky-hoc-phan","kind":"scoped_row","question":"Sinh viên khóa K72 đăng ký học phần ở đợt nào?","expected":"answer","required":["Đợt 2"],"forbidden":["Đợt 1"]}
+{"id":"dk-03","doc":"dang-ky-hoc-phan","kind":"exception","question":"Sinh viên bị cảnh báo học tập được đăng ký tối đa bao nhiêu tín chỉ?","expected":"answer","required":["14 tín chỉ"],"forbidden":["24 tín chỉ"]}
+{"id":"dk-04","doc":"dang-ky-hoc-phan","kind":"exception","question":"Sinh viên đang thực tập tốt nghiệp có phải đăng ký đủ số tín chỉ tối thiểu không?","expected":"answer","required":["miễn"],"forbidden":[]}
+{"id":"dk-05","doc":"dang-ky-hoc-phan","kind":"deadline","question":"Hạn chót rút bớt học phần là ngày nào?","expected":"answer","required":["31/01/2028"],"forbidden":[]}
+{"id":"dk-06","doc":"dang-ky-hoc-phan","kind":"abstain_scope","question":"Đợt đăng ký học phần dành cho khóa K73 là khi nào?","expected":"abstain","required":[],"forbidden":["Đợt 1","Đợt 2","06/01/2028","12/01/2028"]}

@@ -58,6 +58,21 @@ def test_postgres_optimized_views_require_verified_revision_0024(configuration):
                 verified_database_name='explicit-test', verified_schema_revision=revision)
 
 
+def test_postgres_practice_questions_require_verified_revision_0032(configuration):
+    directory, value = configuration
+    offering = '019a0000-0000-7000-8000-0000000000aa'
+    path = new_config(directory, 'postgres-practice.json', value | {'storage': 'postgres', 'database_name': 'explicit-test',
+                                                                     'practice_offerings': [offering]})
+    for revision in (None, '0031'):
+        with pytest.raises(ValueError, match='Practice questions requires explicitly verified schema revision 0032'):
+            load_local_learning(path, workspace=ROOT, tenant_id='configuration-test', postgres_pool=object(),
+                verified_database_name='explicit-test', verified_schema_revision=revision)
+    service, _ = load_local_learning(path, workspace=ROOT, tenant_id='configuration-test', postgres_pool=object(),
+        verified_database_name='explicit-test', verified_schema_revision='0032')
+    assert 'practice_items' in service.repository.collections
+    assert service.practice_offerings == frozenset({offering})
+
+
 def test_learning_ai_is_explicit_and_does_not_call_provider():
     calls = []
     gateway = SimpleNamespace(generate=lambda request: calls.append(request))

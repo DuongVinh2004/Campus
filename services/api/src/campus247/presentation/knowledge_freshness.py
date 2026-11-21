@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -13,6 +13,7 @@ from campus247.presentation.identity import get_current_identity
 
 NO_STORE = {"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"}
 MANAGERS = {IdentityRole.KNOWLEDGE_ADMIN, IdentityRole.SYSTEM_ADMIN}
+MAX_STATUS_IDS = 20
 UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
 
@@ -36,6 +37,14 @@ def create_freshness_router(service: FreshnessService) -> APIRouter:
         if manager(request) is None:
             return problem(403, "FORBIDDEN", "Chỉ quản trị tri thức mới xem được hiệu lực của nguồn.")
         return JSONResponse(await service.report(), headers=NO_STORE)
+
+    @router.get("/v1/knowledge/source-review-status")
+    async def review_status(request: Request, source_ids: str = Query("", max_length=800)):
+        get_current_identity(request)  # any signed-in person; only the state label is returned, never the report
+        ids = [value.strip() for value in source_ids.split(",")]
+        if not 1 <= len(ids) <= MAX_STATUS_IDS or len(set(ids)) != len(ids) or not all(UUID.match(value) for value in ids):
+            return problem(422, "VALIDATION_FAILED", f"Cần từ 1 đến {MAX_STATUS_IDS} mã nguồn hợp lệ, không trùng nhau.")
+        return JSONResponse({"states": await service.review_states(ids)}, headers=NO_STORE)
 
     @router.post("/v1/knowledge/freshness/{source_id}/reviewed")
     async def reviewed(source_id: str, body: ReviewedBody, request: Request):

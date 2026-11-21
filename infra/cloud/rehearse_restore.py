@@ -62,6 +62,7 @@ def rehearse(*, backups: Path, work_dir: Path, steps: Steps, now: Callable[[], d
     database = f"{DATABASE_PREFIX}{stamp}"
     record: dict = {"ok": False, "at": now().isoformat().replace("+00:00", "Z"), "database": database, "steps": []}
     work_dir.mkdir(parents=True, exist_ok=True)
+    work_dir = work_dir.resolve()  # mkdtemp returns an absolute path; a relative --work-dir must still compare equal
     new_root = Path(tempfile.mkdtemp(prefix=ROOT_PREFIX, dir=work_dir))
     created_database = False
 

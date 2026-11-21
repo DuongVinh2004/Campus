@@ -3,6 +3,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { CitationDrawer, type CitationItem } from "./CitationDrawer";
 import { ClaimEvidence } from "./ClaimEvidence";
+import * as reviewStates from "../../lib/use-source-review-states";
 
 describe("CitationDrawer Component (TASK-WEB-CITE-002)", () => {
   afterEach(() => {
@@ -176,5 +177,26 @@ describe("ClaimEvidence Component (TASK-WEB-CITE-003)", () => {
     const span = screen.getByTestId("unsupported-claim");
     expect(span.getAttribute("title")).toBe("Nội dung chưa được kiểm chứng");
     expect(screen.getByText(/Thông tin chưa được xác thực/i)).toBeDefined();
+  });
+});
+
+describe("CitationDrawer review label", () => {
+  afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+  const item = (id: string, sourceId?: string): CitationItem => ({ id, sourceId, title: `Nguồn ${id}`, documentRef: "v1", quote: "Nội dung trích", validityStatus: "active" });
+
+  it("labels a source that is overdue for review and leaves the others alone", () => {
+    vi.spyOn(reviewStates, "useSourceReviewStates").mockReturnValue({ s1: "OVERDUE", s2: "OK" });
+    render(<CitationDrawer isOpen citations={[item("c1", "s1"), item("c2", "s2"), item("c3")]} onClose={() => {}} />);
+    expect(screen.getAllByText("Nguồn quá hạn rà soát — nên đối chiếu văn bản gốc")).toHaveLength(1);
+    expect(screen.getByText("Nguồn c1").closest("article")?.textContent).toContain("quá hạn rà soát");
+    expect(screen.getByText("Nguồn c2").closest("article")?.textContent).not.toContain("quá hạn rà soát");
+  });
+
+  it("looks the states up only for sources with an id, and only while the drawer is open", () => {
+    const spy = vi.spyOn(reviewStates, "useSourceReviewStates").mockReturnValue({});
+    const { rerender } = render(<CitationDrawer isOpen citations={[item("c1", "s1"), item("c3")]} onClose={() => {}} />);
+    expect(spy).toHaveBeenLastCalledWith(["s1"], true);
+    rerender(<CitationDrawer isOpen={false} citations={[item("c1", "s1")]} onClose={() => {}} />);
+    expect(spy).toHaveBeenLastCalledWith(["s1"], false);
   });
 });

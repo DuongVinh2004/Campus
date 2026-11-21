@@ -24,6 +24,8 @@ export interface BookingLimits { open: string; close: string; min_minutes: numbe
 export interface RoomList { items: Room[]; buildings: string[]; source: string; limits: BookingLimits }
 export interface BusyInterval { starts_at: string; ends_at: string; type: "BOOKING" | "CLASS" | "EXAM"; label: string }
 export interface Availability { room: Room; date: string; open: string; close: string; busy: BusyInterval[]; limits: BookingLimits }
+export interface AvailabilityBatch { date: string; open: string; close: string; limits: BookingLimits; items: { room: Room; busy: BusyInterval[] }[]; missing: string[] }
+export const MAX_AVAILABILITY_BATCH = 60;
 export interface BookingPreviewRequest { room_id: string; date: string; start: string; end: string; purpose: string; attendees: number }
 export interface BookingPreview {
   preview_id: string; can_confirm: boolean; problems: string[]; conflicts: BusyInterval[]; expires_at: string; notice: string;
@@ -42,6 +44,9 @@ export const roomsApi = {
     return client().get<RoomList>(`/v1/rooms${qs.size ? `?${qs}` : ""}`);
   },
   availability: (roomId: string, date: string) => client().get<Availability>(`/v1/rooms/${encodeURIComponent(roomId)}/availability?date=${encodeURIComponent(date)}`),
+  // Every listed room's busy times for one day in one request (at most MAX_AVAILABILITY_BATCH ids).
+  availabilityMany: (roomIds: string[], date: string) =>
+    client().get<AvailabilityBatch>(`/v1/rooms/availability?date=${encodeURIComponent(date)}&room_ids=${roomIds.map(encodeURIComponent).join(",")}`),
   preview: (body: BookingPreviewRequest) => client().post<BookingPreview>("/v1/rooms/book/preview", body),
   // The key is per confirmation attempt; reuse the same key when retrying after a network failure.
   confirm: (previewId: string, idempotencyKey: string = newKey()) =>

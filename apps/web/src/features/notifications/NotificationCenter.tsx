@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/lib/i18n";
 import Link from "next/link";
 import { Bell, Inbox, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -11,11 +12,13 @@ import { useStore } from "@/lib/store";
 
 const client = new AssistantTrackingClient(), grantsClient = new AssistantStateService();
 export function NotificationCenter() {
+  const t = useT();
   const runtime = useOptionalUnifiedAssistant();
   const { dataConfig } = useStore();
-  return runtime?.actor && runtime.capabilities ? <ActorNotifications key={`${dataConfig?.mode}:${runtime.capabilities.tenant_id}:${runtime.actor.user_id}:${runtime.actor.roles.join(",")}`} /> : <section className="campus-empty-state"><Bell size={32} /><h2>Thông báo của bạn</h2><p>Cần phiên đã xác minh để đọc thông báo.</p><Link href="/login" className="fluent-btn-primary">Đăng nhập</Link></section>;
+  return runtime?.actor && runtime.capabilities ? <ActorNotifications key={`${dataConfig?.mode}:${runtime.capabilities.tenant_id}:${runtime.actor.user_id}:${runtime.actor.roles.join(",")}`} /> : <section className="campus-empty-state"><Bell size={32} /><h2>{t("ncx.1")}</h2><p>{t("ncx.2")}</p><Link href="/login" className="fluent-btn-primary">{t("ncx.3")}</Link></section>;
 }
 function ActorNotifications() {
+  const t = useT();
   const runtime = useUnifiedAssistant();
   const router = useRouter();
   const [items, setItems] = useState<Notification[]>([]), [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -27,16 +30,16 @@ function ActorNotifications() {
   const [cursor, setCursor] = useState<string | null>(null), [message, setMessage] = useState("");
   const [opened, setOpened] = useState<(Awaited<ReturnType<typeof client.open>> & { event_id: string }) | null>(null);
   async function load() { const subs = await client.subscriptions(); await runtime.guard(); setSubscriptions(subs.items); setConfigured(subs.configured); if (subs.configured) { const page = await client.notifications(); await runtime.guard(); setItems(page.items); setCursor(page.next_cursor); } const page = await grantsClient.grants(); await runtime.guard(); setGrants(page.items.filter(g => g.state === "active" && g.capability === "read_source" && g.lifetime !== "once" && !g.locked_reason)); }
-  async function run(work: () => Promise<void>) { setBusy(true); setError(""); try { await runtime.guard(); await work(); } catch (e) { setError(e instanceof Error ? e.message : "Chưa xác minh được kết quả"); } finally { setBusy(false); } }
+  async function run(work: () => Promise<void>) { setBusy(true); setError(""); try { await runtime.guard(); await work(); } catch (e) { setError(e instanceof Error ? e.message : t("ncx.4")); } finally { setBusy(false); } }
   useEffect(() => { void run(load); }, []); // Explicit user readback refreshes the current session.
-  async function stop(subscription: Subscription) { const clientId = assistantClientId(); setPending({ preview: await client.preview(subscription.key, null, subscription.version, clientId), clientId, label: `Dừng theo dõi hồ sơ ${subscription.payload.spec.resource.id}, sự kiện ${subscription.payload.spec.trigger}, tại phiên bản đăng ký ${subscription.version}.` }); setConfirmed(false); }
-  async function readback() { if (!pending) return; const receipt = await client.receipt(pending.clientId); if (receipt.client_id !== pending.clientId || receipt.state !== "committed") throw new Error("Receipt chưa khớp; giữ preview"); await load(); setMessage(`Đã đọc lại phiên bản ${receipt.version}`); setPending(null); }
+  async function stop(subscription: Subscription) { const clientId = assistantClientId(); setPending({ preview: await client.preview(subscription.key, null, subscription.version, clientId), clientId, label: t("ncx.45", { id: subscription.payload.spec.resource.id, e: subscription.payload.spec.trigger, v: subscription.version }) }); setConfirmed(false); }
+  async function readback() { if (!pending) return; const receipt = await client.receipt(pending.clientId); if (receipt.client_id !== pending.clientId || receipt.state !== "committed") throw new Error(t("ncx.5")); await load(); setMessage(t("ncx.46", { v: receipt.version })); setPending(null); }
   return (
-    <section className="campus-notifications space-y-5" aria-label="Theo dõi và thông báo">
+    <section className="campus-notifications space-y-5" aria-label={t("ncx.6")}>
       <div className="fluent-card border border-[var(--border-color)] bg-[var(--surface-card)] p-5 space-y-2">
-        <h2 className="text-xl font-semibold text-[var(--text-primary)]">Theo dõi và thông báo trong ứng dụng</h2>
+        <h2 className="text-xl font-semibold text-[var(--text-primary)]">{t("ncx.7")}</h2>
         <p className="text-sm text-[var(--text-secondary)]">
-          Chỉ gửi vào inbox của phiên và tài khoản được phép. Email, Slack và kênh bên ngoài chưa được cấu hình. Hết hạn hoặc rút quyền sẽ chặn lần giao tiếp theo.
+          {t("ncx.8")}
         </p>
       </div>
 
@@ -45,7 +48,7 @@ function ActorNotifications() {
           role="alert"
           className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300"
         >
-          {error} Giữ preview và kiểm tra receipt khi kết quả chưa rõ.
+          {error} {t("ncx.9")}
         </p>
       )}
       {message && (
@@ -59,11 +62,11 @@ function ActorNotifications() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <button className="fluent-btn-secondary" disabled={busy} onClick={() => void run(load)}>
-          Đọc lại
+          {t("ncx.10")}
         </button>
         {!configured && (
           <p role="status" className="text-sm font-medium text-[var(--text-secondary)]">
-            Consumer sự kiện/nguồn chưa sẵn sàng. Mở hồ sơ để kiểm tra thủ công.
+            {t("ncx.11")}
           </p>
         )}
       </div>
@@ -71,41 +74,41 @@ function ActorNotifications() {
       <details className="fluent-card border border-[var(--border-color)] bg-[var(--surface-card)] p-5 campus-notification-preferences">
         <summary className="flex cursor-pointer items-center gap-2 font-semibold text-[var(--text-primary)]">
           <SlidersHorizontal size={18} />
-          Cài đặt theo dõi hồ sơ
+          {t("ncx.12")}
         </summary>
         <div className="mt-4 space-y-4">
           <label className="block text-sm font-medium text-[var(--text-primary)]">
-            Quyền và tài nguyên chính xác
+            {t("ncx.13")}
             <select
               className="fluent-input mt-1"
               value={grantId}
               onChange={(e) => setGrantId(e.target.value)}
             >
-              <option value="">Chọn quyền đã cấp</option>
+              <option value="">{t("ncx.14")}</option>
               {grants.map((g) => (
                 <option key={g.id} value={g.id}>
-                  {g.resource.kind} {g.resource.id} · v{g.resource.expected_version} · hết hạn {g.expires_at}
+                  {g.resource.kind} {g.resource.id} · v{g.resource.expected_version} · {t("ncx.48", { d: g.expires_at })}
                 </option>
               ))}
             </select>
           </label>
           <label className="block text-sm font-medium text-[var(--text-primary)]">
-            Sự kiện
+            {t("ncx.15")}
             <select
               className="fluent-input mt-1"
               value={trigger}
               onChange={(e) => setTrigger(e.target.value as TrackingTrigger)}
             >
-              <option value="status">Thay đổi trạng thái</option>
-              <option value="feedback">Phản hồi mới</option>
-              <option value="supplement">Yêu cầu bổ sung</option>
+              <option value="status">{t("ncx.16")}</option>
+              <option value="feedback">{t("ncx.17")}</option>
+              <option value="supplement">{t("ncx.18")}</option>
               <option value="deadline" disabled>
-                Mốc thời hạn — chưa có nguồn xác minh
+                {t("ncx.19")}
               </option>
             </select>
           </label>
           <p className="text-xs text-[var(--text-secondary)]">
-            Giờ yên lặng 22:00–07:00 (UTC+07). Thời hạn theo đúng quyền đã chọn.
+            {t("ncx.20")}
           </p>
           <button
             className="fluent-btn-primary"
@@ -113,7 +116,7 @@ function ActorNotifications() {
             onClick={() =>
               void run(async () => {
                 const grant = grants.find((g) => g.id === grantId);
-                if (!grant) throw new Error("Đọc lại quyền");
+                if (!grant) throw new Error(t("ncx.21"));
                 const clientId = assistantClientId();
                 setPending({
                   preview: await client.preview(
@@ -133,27 +136,27 @@ function ActorNotifications() {
                     clientId
                   ),
                   clientId,
-                  label: `Theo dõi ${trigger} cho hồ sơ ${grant.resource.id}, phiên bản ${grant.resource.expected_version}, tới ${grant.expires_at}. Chỉ thông báo trong ứng dụng. Giờ yên lặng 22:00–07:00 UTC+07.`,
+                  label: t("ncx.47", { e: trigger, id: grant.resource.id, v: grant.resource.expected_version, d: grant.expires_at }),
                 });
                 setConfirmed(false);
               })
             }
           >
-            Xem trước theo dõi
+            {t("ncx.22")}
           </button>
           {subscriptions.map((s) => (
             <article className="fluent-card border border-[var(--border-color)] bg-[var(--surface-subtle)] p-3 text-xs" key={s.key}>
               <p className="font-semibold text-[var(--text-primary)]">
                 {s.payload.spec.resource.id} · {s.payload.spec.trigger} · {s.payload.state} · v{s.version}
               </p>
-              <p className="text-[var(--text-secondary)]">Hết hạn {s.payload.spec.expires_at}</p>
+              <p className="text-[var(--text-secondary)]">{t("ncx.49", { d: s.payload.spec.expires_at })}</p>
               {s.payload.state === "active" && (
                 <button
                   className="fluent-btn-secondary text-xs mt-2"
                   disabled={busy || Boolean(pending)}
                   onClick={() => void run(() => stop(s))}
                 >
-                  Xem trước dừng theo dõi
+                  {t("ncx.23")}
                 </button>
               )}
             </article>
@@ -161,11 +164,11 @@ function ActorNotifications() {
         </div>
       </details>
 
-      <div className="campus-filter-chips" role="group" aria-label="Lọc thông báo">
+      <div className="campus-filter-chips" role="group" aria-label={t("ncx.24")}>
         {[
-          ["all", "Tất cả"],
-          ["public_student", "Dành cho sinh viên"],
-          ["internal_staff", "Nội bộ cán bộ"],
+          ["all", t("ncx.25")],
+          ["public_student", t("ncx.26")],
+          ["internal_staff", t("ncx.27")],
         ].map(([value, label]) => (
           <button
             type="button"
@@ -186,8 +189,8 @@ function ActorNotifications() {
       {!busy && !items.filter((item) => filter === "all" || item.classification === filter).length && (
         <div className="campus-empty-state" role="status">
           <Inbox size={32} />
-          <h3>Chưa có thông báo</h3>
-          <p>Cập nhật từ hồ sơ được theo dõi sẽ xuất hiện tại đây khi nguồn thông báo sẵn sàng.</p>
+          <h3>{t("ncx.28")}</h3>
+          <p>{t("ncx.29")}</p>
         </div>
       )}
 
@@ -201,12 +204,12 @@ function ActorNotifications() {
             <div>
               <p className="font-semibold text-[var(--text-primary)]">{n.reason}</p>
               <p className="text-xs text-[var(--text-secondary)]">
-                Nguồn {n.source_id} · cập nhật {n.updated_at} ·{" "}
-                {n.audience === "staff" ? "Nội bộ cán bộ" : "Thông tin dành cho sinh viên"}
+                {t("ncx.50", { s: n.source_id, u: n.updated_at })} ·{" "}
+                {n.audience === "staff" ? t("ncx.27") : t("ncx.30")}
               </p>
-              <p className="text-xs text-[var(--text-secondary)]">Bước tiếp theo: {n.next_action}</p>
+              <p className="text-xs text-[var(--text-secondary)]">{t("ncx.51", { a: n.next_action })}</p>
               <p className="text-xs text-[var(--text-secondary)]">
-                Hồ sơ {n.resource.id} · phiên bản {n.resource.expected_version}.
+                {t("ncx.52", { id: n.resource.id, v: n.resource.expected_version })}
               </p>
               <div className="flex flex-wrap gap-2 pt-2">
                 <button
@@ -222,12 +225,12 @@ function ActorNotifications() {
                         result.resource.kind !== n.resource.kind ||
                         result.resource.expected_version !== n.resource.expected_version
                       )
-                        throw new Error("Hồ sơ đã thay đổi; đọc lại thông báo.");
+                        throw new Error(t("ncx.31"));
                       setOpened({ ...result, event_id: n.event_id });
                     })
                   }
                 >
-                  Đối chiếu hồ sơ và bàn giao
+                  {t("ncx.32")}
                 </button>
                 <button
                   className="fluent-btn-secondary text-xs"
@@ -235,12 +238,12 @@ function ActorNotifications() {
                   onClick={() =>
                     void run(async () => {
                       const subscription = subscriptions.find((s) => s.key === n.subscription_id);
-                      if (!subscription) throw new Error("Đọc lại đăng ký");
+                      if (!subscription) throw new Error(t("ncx.33"));
                       await stop(subscription);
                     })
                   }
                 >
-                  Dừng theo dõi
+                  {t("ncx.34")}
                 </button>
               </div>
             </div>
@@ -248,18 +251,18 @@ function ActorNotifications() {
         ))}
 
       {opened && (
-        <section className="fluent-card border border-[var(--border-color)] bg-[var(--surface-card)] p-4 space-y-3" aria-label="Bàn giao đã đối chiếu">
+        <section className="fluent-card border border-[var(--border-color)] bg-[var(--surface-card)] p-4 space-y-3" aria-label={t("ncx.35")}>
           <p className="text-sm font-bold text-[var(--text-primary)]">
-            Hồ sơ {opened.resource.id} · v{opened.resource.expected_version}
+            {t("ncx.53", { id: opened.resource.id, v: opened.resource.expected_version })}
           </p>
           {opened.handover.map((handover, index) => (
             <div key={index} className="rounded-lg bg-[var(--surface-subtle)] p-3 text-xs space-y-1">
               <p className="font-semibold text-[var(--color-primary)]">
-                {handover.summary.visibility === "public" ? "Bàn giao công khai" : "Bàn giao nội bộ"} · {handover.queue}
+                {handover.summary.visibility === "public" ? t("ncx.36") : t("ncx.37")} · {handover.queue}
               </p>
-              <p className="text-[var(--text-secondary)]">Đã làm: {handover.summary.done.join("; ")}</p>
-              <p className="text-[var(--text-secondary)]">Còn lại: {handover.summary.open.join("; ")}</p>
-              <p className="text-[var(--text-secondary)]">Tiếp theo: {handover.summary.next_action}</p>
+              <p className="text-[var(--text-secondary)]">{t("ncx.54", { v: handover.summary.done.join("; ") })}</p>
+              <p className="text-[var(--text-secondary)]">{t("ncx.55", { v: handover.summary.open.join("; ") })}</p>
+              <p className="text-[var(--text-secondary)]">{t("ncx.56", { v: handover.summary.next_action })}</p>
             </div>
           ))}
           <button
@@ -280,12 +283,12 @@ function ActorNotifications() {
                   fresh.resource.expected_version !== opened.resource.expected_version ||
                   fresh.open_path !== `${prefix}?request=${fresh.resource.id}`
                 )
-                  throw new Error("Liên kết hoặc phiên bản hồ sơ đã thay đổi; đọc lại thông báo.");
+                  throw new Error(t("ncx.38"));
                 router.push(fresh.open_path);
               })
             }
           >
-            Mở đúng hồ sơ
+            {t("ncx.39")}
           </button>
         </section>
       )}
@@ -303,14 +306,14 @@ function ActorNotifications() {
             })
           }
         >
-          Đọc thêm thông báo
+          {t("ncx.40")}
         </button>
       )}
 
       {pending && (
-        <section className="fluent-card border border-[var(--color-primary-border)] bg-[var(--color-primary-subtle)] p-5 space-y-3" aria-label="Xem trước theo dõi">
+        <section className="fluent-card border border-[var(--color-primary-border)] bg-[var(--color-primary-subtle)] p-5 space-y-3" aria-label={t("ncx.22")}>
           <p className="text-sm font-semibold text-[var(--text-primary)]">{pending.label}</p>
-          <p className="text-xs text-[var(--text-secondary)]">Preview hết hạn {pending.preview.expires_at}</p>
+          <p className="text-xs text-[var(--text-secondary)]">{t("ncx.57", { d: pending.preview.expires_at })}</p>
           <label className="flex items-center gap-2 text-sm text-[var(--text-primary)] cursor-pointer">
             <input
               type="checkbox"
@@ -318,7 +321,7 @@ function ActorNotifications() {
               onChange={(e) => setConfirmed(e.target.checked)}
               className="accent-[var(--color-primary)]"
             />
-            <span>Tôi xác nhận tài nguyên, trigger, thời hạn và kênh in-app</span>
+            <span>{t("ncx.41")}</span>
           </label>
           <div className="flex flex-wrap gap-2">
             <button
@@ -331,21 +334,21 @@ function ActorNotifications() {
                 })
               }
             >
-              Xác nhận và đọc lại
+              {t("ncx.42")}
             </button>
             <button
               className="fluent-btn-secondary"
               disabled={busy}
               onClick={() => void run(readback)}
             >
-              Kiểm tra receipt
+              {t("ncx.43")}
             </button>
             <button
               className="fluent-btn-secondary"
               disabled={busy}
               onClick={() => setPending(null)}
             >
-              Đóng preview
+              {t("ncx.44")}
             </button>
           </div>
         </section>

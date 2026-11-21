@@ -17,7 +17,7 @@ from campus247.rag_v2.observability.trace import TurnTrace, emit
 from campus247.rag_v2.outcome.compose import TIMEOUT_HINT, TIMEOUT_MESSAGE, TOPIC_CHIPS, build_outcome
 from campus247.rag_v2.outcome.guidance import related_documents, scope_chips
 from campus247.rag_v2.retrieval.hybrid import retrieve, scope_allows
-from campus247.rag_v2.scope_terms import missing_terms, without_terms
+from campus247.rag_v2.scope_terms import missing_terms, names_only_other_majors, without_terms
 from campus247.rag_v2.table_rows import answer_rows, general_rows, row_pairs, rows_of_chunks, sibling_rows
 from campus247.rag_v2.vocabulary import EMPTY as EMPTY_VOCABULARY
 from campus247.rag_v2.verification.venue import venue_conflict
@@ -71,8 +71,8 @@ async def _verify_scoped(gateway, passed, units, u, vocabulary, *, deadline_ms):
     lacking_by, groups = {}, {}
     for i, statement in enumerate(passed):
         lacking = missing_terms(u.scope_terms, [units[ref] for ref in statement.unit_ids], vocabulary) if u.scope_terms else []
-        if lacking and vocabulary.terms_in(statement.text):
-            # The statement names other majors itself, so it is about those and not a general rule: it must face the full question.
+        if lacking and names_only_other_majors(statement.text, vocabulary):
+            # Every clause names other majors, so the statement is about those and not a general rule: it must face the full question.
             lacking = []
         lacking_by[i] = tuple(lacking)
         query = without_terms(u.search_query, lacking)[0] if lacking else u.search_query

@@ -27,7 +27,7 @@ class LearningCampusRehearsal:
             raise ValueError("Explicit synthetic Campus rehearsal directory required")
         value = json.loads(manifest.read_text(encoding="utf-8"))
         if (value.get("schema") != "learning-campus-rehearsal-v1" or value.get("synthetic_only") is not True
-                or value.get("revision") not in ("0025", "0026", "0027", "0028", "0029", "0030", "0031") or value.get("host") != "127.0.0.1"
+                or value.get("revision") not in ("0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032") or value.get("host") != "127.0.0.1"
                 or type(value.get("port")) is not int or not 56000 <= value["port"] <= 56999
                 or value.get("database") != "campus247_" + directory.name.replace("-", "_")):
             raise ValueError("Campus rehearsal database identity mismatch")

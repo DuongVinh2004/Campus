@@ -89,11 +89,19 @@ def state_files(root: Path, with_credentials: bool = False):
         yield path, relative
 
 
-def add_tar(archive: Path, base: Path, files) -> int:
+def add_tar(archive: Path, base: Path, files, skipped: list[str] | None = None) -> int:
+    """Pack the files. A file that cannot be read (locked, or blocked by the operating system's malware protection) is left out and
+    named in `skipped` when the caller asked for it; without `skipped` the error stops the backup as before."""
     count = 0
     with tarfile.open(archive, "w:gz") as tar:
         for path, relative in files:
-            tar.add(path, arcname=relative.as_posix(), recursive=False)
+            try:
+                tar.add(path, arcname=relative.as_posix(), recursive=False)
+            except OSError as error:
+                if skipped is None:
+                    raise
+                skipped.append(f"{relative.as_posix()} ({type(error).__name__})")
+                continue
             count += 1
     return count
 
@@ -182,18 +190,22 @@ def backup(root: Path, out: Path, pg_bin: str | None, keep: int, with_credential
         with contextlib.closing(sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True, timeout=30)) as origin,                 contextlib.closing(sqlite3.connect(destination)) as copy:
             origin.backup(copy)
         parts[f"sqlite/{name}"] = sha256(destination)
-    state_count = add_tar(target / "state.tar.gz", root / STATE_REL, state_files(root, with_credentials))
+    skipped: list[str] = []
+    state_count = add_tar(target / "state.tar.gz", root / STATE_REL, state_files(root, with_credentials), skipped)
     parts["state.tar.gz"] = sha256(target / "state.tar.gz")
-    ledger_count = add_tar(target / "ledger.tar.gz", root / LEDGER_REL, ledger_files(root))
+    ledger_count = add_tar(target / "ledger.tar.gz", root / LEDGER_REL, ledger_files(root), skipped)
     parts["ledger.tar.gz"] = sha256(target / "ledger.tar.gz")
     scratch = target / "scratch"
     scratch.mkdir()
-    extra_count = add_tar(target / "extra.tar.gz", root, extra_files(root, scratch, with_credentials))
+    extra_count = add_tar(target / "extra.tar.gz", root, extra_files(root, scratch, with_credentials), skipped)
     shutil.rmtree(scratch)
     parts["extra.tar.gz"] = sha256(target / "extra.tar.gz")
     manifest = {"schema": "campus247-backup-v1", "created_utc": stamp, "database": conn["database"], "parts": parts,
                 "state_files": state_count, "ledger_files": ledger_count, "extra_files": extra_count, "with_credentials": with_credentials,
-                "python": sys.version.split()[0]}
+                "python": sys.version.split()[0],
+                "skipped_unreadable": skipped}
+    if skipped:
+        print(f"WARNING: {len(skipped)} file(s) could not be read and are NOT in this backup: " + "; ".join(skipped[:5]), file=sys.stderr)
     (target / "MANIFEST.json").write_text(json.dumps(manifest, indent=1), encoding="utf-8")
     if keep:
         old = sorted(p for p in out.glob("campus247-backup-*") if p.is_dir())[:-keep]
@@ -213,6 +225,7 @@ def write_status(out: Path, *, ok: bool, started: float, folder: Path | None = N
         record["folder"] = folder.name
         record["bytes"] = sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())
         record["manifest_sha256"] = sha256(folder / "MANIFEST.json")
+        record["skipped_files"] = len(json.loads((folder / "MANIFEST.json").read_text(encoding="utf-8")).get("skipped_unreadable", []))
     if error:
         record["error"] = error
     out.mkdir(parents=True, exist_ok=True)

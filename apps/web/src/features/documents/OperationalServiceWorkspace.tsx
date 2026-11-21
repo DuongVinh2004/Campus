@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, FileText } from "lucide-react";
@@ -21,16 +22,19 @@ const blank = (kind: Kind): Form => ({ kind, purpose: "", recipient: "", course:
 const endpoint = "/v1/student-preparations";
 
 export function OperationalServiceWorkspace({ history = false }: { history?: boolean }) {
+  const t = useT();
   return <AppShell activeNav={history ? "tickets" : "services"} userRole="guest"><ScopedServiceContent history={history} /></AppShell>;
 }
 
 function ScopedServiceContent({ history }: { history: boolean }) {
+  const t = useT();
   const owner = useTabDraftOwner();
-  if (owner.enabled && !owner.scope) return <p role="status">Đăng nhập để mở hoặc tiếp tục bản nháp riêng.</p>;
+  if (owner.enabled && !owner.scope) return <p role="status">{t("osw.1")}</p>;
   return <ServiceContent key={owner.scope || "standalone"} history={history} ownerScope={owner.scope} />;
 }
 
 function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope: string | null }) {
+  const t = useT();
   type Actor = { user_id?: string; subject_id?: string; display_name: string; roles: string[] };
   const [actor, setActor] = useState<Actor | null>(null);
   const [rows, setRows] = useState<Draft[]>([]);
@@ -188,24 +192,24 @@ function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope:
 
   return <>
     <div className="campus-workflow space-y-5">
-      <header className="campus-page-heading"><div data-eyebrow="Dịch vụ một cửa"><h1 className="text-2xl font-semibold">{history ? "Hồ sơ của tôi" : "Dịch vụ học vụ"}</h1><p className="mt-2 text-sm">{actor?.display_name ? `${actor.display_name} · ` : ""}Dùng chung tài khoản, trợ lý và lịch sử trên Campus 24/7.</p></div></header>
-      <p className="campus-panel text-sm" role="status">Bạn có thể chuẩn bị, xem trước và lưu nháp riêng tại đây, rồi gửi vào hệ thống Một cửa nội bộ của Campus 24/7. Hồ sơ chưa được chuyển đến hệ thống tiếp nhận chính thức của HUCE; hệ thống cũng chưa xác thực hồ sơ sinh viên hoặc dữ liệu điểm.</p>
-      {error && <p role="alert" className="rounded-xl border border-[var(--color-danger-subtle)] bg-[var(--surface-subtle)] p-3 text-xs text-[var(--color-danger)]">{error} Nội dung đang soạn được giữ.</p>}
-      {busy && <p role="status">Đang đọc hoặc lưu hồ sơ…</p>}
+      <header className="campus-page-heading"><div data-eyebrow={t("osw.35")}><h1 className="text-2xl font-semibold">{history ? t("osw.33") : t("osw.34")}</h1><p className="mt-2 text-sm">{actor?.display_name ? `${actor.display_name} · ` : ""}{t("oswx.1")}</p></div></header>
+      <p className="campus-panel text-sm" role="status">{t("oswx.2")}</p>
+      {error && <p role="alert" className="rounded-xl border border-[var(--color-danger-subtle)] bg-[var(--surface-subtle)] p-3 text-xs text-[var(--color-danger)]">{error} {t("oswx.3")}</p>}
+      {busy && <p role="status">{t("osw.2")}</p>}
       {notice && <p role="status" className="rounded-xl border border-[var(--color-success-subtle)] bg-[var(--surface-subtle)] p-3 text-xs text-[var(--color-success)]">{notice}</p>}
-      {!actor && !busy && <Link href="/login" className="fluent-btn-primary">Đăng nhập</Link>}
-      {actor && !student && <p>Tài khoản này quản trị nguồn. <Link href="/knowledge/sources" className="underline">Mở quản trị nguồn</Link> hoặc <Link href="/login" className="underline">đăng nhập tài khoản sinh viên</Link> để chuẩn bị hồ sơ cá nhân.</p>}
-      {!editing && history && !!student && <Link href="/services" className="fluent-btn-primary w-fit">Chuẩn bị thủ tục mới</Link>}
+      {!actor && !busy && <Link href="/login" className="fluent-btn-primary">{t("osw.3")}</Link>}
+      {actor && !student && <p>{t("osw.4")} <Link href="/knowledge/sources" className="underline">{t("osw.5")}</Link> {t("osw.6")} <Link href="/login" className="underline">{t("osw.7")}</Link> {t("osw.8")}</p>}
+      {!editing && history && !!student && <Link href="/services" className="fluent-btn-primary w-fit">{t("osw.9")}</Link>}
       {!editing && !history && <ServiceCatalog preparationOnly authenticated={!!student} onChoose={choose} onCertificate={() => choose("STUDENT_CERTIFICATE")} onHistory={() => setShowHistory(true)} />}
       {student && showHistory && (
         <section className="campus-panel space-y-4">
-          <h2 className="text-lg font-semibold">Nháp đã lưu của tôi</h2>
+          <h2 className="text-lg font-semibold">{t("osw.10")}</h2>
           {!visibleRows.length && !busy && (
             <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--border-color)] py-8 text-center">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-[var(--color-primary)]">
                 <FileText className="h-5 w-5" aria-hidden="true" />
               </div>
-              <p className="text-sm text-[var(--text-secondary)]">Chưa có nháp đã lưu.</p>
+              <p className="text-sm text-[var(--text-secondary)]">{t("osw.11")}</p>
             </div>
           )}
           <ul className="space-y-3">
@@ -225,9 +229,9 @@ function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope:
                     <span className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-secondary)]">
                       <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[var(--color-primary-light)] px-2 py-0.5 font-medium text-[var(--color-primary)]">
                         <FileText className="h-3 w-3" aria-hidden="true" />
-                        <span>Nháp · v{row.version}</span>
+                        <span>{t("oswx.4", { v: row.version })}</span>
                       </span>
-                      <span>Chưa gửi đến trường · {new Date(row.updated_at).toLocaleString("vi-VN")}</span>
+                      <span>{t("oswx.5")} · {new Date(row.updated_at).toLocaleString("vi-VN")}</span>
                     </span>
                   </div>
                   <ChevronRight className="h-5 w-5 shrink-0 text-[var(--text-secondary)] transition-colors group-hover:text-[var(--color-primary)]" aria-hidden="true" />
@@ -236,15 +240,15 @@ function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope:
                   <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
                     {confirmSubmitId === row.id ? (
                       <>
-                        <span className="text-sm text-[var(--text-secondary)]" role="status">Gửi hồ sơ này đến Một cửa? Sau khi gửi bạn không sửa được nội dung.</span>
+                        <span className="text-sm text-[var(--text-secondary)]" role="status">{t("osw.12")}</span>
                         <button type="button" className="fluent-btn-primary min-h-[44px]" data-testid={`draft-submit-confirm-${row.id}`} disabled={submittingId === row.id} onClick={() => void submitDraft(row)}>
-                          {submittingId === row.id ? "Đang gửi…" : "Xác nhận gửi"}
+                          {submittingId === row.id ? t("osw.28") : t("osw.29")}
                         </button>
-                        <button type="button" className="fluent-btn-secondary min-h-[44px]" disabled={submittingId === row.id} onClick={() => setConfirmSubmitId(null)}>Hủy</button>
+                        <button type="button" className="fluent-btn-secondary min-h-[44px]" disabled={submittingId === row.id} onClick={() => setConfirmSubmitId(null)}>{t("osw.13")}</button>
                       </>
                     ) : (
                       <button type="button" className="fluent-btn-secondary min-h-[44px]" data-testid={`draft-submit-${row.id}`} disabled={busy || uncertain || !!submittingId}
-                        onClick={() => { setSubmitResult(null); setConfirmSubmitId(row.id); }}>Gửi hồ sơ</button>
+                        onClick={() => { setSubmitResult(null); setConfirmSubmitId(row.id); }}>{t("osw.14")}</button>
                     )}
                   </div>
                 )}
@@ -255,20 +259,20 @@ function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope:
         </section>
       )}
       {student && history && OPS_ENABLED && <SubmittedTickets initialId={submitResult?.ticketId ?? null} refreshToken={ticketsRefresh} />}
-      {student && editing && <section ref={formPanel} tabIndex={-1} aria-label="Biểu mẫu nháp" className="campus-panel space-y-4">
-        <button type="button" className="fluent-btn-secondary" disabled={busy || uncertain} onClick={() => { setEditing(false); setPreview(null); setPending(null); }}>{history ? "← Hồ sơ của tôi" : "← Danh mục dịch vụ"}</button>
+      {student && editing && <section ref={formPanel} tabIndex={-1} aria-label={t("osw.30")} className="campus-panel space-y-4">
+        <button type="button" className="fluent-btn-secondary" disabled={busy || uncertain} onClick={() => { setEditing(false); setPreview(null); setPending(null); }}>{history ? t("osw.26") : t("osw.27")}</button>
         <h2 className="text-xl font-semibold">Chuẩn bị {titles[form.kind].toLocaleLowerCase("vi")}</h2>
-        {selected && <p className="text-sm">Mã nháp {selected.id} · v{selected.version}</p>}
-        {form.kind === "GRADE_APPEAL" && <p>Chưa có bảng điểm, điều kiện và hạn phúc khảo đã xác minh. Tên học phần bạn khai chỉ dùng trong nháp, chưa chứng minh đủ điều kiện nộp.</p>}
-        {form.kind === "STUDENT_CERTIFICATE" && <p>Chưa xác thực tình trạng sinh viên với HUCE; bản nháp này không phải giấy xác nhận được cấp.</p>}
+        {selected && <p className="text-sm">{t("oswx.6", { id: selected.id, v: selected.version })}</p>}
+        {form.kind === "GRADE_APPEAL" && <p>{t("osw.15")}</p>}
+        {form.kind === "STUDENT_CERTIFICATE" && <p>{t("osw.16")}</p>}
         <fieldset disabled={busy || uncertain} className="space-y-4">
-          {form.kind === "STUDENT_CERTIFICATE" && <><label className="block">Mục đích sử dụng<input className="fluent-input mt-1 w-full" maxLength={2000} value={form.purpose} onChange={e => edit({ purpose: e.target.value })} /></label><label className="block">Đơn vị nhận<input className="fluent-input mt-1 w-full" maxLength={500} value={form.recipient} onChange={e => edit({ recipient: e.target.value })} /></label></>}
-          {form.kind === "GRADE_APPEAL" && <label className="block">Học phần bạn muốn hỏi<input className="fluent-input mt-1 w-full" maxLength={500} value={form.course} onChange={e => edit({ course: e.target.value })} /></label>}
-          <label className="block">Nội dung / lý do<textarea className="fluent-input mt-1 w-full" rows={5} maxLength={6000} value={form.reason} onChange={e => edit({ reason: e.target.value })} /></label>
-          <button type="button" className="fluent-btn-primary" disabled={!form.reason.trim()} onClick={() => void prepare()}>Xem trước nháp</button>
+          {form.kind === "STUDENT_CERTIFICATE" && <><label className="block">{t("osw.17")}<input className="fluent-input mt-1 w-full" maxLength={2000} value={form.purpose} onChange={e => edit({ purpose: e.target.value })} /></label><label className="block">{t("osw.18")}<input className="fluent-input mt-1 w-full" maxLength={500} value={form.recipient} onChange={e => edit({ recipient: e.target.value })} /></label></>}
+          {form.kind === "GRADE_APPEAL" && <label className="block">{t("osw.19")}<input className="fluent-input mt-1 w-full" maxLength={500} value={form.course} onChange={e => edit({ course: e.target.value })} /></label>}
+          <label className="block">{t("osw.20")}<textarea className="fluent-input mt-1 w-full" rows={5} maxLength={6000} value={form.reason} onChange={e => edit({ reason: e.target.value })} /></label>
+          <button type="button" className="fluent-btn-primary" disabled={!form.reason.trim()} onClick={() => void prepare()}>{t("osw.21")}</button>
         </fieldset>
-        {preview && <section aria-label="Xem trước nháp" className="space-y-3 rounded-xl border p-4"><h3 className="font-semibold">Xem trước nội dung sẽ lưu</h3><p>{titles[preview.payload.form.kind]}</p>{preview.payload.form.purpose && <p>Mục đích: {preview.payload.form.purpose}</p>}{preview.payload.form.recipient && <p>Đơn vị nhận: {preview.payload.form.recipient}</p>}{preview.payload.form.course && <p>Học phần tự khai: {preview.payload.form.course}</p>}<p className="whitespace-pre-wrap">{preview.payload.form.reason}</p><p className="text-sm">Chỉ lưu nháp vào tài khoản của bạn. Chưa gửi đến cán bộ hoặc hệ thống trường.</p><label className="block"><input type="checkbox" checked={reviewed} disabled={busy || uncertain} onChange={e => setReviewed(e.target.checked)} /> Tôi đã xem nội dung nháp</label><button type="button" className="fluent-btn-primary" disabled={busy || !reviewed} onClick={() => void save()}>{uncertain ? "Đọc lại kết quả bằng cùng mã lưu" : "Lưu nháp đã xem"}</button></section>}
-        <Link href="/chat" className="underline">Hỏi trợ lý về hướng dẫn và nguồn công khai</Link>
+        {preview && <section aria-label={t("osw.21")} className="space-y-3 rounded-xl border p-4"><h3 className="font-semibold">{t("osw.22")}</h3><p>{titles[preview.payload.form.kind]}</p>{preview.payload.form.purpose && <p>Mục đích: {preview.payload.form.purpose}</p>}{preview.payload.form.recipient && <p>Đơn vị nhận: {preview.payload.form.recipient}</p>}{preview.payload.form.course && <p>Học phần tự khai: {preview.payload.form.course}</p>}<p className="whitespace-pre-wrap">{preview.payload.form.reason}</p><p className="text-sm">{t("osw.23")}</p><label className="block"><input type="checkbox" checked={reviewed} disabled={busy || uncertain} onChange={e => setReviewed(e.target.checked)} /> {t("osw.24")}</label><button type="button" className="fluent-btn-primary" disabled={busy || !reviewed} onClick={() => void save()}>{uncertain ? t("osw.31") : t("osw.32")}</button></section>}
+        <Link href="/chat" className="underline">{t("osw.25")}</Link>
       </section>}
     </div>
   </>;

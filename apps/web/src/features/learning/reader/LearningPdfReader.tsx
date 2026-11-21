@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import React, { useEffect, useRef, useState } from "react";
 import type { PDFDocumentProxy, RenderTask, TouchManager } from "pdfjs-dist";
 import type { PDFViewer, PDFLinkService, PDFFindController, EventBus } from "pdfjs-dist/web/pdf_viewer.mjs";
@@ -82,6 +83,7 @@ export function normalizeReaderState(state: Partial<ReaderState> | null | undefi
 }
 
 function PageThumbnail({ doc, pageNo, selected, onSelect }: { doc: PDFDocumentProxy; pageNo: number; selected: boolean; onSelect: () => void }) {
+  const t = useT();
   const button = useRef<HTMLButtonElement>(null), canvas = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     if (!button.current) return;
@@ -99,10 +101,11 @@ function PageThumbnail({ doc, pageNo, selected, onSelect }: { doc: PDFDocumentPr
     observer.observe(button.current);
     return () => { disposed = true; observer.disconnect(); task?.cancel(); };
   }, [doc, pageNo]);
-  return <button ref={button} type="button" className="learning-reader-thumbnail" aria-label={`Đến trang ${pageNo}`} aria-current={selected ? "page" : undefined} onClick={onSelect}><canvas ref={canvas} aria-hidden="true" /><span>Trang {pageNo}</span></button>;
+  return <button ref={button} type="button" className="learning-reader-thumbnail" aria-label={t("pdfx.61", { p: pageNo })} aria-current={selected ? "page" : undefined} onClick={onSelect}><canvas ref={canvas} aria-hidden="true" /><span>Trang {pageNo}</span></button>;
 }
 
 export function LearningPdfReader({ version, initialState, bookmarks = [], onStateChange, onBookmark, annotations = [], citation, navigation, focusedAnnotationId, onSelection, onIdeaSelection, onAnnotationClick, presentation, onPageChange, accessAllowed=true, onAccessDenied, className = "" }: LearningPdfReaderProps) {
+  const t = useT();
   const shell = useRef<HTMLElement>(null), container = useRef<HTMLDivElement>(null), pages = useRef<HTMLDivElement>(null);
   const runtime = useRef<ReaderRuntime | null>(null);
   const callbacks = useRef({ onStateChange, onBookmark }); callbacks.current = { onStateChange, onBookmark };
@@ -111,7 +114,7 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
   const followingRef=useRef(false),personalPosition=useRef<ReaderState|null>(null),lastPresentationSequence=useRef(-1);
   const followedPresentation=useRef<string|undefined>(undefined);
   const seed = useRef(initialState); seed.current = initialState;
-  const [status, setStatus] = useState("Đang mở bài giảng…"), [error, setError] = useState("");
+  const [status, setStatus] = useState(t("pdfx.1")), [error, setError] = useState("");
   const [rangePaused, setRangePaused] = useState(false);
   const [externalUrl, setExternalUrl] = useState<string | null>(null);
   const retryRange = useRef<(() => void) | null>(null);
@@ -139,13 +142,13 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
     let accessTimer:ReturnType<typeof setInterval>|undefined;
     retryRange.current = null;
     setRangePaused(false);
-    setReady(false); setDoc(null); setError(""); setStatus("Đang mở bài giảng…"); setOutline([]); setSelection(null);followingRef.current=false;setFollowing(false);personalPosition.current=null;
+    setReady(false); setDoc(null); setError(""); setStatus(t("pdfx.1")); setOutline([]); setSelection(null);followingRef.current=false;setFollowing(false);personalPosition.current=null;
     const host = container.current, pageHost = pages.current;
-    if(!accessAllowed){setError("Bạn không còn quyền đọc bài giảng này.");setStatus("");pageHost.replaceChildren();return;}
+    if(!accessAllowed){setError(t("pdfx.2"));setStatus("");pageHost.replaceChildren();return;}
     const emit = () => {
       const rt = runtime.current; if (!rt || disposed || followingRef.current) return;
       const state=readPosition(rt,host);
-      void Promise.resolve(callbacks.current.onStateChange?.(state)).catch(() => setStatus("Vị trí đọc chưa được đồng bộ. Bạn vẫn có thể tiếp tục đọc."));
+      void Promise.resolve(callbacks.current.onStateChange?.(state)).catch(() => setStatus(t("pdfx.3")));
     };
     const schedule = () => { if (timer) clearTimeout(timer); timer = setTimeout(emit, 250); };
     void (async () => {
@@ -160,7 +163,7 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
         try { destination = new URL(url); } catch { return; }
         if (!["http:", "https:"].includes(destination.protocol) || destination.username || destination.password) return;
         link.href = "#";
-        link.title = `Liên kết ngoài tới ${destination.host}`;
+        link.title = t("pdfx.62", { h: destination.host });
         link.onclick = event => {
           event.preventDefault();
           if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
@@ -191,13 +194,13 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
         onError: () => {
         if (disposed) return;
         viewer.setDocument(null); links.setDocument(null); runtime.current = null;
-        setReady(false); setDoc(null); setError("Chưa đọc được PDF hoặc quyền truy cập đã thay đổi. Hãy mở lại bài giảng.");
+        setReady(false); setDoc(null); setError(t("pdfx.4"));
         void task?.destroy();
         },
       });
       if (disposed) { range.abort(); return; }
       task = pdfjs.getDocument({ url: source, range, withCredentials: true, enableXfa: false, disableStream: true, disableAutoFetch: true, rangeChunkSize: 262144 });
-      task.onPassword = () => { setError("PDF có mật khẩu chưa được hỗ trợ. Hãy liên hệ giảng viên để nhận bản có thể đọc."); void task?.destroy(); };
+      task.onPassword = () => { setError(t("pdfx.5")); void task?.destroy(); };
       const pdf = await task.promise; if (disposed) { await task.destroy(); return; }
       runtime.current = { viewer, links, find, bus, doc: pdf }; setDoc(pdf); setCount(pdf.numPages);
       bus.on("pagesinit", () => {
@@ -217,8 +220,8 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
       bus.on("scalechanging", ({ scale: next }: { scale: number }) => { if (!disposed) { setScale(next); schedule(); } });
       bus.on("pagerendered", () => { if (!disposed) setPaint(v=>v+1); });
       bus.on("rotationchanging", () => { schedule(); if (!disposed) setPaint(v=>v+1); }); bus.on("scrollmodechanged", schedule); bus.on("updateviewarea", schedule);
-      bus.on("updatefindmatchescount", ({ matchesCount }: { matchesCount: { current: number; total: number } }) => { if (!disposed) setMatches(`${matchesCount.current}/${matchesCount.total} kết quả`); });
-      bus.on("updatefindcontrolstate", ({ state }: { state: number }) => { if (!disposed && state === 1) setMatches("Không tìm thấy văn bản"); });
+      bus.on("updatefindmatchescount", ({ matchesCount }: { matchesCount: { current: number; total: number } }) => { if (!disposed) setMatches(t("pdfx.63", { a: matchesCount.current, b: matchesCount.total })); });
+      bus.on("updatefindcontrolstate", ({ state }: { state: number }) => { if (!disposed && state === 1) setMatches(t("pdfx.6")); });
       viewer.setDocument(pdf); links.setDocument(pdf);
       const verifyAccess=async()=>{
         if(disposed||!runtime.current)return;
@@ -245,7 +248,7 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
         viewer.update();
       });
       observer.observe(host);
-    })().catch(() => { if (!disposed) { setError("Chưa mở được bài giảng. Kiểm tra kết nối và quyền truy cập rồi thử lại."); setStatus(""); } });
+    })().catch(() => { if (!disposed) { setError(t("pdfx.7")); setStatus(""); } });
     const flush = () => emit();
     const reconnect = () => retryRange.current?.();
     host.addEventListener("scroll", schedule);
@@ -296,7 +299,7 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
         mark.type='button';mark.className='learning-reader-annotation';mark.dataset.annotationId=annotation.id;
         if(annotation.id===focusedAnnotationId){mark.dataset.focused='true';mark.setAttribute('aria-pressed','true');}
         mark.style.left=`${mapped.x*100}%`;mark.style.top=`${mapped.y*100}%`;mark.style.width=`${mapped.width*100}%`;mark.style.height=`${mapped.height*100}%`;
-        mark.title=annotation.body??'Ghi chú';mark.setAttribute('aria-label',`Ghi chú trang ${annotation.page_no}: ${(annotation.body??annotation.anchor.text_quote?.exact??'Đánh dấu').slice(0,120)}`);
+        mark.title=annotation.body??t("pdfx.8");mark.setAttribute('aria-label',t("pdfx.64", { p: annotation.page_no, q: (annotation.body??annotation.anchor.text_quote?.exact??t("pdfx.13")).slice(0,120) }));
         if(index>0){mark.setAttribute('aria-hidden','true');mark.tabIndex=-1;}
         mark.onclick=()=>annotationCallback.current?.(annotation);
         page.append(mark);created.push(mark);
@@ -359,64 +362,64 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
       await callbacks.current.onBookmark?.(current, label);
       if (label !== undefined) setBookmarkLabel("");
     } catch {
-      setStatus("Chưa lưu được đánh dấu. Hãy thử lại.");
+      setStatus(t("pdfx.9"));
     } finally {
       setBookmarkSaving(false);
     }
   }
 
-  return <section ref={shell} className={`learning-pdf-reader ${focused ? "learning-reader-focused" : ""} ${toolsExpanded ? "learning-reader-tools-expanded" : ""} ${className}`} aria-label={`Đọc ${version.title}`}>
+  return <section ref={shell} className={`learning-pdf-reader ${focused ? "learning-reader-focused" : ""} ${toolsExpanded ? "learning-reader-tools-expanded" : ""} ${className}`} aria-label={t("pdfx.65", { v: version.title })}>
     <div className="learning-reader-title"><strong>{version.title}</strong><span>{count > 0 ? `${count} trang` : "PDF"}</span></div>
-    <div className="learning-reader-toolbar" role="toolbar" aria-label="Công cụ đọc PDF">
-      <button type="button" onClick={() => setSidebar(sidebar === "pages" ? null : "pages")} aria-pressed={sidebar === "pages"}>Ảnh trang</button>
-      <button type="button" onClick={() => setSidebar(sidebar === "outline" ? null : "outline")} aria-pressed={sidebar === "outline"}>Mục lục</button>
-      <button type="button" onClick={() => setSidebar(sidebar === "bookmarks" ? null : "bookmarks")} aria-pressed={sidebar === "bookmarks"}>Đánh dấu</button>
-      <label>Cách xem <select aria-label="Cách xem PDF" value={mode} disabled={!ready} onChange={e => changeMode(e.target.value as ReaderState["scroll_mode"])}><option value="vertical">Cuộn dọc</option><option value="horizontal">Cuộn ngang</option><option value="page">Từng trang</option></select></label>
-      <button type="button" className="learning-reader-primary-control" aria-label="Trang trước" disabled={!ready || current <= 1} onClick={() => go(current - 1)}>‹</button>
-      <label>Trang <input aria-label="Số trang" type="number" min={1} max={count || 1} value={current} disabled={!ready} onChange={e => { if (e.target.value) go(Number(e.target.value)); }} /></label><span>/ {count || "—"}</span>
-      <button type="button" className="learning-reader-primary-control" aria-label="Trang sau" disabled={!ready || current >= count} onClick={() => go(current + 1)}>›</button>
-      <button type="button" className="learning-reader-primary-control" aria-label="Thu nhỏ" disabled={!ready} onClick={() => zoom(scale - 0.25)}>−</button><output aria-label="Mức phóng">{Math.round(scale * 100)}%</output>
-      <button type="button" className="learning-reader-primary-control" aria-label="Phóng to" disabled={!ready} onClick={() => zoom(scale + 0.25)}>+</button>
-      <button type="button" className="learning-reader-primary-control" disabled={!ready} onClick={() => zoom("page-width")}>Vừa rộng</button><button type="button" disabled={!ready} onClick={() => zoom("page-fit")}>Vừa trang</button>
-      <button type="button" className="learning-reader-tools-toggle learning-reader-primary-control" aria-expanded={toolsExpanded} onClick={() => setToolsExpanded(value => !value)}>{toolsExpanded ? "Thu gọn công cụ" : "Công cụ đọc"}</button>
+    <div className="learning-reader-toolbar" role="toolbar" aria-label={t("pdfx.10")}>
+      <button type="button" onClick={() => setSidebar(sidebar === "pages" ? null : "pages")} aria-pressed={sidebar === "pages"}>{t("pdfx.11")}</button>
+      <button type="button" onClick={() => setSidebar(sidebar === "outline" ? null : "outline")} aria-pressed={sidebar === "outline"}>{t("pdfx.12")}</button>
+      <button type="button" onClick={() => setSidebar(sidebar === "bookmarks" ? null : "bookmarks")} aria-pressed={sidebar === "bookmarks"}>{t("pdfx.13")}</button>
+      <label>{t("pdfx.14")} <select aria-label={t("pdfx.15")} value={mode} disabled={!ready} onChange={e => changeMode(e.target.value as ReaderState["scroll_mode"])}><option value="vertical">{t("pdfx.16")}</option><option value="horizontal">{t("pdfx.17")}</option><option value="page">{t("pdfx.18")}</option></select></label>
+      <button type="button" className="learning-reader-primary-control" aria-label={t("pdfx.19")} disabled={!ready || current <= 1} onClick={() => go(current - 1)}>‹</button>
+      <label>{t("pdfx.68")} <input aria-label={t("pdfx.21")} type="number" min={1} max={count || 1} value={current} disabled={!ready} onChange={e => { if (e.target.value) go(Number(e.target.value)); }} /></label><span>/ {count || "—"}</span>
+      <button type="button" className="learning-reader-primary-control" aria-label={t("pdfx.20")} disabled={!ready || current >= count} onClick={() => go(current + 1)}>›</button>
+      <button type="button" className="learning-reader-primary-control" aria-label={t("pdfx.22")} disabled={!ready} onClick={() => zoom(scale - 0.25)}>−</button><output aria-label={t("pdfx.23")}>{Math.round(scale * 100)}%</output>
+      <button type="button" className="learning-reader-primary-control" aria-label={t("pdfx.24")} disabled={!ready} onClick={() => zoom(scale + 0.25)}>+</button>
+      <button type="button" className="learning-reader-primary-control" disabled={!ready} onClick={() => zoom("page-width")}>{t("pdfx.25")}</button><button type="button" disabled={!ready} onClick={() => zoom("page-fit")}>{t("pdfx.26")}</button>
+      <button type="button" className="learning-reader-tools-toggle learning-reader-primary-control" aria-expanded={toolsExpanded} onClick={() => setToolsExpanded(value => !value)}>{toolsExpanded ? t("pdfx.27") : t("pdfx.28")}</button>
       <button type="button" disabled={!ready} onClick={() => { if (runtime.current) runtime.current.viewer.pagesRotation = (runtime.current.viewer.pagesRotation + 90) % 360; }}>Xoay</button>
-      <button type="button" onClick={() => void fullscreen()} aria-pressed={focused}>{focused ? "Thoát tập trung" : "Toàn màn hình"}</button>
-      {onBookmark && <button type="button" disabled={!ready || bookmarkSaving} onClick={() => void bookmark()}>Đánh dấu trang này</button>}
-      {onSelection && <><button type="button" disabled={!ready} aria-pressed={regionMode} onClick={()=>{setRegionMode(v=>!v);setSelection(null);}}>Chọn vùng ghi chú</button><button type="button" disabled={!ready} onClick={()=>onSelection({version_id:version.version_id,page_no:current,anchor:{kind:'PAGE'}})}>Ghi chú cả trang</button></>}
-      {(version.download_allowed ?? version.capabilities?.download) && <a href={version.download_path ?? version.content_path.replace(/\/content$/, "/download")} download>Tải bản gốc</a>}
+      <button type="button" onClick={() => void fullscreen()} aria-pressed={focused}>{focused ? t("pdfx.29") : t("pdfx.30")}</button>
+      {onBookmark && <button type="button" disabled={!ready || bookmarkSaving} onClick={() => void bookmark()}>{t("pdfx.31")}</button>}
+      {onSelection && <><button type="button" disabled={!ready} aria-pressed={regionMode} onClick={()=>{setRegionMode(v=>!v);setSelection(null);}}>{t("pdfx.32")}</button><button type="button" disabled={!ready} onClick={()=>onSelection({version_id:version.version_id,page_no:current,anchor:{kind:'PAGE'}})}>{t("pdfx.33")}</button></>}
+      {(version.download_allowed ?? version.capabilities?.download) && <a href={version.download_path ?? version.content_path.replace(/\/content$/, "/download")} download>{t("pdfx.34")}</a>}
     </div>
-    <form className="learning-reader-search" onSubmit={e => { e.preventDefault(); search(); }}><label>Tìm trong bài <input aria-label="Tìm trong bài" value={query} onChange={e => setQuery(e.target.value)} /></label><button type="submit" disabled={!ready || !query.trim()}>Tìm tiếp</button><button type="button" disabled={!ready || !query.trim()} onClick={() => search(true)}>Kết quả trước</button><span role="status">{matches}</span></form>
-    {version.has_text_layer === false && <p className="learning-reader-notice">Tài liệu scan chưa có lớp chữ. Bạn vẫn xem được trang; tìm và chọn văn bản chưa khả dụng.</p>}
+    <form className="learning-reader-search" onSubmit={e => { e.preventDefault(); search(); }}><label>{t("pdfx.35")} <input aria-label={t("pdfx.35")} value={query} onChange={e => setQuery(e.target.value)} /></label><button type="submit" disabled={!ready || !query.trim()}>{t("pdfx.36")}</button><button type="button" disabled={!ready || !query.trim()} onClick={() => search(true)}>{t("pdfx.37")}</button><span role="status">{matches}</span></form>
+    {version.has_text_layer === false && <p className="learning-reader-notice">{t("pdfx.38")}</p>}
     {status && <p className="learning-reader-notice" role="status">{status}</p>}
     {rangePaused && <div className="learning-reader-notice" role="status">
-      <p>Đang chờ kết nối để tải thêm trang. Bạn có thể tiếp tục xem phần đã tải.</p>
-      <button type="button" onClick={() => retryRange.current?.()}>Thử tải phần còn thiếu</button>
+      <p>{t("pdfx.39")}</p>
+      <button type="button" onClick={() => retryRange.current?.()}>{t("pdfx.40")}</button>
     </div>}
-    {error && <div role="alert" className="learning-reader-notice"><p>{error}</p><button type="button" onClick={() => setRetry(v => v + 1)}>Thử lại</button></div>}
-    {regionMode&&<p role="status" className="learning-reader-notice">Kéo một vùng trên trang để gắn ghi chú. Bạn cũng có thể dùng nút Ghi chú cả trang.</p>}
-    {selection&&<div className="learning-reader-selection" role="status"><span>Trang {selection.page_no}: {selection.anchor.text_quote?.exact.slice(0,120)??'Vùng đã chọn'}</span><button type="button" onClick={()=>{onSelection?.(selection);setSelection(null);}}>Ghi chú phần đã chọn</button>{onIdeaSelection && <button type="button" onClick={() => { onIdeaSelection(selection); setSelection(null); }}>Lưu vào phiếu ý tưởng</button>}<button type="button" onClick={()=>setSelection(null)}>Bỏ chọn</button></div>}
-    {presentation&&presentation.active!==false&&<div className="learning-reader-selection"><span>{presentation.version_id!==version.version_id?"Giảng viên đang trình bày phiên bản khác. Hãy mở đúng phiên bản để theo dõi.":following?`Đang theo giảng viên ở trang ${presentation.page_no}`:`Giảng viên đang ở trang ${presentation.page_no}. Bạn đang tự đọc.`}</span><button type="button" disabled={!ready||presentation.version_id!==version.version_id} onClick={following?stopFollowing:startFollowing}>{following?"Tạm rời giảng viên":personalPosition.current?"Quay lại giảng viên":"Theo giảng viên"}</button></div>}
+    {error && <div role="alert" className="learning-reader-notice"><p>{error}</p><button type="button" onClick={() => setRetry(v => v + 1)}>{t("pdfx.41")}</button></div>}
+    {regionMode&&<p role="status" className="learning-reader-notice">{t("pdfx.42")}</p>}
+    {selection&&<div className="learning-reader-selection" role="status"><span>{t("pdfx.70", { p: selection.page_no })}: {selection.anchor.text_quote?.exact.slice(0,120)??t("pdfx.43")}</span><button type="button" onClick={()=>{onSelection?.(selection);setSelection(null);}}>{t("pdfx.44")}</button>{onIdeaSelection && <button type="button" onClick={() => { onIdeaSelection(selection); setSelection(null); }}>{t("pdfx.45")}</button>}<button type="button" onClick={()=>setSelection(null)}>{t("pdfx.46")}</button></div>}
+    {presentation&&presentation.active!==false&&<div className="learning-reader-selection"><span>{presentation.version_id!==version.version_id?t("pdfx.47"):following?t("pdfx.66", { p: presentation.page_no }):t("pdfx.67", { p: presentation.page_no })}</span><button type="button" disabled={!ready||presentation.version_id!==version.version_id} onClick={following?stopFollowing:startFollowing}>{following?t("pdfx.48"):personalPosition.current?t("pdfx.49"):t("pdfx.50")}</button></div>}
     <div className="learning-reader-body">
-      {sidebar && <aside className="learning-reader-sidebar" aria-label="Điều hướng tài liệu"><button type="button" onClick={() => setSidebar(null)}>Đóng điều hướng</button>
+      {sidebar && <aside className="learning-reader-sidebar" aria-label={t("pdfx.51")}><button type="button" onClick={() => setSidebar(null)}>{t("pdfx.52")}</button>
         {sidebar === "pages" && doc && Array.from({ length: count }, (_, i) => <PageThumbnail key={i} doc={doc} pageNo={i + 1} selected={current === i + 1} onSelect={() => go(i + 1)} />)}
-        {sidebar === "outline" && (outline.length ? outline.map((entry, i) => <button type="button" key={i} style={{ paddingInlineStart: `${8 + entry.depth * 12}px` }} onClick={() => { if (entry.dest) void runtime.current?.links.goToDestination(entry.dest); }}>{entry.title}</button>) : <p>PDF không có mục lục nội bộ.</p>)}
+        {sidebar === "outline" && (outline.length ? outline.map((entry, i) => <button type="button" key={i} style={{ paddingInlineStart: `${8 + entry.depth * 12}px` }} onClick={() => { if (entry.dest) void runtime.current?.links.goToDestination(entry.dest); }}>{entry.title}</button>) : <p>{t("pdfx.53")}</p>)}
         {sidebar === "bookmarks" && <>
-          {bookmarks.length ? bookmarks.map(mark => <button type="button" key={mark.id} onClick={() => go(mark.page_no)}>{mark.label || `Trang ${mark.page_no}`}</button>) : <p>Bạn chưa đánh dấu trang nào.</p>}
+          {bookmarks.length ? bookmarks.map(mark => <button type="button" key={mark.id} onClick={() => go(mark.page_no)}>{mark.label || t("pdfx.69", { p: mark.page_no })}</button>) : <p>{t("pdfx.54")}</p>}
           {onBookmark && <form className="learning-reader-bookmark-form" onSubmit={event => { event.preventDefault(); void bookmark(bookmarkLabel); }}>
-            <label>Nhãn đánh dấu<input maxLength={500} value={bookmarkLabel} onChange={event => setBookmarkLabel(event.target.value)} /></label>
-            <button type="submit" disabled={!ready || bookmarkSaving}>Lưu đánh dấu</button>
+            <label>{t("pdfx.55")}<input maxLength={500} value={bookmarkLabel} onChange={event => setBookmarkLabel(event.target.value)} /></label>
+            <button type="submit" disabled={!ready || bookmarkSaving}>{t("pdfx.56")}</button>
           </form>}
         </>}
       </aside>}
       <div ref={container} className={`learning-reader-viewport ${regionMode?'learning-reader-region-mode':''}`} data-testid="learning-pdf-viewport" onMouseUp={captureTextSelection} onKeyUp={captureTextSelection} onPointerDown={regionStart} onPointerUp={regionEnd} onPointerCancel={()=>{drag.current=null;}}><div ref={pages} className="pdfViewer" /></div>
     </div>
     <AccessibleDialog open={externalUrl !== null} onClose={() => setExternalUrl(null)} labelledBy="learning-external-link-title" className={styles.dialog}>
-      <h3 id="learning-external-link-title">Mở liên kết ngoài?</h3>
-      <p>Liên kết trong tài liệu sẽ mở một trang web bên ngoài Campus 24/7.</p>
+      <h3 id="learning-external-link-title">{t("pdfx.57")}</h3>
+      <p>{t("pdfx.58")}</p>
       <p style={{ overflowWrap: "anywhere" }}>{externalUrl}</p>
       <div className={styles.row}>
-        <button type="button" onClick={() => setExternalUrl(null)}>Quay lại tài liệu</button>
-        {externalUrl && <a href={externalUrl} target="_blank" rel="noopener noreferrer" onClick={() => setExternalUrl(null)}>Mở trang web</a>}
+        <button type="button" onClick={() => setExternalUrl(null)}>{t("pdfx.59")}</button>
+        {externalUrl && <a href={externalUrl} target="_blank" rel="noopener noreferrer" onClick={() => setExternalUrl(null)}>{t("pdfx.60")}</a>}
       </div>
     </AccessibleDialog>
   </section>;

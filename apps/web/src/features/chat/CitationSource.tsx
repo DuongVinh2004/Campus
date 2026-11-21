@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/lib/i18n";
 import { CAMPUS_API_BASE_URL } from "@/lib/api/base-url";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -23,6 +24,7 @@ const API_BASE_URL = CAMPUS_API_BASE_URL;
 const UUID7 = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 export function CitationSource({ binding }: { binding: CitationSourceBinding }) {
+  const t = useT();
   const [source, setSource] = useState<SourceResult | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "error" | "expired" | "denied" | "success">("idle");
   const controllerRef = useRef<AbortController | null>(null);
@@ -71,21 +73,21 @@ export function CitationSource({ binding }: { binding: CitationSourceBinding }) 
   return <div className="w-full min-w-0" style={{ overflowWrap: "anywhere" }}>
     <button type="button" onClick={() => void open()} disabled={state === "loading"}
       className="text-sm font-semibold text-blue-800 dark:text-blue-300 underline">
-      {state === "loading" ? "Đang xác minh nguồn…" : "Mở đoạn nguồn gốc"}
+      {state === "loading" ? t("c3CitationSource.17") : t("c3CitationSource.18")}
     </button>
-    {state === "expired" && <p role="alert">Phiên đăng nhập đã hết hạn. <a className="underline" href={sessionLoginHref(`/chat?conversation_id=${binding.conversationId}`)}>Đăng nhập lại</a>.</p>}
-    {state === "denied" && <p role="alert">Nguồn không còn khả dụng hoặc bạn không có quyền truy cập. Hãy kiểm tra lại phiên đăng nhập.</p>}
-    {state === "error" && <p role="alert">Chưa thể xác minh nguồn. Hãy thử mở lại.</p>}
-    {source && <section aria-label="Đoạn nguồn gốc đã xác minh" className="mt-3 text-sm">
-      {binding.citation.source_status === "SYNTHETIC" && <p className="font-semibold">Nguồn mô phỏng — không dùng làm quy định thực tế.</p>}
-      <p>Cơ quan ban hành: {source.issuer}</p>
+    {state === "expired" && <p role="alert">{t("sess.1")} <a className="underline" href={sessionLoginHref(`/chat?conversation_id=${binding.conversationId}`)}>{t("sess.2")}</a>.</p>}
+    {state === "denied" && <p role="alert">{t("c3CitationSource.19")}</p>}
+    {state === "error" && <p role="alert">{t("c3CitationSource.20")}</p>}
+    {source && <section aria-label={t("c3CitationSource.21")} className="mt-3 text-sm">
+      {binding.citation.source_status === "SYNTHETIC" && <p className="font-semibold">{t("c3CitationSource.22")}</p>}
+      <p>{t("cite.1")} {source.issuer}</p>
       {source.applicability_note && <p>{source.applicability_note}</p>}
       {!binding.citation.version_label.startsWith("public-") && <>
-        <p>Phiên bản: {binding.citation.version_label}</p>
-        {!source.applicability_note && <p>Hiệu lực từ: {new Date(source.effective_from).toLocaleString("vi-VN", { timeZone: "Asia/Bangkok" })}{source.effective_until ? ` đến ${new Date(source.effective_until).toLocaleString("vi-VN", { timeZone: "Asia/Bangkok" })}` : ""} (UTC+7)</p>}
+        <p>{t("cite.4")} {binding.citation.version_label}</p>
+        {!source.applicability_note && <p>{t("cite.5")} {new Date(source.effective_from).toLocaleString("vi-VN", { timeZone: "Asia/Bangkok" })}{source.effective_until ? ` ${t("cite.6")} ${new Date(source.effective_until).toLocaleString("vi-VN", { timeZone: "Asia/Bangkok" })}` : ""} (UTC+7)</p>}
       </>}
-      <p>Vị trí: {binding.citation.locator.section_path || binding.citation.locator.paragraph_id || `Trang ${binding.citation.locator.page_start}`}</p>
-      <p>Toàn bộ đoạn được trích dẫn:</p>
+      <p>{t("cite.7")} {binding.citation.locator.section_path || binding.citation.locator.paragraph_id || t("cite.8", { n: binding.citation.locator.page_start ?? "" })}</p>
+      <p>{t("c3CitationSource.23")}</p>
       <div className="max-h-80 overflow-y-auto whitespace-pre-wrap rounded border p-3" data-testid="original-source-text">{source.content_text}</div>
     </section>}
   </div>;

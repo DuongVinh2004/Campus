@@ -46,6 +46,18 @@ def source_pointers(outcome, limit=2) -> str:
     return ("\n\nVăn bản liên quan: " + "; ".join(labels[:limit]) + ".") if labels else ""
 
 
+# Functions called with (outcome, rows) for every outcome of a turn, for counting only (see answer_quality.attach_gap_recording).
+OUTCOME_OBSERVERS: list = []
+
+
+def notify_outcome(outcome, rows) -> None:
+    for observer in tuple(OUTCOME_OBSERVERS):
+        try:
+            observer(outcome, rows)
+        except Exception:  # noqa: BLE001 -- an observer must never change an answer
+            pass
+
+
 _HAYSTACKS: dict[tuple[str, int], str] = {}
 # Units whose binding to an authoritative row was already proven. A row is trusted again only when its
 # identifiers, title, path and evidence hash are unchanged and its text equals the proven text, so a
@@ -404,6 +416,7 @@ class RagV2Node:
 
     @staticmethod
     def map_outcome(state, outcome, rows):
+        notify_outcome(outcome, rows)
         errors = list(state.errors)
         errors.append("RAG_V2_" + outcome.kind.upper())
         if outcome.reason:

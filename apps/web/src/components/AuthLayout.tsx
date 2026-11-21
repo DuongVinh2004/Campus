@@ -4,12 +4,15 @@ import React from "react";
 import Link from "next/link";
 import { GraduationCap, ShieldCheck, FileCheck2, BookOpen, ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageToggle } from "./LanguageToggle";
+import { useT } from "../lib/i18n";
 
 interface AuthLayoutProps { children: React.ReactNode; introContent?: React.ReactNode; }
 
 export function AuthLayout({ children, introContent }: AuthLayoutProps) {
+  const t = useT();
   return <div className="campus-auth">
-    <header className="campus-auth-header"><span><GraduationCap size={17} />Cổng Thông Tin Học Vụ Trực Tuyến · HUCE</span><span><Link href="/chat">Hướng dẫn sử dụng</Link><ThemeToggle /></span></header>
+    <header className="campus-auth-header"><span><GraduationCap size={17} />{t("auth.headerTitle")}</span><span><Link href="/chat">{t("auth.guide")}</Link><LanguageToggle /><ThemeToggle /></span></header>
     <main className="campus-auth-main"><div className="campus-auth-frame">
       <section className="campus-auth-intro">
         <Link href="/" className="campus-auth-brand"><GraduationCap size={28} /><div><strong>Campus 24/7</strong><small>ĐẠI HỌC XÂY DỰNG HÀ NỘI</small></div></Link>
@@ -19,10 +22,10 @@ export function AuthLayout({ children, introContent }: AuthLayoutProps) {
             <div><ShieldCheck size={22} /><section><strong>Kiểm soát thông tin cá nhân</strong><p>Quản lý quyền riêng tư và lựa chọn sử dụng dữ liệu của bạn.</p></section></div>
             <div><FileCheck2 size={22} /><section><strong>Dịch vụ một cửa</strong><p>Chuẩn bị bản nháp, xem trước và xác nhận trước khi gửi hồ sơ.</p></section></div>
           </div></>}
-        <Link href="/" className="inline-flex items-center gap-2 text-sm mt-auto"><ArrowLeft size={16} />Quay lại trang chủ</Link>
+        <Link href="/" className="inline-flex items-center gap-2 text-sm mt-auto"><ArrowLeft size={16} />{t("auth.back")}</Link>
       </section>
       <section className="campus-auth-form">{children}</section>
     </div></main>
-    <footer className="campus-auth-footer"><span>© 2026 Trường Đại học Xây dựng Hà Nội · Campus 24/7</span><Link href="/privacy">Chính sách quyền riêng tư</Link></footer>
+    <footer className="campus-auth-footer"><span>{t("auth.footer")}</span><Link href="/privacy">{t("auth.privacyPolicy")}</Link></footer>
   </div>;
 }

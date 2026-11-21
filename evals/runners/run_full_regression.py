@@ -37,6 +37,8 @@ CI_PATHS = [
     "tests/operations/test_offsite.py", "tests/operations/test_watchdog.py", "tests/evals/test_nightly_retrieval.py",
     "tests/api/test_admin_ops.py", "tests/api/test_knowledge_freshness.py", "tests/api/test_oidc_login.py", "tests/api/test_ops_metrics_hooks.py",
     "tests/api/test_gateway_sidecar.py", "tests/api/test_chat_admission.py", "tests/api/test_abuse_limits.py", "tests/api/test_answer_quality.py",
+    # Answer gaps, the retrieval check after a release, the backup tool's unreadable-file rule and the test-folder lister.
+    "tests/api/test_answer_gaps.py", "tests/api/test_gap_reports.py", "tests/api/test_release_check.py", "tests/operations/test_backup_skip.py", "tests/maintenance",
 ]
 
 # Inside the paths above, these import helper modules that exist only under infra/local/rag-fixture (not in the repository), so a

@@ -147,6 +147,6 @@ Câu hỏi của sinh viên là nội dung cá nhân. Người quản trị nộ
 | # | Quyết định | Chặn | Đề xuất |
 |---|---|---|---|
 | C-D1 | Cho sinh viên chủ động gửi câu hỏi (P2): nội dung đồng ý, thời hạn lưu 90 ngày, ai đọc | C1.5 | Đồng ý P2, không làm P3 |
-| C-D2 | Ngân sách gate sinh câu trả lời hằng tuần (~600 lời gọi) | C2.5 | Hằng tuần sau khi lên cloud |
+| C-D2 | Ngân sách gate sinh câu trả lời hằng tuần: **chủ dự án chốt 1000 lời gọi/tuần (21/11/2026)**; ước tính cần ~600 | C2.5 | Hằng tuần sau khi lên cloud |
 | C-D3 | Chọn baseline truy hồi | C2.6 | Lần chạy C2.1 đầu tiên |
 | C-D4 | Migration hạn rà soát do người đặt | C3.6 | Chưa cần; dùng hạn tính ra trước |

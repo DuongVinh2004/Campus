@@ -1,0 +1,221 @@
+{
+ "summary": {
+  "total": 18,
+  "good": 16,
+  "good_rate": 0.889,
+  "classes": {
+   "helpful": 14,
+   "correct_stop": 2,
+   "wrong": 2
+  },
+  "by_kind": {
+   "abstain_scope": {
+    "correct_stop": 2
+   },
+   "cross_reference": {
+    "helpful": 1
+   },
+   "deadline": {
+    "helpful": 3
+   },
+   "exception": {
+    "helpful": 2
+   },
+   "general_rule_applies": {
+    "wrong": 1
+   },
+   "prose": {
+    "helpful": 4,
+    "wrong": 1
+   },
+   "scoped_row": {
+    "helpful": 1
+   },
+   "table_cell": {
+    "helpful": 3
+   }
+  }
+ },
+ "results": [
+  {
+   "id": "dk-01",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Đợt 1 đăng ký học phần học kỳ 2 năm học 2027-2028 mở từ 08:00 ngày 06/01/2028 đến 17:00 ngày 10/01/2028, dành cho sinh viên khóa K70 và K71.",
+   "reason": null,
+   "scored_text": "Đợt 1 đăng ký học phần học kỳ 2 năm học 2027-2028 mở từ 08:00 ngày 06/01/2028 đến 17:00 ngày 10/01/2028, dành cho sinh viên khóa K70 và K71.",
+   "class": "helpful"
+  },
+  {
+   "id": "dk-02",
+   "kind": "scoped_row",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên khóa K72 đăng ký học phần học kỳ 2 năm học 2027-2028 ở Đợt 2, từ 08:00 ngày 12/01/2028 đến 17:00 ngày 15/01/2028.",
+   "reason": null,
+   "scored_text": "Sinh viên khóa K72 đăng ký học phần học kỳ 2 năm học 2027-2028 ở Đợt 2, từ 08:00 ngày 12/01/2028 đến 17:00 ngày 15/01/2028.",
+   "class": "helpful"
+  },
+  {
+   "id": "dk-03",
+   "kind": "exception",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên bị cảnh báo học tập chỉ được đăng ký tối đa 14 tín chỉ.",
+   "reason": null,
+   "scored_text": "Sinh viên bị cảnh báo học tập chỉ được đăng ký tối đa 14 tín chỉ.",
+   "class": "helpful"
+  },
+  {
+   "id": "dk-04",
+   "kind": "exception",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên đang thực tập tốt nghiệp được miễn số tín chỉ tối thiểu nhưng vẫn phải tuân thủ mức tối đa.",
+   "reason": null,
+   "scored_text": "Sinh viên đang thực tập tốt nghiệp được miễn số tín chỉ tối thiểu nhưng vẫn phải tuân thủ mức tối đa.",
+   "class": "helpful"
+  },
+  {
+   "id": "dk-05",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên được rút bớt học phần chậm nhất ngày 31/01/2028.",
+   "reason": null,
+   "scored_text": "Sinh viên được rút bớt học phần chậm nhất ngày 31/01/2028.",
+   "class": "helpful"
+  },
+  {
+   "id": "dk-06",
+   "kind": "abstain_scope",
+   "expected": "abstain",
+   "outcome": "refuse",
+   "text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "reason": "no_source",
+   "scored_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.\nQUY CHẾ THỰC TẬP TỐT NGHIỆP NĂM HỌC 2027-2028 (tài liệu tổng hợp để kiểm thử, không phải văn bản chính thức)",
+   "class": "correct_stop"
+  },
+  {
+   "id": "hb-01",
+   "kind": "table_cell",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học bổng loại giỏi nhóm ngành Công nghệ thông tin là 9.000.000 đồng mỗi học kỳ (học kỳ 1 năm học 2027-2028).",
+   "reason": null,
+   "scored_text": "Học bổng loại giỏi nhóm ngành Công nghệ thông tin là 9.000.000 đồng mỗi học kỳ (học kỳ 1 năm học 2027-2028).",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-02",
+   "kind": "table_cell",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học kỳ 1 năm học 2027-2028, học bổng loại xuất sắc nhóm ngành Kiến trúc và quy hoạch là 10.000.000 đồng mỗi học kỳ.",
+   "reason": null,
+   "scored_text": "Học kỳ 1 năm học 2027-2028, học bổng loại xuất sắc nhóm ngành Kiến trúc và quy hoạch là 10.000.000 đồng mỗi học kỳ.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-03",
+   "kind": "table_cell",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Học kỳ 1 năm học 2027-2028, học bổng khuyến khích học tập loại khá nhóm ngành Kỹ thuật xây dựng là 5.000.000 đồng mỗi học kỳ.",
+   "reason": null,
+   "scored_text": "Học kỳ 1 năm học 2027-2028, học bổng khuyến khích học tập loại khá nhóm ngành Kỹ thuật xây dựng là 5.000.000 đồng mỗi học kỳ.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-04",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Loại xuất sắc yêu cầu điểm trung bình học kỳ từ 3,60 trở lên.",
+   "reason": null,
+   "scored_text": "Loại xuất sắc yêu cầu điểm trung bình học kỳ từ 3,60 trở lên.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-05",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Mỗi lớp xét tối đa 3 suất loại xuất sắc.",
+   "reason": null,
+   "scored_text": "Mỗi lớp xét tối đa 3 suất loại xuất sắc.",
+   "class": "helpful"
+  },
+  {
+   "id": "hb-06",
+   "kind": "abstain_scope",
+   "expected": "abstain",
+   "outcome": "refuse",
+   "text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "reason": "no_source",
+   "scored_text": "Mình chưa tìm thấy nguồn phù hợp để trả lời câu hỏi này.",
+   "class": "correct_stop"
+  },
+  {
+   "id": "tt-01",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên đã tích lũy từ 100 tín chỉ trở lên và không còn học phần bắt buộc bị điểm F của học kỳ trước thì được đăng ký thực tập.",
+   "reason": null,
+   "scored_text": "Sinh viên đã tích lũy từ 100 tín chỉ trở lên và không còn học phần bắt buộc bị điểm F của học kỳ trước thì được đăng ký thực tập.",
+   "class": "helpful"
+  },
+  {
+   "id": "tt-02",
+   "kind": "cross_reference",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên đang bị đình chỉ học tập không được đăng ký thực tập, trừ trường hợp được hiệu trưởng cho phép theo quy định tại Điều 6.\nHiệu trưởng có thể cho phép sinh viên đang bị đình chỉ học tập đăng ký thực tập khi lý do đình chỉ là sức khỏe và có xác nhận của cơ sở y tế; hồ sơ gửi Phòng Đào tạo.",
+   "reason": null,
+   "scored_text": "Sinh viên đang bị đình chỉ học tập không được đăng ký thực tập, trừ trường hợp được hiệu trưởng cho phép theo quy định tại Điều 6.\nHiệu trưởng có thể cho phép sinh viên đang bị đình chỉ học tập đăng ký thực tập khi lý do đình chỉ là sức khỏe và có xác nhận của cơ sở y tế; hồ sơ gửi Phòng Đào tạo.",
+   "class": "helpful"
+  },
+  {
+   "id": "tt-03",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Thời gian thực tập tối thiểu là 8 tuần liên tục; sinh viên ngành Kiến trúc thực tập tối thiểu 10 tuần.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "reason": null,
+   "scored_text": "Thời gian thực tập tối thiểu là 8 tuần liên tục; sinh viên ngành Kiến trúc thực tập tối thiểu 10 tuần.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "class": "helpful"
+  },
+  {
+   "id": "tt-04",
+   "kind": "prose",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Kết quả thực tập gồm điểm của người hướng dẫn tại đơn vị (40%) và điểm báo cáo trước hội đồng (60%).",
+   "reason": null,
+   "scored_text": "Kết quả thực tập gồm điểm của người hướng dẫn tại đơn vị (40%) và điểm báo cáo trước hội đồng (60%).",
+   "class": "wrong"
+  },
+  {
+   "id": "tt-05",
+   "kind": "deadline",
+   "expected": "answer",
+   "outcome": "answer",
+   "text": "Sinh viên nộp phiếu đề xuất đơn vị cho Khoa chậm nhất 3 tuần trước ngày bắt đầu thực tập.",
+   "reason": null,
+   "scored_text": "Sinh viên nộp phiếu đề xuất đơn vị cho Khoa chậm nhất 3 tuần trước ngày bắt đầu thực tập.",
+   "class": "helpful"
+  },
+  {
+   "id": "tt-06",
+   "kind": "general_rule_applies",
+   "expected": "answer",
+   "outcome": "partial",
+   "text": "Thời gian thực tập tối thiểu là 8 tuần liên tục; sinh viên ngành Kiến trúc thực tập tối thiểu 10 tuần.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "reason": null,
+   "scored_text": "Thời gian thực tập tối thiểu là 8 tuần liên tục; sinh viên ngành Kiến trúc thực tập tối thiểu 10 tuần.\n\nMình chỉ xác minh được phần thông tin trên; các phần còn lại chưa đủ căn cứ.",
+   "class": "wrong"
+  }
+ ]
+}

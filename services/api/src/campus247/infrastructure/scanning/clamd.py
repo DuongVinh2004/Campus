@@ -59,6 +59,12 @@ def parse_reply(reply: str) -> str | None:
     raise ScannerUnavailable("SCANNER_ERROR")
 
 
+def removed_by_host(error: OSError) -> bool:
+    """The file we had just written is gone, or the operating system refuses to read it as "contains a virus" (Windows error 225/226).
+    The host's own malware protection acted on it, which is a detection, not a scanner outage: retrying would only repeat it."""
+    return isinstance(error, FileNotFoundError) or getattr(error, "winerror", None) in (225, 226)
+
+
 class ClamdScanner:
     name = "clamd"
 
@@ -165,7 +171,12 @@ class ClamdScanner:
                 raise
             except ScannerUnavailable as failure:
                 error = failure
-            except (OSError, TimeoutError):
+            except OSError as failure:
+                if removed_by_host(failure):
+                    self._observe("rejected", started, "HOST_PROTECTION_BLOCKED", attempts)
+                    raise ScanRejected("HOST_PROTECTION_BLOCKED") from None
+                error = ScannerUnavailable("SCANNER_UNAVAILABLE")
+            except TimeoutError:
                 error = ScannerUnavailable("SCANNER_UNAVAILABLE")
             else:
                 self._observe("clean", started, None, attempts)
@@ -208,7 +219,9 @@ class ClamdScanner:
             writer.write(struct.pack(">I", 0))
             await writer.drain()
             reply = (await reader.read(4096)).decode("utf-8", errors="replace")
-        except (ConnectionError, OSError):
+        except OSError as failure:
+            if removed_by_host(failure) and not isinstance(failure, ConnectionError):
+                raise  # scan() turns this into a rejection
             raise ScannerUnavailable("SCANNER_UNAVAILABLE") from None
         finally:
             writer.close()

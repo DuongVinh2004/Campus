@@ -60,8 +60,8 @@ def preserve(c):
 def test_reviewed_ancestry_and_forward_only_recovery():
     f = load("filter_fixture", HERE / "fixture.py")
     _, script, head, _ = f.chain()
-    # Later reviewed additive revisions (0014-0031) extend the same linear chain.
-    assert head == "0031"
+    # Later reviewed additive revisions (0014-0032) extend the same linear chain.
+    assert head == "0032"
     chain = [(r.revision, r.down_revision) for r in script.iterate_revisions(head, "0010")]
     assert chain[-3:] == [("0013", "0012"), ("0012", "0011"), ("0011", "0010")]
     assert [down for _, down in chain][:-1] == [revision for revision, _ in chain][1:]
