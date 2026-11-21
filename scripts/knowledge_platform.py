@@ -541,6 +541,10 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         attach_quality_recording(feedback, quality_store)
     attach_gap_recording(quality_store)  # refusals counted under the sources they pointed at; no question, answer or person
     app.include_router(create_quality_router(quality_store, freshness_service))
+    # P2 (owner approved the consent text 2026-11-21): a student's own report of missing information, redacted, kept 90 days.
+    from campus247.application.knowledge.gap_reports import GapReportStore
+    from campus247.presentation.knowledge_quality import create_gap_report_router
+    app.include_router(create_gap_report_router(GapReportStore(STATE / "gap-reports.sqlite3")))
 
     # Sign in with the university account: only when the owner supplied a provider configuration (CAMPUS247_OIDC_CONFIG).
     if os.environ.get("CAMPUS247_OIDC_CONFIG"):

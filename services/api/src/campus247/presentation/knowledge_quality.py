@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from campus247.application.knowledge.answer_quality import GAP_ACTIONS, AnswerQualityStore, titled_report
+from campus247.application.knowledge.gap_reports import CONSENT_VERSION, MAX_QUESTION, MIN_QUESTION, GapReportStore
 from campus247.ports.identity import IdentityRole
 from campus247.presentation.identity import get_current_identity
 
@@ -82,5 +83,53 @@ def create_quality_router(store: AnswerQualityStore, freshness_service, *, clock
         except LookupError:
             return _problem(404, "NOT_FOUND", "Không tìm thấy cụm này.")
         return JSONResponse({"cluster_key": cluster_key, "action": body.action}, headers=NO_STORE)
+
+    return router
+
+
+class GapReportBody(BaseModel):
+    question: str = Field(min_length=MIN_QUESTION, max_length=MAX_QUESTION + 200)
+    consent: bool
+    consent_version: str = Field(max_length=40)
+
+
+class DeleteBody(BaseModel):
+    delete_code: str = Field(min_length=1, max_length=100)
+
+
+def create_gap_report_router(store: GapReportStore, *, clock=None) -> APIRouter:
+    """P2: a student sends one redacted question after agreeing; managers read the kept texts. See application/knowledge/gap_reports.py."""
+    from datetime import UTC, datetime
+    router = APIRouter(tags=["Knowledge quality"])
+
+    def now():
+        return clock() if clock else datetime.now(UTC)
+
+    @router.post("/v1/answer-gap-reports")
+    async def report(body: GapReportBody, request: Request):
+        get_current_identity(request)  # who it is gets checked but never stored
+        if not body.consent or body.consent_version != CONSENT_VERSION or not MIN_QUESTION <= len(body.question.strip()) <= MAX_QUESTION:
+            return _problem(422, "VALIDATION_FAILED", "Cần đồng ý theo văn bản hiện hành và câu hỏi dài 3 đến 500 ký tự.")
+        try:
+            receipt = store.submit(body.question, at=now())
+        except OverflowError:
+            return _problem(429, "RATE_LIMITED", "Hôm nay đã nhận đủ báo cáo. Hãy thử lại vào ngày mai.")
+        return JSONResponse({"report_id": receipt.report_id, "delete_code": receipt.delete_code, "question": receipt.question,
+                             "text_kept": receipt.text_kept, "expires_at": receipt.expires_at}, status_code=201, headers=NO_STORE)
+
+    @router.post("/v1/answer-gap-reports/delete")
+    async def delete(body: DeleteBody, request: Request):
+        get_current_identity(request)
+        if not store.delete(body.delete_code):
+            return _problem(404, "NOT_FOUND", "Không tìm thấy báo cáo với mã này.")
+        return JSONResponse({"deleted": True}, headers=NO_STORE)
+
+    @router.get("/v1/knowledge/gap-reports")
+    async def read(request: Request):
+        identity = get_current_identity(request)
+        if not MANAGERS.intersection(identity.roles):
+            return _problem(403, "FORBIDDEN", "Chỉ quản trị tri thức mới đọc được các báo cáo này.")
+        moment = now()
+        return JSONResponse({"total": store.total(now=moment), "samples": store.samples(now=moment)}, headers=NO_STORE)
 
     return router

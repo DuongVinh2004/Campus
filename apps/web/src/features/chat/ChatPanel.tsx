@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { AnswerFeedback, type FeedbackRating } from "./AnswerFeedback";
+import { GapReport } from "./GapReport";
 import { ThemeToggle } from "../../components/ThemeToggle";
 
 import { FAILED_GUIDANCE, type AgentProgress } from "./sse";
@@ -754,7 +755,7 @@ export function ChatPanel({
             {/* Transcript Messages */}
             {messages.length > 0 && (
               <div className="space-y-6">
-                {messages.map((message) => {
+                {messages.map((message, messageIndex) => {
                   const isUser = message.role === "user";
                   const isSystem = message.role === "system";
                   const isFailed = message.status === "failed" || message.status === "unknown";
@@ -969,6 +970,10 @@ export function ChatPanel({
                               answerId={message.id}
                               onFeedbackSubmit={onFeedbackSubmit}
                             />}
+                            {onFeedbackSubmit && SERVER_ID.test(message.id) && (() => {
+                              const asked = messages.slice(0, messageIndex).reverse().find((item) => item.role === "user")?.content;
+                              return asked ? <GapReport question={asked} /> : null;
+                            })()}
                           </div>
                         )}
                       </div>

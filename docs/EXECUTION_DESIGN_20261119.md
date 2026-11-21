@@ -538,3 +538,10 @@ Chưa làm vì cần quyết định hoặc đầu vào: mục 6 (OIDC, kênh c�
 Đã có tiếng Anh cho: điều hướng và ô tìm kiếm, khung và trang đăng nhập (cả trang đăng nhập vận hành, trước đây thiếu nút đổi ngôn ngữ), **hộp thư thông báo**, **màn hình phòng học** (khoảng 80 chuỗi, gồm chuỗi có tham số), **thời khóa biểu theo tuần**. Mỗi màn có một test tiếng Anh; web 157 tệp / 965 test đạt, `tsc` sạch. Phương pháp và công cụ trích/thay chữ nằm ở `scripts/i18n/` (README) để các màn còn lại làm cơ học: **chat (`ChatPanel`, ~110 dòng), phiếu hỗ trợ/dịch vụ, học liệu, quản trị tri thức, trang chủ**. Câu trả lời của chatbot giữ tiếng Việt (B4.1: truy hồi tiếng Anh kém hơn).
 
 **Cập nhật cuối 20/11:** thêm tiếng Anh cho toàn bộ khu chat (khung chat, phản hồi, lịch sử, trích dẫn), màn dịch vụ học vụ / hồ sơ của tôi (chữ được lưu vào hồ sơ đã gửi vẫn giữ tiếng Việt), phần còn lại của khung ứng dụng (tiêu đề, biển báo vai trò, nhãn trợ năng) và trang quyền riêng tư. Còn tiếng Việt: trang chủ, danh sách hồ sơ cũ, phần sinh viên của học tập, và các màn cho cán bộ, giảng viên, quản trị, tri thức. Câu trả lời của chatbot vẫn là tiếng Việt (xem B4.1).
+
+### Quyết định của chủ dự án ngày 21/11/2026
+
+- **Đăng nhập (mục 1):** dùng cách hiện có (tài khoản thử và đăng nhập chủ dự án) cho đến khi HUCE cung cấp OIDC. Không làm gì thêm.
+- **Kênh cảnh báo (mục 2):** chủ dự án tự tạo bot Telegram, tự đặt token vào `.env`. Chờ `chat_id`; chưa nối.
+- **P2 (mục 3):** đã duyệt văn bản (`docs/P2_CONSENT_TEXT_DRAFT_20261121.md`). Đã làm: `application/knowledge/gap_reports.py`, `create_gap_report_router` (gắn trong `scripts/knowledge_platform.py`), hộp thoại "Báo thiếu thông tin" (`apps/web/src/features/chat/GapReport.tsx`), 17 test API và 4 test web. Chưa làm: gom cụm theo nội dung bằng embedding và màn đọc các báo cáo trong `/knowledge/quality` (API `GET /v1/knowledge/gap-reports` đã có). Chưa chạy trên runtime 8015 (cần khởi động lại để nạp router).
+- **Ngân sách gate hằng tuần (mục 4):** 1000 lời gọi/tuần. Gate C2.5 vẫn chưa được viết (đợi lên cloud); số này sẽ là trần khi viết.
