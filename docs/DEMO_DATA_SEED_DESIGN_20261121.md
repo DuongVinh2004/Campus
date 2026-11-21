@@ -124,7 +124,7 @@ ghi ở `infra/local/seed-backup-*` (bản dữ liệu gốc trước seed: `see
 | Hồ sơ | 178 hồ sơ, 842 sự kiện (trả lời, ghi chú nội bộ, đổi trạng thái), 14 quá hạn trong hàng chờ | như trên |
 | Đặt phòng, thông báo | 160 lượt đặt phòng (đã dùng/đã hủy/sắp tới), 775 thông báo, 793 dòng audit | như trên |
 | Học tập | 1 học kỳ, 8 học phần, 13 lớp học phần, 78 ghi danh, 55 tài liệu PDF (quét ClamAV thật, công bố), ~230 lượt đọc/đánh dấu/ghi chú, 19 hỏi–đáp có trả lời của giảng viên | API thật (`scripts/seed_demo_learning.py`) |
-| Chat | 27 câu hỏi thật qua RAG + nhà cung cấp (23 trả lời có nguồn, 1 trả lời một phần, 2 từ chối an toàn, 1 lỗi hệ thống); 17 đánh giá câu trả lời; tổng 119 lượt gọi gateway | API thật (`scripts/seed_demo_chat.py`) |
+| Chat | 40 câu hỏi thật qua RAG + nhà cung cấp (30 trả lời có nguồn, 4 trả lời một phần, 5 từ chối an toàn, 1 lỗi hệ thống); 31 đánh giá câu trả lời (25 hữu ích, 6 chưa hữu ích); tổng 171 lượt gọi gateway (13 câu cuối được chủ dự án duyệt thêm) | API thật (`scripts/seed_demo_chat.py`) |
 | Dịch vụ học vụ | 33 bản nháp hồ sơ cho 25 sinh viên | API thật (`scripts/seed_demo_preparations.py`) |
 
 Sửa lỗi phát hiện trong lúc làm:
@@ -138,7 +138,6 @@ Sửa lỗi phát hiện trong lúc làm:
 
 Chưa làm / bị chặn:
 
-- 13 câu chat còn lại (~52 lượt gọi) vượt mức 120 lượt đã duyệt — chờ chủ dự án quyết.
 - Tài liệu tri thức trong hàng chờ duyệt: cần tải tài liệu công khai thật từ huce.edu.vn — chờ chủ dự án cho phép tải.
 - Bàn giao ca (`/v1/handovers`): runtime 8015 chặn đường này và kho của nó chỉ nằm trong bộ nhớ, nên không seed được bền vững.
 - Đồng ý quyền riêng tư, bộ nhớ/theo dõi của trợ lý: trang vận hành không có thao tác tạo; để trống.
