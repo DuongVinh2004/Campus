@@ -58,3 +58,24 @@ def test_delete_refuses_links(tmp_path):
     deleted, refused = module.delete_listed(tmp_path, listing)
     assert deleted == [] and refused == [".pytest-tmp-link"]
     assert (target / "a.txt").exists()
+
+
+def test_a_directory_that_cannot_be_removed_does_not_stop_the_others(tmp_path, monkeypatch, capsys):
+    locked = _make(tmp_path, ".pytest-tmp-locked")
+    easy = _make(tmp_path, ".pytest-tmp-easy")
+    listing = tmp_path / "list.csv"
+    listing.write_text("name,bytes,modified,readable\n.pytest-tmp-locked,10,x,False\n.pytest-tmp-easy,10,x,True\n", encoding="utf-8")
+    real = module.shutil.rmtree
+
+    def rmtree(path, *args, **kwargs):
+        if Path(path).name == ".pytest-tmp-locked":
+            raise PermissionError(5, "Access is denied", str(path))
+        return real(path, *args, **kwargs)
+
+    monkeypatch.setattr(module.shutil, "rmtree", rmtree)
+    deleted, refused = module.delete_listed(tmp_path, listing)
+    assert deleted == [".pytest-tmp-easy"] and refused == []
+    assert module.LAST_FAILED == [".pytest-tmp-locked"]
+    assert locked.exists() and not easy.exists()
+    assert module.main(["--root", str(tmp_path), "--delete", str(listing)]) == 1  # locked one still reported as a failure
+    assert "failed: .pytest-tmp-locked" in capsys.readouterr().out

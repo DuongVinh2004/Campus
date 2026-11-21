@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 PATTERN = re.compile(r"^\.pytest-tmp[A-Za-z0-9._-]*$")
+LAST_FAILED: list[str] = []  # directories the last delete_listed call could not remove (for example access denied)
 
 
 def _is_link(path: Path) -> bool:
@@ -59,6 +60,7 @@ def write_csv(rows: list[dict], target: Path) -> None:
 
 def delete_listed(root: Path, listing: Path) -> tuple[list[str], list[str]]:
     deleted, refused = [], []
+    LAST_FAILED.clear()
     with listing.open(newline="", encoding="utf-8") as stream:
         names = [row["name"] for row in csv.DictReader(stream)]
     for name in names:
@@ -71,7 +73,11 @@ def delete_listed(root: Path, listing: Path) -> tuple[list[str], list[str]]:
         if _is_link(target) or not target.is_dir():
             refused.append(name)
             continue
-        shutil.rmtree(target, ignore_errors=False)
+        try:
+            shutil.rmtree(target, ignore_errors=False)
+        except OSError:
+            LAST_FAILED.append(name)  # an unreadable folder (made by another identity) must not stop the rest
+            continue
         deleted.append(name)
     return deleted, refused
 
@@ -85,10 +91,12 @@ def main(argv: list[str] | None = None) -> int:
     root = args.root.resolve()
     if args.delete:
         deleted, refused = delete_listed(root, args.delete)
-        print(f"deleted={len(deleted)} refused={len(refused)}")
+        print(f"deleted={len(deleted)} refused={len(refused)} failed={len(LAST_FAILED)}")
         for name in refused:
             print("refused:", name)
-        return 1 if refused else 0
+        for name in LAST_FAILED:
+            print("failed:", name)
+        return 1 if refused or LAST_FAILED else 0
     rows = scan(root)
     if args.out:
         write_csv(rows, args.out)

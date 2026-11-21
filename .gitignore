@@ -88,3 +88,7 @@ infra/local/ui-shots/
 
 # Per-run pytest base temp directories (created in the repo because tests require basetemp inside it)
 /.pytest-tmp*/
+
+# Downloaded third-party binaries (pinned and checked in docs/); never commit them
+/infra/local/tools/
+/infra/local/pytest-tmp-locked-*.txt
