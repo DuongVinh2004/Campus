@@ -21,6 +21,7 @@ export interface AnswerQualityReport {
 
 export interface StudentGapReports {
   total: number; samples: { id: number; at: string; expires_at: string; question: string }[];
+  groups?: { question: string; count: number; ids: number[]; last_at: string }[];
 }
 
 const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });

@@ -22,6 +22,8 @@ export function StudentGapReports() {
   if (error) return <p role="alert" data-testid="student-reports-error" className="campus-panel p-4 text-sm">{error}</p>;
   if (!data) return null;
   const samples = Array.isArray(data.samples) ? data.samples : [];
+  const groups = Array.isArray(data.groups) && data.groups.length ? data.groups
+    : samples.map((sample) => ({ question: sample.question, count: 1, ids: [sample.id], last_at: sample.at }));
   return (
     <section aria-labelledby="student-reports-heading" className="space-y-3" data-testid="student-reports">
       <header>
@@ -35,10 +37,12 @@ export function StudentGapReports() {
         <p data-testid="student-reports-empty" className="campus-panel p-4 text-sm">Chưa có báo cáo nào.</p>
       ) : (
         <ul className="space-y-2">
-          {samples.map((sample) => (
-            <li key={sample.id} className="campus-panel p-4 text-sm">
-              <p className="break-words">{sample.question}</p>
-              <p className="text-xs text-[var(--text-secondary)]">{new Date(sample.at).toLocaleString("vi-VN")} · hết hạn {new Date(sample.expires_at).toLocaleDateString("vi-VN")}</p>
+          {groups.map((group) => (
+            <li key={group.ids[0]} className="campus-panel p-4 text-sm">
+              <p className="break-words">{group.question}</p>
+              <p className="text-xs text-[var(--text-secondary)]">
+                {group.count > 1 ? `${group.count} báo cáo giống nhau · ` : ""}gần nhất {new Date(group.last_at).toLocaleString("vi-VN")}
+              </p>
             </li>
           ))}
         </ul>

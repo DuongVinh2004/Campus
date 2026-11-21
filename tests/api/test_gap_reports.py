@@ -135,3 +135,28 @@ class TestApi:
     def test_responses_are_not_cached(self, client):
         reply = client.post("/v1/answer-gap-reports", headers=auth("student"), json=self.body)
         assert reply.headers["Cache-Control"] == "no-store"
+
+
+class TestGrouping:
+    def test_similar_questions_share_a_group_and_the_biggest_group_comes_first(self):
+        from campus247.application.knowledge.gap_reports import group_samples
+        rows = [
+            {"id": 1, "at": "2026-11-20T01:00:00Z", "expires_at": "x", "question": "Học phí kỳ này nộp ở đâu?"},
+            {"id": 2, "at": "2026-11-21T01:00:00Z", "expires_at": "x", "question": "Nộp học phí kỳ này ở đâu ạ"},
+            {"id": 3, "at": "2026-11-21T02:00:00Z", "expires_at": "x", "question": "Lịch thi cuối kỳ lớp SQL khi nào"},
+            {"id": 4, "at": "2026-11-19T01:00:00Z", "expires_at": "x", "question": "Hoc phi ky nay nop o dau"},
+        ]
+        groups = group_samples(rows)
+        assert [g["count"] for g in groups] == [3, 1]
+        assert sorted(groups[0]["ids"]) == [1, 2, 4] and groups[0]["last_at"] == "2026-11-21T01:00:00Z"
+        assert groups[0]["question"] == "Nộp học phí kỳ này ở đâu ạ"  # the most recent wording represents the group
+
+    def test_no_samples_no_groups(self):
+        from campus247.application.knowledge.gap_reports import group_samples
+        assert group_samples([]) == []
+
+    def test_the_manager_list_carries_the_groups(self, client):
+        for question in ("Học phí kỳ này nộp ở đâu?", "Nộp học phí kỳ này ở đâu ạ"):
+            client.post("/v1/answer-gap-reports", headers=auth("student"), json={"question": question, "consent": True, "consent_version": CONSENT_VERSION})
+        data = client.get("/v1/knowledge/gap-reports", headers=auth("kadmin")).json()
+        assert [g["count"] for g in data["groups"]] == [2]

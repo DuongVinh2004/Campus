@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from campus247.application.knowledge.answer_quality import GAP_ACTIONS, AnswerQualityStore, titled_report
-from campus247.application.knowledge.gap_reports import CONSENT_VERSION, MAX_QUESTION, MIN_QUESTION, GapReportStore
+from campus247.application.knowledge.gap_reports import CONSENT_VERSION, MAX_QUESTION, MIN_QUESTION, GapReportStore, group_samples
 from campus247.ports.identity import IdentityRole
 from campus247.presentation.identity import get_current_identity
 
@@ -130,6 +130,7 @@ def create_gap_report_router(store: GapReportStore, *, clock=None) -> APIRouter:
         if not MANAGERS.intersection(identity.roles):
             return _problem(403, "FORBIDDEN", "Chỉ quản trị tri thức mới đọc được các báo cáo này.")
         moment = now()
-        return JSONResponse({"total": store.total(now=moment), "samples": store.samples(now=moment)}, headers=NO_STORE)
+        samples = store.samples(now=moment)
+        return JSONResponse({"total": store.total(now=moment), "samples": samples, "groups": group_samples(samples)}, headers=NO_STORE)
 
     return router

@@ -16,7 +16,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from campus247.application.knowledge.crawl.pii import CCCD, EMAIL, PHONE
+from campus247.application.knowledge.crawl.pii import CCCD, EMAIL, PHONE, _fold
 
 CONSENT_VERSION = "p2-2026-11-21"
 RETENTION = timedelta(days=90)
@@ -101,3 +101,32 @@ class GapReportStore:
             rows = db.execute("""SELECT id, at, expires_at, question_redacted FROM gap_reports
                                  WHERE expires_at > ? AND question_redacted IS NOT NULL ORDER BY at DESC, id DESC LIMIT ?""", (_stamp(now), limit)).fetchall()
         return [{"id": r[0], "at": r[1], "expires_at": r[2], "question": r[3]} for r in rows]
+
+
+SAME_QUESTION = 0.6  # share of words two questions must have in common (Jaccard) to land in one group
+
+
+def _words(text: str) -> frozenset[str]:
+    return frozenset(w for w in re.findall(r"[a-z0-9]+", _fold(text)) if len(w) > 1 or w == "o")
+
+
+def group_samples(samples: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Group questions that share most of their words, ignoring accents and case. Cheap and deterministic: no model is called.
+
+    The most recent question represents its group. Biggest group first, then the most recently reported.
+    """
+    groups: list[dict[str, Any]] = []
+    for sample in sorted(samples, key=lambda s: (s["at"], s["id"]), reverse=True):
+        words = _words(sample["question"])
+        for group in groups:
+            union = words | group["_words"]
+            if union and len(words & group["_words"]) / len(union) >= SAME_QUESTION:
+                group["ids"].append(sample["id"])
+                break
+        else:
+            groups.append({"question": sample["question"], "ids": [sample["id"]], "last_at": sample["at"], "_words": words})
+    for group in groups:
+        group["count"] = len(group["ids"])
+        del group["_words"]
+    groups.sort(key=lambda g: (g["count"], g["last_at"]), reverse=True)
+    return groups
