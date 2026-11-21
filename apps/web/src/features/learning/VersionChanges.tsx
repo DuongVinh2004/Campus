@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, type MessageKey } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { LearningGateway, type LearningChangeItem, type LearningChangeMode, type LearningMaterial, type LearningVersion, type LearningVersionChangeSet } from "../../lib/data/api/learning-gateway";
 import styles from "./learning.module.css";
@@ -7,14 +8,14 @@ import { useActorRouteState, useTabDraftOwner } from "../chat/route-drafts";
 import {LearningMetadataComparison,MetadataDraftHistory,type MetadataDraft} from './LearningMetadataComparison';
 
 const api = new LearningGateway();
-const modes: Record<LearningChangeMode, string> = {
-  PAGE_MAP: "Có đánh dấu trang",
-  WHOLE_DOCUMENT: "Thay đổi toàn tài liệu",
-  UNSPECIFIED: "Chưa có bản mô tả trang",
+const modes: Record<LearningChangeMode, MessageKey> = {
+  PAGE_MAP: "vcx.1",
+  WHOLE_DOCUMENT: "vcx.2",
+  UNSPECIFIED: "vcx.3",
 };
-const kinds = { EDITED: "Sửa", MOVED: "Chuyển vị trí", ADDED: "Thêm", REMOVED: "Bỏ" } as const;
+const kinds = { EDITED: "vcx.4", MOVED: "vcx.5", ADDED: "vcx.6", REMOVED: "vcx.7" } as const;
 const pptx = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-const pageLabel = (type?: string) => type === pptx ? "Slide trong bản xem PowerPoint" : "Trang PDF";
+const pageLabel = (type?: string): MessageKey => type === pptx ? "vcx.8" : "vcx.pdfpage";
 type ChangeStructure={base_version_id:string;mode:LearningChangeMode|'';items:LearningChangeItem[]};
 const changeLabels={structure:'Cấu trúc so sánh',reason:'Lý do cập nhật',target_guidance:'Chỉ dẫn đọc độc lập của bản mới'};
 
@@ -24,28 +25,30 @@ export function olderPublishedVersions(material: LearningMaterial, version: Lear
 }
 
 export function ChangeDetails({ change, onOpen }: { change: LearningVersionChangeSet; onOpen?: (version: string, page: number) => void }) {
+  const t = useT();
   return <div className={styles.stack}>
     {change.base_available ? <>
-      <p>Bản {change.base_version_no} → Bản {change.target_version_no} · {modes[change.mode]}</p>
+      <p>{t("vcx.9", { a: change.base_version_no ?? "", b: change.target_version_no })} · {t(modes[change.mode])}</p>
       <p>{change.reason}</p>
-    </> : <p>Bản {change.target_version_no}. Bản trước hiện không khả dụng.</p>}
+    </> : <p>{t("vcx.10", { v: change.target_version_no })}</p>}
     {change.target_guidance && <p>{change.target_guidance}</p>}
     {!!change.items.length && <ul>{change.items.map((item, index) => <li key={index}>
-      {item.kind && <strong>{kinds[item.kind]} </strong>}{item.description && <span>{item.description}</span>}
+      {item.kind && <strong>{t(kinds[item.kind])} </strong>}{item.description && <span>{item.description}</span>}
       {item.guidance && <p>{item.guidance}</p>}
       <div className={styles.row}>
         {change.base_available && item.old_page && (onOpen && change.base_version_id
-          ? <button type="button" onClick={() => onOpen(change.base_version_id!, item.old_page!)}>Mở bản trước · {pageLabel(change.base_media_type)} {item.old_page}</button>
-          : <span>Bản trước · {pageLabel(change.base_media_type)} {item.old_page}</span>)}
+          ? <button type="button" onClick={() => onOpen(change.base_version_id!, item.old_page!)}>{t("vcx.12", { p: t(pageLabel(change.base_media_type)), n: item.old_page })}</button>
+          : <span>{t("vcx.13", { p: t(pageLabel(change.base_media_type)), n: item.old_page })}</span>)}
         {item.new_page && (onOpen
-          ? <button type="button" onClick={() => onOpen(change.target_version_id, item.new_page!)}>Mở bản mới · {pageLabel(change.target_media_type)} {item.new_page}</button>
-          : <span>Bản mới · {pageLabel(change.target_media_type)} {item.new_page}</span>)}
+          ? <button type="button" onClick={() => onOpen(change.target_version_id, item.new_page!)}>{t("vcx.14", { p: t(pageLabel(change.target_media_type)), n: item.new_page })}</button>
+          : <span>{t("vcx.15", { p: t(pageLabel(change.target_media_type)), n: item.new_page })}</span>)}
       </div>
     </li>)}</ul>}
   </div>;
 }
 
 export function VersionChangeBanner({ versionId, actorId, onOpen }: { versionId: string; actorId: string; onOpen: (version: string, page: number) => void }) {
+  const t = useT();
   const owner=useTabDraftOwner();
   const readScope=JSON.stringify([owner.scope,actorId,versionId]);
   const [loadedScope,setLoadedScope]=useState<string>();
@@ -62,15 +65,16 @@ export function VersionChangeBanner({ versionId, actorId, onOpen }: { versionId:
     return () => controller.abort();
   }, [versionId, actorId,readScope,owner.enabled,owner.scope]);
   if(loadedScope!==readScope||(owner.enabled&&!owner.scope))return null;
-  if (error) return <p role="status">Chưa đọc được mô tả thay đổi.</p>;
+  if (error) return <p role="status">{t("vcx.16")}</p>;
   if (!change) return null;
-  return <details className={styles.alert}><summary>Trang thay đổi trong phiên bản này</summary><ChangeDetails change={change} onOpen={onOpen} /></details>;
+  return <details className={styles.alert}><summary>{t("vcx.17")}</summary><ChangeDetails change={change} onOpen={onOpen} /></details>;
 }
 
 export function VersionChangeEditor({ version, material, actorId, onSave }: {
   version: LearningVersion; material: LearningMaterial; actorId: string;
   onSave: (payload: Record<string, unknown>, key: string) => Promise<LearningVersionChangeSet>;
 }) {
+  const t = useT();
   const candidates = olderPublishedVersions(material, version);
   const defaultBase = candidates.find(item => item.id === material.current_published_version_id)?.id ?? candidates[0]?.id ?? "";
   const owner = useTabDraftOwner();
@@ -157,10 +161,10 @@ export function VersionChangeEditor({ version, material, actorId, onSave }: {
             updateItem(index, { kind, old_page: kind === "ADDED" ? null : item.old_page, new_page: kind === "REMOVED" ? null : item.new_page,
               guidance: kind === "REMOVED" ? "" : item.guidance });
           }}>{Object.entries(kinds).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          {item.kind !== "ADDED" && <label>Bản trước · {pageLabel(base?.source_media_type)}
+          {item.kind !== "ADDED" && <label>Bản trước · {t(pageLabel(base?.source_media_type))}
             <input required type="number" min={1} max={base?.page_count} value={item.old_page ?? ""}
               onChange={event => updateItem(index, { old_page: event.target.value ? Number(event.target.value) : null })} /></label>}
-          {item.kind !== "REMOVED" && <label>Bản mới · {pageLabel(version.source_media_type)}
+          {item.kind !== "REMOVED" && <label>Bản mới · {t(pageLabel(version.source_media_type))}
             <input required type="number" min={1} max={version.page_count} value={item.new_page ?? ""}
               onChange={event => updateItem(index, { new_page: event.target.value ? Number(event.target.value) : null })} /></label>}
           <label>Mô tả so sánh <textarea required maxLength={1000} value={item.description ?? ""}
@@ -191,9 +195,9 @@ export function VersionChangeEditor({ version, material, actorId, onSave }: {
     const current:ChangeStructure=JSON.parse(value);
     const source=candidates.find(candidate=>candidate.id===current.base_version_id);
     return <div className={styles.stack}>
-      <p>Bản trước: {source?`Bản ${source.version_no}`:'Chưa có bản trước khả dụng'} · {current.mode?modes[current.mode]:'Chưa chọn phạm vi'}</p>
+      <p>Bản trước: {source?`Bản ${source.version_no}`:'Chưa có bản trước khả dụng'} · {current.mode?t(modes[current.mode]):'Chưa chọn phạm vi'}</p>
       {current.items.length>0?<ol>{current.items.map((item,index)=><li key={index}>
-        <p>{item.kind?kinds[item.kind]:'Chưa chọn loại'} · Bản trước: {item.old_page??'—'} · Bản mới: {item.new_page??'—'}</p>
+        <p>{item.kind?t(kinds[item.kind]):'Chưa chọn loại'} · Bản trước: {item.old_page??'—'} · Bản mới: {item.new_page??'—'}</p>
         <p>{item.description}</p>{item.guidance&&<p>Chỉ dẫn: {item.guidance}</p>}
       </li>)}</ol>:<p>Không có cặp trang.</p>}
     </div>;
