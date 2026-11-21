@@ -54,9 +54,7 @@ it.each(['owner','record','route'] as const)('aborts comparison across %s change
 it('hides an older comparison when a fresh read is denied and preserves the original draft and revision',async()=>{
   const read=vi.fn().mockResolvedValueOnce(latest).mockRejectedValueOnce(new Error('Synthetic access denied'));
   const save=vi.fn().mockRejectedValue(new Error('Keep synthetic draft'));
-  render(<Root read={read} save={save}/>);fireEvent.change(screen.getByLabelText('Title'),{target:{value:'Private edit'}});compare();await screen.findByLabelText('Chọn nội dung: Title');
-  // The button reads "Đang đọc…" until the loading state clears one update later; wait for it instead of querying synchronously.
-  await screen.findByRole('button',{name:'Đối chiếu bản trên máy chủ'});compare();
+  render(<Root read={read} save={save}/>);fireEvent.change(screen.getByLabelText('Title'),{target:{value:'Private edit'}});compare();await screen.findByLabelText('Chọn nội dung: Title');compare();
   await screen.findByText('Synthetic access denied');expect(screen.queryByRole('button',{name:'Dùng kết quả đối chiếu để soạn tiếp'})).toBeNull();expect(screen.queryByText('Server description')).toBeNull();
   fireEvent.click(screen.getByRole('button',{name:'Preview'}));await waitFor(()=>expect(save).toHaveBeenCalled());expect(save.mock.calls[0][0]).toMatchObject({title:'Private edit',revision:3});
 });
