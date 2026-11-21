@@ -20,7 +20,7 @@ dependencies = [
     "openai==3.24.0",
     "tiktoken==0.14.0",
     "tzdata==2026.6",
-    "pypdf==6.19.0",
+    "pypdf==6.21.4",
     "python-multipart==0.0.32",
     "pdfplumber==0.11.10",
     "cryptography==50.0.2",
