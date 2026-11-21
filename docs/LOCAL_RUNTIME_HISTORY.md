@@ -1,3 +1,5 @@
+> **Archived operating notes.** This file used to be the repository README. It records how the local runtime was run and what state it was in on 24-27 Oct 2026; paths and ports below describe that history. For the current overview see the [project README](../README.md); for current commands see `.claude/skills/campus247/references/verification.md`.
+
 # Campus 24/7
 
 ## Một bản chính để sử dụng — 27/10/2026
@@ -10,7 +12,7 @@ Quản trị nguồn xuất hiện theo quyền. `pnpm start` và
 Các API kiểm thử8017/8018 và frontend3018 đã dừng sau kiểm tra idle, dữ liệu còn nguyên.
 
 Tài khoản sinh viên local là `student-local`; mật khẩu ở
-[tệp credentials trong workspace](infra/local/knowledge-platform-20261023/student-credentials.json).
+tệp credentials cục bộ trong workspace (không nằm trong git).
 Không thay tài khoản admin, khóa, mật khẩu hoặc lịch sử cũ. Dịch vụ hỗ trợ chuẩn bị,
 xem trước và lưu nháp có biên nhận trong cùng actor store, đọc lại tại Hồ sơ của tôi.
 Chưa có kết nối tiếp nhận HUCE, xác thực tình trạng sinh viên, bảng điểm, lịch cá nhân
@@ -43,10 +45,10 @@ model và release, tái sử dụng tiến trình đang chạy và giữ log ri�
 Hai dịch vụ BGE ở 18081/18082 phải sẵn sàng với đúng revision đã lưu.
 Lệnh không khởi tạo lại database, không thay model hoặc sửa chính sách Windows.
 Kết quả kiểm chứng và giới hạn tại
-[báo cáo khôi phục runtime](docs/HUCE_RUNTIME_RECOVERY_20261024.md) và
-[kế hoạch hoàn thiện kho](docs/HUCE_CORPUS_COMPLETION_PLAN_20261024.md),
-[kết quả xử lý](docs/HUCE_CORPUS_COMPLETION_RESULT_20261024.md) và
-[bảng trạng thái đủ 117 nguồn](docs/HUCE_SOURCE_STATUS_20261024.md).
+[báo cáo khôi phục runtime](HUCE_RUNTIME_RECOVERY_20261024.md) và
+[kế hoạch hoàn thiện kho](HUCE_CORPUS_COMPLETION_PLAN_20261024.md),
+[kết quả xử lý](HUCE_CORPUS_COMPLETION_RESULT_20261024.md) và
+[bảng trạng thái đủ 117 nguồn](HUCE_SOURCE_STATUS_20261024.md).
 
 ## Tham khảo bản tổng hợp trước khi hợp nhất về8015
 
@@ -87,9 +89,9 @@ thử hồ sơ tổng hợp không xác nhận dữ liệu hoặc quy trình ch�
 
 ## Kế hoạch đồ án hiện tại
 
-Định hướng triển khai hiện tại là [kế hoạch đồ án tốt nghiệp](docs/GRADUATION_PROJECT_PLAN_20261013.md): một người, sáu tháng, tập trung vào RAG thích ứng, truy hồi trên đồ thị và hệ thống đa tác tử có kiểm chứng bằng chứng.
+Định hướng triển khai hiện tại là [kế hoạch đồ án tốt nghiệp](GRADUATION_PROJECT_PLAN_20261013.md): một người, sáu tháng, tập trung vào RAG thích ứng, truy hồi trên đồ thị và hệ thống đa tác tử có kiểm chứng bằng chứng.
 
-Sáu kế hoạch triển khai cũ đã được chuyển nguyên vẹn vào [khu lưu trữ và bảng phục hồi](archive/legacy-plans-20261013/README.md) theo xác nhận trực tiếp của người dùng ngày 13/10/2026. Phần mô tả và quy trình cũ bên dưới được giữ làm tài liệu tham khảo lịch sử; yêu cầu trực tiếp hiện tại và hướng dẫn thực thi trong `AGENTS.md` xác định công việc triển khai.
+Sáu kế hoạch triển khai cũ đã được chuyển nguyên vẹn vào khu lưu trữ và bảng phục hồi (`archive/legacy-plans-20261013/`, chỉ có ở máy cục bộ, không nằm trong git) theo xác nhận trực tiếp của người dùng ngày 13/10/2026. Phần mô tả và quy trình cũ bên dưới được giữ làm tài liệu tham khảo lịch sử; yêu cầu trực tiếp hiện tại và hướng dẫn thực thi trong `AGENTS.md` xác định công việc triển khai.
 
 Việc đổi kế hoạch giữ nguyên dữ liệu, bằng chứng, cơ chế bảo vệ, xác thực, phân quyền, xác nhận thao tác và các ranh giới môi trường/ngân sách. Mã nguồn và các thay đổi có sẵn được tiếp tục tận dụng.
 
