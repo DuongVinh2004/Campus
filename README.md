@@ -1,134 +1,101 @@
 # Campus 24/7
 
-## Một bản chính để sử dụng — 27/10/2026
+[![CI](https://github.com/DuongVinh2004/Campus/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DuongVinh2004/Campus/actions/workflows/ci.yml)
+[![Security & Supply Chain](https://github.com/DuongVinh2004/Campus/actions/workflows/security.yaml/badge.svg?branch=main)](https://github.com/DuongVinh2004/Campus/actions/workflows/security.yaml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Python 3.12-3.13](https://img.shields.io/badge/python-3.12--3.13-blue)
+![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange)
 
-Mở **[Campus 24/7](http://127.0.0.1:8015/services)**. Chat có nguồn, dịch vụ học vụ,
-hồ sơ của tôi, lịch học, phòng học và quyền riêng tư dùng chung menu và đăng nhập.
-Quản trị nguồn xuất hiện theo quyền. `pnpm start` và
-`.venv/Scripts/python.exe -B scripts/campus.py start` đều mở cùng runtime8015;
-`scripts/campus.py status` kiểm trạng thái thật. Frontend3015 là thành phần nội bộ.
-Các API kiểm thử8017/8018 và frontend3018 đã dừng sau kiểm tra idle, dữ liệu còn nguyên.
+**A source-grounded academic assistant and campus-services platform** built around the public information of Hanoi University of Civil Engineering (HUCE): chat with citations, academic service requests, timetable and exams, room booking, learning materials, and a knowledge-management console that keeps the assistant's sources current.
 
-Tài khoản sinh viên local là `student-local`; mật khẩu ở
-[tệp credentials trong workspace](infra/local/knowledge-platform-20261023/student-credentials.json).
-Không thay tài khoản admin, khóa, mật khẩu hoặc lịch sử cũ. Dịch vụ hỗ trợ chuẩn bị,
-xem trước và lưu nháp có biên nhận trong cùng actor store, đọc lại tại Hồ sơ của tôi.
-Chưa có kết nối tiếp nhận HUCE, xác thực tình trạng sinh viên, bảng điểm, lịch cá nhân
-hoặc đặt phòng thật; nháp không phải hồ sơ đã gửi/cấp giấy. Không dùng fixture thay dữ liệu trường.
+> **Independent project. Not an official service of HUCE.** It is built from public HUCE information and clearly labelled synthetic data. It has **no connection** to HUCE's student information, grades, single sign-on, request intake or room-booking systems, and must not be presented as one of them. Student-facing screens say so wherever simulated data is shown.
 
-`pnpm build` chỉ tạo artifact frontend để kiểm tra, không khởi động một sản phẩm khác
-hoặc tự chuyển dữ liệu. Build cũ, backup và evidence được giữ để phục hồi.
-Phần dưới là lịch sử triển khai, không phải các địa chỉ cần chạy song song.
+*Tóm tắt tiếng Việt:* Campus 24/7 là trợ lý học vụ có trích dẫn nguồn và nền tảng dịch vụ sinh viên (hỏi đáp, hồ sơ, lịch học/thi, đặt phòng, học liệu, quản trị nguồn tri thức), xây dựng trên thông tin công khai của Trường Đại học Xây dựng Hà Nội. Đây là dự án độc lập, **không phải dịch vụ chính thức của trường**; dữ liệu cá nhân là dữ liệu mô phỏng, giao diện chính là tiếng Việt.
 
-## Tham khảo kho tri thức — 24/10/2026
+## What it does
 
-Mở [chatbot](http://127.0.0.1:8015/chat) hoặc
-[đăng nhập quản trị nguồn](http://127.0.0.1:8015/login). Runtime này dùng
-PostgreSQL và release 114 tài liệu HUCE, thêm 3 nguồn trùng/liên kết được đối soát;
-93 nguồn có giới hạn phần chữ/bảng/sơ đồ, trong đó 12 nguồn chưa rõ khóa áp dụng.
-122 phiên bản chưa duyệt được giữ lại: 119 bản lịch sử và 3 bản nguồn trùng/liên kết,
-không phải 122 tài liệu mới đang đợi xử lý. Chưa kết nối SSO hoặc
-hồ sơ học vụ cá nhân. Đây là entry của kho tri thức, khác runtime tổng hợp
-ở cổng 3115 bên dưới.
+| Area | Capabilities |
+| --- | --- |
+| **Assistant (RAG)** | Answers only from approved sources and shows the citations; refuses or asks to clarify when evidence is missing; guards against prompt injection and stale sources. |
+| **Academic services** | Students prepare, preview and confirm requests (certificate, grade appeal, general support); a staff queue handles them with replies, notes and status changes; every write action needs permission, preview, confirmation, idempotency and an audit record. |
+| **Timetable and rooms** | Weekly timetable, exams, personal events, calendar export; room search, availability and booking with conflict checks. |
+| **Learning materials** | Lecturers publish PDF/PPTX lectures per class session after a malware scan; students read, bookmark, annotate and ask questions on a page. |
+| **Knowledge management** | Document intake with automatic checks, review and publication; a polite crawler for public HUCE pages; index rebuild and hot reload; freshness reminders and answer-gap reports. |
+| **Operations** | Admin overview, metrics, alerts, backups and restore drills, rate limiting and admission control, installable web app (PWA). |
 
-Khởi động lại các thành phần đã lưu từ thư mục repository:
+## Architecture at a glance
 
-```powershell
-& 'infra/local/rag-fixture/.venv/Scripts/python.exe' -B scripts/knowledge_platform_runtime.py start
-& 'infra/local/rag-fixture/.venv/Scripts/python.exe' -B scripts/knowledge_platform_runtime.py status
+```
+ Browser (Next.js 16, React 19, Tailwind 4)
+        │  same-origin /v1/* and pages
+        ▼
+ API (FastAPI) ── presentation → application → domain      (ports isolate the outside world)
+        │             │
+        │             ├─ agent: LangGraph flow, grounding, guardrails, human confirmation
+        │             └─ infrastructure: PostgreSQL + pgvector, SQLite stores, Redis (optional),
+        │                                 model gateway, ClamAV, file storage
+        ▼
+ Knowledge index (RAG v2) ◄── ingestion worker ◄── documents, crawler
 ```
 
-Lệnh `start` dùng cluster và bản build v14 hiện có, kiểm danh tính database,
-model và release, tái sử dụng tiến trình đang chạy và giữ log riêng từng lần.
-Hai dịch vụ BGE ở 18081/18082 phải sẵn sàng với đúng revision đã lưu.
-Lệnh không khởi tạo lại database, không thay model hoặc sửa chính sách Windows.
-Kết quả kiểm chứng và giới hạn tại
-[báo cáo khôi phục runtime](docs/HUCE_RUNTIME_RECOVERY_20261024.md) và
-[kế hoạch hoàn thiện kho](docs/HUCE_CORPUS_COMPLETION_PLAN_20261024.md),
-[kết quả xử lý](docs/HUCE_CORPUS_COMPLETION_RESULT_20261024.md) và
-[bảng trạng thái đủ 117 nguồn](docs/HUCE_SOURCE_STATUS_20261024.md).
+Principles that shape the code:
 
-## Tham khảo bản tổng hợp trước khi hợp nhất về8015
+- **The model proposes; deterministic code decides.** Authentication, authorization and execution of any write are never delegated to a prompt.
+- **Layered, with enforced boundaries.** `domain` and `application` never import web, database or framework code; `tests/architecture` checks it.
+- **Contracts first.** The HTTP API is described in `contracts/openapi/v1/openapi.yaml`; contract tests keep code and description aligned.
+- **Evidence over claims.** Answer quality, refusals and safety are measured by evaluation sets and gates in `evals/`.
 
-Từ thư mục repository trên Windows, chạy `pnpm start` hoặc
-`.venv/Scripts/python.exe -B scripts/campus.py start` rồi mở
-http://127.0.0.1:3115. Trang web, API `/v1/*`, tệp tải xuống và streaming đều
-đi qua địa chỉ này. Backend chỉ lắng nghe loopback `127.0.0.1:8006`; trình duyệt
-không gọi trực tiếp backend và không cần CORS giữa hai cổng.
+## Repository layout
 
-Lệnh khởi động tự build khi mã thay đổi, kiểm tra backend trước khi mở frontend,
-không tự đổi cổng hoặc tắt tiến trình đang chiếm cổng. Ctrl+C dừng đúng hai tiến
-trình con. Các bản build và log được giữ lại, không tự dọn dữ liệu. `pnpm build`
-chỉ tạo bản build mới. Các lệnh `apps/web` riêng là công cụ frontend, không phải
-lệnh chạy toàn ứng dụng.
+| Path | Contents |
+| --- | --- |
+| `apps/web` | Next.js web application (Vietnamese UI, partial English) |
+| `services/api` | FastAPI backend (`campus247` package), Alembic migrations |
+| `services/worker`, `workers/` | Background workers (document ingestion, jobs) |
+| `packages/` | Shared packages: `evals`, `prompts`, `synthetic` |
+| `contracts/` | OpenAPI, JSON Schema, AsyncAPI |
+| `evals/` | Evaluation datasets, runners, red-team cases, regression gates |
+| `infra/` | Local runtime profiles, cloud deployment kit, CDK, specifications |
+| `scripts/` | Runtime launcher, data acquisition, maintenance and QA tools |
+| `tests/` | Backend and integration tests |
+| `docs/` | Governance, product, architecture, AI, security and quality documents |
+| `release/` | Release manifest and evidence |
 
-Runtime dùng các bản sao SQLite nhất quán trong
-`.tooling/campus-single-entry-20261015-01/runtime`; nguồn cũ được giữ nguyên.
-`/health/entry` báo trạng thái tích hợp. `CAMPUS_MODEL_MODE=guarded`
-không gọi model trả phí. Chế độ `retained` nối gateway DeepSeek hiện có, BGE
-embedding/reranker trên loopback và ledger ngân sách tích lũy; chỉ khởi động khi
-các dịch vụ model và headroom hiện có đáp ứng. Không tạo model giả hoặc quota mới.
-Theo yêu cầu trực tiếp ngày 20/10/2026, trần tổng số lượt gọi và trần tổng chi phí
-đã được bỏ. Bản ghi `resource-authorization-06-accounting-only.json` giữ snapshot
-và liên kết lịch sử; số lượt, chi phí và các lượt chưa quyết toán vẫn được ghi nhận.
-Khi bản ghi này hiện diện, backend mặc định dùng `retained`; vẫn có thể chọn
-`guarded` rõ ràng. Giới hạn mỗi lượt xử lý, tài nguyên local, timeout, egress,
-xác thực và phân quyền giữ nguyên. Health báo `budget: accounting_only`.
-`CAMPUS_RUNTIME_DIR` có thể chỉ đến một runtime đã khởi tạo trong workspace để
-kiểm thử trên bản sao độc lập. Không trỏ tới dữ liệu gốc hoặc một thư mục bất kỳ.
+## Getting started
 
-Kiểm thử trình duyệt thật dùng `apps/web/playwright.live.config.ts` và
-`scripts/verify_campus_e2e.py NN --exclude-model`; mỗi lần cần số `NN` mới để giữ
-nguyên bằng chứng cũ. Ca `--grep @model` gọi dịch vụ trả phí và phải nằm trong
-phạm vi dữ liệu/ngân sách đã được người dùng cho phép. Trong chiến dịch E2E,
-`CAMPUS_E2E_PAID_CALL_CEILING` chỉ thắt thêm trần calls tích lũy, không tăng quota.
-Lịch học cá nhân, đặt phòng và dashboard quản trị vẫn cần tích hợp riêng; kiểm
-thử hồ sơ tổng hợp không xác nhận dữ liệu hoặc quy trình chính thức của trường.
+Requirements: Python 3.12 or 3.13 with [uv](https://docs.astral.sh/uv/), Node.js with pnpm 9.12.0.
 
-## Kế hoạch đồ án hiện tại
+```bash
+git clone https://github.com/DuongVinh2004/Campus.git
+cd Campus
 
-Định hướng triển khai hiện tại là [kế hoạch đồ án tốt nghiệp](docs/GRADUATION_PROJECT_PLAN_20261013.md): một người, sáu tháng, tập trung vào RAG thích ứng, truy hồi trên đồ thị và hệ thống đa tác tử có kiểm chứng bằng chứng.
+uv sync --frozen                                   # Python dependencies (exact versions in uv.lock)
+pnpm install --frozen-lockfile --filter 'web...' --ignore-scripts
 
-Sáu kế hoạch triển khai cũ đã được chuyển nguyên vẹn vào [khu lưu trữ và bảng phục hồi](archive/legacy-plans-20261013/README.md) theo xác nhận trực tiếp của người dùng ngày 13/10/2026. Phần mô tả và quy trình cũ bên dưới được giữ làm tài liệu tham khảo lịch sử; yêu cầu trực tiếp hiện tại và hướng dẫn thực thi trong `AGENTS.md` xác định công việc triển khai.
-
-Việc đổi kế hoạch giữ nguyên dữ liệu, bằng chứng, cơ chế bảo vệ, xác thực, phân quyền, xác nhận thao tác và các ranh giới môi trường/ngân sách. Mã nguồn và các thay đổi có sẵn được tiếp tục tận dụng.
-
-## Tham khảo lịch sử
-
-Campus 24/7 is a documentation-first commercial product for a single university. The initial reference deployment is an unofficial, simulated pilot for the Faculty of Information Technology at Hanoi University of Civil Engineering (HUCE).
-
-This repository is a documentation package with machine-readable contracts, evaluation fixtures, infrastructure specifications and a draft delivery catalog. Its status is mixed: governance and selected product documents are approved, many design/contract/quality documents are reviewed, and service, UX, architecture, security and platform documents remain draft. It intentionally contains no production application code yet, and this package does not approve implementation, a real-data pilot, or production.
-
-## Read first
-
-1. `docs/00-governance/DOCUMENT_CONTROL.md`
-2. `docs/00-governance/DECISION_REGISTER.md`
-3. `docs/00-governance/DOCUMENT_MANIFEST.yaml`
-4. `docs/00-governance/MASTER_TRACEABILITY_MATRIX.md`
-5. `docs/00-governance/CONSISTENCY_REPORT.md`
-6. `docs/README.md`
-7. `tasks/README.md` before working on a task
-
-## Important status
-
-- Product intent: commercial, production-grade design.
-- Initial institution: one university only; no SaaS or multi-tenant scope in V1.
-- Data: public-source references plus deterministic synthetic data; no real student data.
-- Coding executor: Gemini 3.8 Flash, operating only through reviewed atomic tasks.
-- Production LLM provider: DeepSeek behind a provider-neutral gateway.
-- Hosting preference: AWS.
-- This is not an official HUCE service and must not be presented as one.
-- The repository is synthetic-only. Do not use real student/staff data, university credentials, live institutional integrations, or paid provider calls without the separate approvals required by governance.
-
-## Local validation
-
-Run only offline, synthetic-safe checks from the repository root:
-
-```powershell
-$env:PYTHONDONTWRITEBYTECODE = '1'
-python tasks/tools/validate_catalog.py
-python contracts/tools/validate_openapi.py
-python evals/validate_contracts.py
+pnpm --filter web exec tsc --noEmit                # type check the web app
+pnpm --filter web test                             # web unit and accessibility tests
+uv run --frozen python -B evals/runners/run_full_regression.py --ci --out .ci-evidence/regression
 ```
 
-Validation output is structural evidence only; it is not implementation, release, real-data, pilot, or production approval. Do not automatically commit, push, deploy, or change task/document approval states.
+The last command is the portable regression subset that CI runs. The **full local runtime** (PostgreSQL with pgvector, embedding and reranking model servers, ClamAV scanner, the model gateway, the RAG index) needs data and model files that are not in this repository; it is described in [`verification.md`](.claude/skills/campus247/references/verification.md) and in [`docs/`](docs/README.md). Calls to the paid language-model provider are never made by tests: they use deterministic fakes unless you configure a provider yourself.
+
+## Quality gates
+
+`main` is protected: every change arrives through a pull request and must pass six checks — task catalog validation, backend regression subset, web tests and type check, AI safety gate, release manifest gate, and a supply-chain and secret audit. Secret scanning with push protection, Dependabot, least-privilege CI tokens and SHA-pinned actions are enabled. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Documentation
+
+- [Documentation index](docs/README.md) — governance, product, architecture, AI, security, quality.
+- [Architecture and conventions](.claude/skills/campus247/references/architecture.md)
+- [RAG and AI safety rules](.claude/skills/campus247/references/rag-and-ai-safety.md)
+- [Local runtime history (archived notes)](docs/LOCAL_RUNTIME_HISTORY.md)
+
+## Project status and limitations
+
+Pre-release: there is no tagged version yet and only `main` is supported. It is developed by a single maintainer and has been run on one machine, with a cloud deployment kit prepared in `infra/cloud` but not operated in production. Answer quality and safety are measured on evaluation sets with machine-verified gold answers; behaviour with real users is **not measured**. Personal data in the demo (accounts, timetables, requests) is simulated.
+
+## Contributing, security, license
+
+- Contributions are welcome: read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+- Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+- Released under the [MIT License](LICENSE).

@@ -1,19 +1,24 @@
-## Description
-Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context.
+## Purpose
+<!-- Why is this change needed? Link the issue: "Fixes #123". -->
 
-Fixes # (issue)
+## What changed
+<!-- A short list. Every changed line should trace back to the purpose above. -->
 
-## Type of change
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] This change requires a documentation update
+## How it was verified
+<!-- Commands you ran and what they showed. Say what you did NOT run. -->
 
-## Checklist:
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
+## Risk and scope
+- [ ] Touches authentication, authorization, confirmation of write actions, or tenant/scope filtering
+- [ ] Touches RAG, prompts, grounding or refusal behaviour
+- [ ] Changes the HTTP API (contract in `contracts/` updated, contract tests run)
+- [ ] Adds a database migration (additive only, tested on a throwaway database)
+- [ ] Changes dependencies or CI
+- [ ] Changes the web UI (screenshots or a short description attached)
+
+## Checklist
+- [ ] The title follows [Conventional Commits](https://www.conventionalcommits.org/) (`feat(scope): ...`, `fix: ...`)
+- [ ] Tests were added or updated next to the changed behaviour, and the relevant ones pass
+- [ ] No secrets, tokens, `.env` files, real student/staff data or local runtime state are included
+- [ ] No protection was weakened to make a test pass (authentication, authorization, confirmation, thresholds, expected results)
+- [ ] Documentation and `CHANGELOG.md` (under *Unreleased*) are updated when behaviour changes
+- [ ] If this depends on another open pull request, the base branch is that one and the description says so

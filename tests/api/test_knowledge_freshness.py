@@ -155,6 +155,15 @@ def client(tmp_path):
                         ("officer", IdentityRole.SUPPORT_OFFICER)):
         adapter.add(token, role)
     service = FreshnessService(FakePool(FakeConn(ROWS)), SourceReviewStore(tmp_path / "r.sqlite3"), tenant="t")
+    # The ROWS are built around the fixed NOW; the router asks for the real time, so the expected counts drifted as days passed
+    # (a second source became overdue on 2026-11-23). Pin the service clock to NOW for the API tests.
+    for name in ("report", "review_states"):
+        original = getattr(service, name)
+
+        async def pinned(*args, _original=original, now=None, **kwargs):
+            return await _original(*args, now=now or NOW, **kwargs)
+
+        setattr(service, name, pinned)
     app = FastAPI()
     app.add_middleware(IdentityMiddleware, adapter=adapter)
     app.include_router(create_freshness_router(service))

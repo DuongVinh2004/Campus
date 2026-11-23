@@ -5,7 +5,7 @@ description = "Campus 24/7 — HUCE Demo backend application and services"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
-    "langgraph==1.2.12",
+    "langgraph==1.2.14",
     "langchain-core==1.6.3",
     "fastapi==0.141.1",
     "uvicorn[standard]==0.52.1",
@@ -20,7 +20,7 @@ dependencies = [
     "openai==3.24.0",
     "tiktoken==0.14.0",
     "tzdata==2026.6",
-    "pypdf==6.19.0",
+    "pypdf==6.21.4",
     "python-multipart==0.0.32",
     "pdfplumber==0.11.10",
     "cryptography==50.0.2",
@@ -68,8 +68,8 @@ where = ['services/api/src', 'packages/synthetic/src']
 namespaces = true
 
 [tool.campus247.dependency-approval]
-reference = "DIRECT-HUMAN-2026-11-16-TZDATA-001"
-candidate-lock-sha256 = "edd5ac6ca92357cc9938e219a108cca24858aa7e3d4fc86e47adcf3265dad452"
+reference = "DIRECT-HUMAN-2026-11-21-SECURITY-UPDATES-001"
+candidate-lock-sha256 = "beb290369b0e1397ef564abb953aa7b9907c3ec8bbd657855617bc8a832b51ce"
 review = "tests/unit/dependency_resolution/dependency-review.json"
 
 
