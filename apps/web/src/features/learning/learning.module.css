@@ -215,3 +215,8 @@ html.dark .badgeMuted { background:#2a1e17; color:#ffb27a; }
 .readerMain .alert { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem .75rem; padding:.5rem .75rem; font-size:.875rem; }
 .readerMain .alert p { margin:0; }
 .workspace .readerMain .alert button { min-height:32px; padding:.25rem .7rem; font-size:.8125rem; }
+
+/* Form submit buttons read as the main action of their form. */
+.workspace form button:not([type=button]):not(.iconBtnReset) { background:var(--color-primary); border-color:var(--color-primary); color:var(--color-on-primary); font-weight:600; }
+.workspace form button:not([type=button]):hover:not(:disabled) { background:var(--color-primary-hover); border-color:var(--color-primary-hover); }
+.workspace form .campus-icon-btn[data-variant=outline] { background:var(--surface-card); border-color:var(--color-border-strong); color:var(--text-primary); }

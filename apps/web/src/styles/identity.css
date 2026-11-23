@@ -133,3 +133,23 @@ html [data-campus-ui] .campus-chat-welcome button.campus-prompt-chip:hover { bor
 
 /* The "Đăng nhập" link in the availability banner is a button-sized target, not a hairline link. */
 .knowledge-availability-link { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 10px; }
+
+/* Icon buttons: quiet squares for secondary actions (edit, delete, refresh, close, copy, share, reorder). */
+html [data-campus-ui] button.campus-icon-btn, html button.campus-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
+  width: 36px; min-width: 36px; height: 36px; min-height: 36px; padding: 0; border: 1px solid transparent; border-radius: 10px;
+  background: transparent; color: var(--text-secondary); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+}
+html [data-campus-ui] button.campus-icon-btn[data-labelled], html button.campus-icon-btn[data-labelled] { width: auto; padding: 0 12px; }
+html [data-campus-ui] button.campus-icon-btn[data-variant=outline], html button.campus-icon-btn[data-variant=outline] { border-color: var(--color-border-strong); background: var(--surface-card); color: var(--text-primary); }
+html [data-campus-ui] button.campus-icon-btn[data-variant=primary], html button.campus-icon-btn[data-variant=primary] { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); font-weight: 600; }
+html [data-campus-ui] button.campus-icon-btn:hover:not(:disabled), html button.campus-icon-btn:hover:not(:disabled) { background: var(--color-primary-light); color: var(--brand-ink); }
+html [data-campus-ui] button.campus-icon-btn[data-variant=primary]:hover:not(:disabled), html button.campus-icon-btn[data-variant=primary]:hover:not(:disabled) { background: var(--color-primary-hover); color: var(--color-on-primary); }
+html [data-campus-ui] button.campus-icon-btn[data-variant=danger]:hover:not(:disabled), html button.campus-icon-btn[data-variant=danger]:hover:not(:disabled) { background: #fef2f2; color: #b91c1c; }
+html.dark button.campus-icon-btn[data-variant=danger]:hover:not(:disabled) { background: #2a1517; color: #fca5a5; }
+html [data-campus-ui] button.campus-icon-btn:disabled, html button.campus-icon-btn:disabled { opacity: .45; cursor: not-allowed; }
+html [data-campus-ui] button.campus-icon-btn:focus-visible, html button.campus-icon-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.campus-icon-btn-glyph { display: inline-grid; place-items: center; line-height: 0; }
+.campus-icon-btn-label { line-height: 1; }
+.campus-icon-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }

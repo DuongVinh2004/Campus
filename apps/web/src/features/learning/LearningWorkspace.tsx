@@ -2,8 +2,9 @@
 
 import { useT } from "../../lib/i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { IconButton } from "../../components/shared/IconButton";
 import Link from "next/link";
-import { BookOpen, Link2, X } from "lucide-react";
+import { BookOpen, Link2, X, ArrowUp, ArrowDown, RefreshCw } from "lucide-react";
 import { AppShell, type Role } from "../../components/AppShell";
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { LearningGateway, LearningApiError, type LearningCapabilities, type LearningExitTicket, type LearningMaterial, type LearningOcrAnchor, type LearningOffering, type LearningPreview, type LearningReaderMetadata, type LearningSession, type LearningVersionChangeSet } from "../../lib/data/api/learning-gateway";
@@ -592,12 +593,12 @@ export function LearningWorkspace() {
   return <><LearningSessionNotice state={session.state} onCheck={() => void session.check()} />
     <PreservedActivity mode={session.state === "ready" ? "visible" : "hidden"}>
     <AppShell activeNav="learning" userRole={role}><div className={styles.workspace}>
-    <header className={styles.heading}><div><h1>{t("lwx.18")}</h1><p className={styles.muted}>{t("lwx.19")}</p></div><button disabled={busy || loading} onClick={() => {
+    <header className={styles.heading}><div><h1>{t("lwx.18")}</h1><p className={styles.muted}>{t("lwx.19")}</p></div><IconButton label={t("lwx.21")} variant="outline" icon={<RefreshCw size={17} />} disabled={busy || loading} onClick={() => {
       if (!capabilities || capabilities.enabled === false || capabilities.available === false) {
         setError(""); setLoading(true); setInitializationAttempt(value => value + 1); return;
       }
       void run(async () => { setOfferings(await gateway.offerings(admin)); if (sessionId) await reloadMaterials(); setNotice(t("lwx.20")); });
-    }}>{t("lwx.21")}</button></header>
+    }} /></header>
     {error && <div role="alert" className={`${styles.alert} ${styles.error}`}>{error} {role==="guest"&&<Link href={`/login?redirect=${encodeURIComponent(loginTarget)}`}>{t("lwx.22")}</Link>}</div>}
     {notice && <p role="status" className={styles.alert}>{notice}</p>}
     {busy&&<p role="status">{t("lwx.23")}</p>}
@@ -710,7 +711,7 @@ export function LearningWorkspace() {
               }
             }}>{(values,change)=><>
             <label>Tiêu đề buổi<input name="title" value={values.title} onChange={event=>change("title",event.target.value)} required/></label><label>Mô tả buổi<textarea name="description" value={values.description} onChange={event=>change("description",event.target.value)}/></label><label>Thời gian dự kiến<input type="datetime-local" name="starts_at" aria-describedby="learning-class-timezone" value={values.starts_at} onChange={event=>change("starts_at",event.target.value)}/></label><button>Xem trước cập nhật</button>
-          </>}</LearningMetadataForm><div className={styles.actions}><button disabled={busy||sessions[0]?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,-1))}>Đưa buổi lên</button><button disabled={busy||sessions.at(-1)?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,1))}>Đưa buổi xuống</button></div>
+          </>}</LearningMetadataForm><div className={styles.actions}><IconButton label="Đưa buổi lên" variant="outline" icon={<ArrowUp size={16} />} disabled={busy||sessions[0]?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,-1))} /><IconButton label="Đưa buổi xuống" variant="outline" icon={<ArrowDown size={16} />} disabled={busy||sessions.at(-1)?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,1))} /></div>
         </details>}
         {manageable&&sessionId&&<details onToggle={event=>{if(event.currentTarget.open)void run(async()=>{const lists=await Promise.all(sessions.map(item=>gateway.materials(item.id)));const unique=new Map(lists.flat().map(item=>[item.id,item]));setLinkCandidates([...unique.values()].filter(item=>!materials.some(current=>current.id===item.id)));});}}><summary>Dùng lại bài giảng của buổi khác</summary><form className={styles.form} onSubmit={event=>{event.preventDefault();const id=formValue(event.currentTarget,"material_id");void run(async()=>{await reviewedWrite(`/sessions/${sessionId}/material-links`,{material_ids:[...materials.map(item=>item.id),id]},"material_links","Liên kết bài giảng vào buổi này","PUT");await reloadMaterials();});}}><label>Tài liệu trong cùng lớp<select aria-label="Tài liệu trong cùng lớp" name="material_id" required><option value="">Chọn tài liệu</option>{linkCandidates.map(item=><option key={item.id} value={item.id}>{item.title}</option>)}</select></label><button disabled={busy||!linkCandidates.length}>Thêm liên kết</button></form></details>}
         {sessionId && !materials.length && <p>{t("lwx.40")}</p>}
@@ -759,7 +760,7 @@ export function LearningWorkspace() {
                 if(currentWorkspace.current.actorId===actorId&&currentWorkspace.current.sessionId===sessionId)setMaterials(rows);
               }
             }}>{(values,change)=><><label>Tiêu đề<input name="title" value={values.title} onChange={event=>change("title",event.target.value)} required/></label><label>Mô tả<textarea name="description" value={values.description} onChange={event=>change("description",event.target.value)}/></label><label>Hiển thị<select aria-label="Hiển thị" name="visibility" value={values.visibility} onChange={event=>change("visibility",event.target.value)}><option value="VISIBLE">Hiển thị trong lớp</option><option value="HIDDEN">Ẩn với sinh viên</option></select></label><button>Xem trước thay đổi</button></>}</LearningMetadataForm></details>}
-          {manageable&&<div className={styles.actions}><button disabled={busy||materials[0]?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,-1))}>Đưa bài lên</button><button disabled={busy||materials.at(-1)?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,1))}>Đưa bài xuống</button></div>}
+          {manageable&&<div className={styles.actions}><IconButton label="Đưa bài lên" variant="outline" icon={<ArrowUp size={16} />} disabled={busy||materials[0]?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,-1))} /><IconButton label="Đưa bài xuống" variant="outline" icon={<ArrowDown size={16} />} disabled={busy||materials.at(-1)?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,1))} /></div>}
           {manageable && <details><summary>{t("lwx.55")}</summary><LearningUploadForm actorId={actorId} draftId={`version-upload:${item.id}`} existing accept={uploadAccept} pptxEnabled={pptxEnabled} disabled={busy}
             maxBytes={capabilities?.max_file_bytes||capabilities?.limits?.max_file_bytes||50*1024*1024} onUpload={(draft,file,signal,onIntent)=>upload(draft,file,signal,onIntent,item.id)} onAccepted={acceptedUpload}
             onCancelIntent={id=>gateway.write(`/upload-intents/${id}/abort`,{})}/></details>}
