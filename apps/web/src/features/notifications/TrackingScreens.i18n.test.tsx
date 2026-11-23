@@ -21,8 +21,8 @@ describe("tracking and memory screens in English", () => {
     expect(screen.getByRole("link", { name: "Sign in" })).toBeInTheDocument();
   });
 
-  it("personal memory asks for a verified session in English", () => {
+  it("personal memory says in English that the feature is off when no assistant runtime is mounted", () => {
     render(<LanguageProvider><MemoryCenter /></LanguageProvider>);
-    expect(screen.getByText("Your session and role must be verified to open memory.")).toBeInTheDocument();
+    expect(screen.getByText("Assistant memory is not enabled in this build.")).toBeInTheDocument();
   });
 });
