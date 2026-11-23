@@ -33,6 +33,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   RefreshCw,
+  LogOut,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
@@ -172,6 +173,18 @@ export function AppShell({
     update(); viewport.addEventListener("resize", update);
     return () => viewport.removeEventListener("resize", update);
   }, [chat]);
+
+  const [signingOut, setSigningOut] = useState(false);
+  const signOut = useCallback(async () => {
+    setSigningOut(true);
+    try {
+      // The server revokes the session and clears the HttpOnly cookie; the browser cannot do either itself.
+      await fetch(`${CAMPUS_API_BASE_URL}/v1/auth/logout`, { method: "POST", credentials: "include", cache: "no-store" });
+    } catch {
+      // Leave anyway: the login page below makes the state visible and the session still expires on its own.
+    }
+    window.location.assign("/login");
+  }, []);
 
   const operational = process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true";
   const unreadCount = useUnreadNotifications(operational && !!localActor);
@@ -412,6 +425,11 @@ export function AppShell({
               <strong>HUCE</strong>
               <small>{t("shellx.39")}</small>
             </span>
+            {operational && localActor && (
+              <button type="button" className="campus-icon-button" aria-label="Đăng xuất" title="Đăng xuất" disabled={signingOut} onClick={() => void signOut()}>
+                <LogOut size={19} aria-hidden="true" />
+              </button>
+            )}
           </div>
         </header>}
 
