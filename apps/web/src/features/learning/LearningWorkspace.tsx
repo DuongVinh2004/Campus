@@ -3,7 +3,7 @@
 import { useT } from "../../lib/i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Link2, X } from "lucide-react";
 import { AppShell, type Role } from "../../components/AppShell";
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { LearningGateway, LearningApiError, type LearningCapabilities, type LearningExitTicket, type LearningMaterial, type LearningOcrAnchor, type LearningOffering, type LearningPreview, type LearningReaderMetadata, type LearningSession, type LearningVersionChangeSet } from "../../lib/data/api/learning-gateway";
@@ -145,6 +145,8 @@ export function LearningWorkspace() {
     };
   },[]);
   const readerId = reader?.version_id || reader?.id;
+  // Opening a document brings the reader into view, like opening a file in an app.
+  useEffect(() => { if (readerId) document.getElementById("learning-reader")?.scrollIntoView?.({ block: "start", behavior: "smooth" }); }, [readerId]);
   const syncIssue = readerId ? syncIssues[readerId] : undefined;
   const offering = offerings.find(item => item.id === offeringId);
   const activeMembers=catalogScope===JSON.stringify([actorId,offeringId])?catalogs.members:[];
@@ -792,11 +794,18 @@ export function LearningWorkspace() {
       </section></div>}
       {(reader || exitTicketId) && <div className={reader && exitTicketId ? styles.exitReaderColumns : undefined}>
       {reader && <section id="learning-reader" tabIndex={-1} className={styles.reader} aria-label={t("lwx.46")}>
-        <div className={styles.row}><h2>{reader.title}</h2><span>Phiên bản {reader.version_no}</span><button onClick={()=>void run(async()=>{await flushReaderState();setReader(null);})}>{t("lwx.47")}</button></div>
-        {readerId && reader.capabilities.page_feedback && actorId && <StudentPageFeedback
-          key={`${actorId}:${readerId}:${readerGeneration}`} actorId={actorId} versionId={readerId}
-          versionNumber={reader.version_no} pageNo={readerPage} sourceSessionId={readerSessionId} timeZone={timeZone}
-        />}
+        <header className={styles.readerHeader}>
+          <h2>{reader.title}</h2><span className={styles.badge}>Phiên bản {reader.version_no}</span>
+          <span className={styles.spacer} />
+          <button type="button" className={styles.iconButton} aria-label={t("lwx.49")} title={t("lwx.49")} disabled={busy} onClick={()=>void run(async()=>{
+            const note=annotations.find(item=>item.id===anchorId&&item.version_id===readerId&&item.page_no===readerPage);
+            const url=new URL(linkPath({version_id:readerId!,page_no:readerPage,anchor_id:note?.id,session_id:readerSessionId}),window.location.origin);
+            await navigator.clipboard.writeText(url.href);setNotice(t("lwx.48"));
+          })}><Link2 size={18} aria-hidden="true" /></button>
+          <button type="button" className={styles.iconButton} aria-label={t("lwx.47")} title={t("lwx.47")} onClick={()=>void run(async()=>{await flushReaderState();setReader(null);})}><X size={18} aria-hidden="true" /></button>
+        </header>
+        <div className={styles.readerLayout}>
+        <div className={styles.readerMain}>
         {readerId && reader.capabilities.version_changes && reader.publication_state === "PUBLISHED" && actorId && <VersionChangeBanner
           key={`${actorId}:${readerId}:${readerGeneration}`} actorId={actorId} versionId={readerId}
           onOpen={(versionId, page) => void run(() => openVersion(versionId, page, undefined, readerSessionId))}
@@ -804,18 +813,11 @@ export function LearningWorkspace() {
         {exitEnabled && exitReaderSource && exitTickets.map(ticket => ticket.state !== "SOURCE_UNAVAILABLE"
           && ticket.state !== "DRAFT" && ticket.version_id === readerId && ticket.page_no === readerPage
           && <button type="button" key={ticket.id} onClick={() => selectExitTicket(ticket.id)}>Mở phiếu ra lớp · {ticket.question}</button>)}
-        <button disabled={busy} onClick={()=>void run(async()=>{
-          const note=annotations.find(item=>item.id===anchorId&&item.version_id===readerId&&item.page_no===readerPage);
-          const url=new URL(linkPath({version_id:readerId!,page_no:readerPage,anchor_id:note?.id,session_id:readerSessionId}),window.location.origin);
-          await navigator.clipboard.writeText(url.href);setNotice(t("lwx.48"));
-        })}>{t("lwx.49")}</button>
         {reader.publication_state==="PUBLISHED"&&reader.current_published_version_id&&reader.current_published_version_id!==readerId&&
           <div className={styles.alert}><p role="status">{t("lwx.50")}</p><button disabled={busy} onClick={()=>void run(()=>openVersion(reader.current_published_version_id!,undefined,undefined,readerSessionId))}>Mở bản hiện hành</button></div>}
         {syncIssue === "conflict" && <div role="alert" className={styles.alert}><p>{t("lwx.51")}</p><button disabled={busy} onClick={()=>void run(()=>resolveReaderConflict(false))}>Dùng vị trí đã đồng bộ</button><button disabled={busy} onClick={()=>void run(()=>resolveReaderConflict(true))}>Giữ vị trí trên thiết bị này</button></div>}
         {syncIssue === "retry" && <div role="status" className={styles.alert}>{t("lwx.52")}<button disabled={busy} onClick={() => void flushReaderState()}>{t("lwx.53")}</button></div>}
         <LearningPresentation key={`${reader.offering_id||offeringId}:${reader.version_id||reader.id}`} offeringId={reader.offering_id||offeringId} versionId={reader.version_id||reader.id} actorId={actorId} canManage={reader.capabilities.manage} pageNo={readerPage} onPresentation={setPresentation}/>
-        {readerId && reader.capabilities.idea_cards && <button type="button"
-          onClick={() => beginIdea({ version_id: readerId, page_no: readerPage, anchor: { kind: "PAGE" } })}>{t("lwx.54")}</button>}
         {actorId && readerId && (reader.capabilities.accessible_text || reader.capabilities.manage_accessible_text)
           ? <AccessibleText key={`ocr:${actorId}:${readerId}`} actorId={actorId} versionId={readerId} pageCount={reader.page_count} sourcePage={readerPage}
             canRead={!!reader.capabilities.accessible_text} canManage={!!reader.capabilities.manage_accessible_text}
@@ -823,8 +825,18 @@ export function LearningWorkspace() {
               {pdfReader}
             </AccessibleText>
           : pdfReader}
+        </div>
+        <aside className={styles.readerSide} aria-label="Ghi chú và hỏi đáp">
+        {readerId && reader.capabilities.page_feedback && actorId && <StudentPageFeedback
+          key={`${actorId}:${readerId}:${readerGeneration}`} actorId={actorId} versionId={readerId}
+          versionNumber={reader.version_no} pageNo={readerPage} sourceSessionId={readerSessionId} timeZone={timeZone}
+        />}
+        {readerId && reader.capabilities.idea_cards && <button type="button"
+          onClick={() => beginIdea({ version_id: readerId, page_no: readerPage, anchor: { kind: "PAGE" } })}>{t("lwx.54")}</button>}
         <LearningDiscussion key={reader.version_id||reader.id} versionId={reader.version_id||reader.id} renditionId={reader.rendition_id} selection={selection} canManage={reader.capabilities.manage} canShareNotes={reader.publication_state === "PUBLISHED"} actorId={actorId} onSource={page=>void run(async()=>{await openVersion(reader.version_id||reader.id,page,undefined,readerSessionId);document.getElementById("learning-reader")?.focus();})} onAnnotationsChange={setAnnotations}/>
         <LearningExplanation actorId={actorId} versionId={reader.version_id||reader.id} selection={selection} available={reader.capabilities.explain===true} onSource={(id,page)=>void run(()=>openVersion(id,page))}/>
+        </aside>
+        </div>
       </section>}
       {exitTicketId && <ExitTicketDetail key={`${actorId}:${exitTicketId}`} actorId={actorId} ticketId={exitTicketId}
         staff={exitStaff} canManage={manageable} materials={materials} instructions={instructions}

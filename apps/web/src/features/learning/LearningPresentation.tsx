@@ -102,7 +102,7 @@ export function LearningPresentation({offeringId,versionId,actorId,canManage,pag
   },[pageNo,actorId]);
   async function start(){setBusy(true);setError("");try{const session=await api.write<Session>(`/offerings/${offeringId}/presentations`,{version_id:versionId});setCurrent(session);setSessions(previous=>[session,...previous.filter(item=>item.id!==session.id)]);}catch(e){setError(e instanceof Error?e.message:"Chưa bắt đầu được phiên.");}finally{setBusy(false);}}
   async function end(){if(!current)return;setBusy(true);try{const ended=await api.write<Session>(`/presentations/${current.id}/end`,{});currentRef.current=ended;setCurrent(ended);setSessions(previous=>previous.filter(item=>item.id!==current.id));}catch(e){setError(e instanceof Error?e.message:"Chưa kết thúc được phiên.");}finally{setBusy(false);}}
-  return <section className={`${styles.panel} ${styles.stack}`} aria-label="Theo dõi trang giảng viên"><h3>Trang giảng viên đang trình bày</h3>{error&&<p role="alert">{error}</p>}<div className={styles.row}>
+  return <section className={`${styles.panel} ${styles.strip}`} aria-label="Theo dõi trang giảng viên"><h3>Trang giảng viên đang trình bày</h3>{error&&<p role="alert">{error}</p>}<div className={styles.row}>
     {canManage&&<button disabled={busy} onClick={()=>void start()}>Bắt đầu trình bày tài liệu này</button>}
     <button onClick={()=>{setError("");void reload();}}>Tải lại phiên trình bày</button>
     {sessions.map((session,index)=><button key={session.id} aria-pressed={session.id===current?.id} onClick={()=>{setError("");setCurrent(session);}}>Chọn phiên trình bày {index+1} · trang {session.page_no}</button>)}
