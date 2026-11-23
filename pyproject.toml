@@ -34,7 +34,7 @@ dependencies = [
     "opentelemetry-instrumentation-httpx==0.66b0",
     "opentelemetry-instrumentation-sqlalchemy==0.66b0",
     "opentelemetry-instrumentation-redis==0.66b0",
-    "langfuse==4.17.0",
+    "langfuse==5.2.0",
     "numpy==2.5.3",
     "scikit-learn==1.9.1",
 ]
