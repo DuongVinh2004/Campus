@@ -279,7 +279,7 @@ async def components(*, rehearsal=None, learning_rehearsal=None):
         init=learning_rehearsal.verify_connection if learning_rehearsal else None)
     async with pool.acquire() as conn:
         revision = await conn.fetchval("SELECT version_num FROM alembic_version")
-        accepted_revisions = {"0025", "0026", "0027", "0028", "0029", "0030", "0031"} if learning_rehearsal else ({"0020", "0021", "0022", "0023", "0024"} if rehearsal else {"0017", "0018", "0022", "0023", "0024"})
+        accepted_revisions = {"0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032"} if learning_rehearsal else ({"0020", "0021", "0022", "0023", "0024"} if rehearsal else {"0017", "0018", "0022", "0023", "0024"})
         if revision not in accepted_revisions:
             raise ValueError("Apply additive platform migrations before running services")
         if rehearsal and revision != json.loads(Path(rehearsal).read_text(encoding="utf-8"))["revision"]:
@@ -533,13 +533,18 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.include_router(create_freshness_router(freshness_service))
 
     # Which sources are behind answers people mark "not helpful": counts per source only, no question and no person.
-    from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_quality_recording
+    from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_gap_recording, attach_quality_recording
     from campus247.presentation.knowledge_quality import create_quality_router
     quality_store = AnswerQualityStore(STATE / "answer-quality.sqlite3")
     feedback = getattr(app.state, "feedback_service", None)  # absent in the rehearsal/learning-only apps: nothing to record then
     if feedback is not None:
         attach_quality_recording(feedback, quality_store)
+    attach_gap_recording(quality_store)  # refusals counted under the sources they pointed at; no question, answer or person
     app.include_router(create_quality_router(quality_store, freshness_service))
+    # P2 (owner approved the consent text 2026-11-21): a student's own report of missing information, redacted, kept 90 days.
+    from campus247.application.knowledge.gap_reports import GapReportStore
+    from campus247.presentation.knowledge_quality import create_gap_report_router
+    app.include_router(create_gap_report_router(GapReportStore(STATE / "gap-reports.sqlite3")))
 
     # Sign in with the university account: only when the owner supplied a provider configuration (CAMPUS247_OIDC_CONFIG).
     if os.environ.get("CAMPUS247_OIDC_CONFIG"):
@@ -610,9 +615,25 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 async def start_jobs():
                     jobs = [asyncio.create_task(platform.schedules.serve())]
                     jobs.append(asyncio.create_task(run_reminders(ops_service.store, student_subjects)))
+                    if learning_service is not None:
+                        from campus247.application.campus_ops.reminder_job import run_exit_ticket_reminders
+                        jobs.append(asyncio.create_task(run_exit_ticket_reminders(learning_service, ops_service.store)))
                     from campus247.application.knowledge.freshness_reminders import run_freshness_reminders
                     jobs.append(asyncio.create_task(run_freshness_reminders(
                         freshness_service, ops_service.store, lambda: [owner_adapter.directory()["owner_id"]])))
+                    from campus247.application.knowledge.release_check import ReleaseWatch, run_release_watch
+                    from campus247.observability.ops_metrics import OPS as release_check_ops
+
+                    async def start_release_check():
+                        # The same script the nightly timer runs, tagged as release-triggered; it skips itself when the models are down.
+                        check = await asyncio.create_subprocess_exec(sys.executable, "-B", str(ROOT / "evals/runners/nightly_retrieval.py"), "run", "--trigger", "release",
+                            cwd=str(ROOT), stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
+                        asyncio.create_task(check.wait())
+
+                    jobs.append(asyncio.create_task(run_release_watch(ReleaseWatch(
+                        lambda: (runtime.current or {}).get("release_id"), start_release_check,
+                        lambda: release_check_ops.gauges.get("in_flight", 0) > 3))))
+
                     from campus247.observability.alert_job import run_alerts
                     from campus247.observability.alert_notifiers import build_notifier
                     from campus247.observability.alerts import AlertManager

@@ -88,6 +88,21 @@ def deliver(store, candidates: list[Candidate], *, now: datetime) -> int:
     return sent
 
 
+def exit_ticket_candidates(rows: list[dict[str, Any]]) -> list[Candidate]:
+    """One candidate per student who still owes an answer; `rows` come from learning.exit_reminders.open_exit_ticket_deadlines."""
+    candidates = []
+    for row in rows:
+        def describe(left: timedelta, row: dict[str, Any] = row) -> tuple[str, str]:
+            local = row["closes"].astimezone(VN)
+            return (f"Phiếu ra lớp sắp đóng: {row['session_title']}",
+                    f"Còn {time_left_text(left)} để nộp. Đóng lúc {local:%H:%M} ngày {local:%d/%m/%Y}.")
+
+        for student in row["students"]:
+            candidates.append(Candidate(item_key=f"exit_ticket:{row['ticket_id']}", recipient=student, kind="REMINDER", deadline=row["closes"],
+                                        describe=describe, link="/learning", pref_kind="exit_tickets"))
+    return candidates
+
+
 def exam_candidates(store, resolve_recipient: Callable[[str], str | None], *, now: datetime,
                     horizon: timedelta = timedelta(hours=26)) -> list[Candidate]:
     """Upcoming exams in the schedule table. `resolve_recipient` maps a schedule owner key (a student code) to a subject id."""

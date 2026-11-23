@@ -1,5 +1,6 @@
 "use client";
 
+import { useT, type MessageKey } from "@/lib/i18n";
 import { useCallback, useEffect, useState } from "react";
 import { fieldLabel } from "@/lib/ticket-labels";
 import {
@@ -14,7 +15,6 @@ import {
 import {
   problemMessage,
   ticketsApi,
-  TICKET_STATUS_LABEL,
   type Ticket,
   type TicketDetail,
   type TicketStatus,
@@ -41,8 +41,18 @@ function formatDate(iso: string | null | undefined): string {
   }
 }
 
+const STATUS_KEY: Record<string, MessageKey> = {
+  SUBMITTED: "ticket.status.SUBMITTED",
+  IN_REVIEW: "ticket.status.IN_REVIEW",
+  NEED_INFO: "ticket.status.NEED_INFO",
+  RESOLVED: "ticket.status.RESOLVED",
+  REJECTED: "ticket.status.REJECTED",
+  CANCELLED: "ticket.status.CANCELLED",
+};
+
 function StatusBadge({ status }: { status: TicketStatus }) {
-  const label = TICKET_STATUS_LABEL[status] || status;
+  const t = useT();
+  const label = STATUS_KEY[status] ? t(STATUS_KEY[status]) : status;
 
   let icon = <Send className="h-4 w-4 shrink-0" aria-hidden="true" />;
   if (status === "IN_REVIEW") {
@@ -69,6 +79,7 @@ export function SubmittedTickets({
   initialId = null,
   refreshToken = 0,
 }: SubmittedTicketsProps) {
+  const t = useT();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loadingList, setLoadingList] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
@@ -177,14 +188,14 @@ export function SubmittedTickets({
   return (
     <div className="campus-page min-w-0 space-y-6">
       <header className="campus-page-heading">
-        <div data-eyebrow="Theo dõi hồ sơ">
-          <h1 className="text-2xl font-semibold">Hồ sơ đã gửi</h1>
-          <p>Theo dõi tiến trình xử lý và phản hồi yêu cầu một cửa.</p>
+        <div data-eyebrow={t("stx.1")}>
+          <h1 className="text-2xl font-semibold">{t("stx.2")}</h1>
+          <p>{t("stx.3")}</p>
         </div>
       </header>
 
       <section className="campus-panel border-[var(--border-color)] bg-[var(--surface-subtle)] p-4 text-sm text-[var(--text-secondary)]">
-        Hồ sơ được xử lý trong hệ thống Một cửa nội bộ của Campus 24/7; chưa kết nối hệ thống tiếp nhận của HUCE.
+        {t("stx.4")}
       </section>
 
       {loadingList && (
@@ -192,7 +203,7 @@ export function SubmittedTickets({
           role="status"
           className="campus-panel p-8 text-center text-sm text-[var(--text-secondary)]"
         >
-          Đang tải…
+          {t("stx.5")}
         </div>
       )}
 
@@ -204,7 +215,7 @@ export function SubmittedTickets({
             onClick={fetchTickets}
             className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-5 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           >
-            Thử lại
+            {t("stx.6")}
           </button>
         </div>
       )}
@@ -213,9 +224,9 @@ export function SubmittedTickets({
         <div className="campus-empty-state">
           <FileText className="h-10 w-10 text-[var(--color-primary)]" aria-hidden="true" />
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            Bạn chưa gửi hồ sơ nào
+            {t("stx.7")}
           </h2>
-          <p>Soạn nháp ở &apos;Dịch vụ học vụ&apos; rồi bấm &apos;Gửi hồ sơ&apos;.</p>
+          <p>{t("stx.8")}</p>
         </div>
       )}
 
@@ -225,19 +236,19 @@ export function SubmittedTickets({
           <section
             data-testid="submitted-tickets"
             className="space-y-3 lg:col-span-5"
-            aria-label="Danh sách hồ sơ đã gửi"
+            aria-label={t("stx.9")}
           >
-            {tickets.map((t) => {
-              const isSelected = t.id === selectedId;
+            {tickets.map((row) => {
+              const isSelected = row.id === selectedId;
               return (
                 <div
-                  key={t.id}
-                  data-testid={`submitted-ticket-${t.id}`}
-                  onClick={() => setSelectedId(t.id)}
+                  key={row.id}
+                  data-testid={`submitted-ticket-${row.id}`}
+                  onClick={() => setSelectedId(row.id)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      setSelectedId(t.id);
+                      setSelectedId(row.id);
                     }
                   }}
                   tabIndex={0}
@@ -251,27 +262,27 @@ export function SubmittedTickets({
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span className="font-mono text-xs font-semibold text-[var(--color-primary)]">
-                      {t.code}
+                      {row.code}
                     </span>
-                    <StatusBadge status={t.status} />
+                    <StatusBadge status={row.status} />
                   </div>
                   <h2 className="mt-2 text-base font-semibold text-[var(--text-primary)] break-words">
-                    {t.title}
+                    {row.title}
                   </h2>
                   <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                    {t.service_label}
+                    {row.service_label}
                   </p>
-                  {t.assignee_display && (
+                  {row.assignee_display && (
                     <p className="mt-2 text-xs text-[var(--text-secondary)]">
-                      Cán bộ phụ trách:{" "}
+                      {t("stx.10")}{" "}
                       <span className="font-medium text-[var(--text-primary)]">
-                        {t.assignee_display}
+                        {row.assignee_display}
                       </span>
                     </p>
                   )}
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border-color)] pt-2 text-xs text-[var(--text-secondary)]">
-                    <span>Gửi: {formatDate(t.created_at)}</span>
-                    <span>Cập nhật: {formatDate(t.updated_at)}</span>
+                    <span>{t("stx.36")} {formatDate(row.created_at)}</span>
+                    <span>{t("stx.13")} {formatDate(row.updated_at)}</span>
                   </div>
                 </div>
               );
@@ -282,7 +293,7 @@ export function SubmittedTickets({
           <section className="lg:col-span-7">
             {!selectedId ? (
               <div className="campus-panel p-8 text-center text-sm text-[var(--text-secondary)]">
-                Chọn một hồ sơ từ danh sách để xem chi tiết tiến trình xử lý.
+                {t("stx.11")}
               </div>
             ) : loadingDetail ? (
               <div
@@ -290,7 +301,7 @@ export function SubmittedTickets({
                 className="campus-panel p-8 text-center text-sm text-[var(--text-secondary)]"
                 role="status"
               >
-                Đang tải…
+                {t("stx.5")}
               </div>
             ) : detailError ? (
               <div
@@ -304,7 +315,7 @@ export function SubmittedTickets({
                   onClick={() => fetchDetail(selectedId)}
                   className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-5 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                 >
-                  Thử lại
+                  {t("stx.6")}
                 </button>
               </div>
             ) : detail ? (
@@ -328,20 +339,20 @@ export function SubmittedTickets({
 
                   <div className="mt-4 grid grid-cols-1 gap-2 text-xs text-[var(--text-secondary)] sm:grid-cols-2">
                     <div>
-                      Ngày gửi:{" "}
+                      {t("stx.12")}{" "}
                       <span className="font-medium text-[var(--text-primary)]">
                         {formatDate(detail.created_at)}
                       </span>
                     </div>
                     <div>
-                      Cập nhật:{" "}
+                      {t("stx.13")}{" "}
                       <span className="font-medium text-[var(--text-primary)]">
                         {formatDate(detail.updated_at)}
                       </span>
                     </div>
                     {detail.assignee_display && (
                       <div className="sm:col-span-2">
-                        Cán bộ phụ trách:{" "}
+                        {t("stx.10")}{" "}
                         <span className="font-medium text-[var(--text-primary)]">
                           {detail.assignee_display}
                         </span>
@@ -352,14 +363,14 @@ export function SubmittedTickets({
                   {detail.due_at && (
                     <div className="mt-3 flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                       <span>
-                        Hạn xử lý dự kiến:{" "}
+                        {t("stx.14")}{" "}
                         <span className="font-medium text-[var(--text-primary)]">
                           {formatDate(detail.due_at)}
                         </span>
                       </span>
                       {detail.overdue && (
                         <span className="rounded border border-[var(--border-color)] bg-[var(--surface-subtle)] px-2 py-0.5 text-xs font-semibold text-[var(--color-primary)]">
-                          Quá hạn
+                          {t("stx.15")}
                         </span>
                       )}
                     </div>
@@ -369,7 +380,7 @@ export function SubmittedTickets({
                 {/* Summary */}
                 <div>
                   <h3 className="text-sm font-semibold text-[var(--text-primary)]">
-                    Nội dung yêu cầu
+                    {t("stx.16")}
                   </h3>
                   <p className="mt-2 text-sm text-[var(--text-secondary)] whitespace-pre-wrap break-words">
                     {detail.summary}
@@ -380,7 +391,7 @@ export function SubmittedTickets({
                 {detail.fields && Object.keys(detail.fields).length > 0 && (
                   <div>
                     <h3 className="mb-2 text-sm font-semibold text-[var(--text-primary)]">
-                      Thông tin đã cung cấp
+                      {t("stx.17")}
                     </h3>
                     <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                       {Object.entries(detail.fields).map(([k, v]) => (
@@ -403,7 +414,7 @@ export function SubmittedTickets({
                 {/* Events Timeline */}
                 <div>
                   <h3 className="mb-3 text-sm font-semibold text-[var(--text-primary)]">
-                    Tiến trình xử lý
+                    {t("stx.18")}
                   </h3>
                   {(() => {
                     const publicEvents = (detail.events || []).filter(
@@ -412,14 +423,14 @@ export function SubmittedTickets({
                     if (publicEvents.length === 0) {
                       return (
                         <p className="text-sm text-[var(--text-secondary)] italic">
-                          Chưa có cập nhật tiến trình công khai.
+                          {t("stx.19")}
                         </p>
                       );
                     }
                     return (
                       <ol className="relative ml-2 space-y-4 border-l border-[var(--border-color)] pl-4">
                         {publicEvents.map((ev) => {
-                          const senderLabel = ev.is_mine ? "Bạn" : ev.actor_kind === "student" ? "Sinh viên" : ev.actor_kind === "system" ? "Hệ thống" : "Cán bộ";
+                          const senderLabel = ev.is_mine ? t("stx.20") : ev.actor_kind === "student" ? t("stx.21") : ev.actor_kind === "system" ? t("stx.22") : t("stx.23");
                           return (
                             <li key={ev.id} className="relative">
                               <div className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border border-[var(--border-color)] bg-[var(--surface-card)]" />
@@ -452,12 +463,12 @@ export function SubmittedTickets({
                       {detail.allowed_actions.includes("reply") && (
                         <form onSubmit={handleReplySubmit} className="space-y-3">
                           <h3 className="text-sm font-semibold text-[var(--text-primary)]">
-                            Phản hồi cán bộ
+                            {t("stx.24")}
                           </h3>
 
                           {detail.status === "NEED_INFO" && (
                             <div className="rounded-lg border border-[var(--border-color)] bg-[var(--color-primary-light)] p-3 text-sm font-medium text-[var(--color-primary)]">
-                              Cán bộ đang chờ bạn bổ sung thông tin
+                              {t("stx.25")}
                             </div>
                           )}
 
@@ -473,12 +484,12 @@ export function SubmittedTickets({
                             onChange={(e) => setReplyText(e.target.value)}
                             maxLength={2000}
                             rows={3}
-                            placeholder="Nhập nội dung phản hồi hoặc bổ sung thông tin (tối đa 2000 ký tự)…"
+                            placeholder={t("stx.26")}
                             className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] p-3 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
                           />
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-[var(--text-secondary)]">
-                              {replyText.length}/2000 ký tự
+                              {t("stx.37", { n: replyText.length })}
                             </span>
                             <button
                               type="submit"
@@ -490,7 +501,7 @@ export function SubmittedTickets({
                               }
                               className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 py-2 text-sm font-medium text-[var(--color-on-primary,white)] transition-opacity hover:opacity-90 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                             >
-                              {replySubmitting ? "Đang gửi…" : "Gửi phản hồi"}
+                              {replySubmitting ? t("stx.27") : t("stx.28")}
                             </button>
                           </div>
                         </form>
@@ -505,15 +516,15 @@ export function SubmittedTickets({
                               onClick={() => setCancelOpen(true)}
                               className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-5 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                             >
-                              Hủy hồ sơ
+                              {t("stx.29")}
                             </button>
                           ) : (
                             <div className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-subtle)] p-4 space-y-3">
                               <h4 className="text-sm font-semibold text-[var(--text-primary)]">
-                                Xác nhận hủy hồ sơ?
+                                {t("stx.30")}
                               </h4>
                               <p className="text-xs text-[var(--text-secondary)]">
-                                Hồ sơ sẽ ngừng xử lý sau khi xác nhận.
+                                {t("stx.31")}
                               </p>
                               {cancelError && (
                                 <div role="alert" className="text-sm text-[var(--color-primary)]">
@@ -524,7 +535,7 @@ export function SubmittedTickets({
                                 type="text"
                                 value={cancelReason}
                                 onChange={(e) => setCancelReason(e.target.value)}
-                                placeholder="Lý do hủy (tùy chọn)"
+                                placeholder={t("stx.32")}
                                 className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] p-2.5 text-sm text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
                               />
                               <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -535,7 +546,7 @@ export function SubmittedTickets({
                                   onClick={handleCancelSubmit}
                                   className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 py-2 text-sm font-medium text-[var(--color-on-primary,white)] transition-opacity hover:opacity-90 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                                 >
-                                  {cancelSubmitting ? "Đang hủy…" : "Xác nhận hủy"}
+                                  {cancelSubmitting ? t("stx.33") : t("stx.34")}
                                 </button>
                                 <button
                                   type="button"
@@ -546,7 +557,7 @@ export function SubmittedTickets({
                                   }}
                                   className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-5 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                                 >
-                                  Giữ hồ sơ
+                                  {t("stx.35")}
                                 </button>
                               </div>
                             </div>

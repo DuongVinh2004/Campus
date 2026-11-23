@@ -11,7 +11,7 @@ from campus247.infrastructure.identity.local_learning import (
     LocalLearningIdentityAdapter,
 )
 
-LEARNING_REVISIONS = ("0023", "0024", "0025", "0026", "0027", "0028", "0029", "0030", "0031")
+LEARNING_REVISIONS = ("0023", "0024", "0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032")
 
 
 def checked_learning_path(path: Path, workspace: Path) -> Path:
@@ -76,6 +76,7 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
     version_change_offerings = learning_offering_ids(config, "version_change_offerings")
     exit_ticket_offerings = learning_offering_ids(config, "exit_ticket_offerings")
     idea_card_offerings = learning_offering_ids(config, "idea_card_offerings")
+    practice_offerings = learning_offering_ids(config, "practice_offerings")
     accessible_text_offerings = learning_offering_ids(config, "accessible_text_offerings")
     ocr_paused_offerings = learning_offering_ids(config, "accessible_text_ocr_paused_offerings")
     if not set(ocr_paused_offerings).issubset(accessible_text_offerings):
@@ -96,7 +97,7 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
         for offerings, revision, feature in (
             (feedback_offerings, "0026", "Page feedback"), (version_change_offerings, "0028", "Version changes"),
             (exit_ticket_offerings, "0029", "Exit tickets"), (idea_card_offerings, "0030", "Idea cards"),
-            (accessible_text_offerings, "0031", "Accessible text"),
+            (accessible_text_offerings, "0031", "Accessible text"), (practice_offerings, "0032", "Practice questions"),
         ):
             if offerings and not schema_has(revision):
                 raise ValueError(f"{feature} requires explicitly verified schema revision {revision} or a supported successor")
@@ -104,7 +105,7 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
             postgres_pool, tenant_id=tenant_id, page_feedback_schema=schema_has("0026"),
             page_explanations_schema=schema_has("0027"), version_changes_schema=schema_has("0028"),
             exit_tickets_schema=schema_has("0029"), idea_cards_schema=schema_has("0030"),
-            accessible_text_schema=schema_has("0031"),
+            accessible_text_schema=schema_has("0031"), practice_schema=schema_has("0032"),
         )
     blob_store = LearningBlobStore(paths["blob_directory"], workspace=workspace,
         max_total_bytes=config.get('storage_quota_bytes', 10 * 1024**3))
@@ -150,7 +151,7 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
         signing_key=directory["signing_key"], scanner=scanner, directory=adapter.public_directory,
         ai_source_hashes=ai_hashes, optimize_pdf=optimize_pdf, page_feedback_offerings=feedback_offerings,
         page_explanations_available=config["storage"] == "sqlite" or schema_has("0027"),
-        version_change_offerings=version_change_offerings, exit_ticket_offerings=exit_ticket_offerings,
+        version_change_offerings=version_change_offerings, exit_ticket_offerings=exit_ticket_offerings, practice_offerings=practice_offerings,
         idea_card_offerings=idea_card_offerings, accessible_text_offerings=accessible_text_offerings,
         accessible_text_ocr_paused_offerings=ocr_paused_offerings,
         accessible_text_byte_quota=ocr_quota)

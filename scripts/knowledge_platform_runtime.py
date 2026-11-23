@@ -46,6 +46,25 @@ class EngineMismatch(RuntimeError):
     pass
 
 
+def alert_environment(env_file: Path = ROOT / ".env") -> dict[str, str]:
+    """The alert channel settings (CAMPUS247_ALERT_*) from .env, for the API process only.
+
+    Other keys in .env are not passed on. The values are file paths and ids; the Telegram token itself lives in the file the
+    path points to. A missing or unreadable .env gives an empty result, so the runtime starts with only the log channel.
+    """
+    try:
+        lines = env_file.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return {}
+    values: dict[str, str] = {}
+    for line in lines:
+        key, separator, value = line.partition("=")
+        key = key.strip()
+        if separator and key.startswith("CAMPUS247_ALERT_") and not line.lstrip().startswith("#"):
+            values[key] = value.strip().strip('"').strip("'")
+    return values
+
+
 def listening(port):
     with socket.socket() as probe:
         probe.settimeout(1)
@@ -390,6 +409,7 @@ def start(frontend=FRONTEND, *, defer_worker=False, engine="v2", rag_v2_index=RA
                         environment.update(CAMPUS247_RAG_V2_INDEX=str(index))
                     if kind == "api":
                         environment.update(CAMPUS247_PROFILE=profile.name)
+                        environment.update({k: v for k, v in alert_environment().items() if k not in os.environ})
                         if scanner_wanted() and "CAMPUS_LEARNING_CONFIG" not in environment:
                             environment.update(CAMPUS_LEARNING_CONFIG=str(learning_config_path()))
                         environment.update(CAMPUS247_RAG_ENGINE=engine, CAMPUS247_RAG_V2_INDEX=str(index),

@@ -18,6 +18,7 @@ OPEN_TIME, CLOSE_TIME = time(7, 0), time(21, 0)
 MIN_MINUTES, MAX_MINUTES, STEP_MINUTES = 30, 240, 15
 HORIZON_DAYS = 14
 MAX_ACTIVE_BOOKINGS = 3
+MAX_BATCH_ROOMS = 60
 PREVIEW_TTL = timedelta(minutes=10)
 STAFF_ROLES = {IdentityRole.SUPPORT_OFFICER, IdentityRole.SYSTEM_ADMIN}
 ADMIN_ROLES = {IdentityRole.SYSTEM_ADMIN, IdentityRole.KNOWLEDGE_ADMIN}
@@ -145,7 +146,43 @@ class CampusOpsService:
         return {"room": self._room_view(room), "date": day, "open": "07:00", "close": "21:00",
                 "busy": self._busy(room, start, end), "limits": self.booking_limits()}
 
-    def _validate_slot(self, room: dict[str, Any], day: str, start: str, end: str, attendees: int) -> tuple[datetime, datetime]:
+    def availability_many(self, room_ids: list[str], day: str) -> dict[str, Any]:
+        """Same answer as `availability` for each room, in a constant number of queries (one page load asks for ~34 rooms)."""
+        try:
+            d = date.fromisoformat(day)
+        except ValueError:
+            raise OpsError(422, "INVALID_DATE", "Ngày phải có dạng YYYY-MM-DD.") from None
+        if (not room_ids or len(room_ids) > MAX_BATCH_ROOMS or len(set(room_ids)) != len(room_ids)
+                or any(not isinstance(i, str) or not i or len(i) > 64 for i in room_ids)):
+            raise OpsError(422, "INVALID_ROOM_IDS", f"Cần từ 1 đến {MAX_BATCH_ROOMS} mã phòng, không trùng nhau.")
+        start = datetime.combine(d, OPEN_TIME, tzinfo=ICT).astimezone(timezone.utc)
+        end = datetime.combine(d, CLOSE_TIME, tzinfo=ICT).astimezone(timezone.utc)
+        marks = ",".join("?" * len(room_ids))
+        rooms = {r["id"]: r for r in self.store.query(f"SELECT * FROM ops_rooms WHERE id IN ({marks})", room_ids)}
+        found = [rooms[i] for i in room_ids if i in rooms]
+        busy: dict[str, list[dict[str, Any]]] = {r["id"]: [] for r in found}
+        if found:
+            by_code = {r["code"]: r["id"] for r in found}
+            id_marks, code_marks = ",".join("?" * len(found)), ",".join("?" * len(by_code))
+            bookings = self.store.query(
+                f"""SELECT room_id, starts_at, ends_at FROM ops_room_bookings
+                    WHERE room_id IN ({id_marks}) AND status='CONFIRMED' AND starts_at<? AND ends_at>?""",
+                [r["id"] for r in found] + [_iso(end), _iso(start)])
+            classes = self.store.query(
+                f"""SELECT DISTINCT location, starts_at, ends_at, course_code, course_name, kind FROM ops_schedule
+                    WHERE location IN ({code_marks}) AND deleted_at IS NULL AND kind IN ('CLASS','EXAM') AND starts_at<? AND ends_at>?""",
+                list(by_code) + [_iso(end), _iso(start)])
+            for b in bookings:
+                busy[b["room_id"]].append({"starts_at": b["starts_at"], "ends_at": b["ends_at"], "type": "BOOKING", "label": "Đã có người đặt"})
+            for s in classes:
+                busy[by_code[s["location"]]].append({"starts_at": s["starts_at"], "ends_at": s["ends_at"],
+                                                     "type": "EXAM" if s["kind"] == "EXAM" else "CLASS",
+                                                     "label": f"{s['course_code']} · {s['course_name']}"})
+        return {"date": day, "open": "07:00", "close": "21:00", "limits": self.booking_limits(),
+                "items": [{"room": self._room_view(r), "busy": sorted(busy[r["id"]], key=lambda x: x["starts_at"])} for r in found],
+                "missing": [i for i in room_ids if i not in rooms]}
+
+    def _validate_slot(self,room: dict[str, Any], day: str, start: str, end: str, attendees: int) -> tuple[datetime, datetime]:
         try:
             d = date.fromisoformat(day)
             t0, t1 = time.fromisoformat(start), time.fromisoformat(end)
@@ -357,7 +394,7 @@ class CampusOpsService:
         return {"id": event_id, "deleted": True}
 
     # ---------------------------------------------------------- notifications
-    REMINDER_KINDS = ("exam", "sources")
+    REMINDER_KINDS = ("exam", "exit_tickets", "sources")
 
     def reminder_preferences(self, identity: IdentityContext) -> dict[str, bool]:
         """Which kinds of reminders the caller receives. Everything is on until the person switches it off."""

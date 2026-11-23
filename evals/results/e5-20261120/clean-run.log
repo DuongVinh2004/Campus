@@ -1,0 +1,16 @@
+before: {"units":9173,"release":"01a1f514-2e62-7177-a400-1a7002de6d94","generation":29}
+ok   the document is accepted (HTTP 202)
+  state PROCESSING after 0 s
+  state READY_TO_PUBLISH after 5 s
+  state INDEXING after 35 s
+  state ACTIVE after 70 s
+ok   the document becomes usable (state ACTIVE; 70 s)
+during: {"units":9176,"release":"01a1f52c-db80-7e15-8e5e-9e7eff3b2d23","generation":30}
+ok   the index grew (9173 to 9176 units)
+ok   the chatbot answers from the new document: "Trợ lý AI • 01:59 Phòng Thí nghiệm Hư Cấu QA mở cửa lúc 06:45 và đóng cửa lúc 19:15 các ngày làm việc. [1] Nguồn: [1] QA-2026-11-19 Giờ làm việc Phòng Thí nghiệ"
+ok   the answer carries a citation to it
+ok   the document is revoked (HTTP 200)
+after: {"units":9173,"release":"01a1f52c-db80-7e15-8e5e-9e7eff3b2d23","generation":31}
+ok   the index is back to 9173 units (now 9173)
+ok   after the revocation the chatbot no longer knows the made-up fact
+8 checks passed, 0 failed

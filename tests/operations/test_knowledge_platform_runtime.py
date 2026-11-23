@@ -150,3 +150,21 @@ def test_worker_with_no_pulse_or_multiple_workers_is_not_ready():
         runtime.worker_state(rows)
     with pytest.raises(RuntimeError, match="Exactly one"):
         runtime.worker_state(rows+[{**rows[0], "ProcessId":43}])
+
+
+def test_alert_settings_come_from_env_and_nothing_else_does(tmp_path):
+    env = tmp_path / ".env"
+    env.write_text(
+        "OPENAI_KEY=do-not-pass\n"
+        "CAMPUS247_ALERT_TELEGRAM_TOKEN_FILE=C:/Some Folder/token.key\n"
+        "# CAMPUS247_ALERT_SMTP_HOST=commented.example\n"
+        'CAMPUS247_ALERT_TELEGRAM_CHAT_ID="12345"\n',
+        encoding="utf-8")
+    assert runtime.alert_environment(env) == {
+        "CAMPUS247_ALERT_TELEGRAM_TOKEN_FILE": "C:/Some Folder/token.key",
+        "CAMPUS247_ALERT_TELEGRAM_CHAT_ID": "12345",
+    }
+
+
+def test_a_missing_env_file_means_only_the_log_channel(tmp_path):
+    assert runtime.alert_environment(tmp_path / "absent.env") == {}

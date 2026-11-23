@@ -38,7 +38,7 @@ async function step(name, fn) {
 const PAGES = {
   student: ["/chat", "/services", "/tickets", "/schedule", "/rooms", "/notifications", "/learning", "/privacy", "/memory"],
   staff: ["/staff", "/tickets", "/chat", "/rooms", "/notifications"],
-  owner: ["/admin", "/knowledge/sources", "/knowledge/documents", "/knowledge/freshness", "/knowledge/policy-graph", "/knowledge/crawl"],
+  owner: ["/admin", "/knowledge/sources", "/knowledge/documents", "/knowledge/freshness", "/knowledge/quality", "/knowledge/policy-graph", "/knowledge/crawl"],
 };
 const PUBLIC_PAGES = ["/login", "/offline"];
 // Requests that are expected to be refused for a role (the page shows its own message for them).
@@ -217,8 +217,11 @@ async function cleanupLeftovers() {
 
 async function roomsFlow() {
   const { context, page } = await newSession("student");
+  const availabilityCalls = [];
+  page.on("request", (r) => { if (/\/v1\/rooms\/(availability|[^/]+\/availability)\?/.test(r.url())) availabilityCalls.push(r.url()); });
   await visit(page, "/rooms");
   await page.getByText(/Danh sách phòng học \(\d+\)/).waitFor({ timeout: 15000 });
+  check(availabilityCalls.length >= 1 && availabilityCalls.length <= 2, `rooms: availability of every room is fetched in at most 2 requests (saw ${availabilityCalls.length})`);
   await page.getByRole("button", { name: "Đặt phòng" }).first().click();
   const dialog = page.locator("[role=dialog]");
   await dialog.locator("textarea").fill(`${TAG} họp nhóm`);
@@ -262,6 +265,23 @@ async function scheduleFlow() {
   if (await confirm.count()) await confirm.last().click();
   await page.getByText(`${TAG} ôn thi`).first().waitFor({ state: "detached", timeout: 8000 });
   check(true, "schedule: the event can be deleted");
+  await context.close();
+}
+
+// Needs the local student to be enrolled in a synthetic class first: python scripts/learning_enroll_local_student.py --apply
+async function learningFlow() {
+  const { context, page } = await newSession("student");
+  const log = watch(page, "student");
+  await visit(page, "/learning");
+  await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
+  const text = await page.locator("main").innerText();
+  check(/Lớp SQL/.test(text), "learning: the enrolled synthetic class is listed for the student");
+  check(!/không có quyền|Dịch vụ học liệu chưa sẵn sàng/.test(text), "learning: no access or availability error is shown");
+  await page.waitForTimeout(1500); // the first class is selected on its own and its sessions load
+  const after = await page.locator("main").innerText();
+  check(/Buổi|buổi/.test(after), "learning: opening the class shows its sessions");
+  check(log.badResponses.length === 0, `learning: failed requests ${log.badResponses.slice(0, 3).join(" | ")}`);
+  check(log.pageErrors.length === 0, `learning: page errors ${log.pageErrors.join(" | ")}`);
   await context.close();
 }
 
@@ -374,6 +394,7 @@ if (ONLY === "all" || ONLY === "flows") {
   await step("rooms", roomsFlow);
   await step("schedule", scheduleFlow);
   await step("tickets", ticketFlow);
+  await step("learning", learningFlow);
   await step("owner", ownerFlow);
 }
 await browser.close();

@@ -1,0 +1,9 @@
+before: {"units":9173,"release":"01a1f514-2e62-7177-a400-1a7002de6d94","generation":28}
+resuming with 01a1f513-a54f-76b2-8ec5-bd5dee85a93e ACTIVE
+ok   the document is accepted (HTTP 202)
+FAIL the document becomes usable (state undefined; 904 s)
+ok   the document is revoked (HTTP 200)
+after: {"units":9173,"release":"01a1f514-2e62-7177-a400-1a7002de6d94","generation":29}
+ok   the index is back to 9173 units (now 9173)
+ok   after the revocation the chatbot no longer knows the made-up fact
+4 checks passed, 1 failed

@@ -1,0 +1,10 @@
+{
+ "ok": true,
+ "verified": true,
+ "finished_at": "2026-11-19T16:16:25.777445Z",
+ "duration_s": 302.3,
+ "folder": "campus247-backup-20261119T161123Z",
+ "bytes": 565852870,
+ "manifest_sha256": "1cfbd887b1bc53d1bc4ac2fe41b792b189253dae598f6111863d8cf26c7a086c",
+ "skipped_files": 1
+}

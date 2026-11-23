@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { clearPwaCaches } from "@/components/PwaRegister";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Lock,
@@ -293,6 +294,8 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  // Arriving here means nobody is signed in (or someone is switching account): whatever the service worker kept must go.
+  useEffect(() => { clearPwaCaches(); }, []);
   if (process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true") return <OwnerLogin />;
   if (CERTIFICATE_DEMO) return <CertificateLogin />;
   return (

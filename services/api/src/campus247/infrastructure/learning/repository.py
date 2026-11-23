@@ -16,6 +16,7 @@ from campus247.application.learning.exit_tickets import (
     EXIT_TICKET_NOTICE,
     EXIT_TICKET_READS,
 )
+from campus247.application.learning.practice_sets import PRACTICE_COLLECTIONS
 from campus247.domain.learning import LearningError, require
 from campus247.ports.learning_repository import COLLECTIONS, empty_state
 
@@ -73,7 +74,7 @@ class PostgresLearningRepository:
 
 Provision using migration0023 and provision_tenant; reads never auto-create rows.
 """
-    def __init__(self, pool, *, tenant_id: str, page_feedback_schema: bool = False, page_explanations_schema: bool = False, version_changes_schema: bool = False, exit_tickets_schema: bool = False, idea_cards_schema: bool = False, accessible_text_schema: bool = False):
+    def __init__(self, pool, *, tenant_id: str, page_feedback_schema: bool = False, page_explanations_schema: bool = False, version_changes_schema: bool = False, exit_tickets_schema: bool = False, idea_cards_schema: bool = False, accessible_text_schema: bool = False, practice_schema: bool = False):
         require(bool(tenant_id), 503, "INVALID_TENANT", "Chưa cấu hình phạm vi học liệu.")
         self.pool, self.tenant_id = pool, tenant_id
         self.collections = COLLECTIONS + ("feedback_windows", "page_feedback") if page_feedback_schema else COLLECTIONS
@@ -87,6 +88,9 @@ Provision using migration0023 and provision_tenant; reads never auto-create rows
             self.collections += ("idea_topics", "idea_cards", "idea_shares", "idea_grants")
         if accessible_text_schema:
             self.collections += OCR_COLLECTIONS
+        if practice_schema:
+            # Order matters for the write: a set is stored before its questions, a question before answers and review state.
+            self.collections += PRACTICE_COLLECTIONS
 
     async def provision_tenant(self):
         async with self.pool.acquire() as db:

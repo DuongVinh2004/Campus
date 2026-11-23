@@ -1,0 +1,1 @@
+{"at": "2026-11-19T17:51:04.951294Z", "trigger": "manual", "folder": "20261119", "cases": 120, "any": 0.9916666666666667, "fused_top8": 0.9666666666666667, "survive": 0.875, "rerank": "http", "embedding": "http", "regressed": false}

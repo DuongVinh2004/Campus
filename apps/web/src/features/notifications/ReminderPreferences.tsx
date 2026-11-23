@@ -4,15 +4,44 @@ import React, { useEffect, useState } from "react";
 import { CAMPUS_API_BASE_URL } from "../../lib/api/base-url";
 import { ApiClient, ApiClientError } from "../../lib/api/client";
 
-type Kind = "exam" | "sources";
+type Kind = "exam" | "exit_tickets" | "sources";
 type Preferences = Record<Kind, boolean>;
 
 const LABELS: Record<Kind, { title: string; help: string }> = {
   exam: { title: "Nhắc lịch thi", help: "Thông báo trước giờ thi 24 giờ và 2 giờ." },
+  exit_tickets: { title: "Nhắc nộp phiếu ra lớp", help: "Thông báo trước khi phiếu ra lớp đóng 24 giờ và 2 giờ, nếu bạn chưa nộp." },
   sources: { title: "Nhắc rà soát nguồn tri thức", help: "Thông báo trước khi nguồn hết hiệu lực hoặc đến hạn rà soát, và tóm tắt hằng tuần." },
 };
 
 const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });
+
+const MANAGER_ROLES = ["KNOWLEDGE_ADMIN", "SYSTEM_ADMIN"];
+
+/** Everyone gets the exam switch; students also get exit tickets, and people who manage knowledge get source reviews. */
+export function reminderKindsFor(roles: readonly string[] | undefined): Kind[] {
+  const kinds: Kind[] = ["exam"];
+  if (roles?.includes("STUDENT")) kinds.push("exit_tickets");
+  if (roles?.some((role) => MANAGER_ROLES.includes(role))) kinds.push("sources");
+  return kinds;
+}
+
+/** The same switches, choosing which ones to show from the signed-in person's roles. */
+export function ReminderPreferencesForMe() {
+  const [roles, setRoles] = useState<string[] | undefined>(undefined);
+  const [known, setKnown] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    client()
+      .get<{ roles?: string[] }>("/v1/users/me")
+      .then((me) => !cancelled && setRoles(me.roles))
+      .catch(() => undefined) // not identified: the exam switch alone is the safe default
+      .finally(() => !cancelled && setKnown(true));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return known ? <ReminderPreferences kinds={reminderKindsFor(roles)} /> : <p role="status" className="text-sm">Đang tải cài đặt nhắc việc…</p>;
+}
 
 /** On/off switches for the reminders a person receives. `kinds` lists which ones to show (students: exam; knowledge managers: sources). */
 export function ReminderPreferences({ kinds = ["exam"] }: { kinds?: Kind[] }) {

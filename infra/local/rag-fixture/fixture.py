@@ -78,6 +78,10 @@ REVIEWED_ADDITIONS = {
     "0029_learning_exit_tickets.py": "4e67df64496eee106d6320bbfaaacdb2b93c7166e5b7c63ac1b2452686f0d3dc",
     "0030_learning_idea_cards.py": "b252172f8bfc91ee0e431d1177c1df203ec8bcf39f38338d767a04726e261bd9",
     "0031_learning_accessible_text.py": "53991e655f08df3e2ffca7256ef74c4e5ff71b4292cf916ee14d1a2e1a3352e1",
+    # 0032 (learning practice questions) approved by the owner in chat on 2026-11-21 ("duyệt hash"): linear 0031 -> 0032, creates
+    # four new learning.practice_* tables, indexes, one function and triggers only; no DROP/DELETE/TRUNCATE/ALTER/UPDATE of existing
+    # data; downgrade() raises. Executed on a throwaway database by tests/learning_entry/test_practice_postgres.py.
+    "0032_learning_practice.py": "cf9d3a1d8e2d98c8a31165570b7a415ae40d28e99da639eaca880d0574d07a7f",
 }
 SOURCE_ID = "019a0000-0000-7000-8000-000000000001"
 DOCUMENT_ID = "019a0000-0000-7000-8000-000000000002"

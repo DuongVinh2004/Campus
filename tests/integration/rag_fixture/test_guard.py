@@ -79,7 +79,7 @@ class FixtureGuardTests(unittest.TestCase):
     def test_reviewed_addition_preserves_historical_baseline_and_ancestry(self):
         _, script, head, tables = fixture.chain()
         # Later reviewed additive revisions extend the chain; ancestry of 0010-0013 is unchanged.
-        self.assertEqual(head, "0031")   # 0023-0031 (learning) reviewed and owner-approved 2026-11-16, see fixture.REVIEWED_ADDITIONS
+        self.assertEqual(head, "0032")   # 0023-0031 (learning) owner-approved 2026-11-16, 0032 on 2026-11-21; see fixture.REVIEWED_ADDITIONS
         self.assertEqual(script.get_revision("0013").down_revision, "0012")
         self.assertEqual(script.get_revision("0012").down_revision, "0011")
         self.assertEqual(script.get_revision("0011").down_revision, "0010")

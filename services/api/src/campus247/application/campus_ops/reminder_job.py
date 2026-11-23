@@ -32,3 +32,25 @@ async def run_reminders(store, resolver_factory: Callable[[], Callable[[str], st
         done += 1
         if passes is None or done < passes:
             await asyncio.sleep(every_s)
+
+
+async def run_exit_ticket_reminders(learning_service, store, *, every_s: float = 300.0,
+                                    clock: Callable[[], datetime] = lambda: datetime.now(UTC), passes: int | None = None) -> None:
+    """Remind students of exit tickets that close soon. Needs the learning service; does nothing for classes without the feature."""
+    from campus247.application.campus_ops.reminders import exit_ticket_candidates
+    from campus247.application.learning.exit_reminders import exit_ticket_deadlines
+    done = 0
+    while passes is None or done < passes:
+        try:
+            now = clock()
+            rows = await exit_ticket_deadlines(learning_service, now)
+            sent = await asyncio.to_thread(deliver, store, exit_ticket_candidates(rows), now=now) if rows else 0
+            if sent:
+                LOG.info("exit_ticket_reminders_sent count=%d", sent)
+        except asyncio.CancelledError:
+            raise
+        except Exception as error:  # noqa: BLE001 -- keep the loop alive; the next pass tries again
+            LOG.warning("exit_ticket_reminders_failed kind=%s", type(error).__name__)
+        done += 1
+        if passes is None or done < passes:
+            await asyncio.sleep(every_s)

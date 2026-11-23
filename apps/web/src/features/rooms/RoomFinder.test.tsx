@@ -10,7 +10,7 @@ vi.mock("@/lib/campus-ops-api", async (importOriginal) => {
     ...actual,
     roomsApi: {
       list: vi.fn(),
-      availability: vi.fn(),
+      availabilityMany: vi.fn(),
       preview: vi.fn(),
       confirm: vi.fn(),
       mine: vi.fn(),
@@ -102,7 +102,11 @@ const mockMyBookings: Booking[] = [
 describe("RoomFinder", () => {
   beforeEach(() => {
     vi.mocked(roomsApi.list).mockResolvedValue(mockRoomList);
-    vi.mocked(roomsApi.availability).mockResolvedValue(mockAvailability);
+    vi.mocked(roomsApi.availabilityMany).mockImplementation(async (ids: string[]) => ({
+      date: mockAvailability.date, open: mockAvailability.open, close: mockAvailability.close, limits: mockLimits,
+      items: mockRoomList.items.filter((r) => ids.includes(r.id)).map((room) => ({ room, busy: mockAvailability.busy })),
+      missing: [],
+    }));
     vi.mocked(roomsApi.mine).mockResolvedValue({ items: mockMyBookings });
   });
 
@@ -129,6 +133,13 @@ describe("RoomFinder", () => {
     expect(screen.getByTestId("room-card-H1-102")).toBeInTheDocument();
     expect(screen.getByText("Đang bảo trì")).toBeInTheDocument();
     expect(screen.getByTestId("room-book-H1-102")).toBeDisabled();
+  });
+
+  it("hỏi khả dụng của mọi phòng bằng một yêu cầu duy nhất", async () => {
+    render(<RoomFinder />);
+    await screen.findByTestId("room-card-H1-101");
+    expect(roomsApi.availabilityMany).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(roomsApi.availabilityMany).mock.calls[0][0]).toEqual(mockRoomList.items.map((r) => r.id));
   });
 
   it("hiển thị lỗi khi tải phòng thất bại và cho phép thử lại", async () => {

@@ -60,12 +60,12 @@ def inbox(store, who):
 
 def test_everything_is_on_by_default(env):
     client, _, _ = env
-    assert client.get("/v1/notifications/preferences", headers=auth("a")).json() == {"exam": True, "sources": True}
+    assert client.get("/v1/notifications/preferences", headers=auth("a")).json() == {"exam": True, "exit_tickets": True, "sources": True}
 
 
 def test_switching_off_and_on_is_remembered_per_person(env):
     client, _, _ = env
-    assert client.put("/v1/notifications/preferences", headers=auth("a"), json={"exam": False}).json() == {"exam": False, "sources": True}
+    assert client.put("/v1/notifications/preferences", headers=auth("a"), json={"exam": False}).json() == {"exam": False, "exit_tickets": True, "sources": True}
     assert client.get("/v1/notifications/preferences", headers=auth("a")).json()["exam"] is False
     assert client.get("/v1/notifications/preferences", headers=auth("b")).json()["exam"] is True  # someone else is unaffected
     assert client.put("/v1/notifications/preferences", headers=auth("a"), json={"exam": True}).json()["exam"] is True
@@ -76,7 +76,7 @@ def test_bad_bodies_are_refused_and_change_nothing(env, body):
     client, _, _ = env
     reply = client.put("/v1/notifications/preferences", headers=auth("a"), json=body)
     assert reply.status_code in (400, 422)
-    assert client.get("/v1/notifications/preferences", headers=auth("a")).json() == {"exam": True, "sources": True}
+    assert client.get("/v1/notifications/preferences", headers=auth("a")).json() == {"exam": True, "exit_tickets": True, "sources": True}
 
 
 def test_it_needs_a_session(env):

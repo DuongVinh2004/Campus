@@ -89,6 +89,7 @@ async def test_zero_deadline_does_not_invoke_reranker():
     reranker = Reranker()
     result = await retrieve(U, Index([unit(1)]), reranker, rerank_deadline_s=0)
     assert result.fallback_used and reranker.texts is None
+    assert result.trace["status"] == "RRF_ONLY"  # reranking is off by design, not timed out
 
 
 @pytest.mark.asyncio
@@ -104,7 +105,7 @@ async def test_disabled_reranker_keeps_high_ranked_clauses_before_other_document
                             rerank_deadline_s=0, final_limit=final_limit)
     assert [c.unit_id for c in result.candidates] == [str(i) for i in range(final_limit)]
     assert [c.final_rank for c in result.candidates] == list(range(1, final_limit + 1))
-    assert result.fallback_used and result.trace["status"] == "RRF_TIMEOUT"
+    assert result.fallback_used and result.trace["status"] == "RRF_ONLY"
     assert reranker.texts is None
 
 

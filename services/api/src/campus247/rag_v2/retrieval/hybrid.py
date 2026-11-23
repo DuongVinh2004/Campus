@@ -206,7 +206,10 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
         except Exception as error:  # noqa: BLE001 -- every reranker failure must fall back to RRF
             fallback = True
             chosen.sort(key=lambda c: (-c.fused_score, c.unit_id))
-            trace["status"] = "RRF_TIMEOUT" if isinstance(error, TimeoutError) else "RRF_ERROR"
+            # A zero deadline means reranking is switched off on purpose (measured: the CPU reranker lowered
+            # gold survival, see rag_v2/service.py), so it must not be reported as a timeout.
+            trace["status"] = ("RRF_ONLY" if rerank_deadline_s == 0
+                               else "RRF_TIMEOUT" if isinstance(error, TimeoutError) else "RRF_ERROR")
     if LEXICAL_PIN and chosen and rerank_deadline_s == 0:
         # Context packing reads only the first PACK_WINDOW rows, so the strongest lexical hits
         # (exact codes and names that vectors miss) must sit inside that window.
