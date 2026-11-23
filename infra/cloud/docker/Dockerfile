@@ -2,7 +2,7 @@
 #   docker build -f infra/cloud/docker/Dockerfile -t campus247-sim .
 # Only code goes into the image. Model files, the retrieval index and the web app are mounted read-only at run time and the
 # restored state lives in the container, so nothing of the development machine's live runtime is touched.
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 ENV DEBIAN_FRONTEND=noninteractive CAMPUS247_ROOT=/opt/campus247 CAMPUS247_SKIP_SERVICES=1 CAMPUS247_SKIP_FETCH=1 CAMPUS247_PROFILE=cloud
 WORKDIR /opt/campus247
 # The installer only needs the lock file, the profiles and the kit: copying the rest of the code afterwards keeps the
