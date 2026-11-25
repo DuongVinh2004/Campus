@@ -35,8 +35,9 @@ Chọn dòng gần nhất; chỉ chạy thứ liên quan.
 | Luồng người dùng, responsive | Playwright. `apps/web/e2e/*.spec.ts` chưa có config mặc định; `e2e-live/*.pw.ts` dùng `playwright.live.config.ts` (Chrome cục bộ, `baseURL` còn trỏ cổng cũ 3115, cần đổi sang 8015 khi chạy). Cần runtime đang chạy |
 | Route/logic API | `.venv/Scripts/python.exe -B -m pytest -q tests/<thư mục liên quan>` |
 | Đổi hợp đồng API | Cập nhật `contracts/`, chạy `tests/contract`, `tests/contracts` |
-| Đổi import/lớp | `-m pytest -q tests/architecture`. Hiện đã có 1 vi phạm cũ: `application/knowledge/applicability.py` import `infrastructure.knowledge.repository`, nên test này đang đỏ. Đừng gây thêm vi phạm; sửa bằng cách đưa qua `ports` khi đụng tới file đó |
-| Migration | Test migration trong `tests/` liên quan; kiểm trên DB tạm, không chạm DB có dữ liệu thật |
+| Đổi import/lớp | `-m pytest -q tests/architecture`. Hiện đã có 1 vi phạm cũ (kiểm 2026-11-25): `presentation/oidc.py` import `infrastructure.identity.oidc*`, nên test này đang đỏ. Đừng gây thêm vi phạm; sửa bằng cách đưa qua `ports` khi đụng tới file đó |
+| Migration | Test migration trong `tests/` liên quan; kiểm trên DB tạm, không chạm DB có dữ liệu thật (DB trống cần `CREATE EXTENSION vector` trước `alembic upgrade head`, xem `infra/local/audit-20261125/migration_roundtrip.sh`) |
+| OCR native, ClamAV thật | `LEARNING_OCR_NATIVE_HTTP=1 LEARNING_OCR_RUNTIME_DIR=... LEARNING_OCR_FIXTURE_PDF=... LEARNING_TEST_ROOT=... PYTHONPATH=services/worker/src pytest tests/learning_entry/test_accessible_text_http.py tests/learning_entry/test_scan_real_daemon.py` (thiếu `PYTHONPATH` worker thì báo `No module named 'campus247_worker'`) |
 | RAG, prompt, guardrail, grounding | Test `tests/evals`, `tests/knowledge_platform`; `evals/validate_contracts.py`; gate trong `evals/gates` |
 | Bảo mật, quyền, xác nhận hành động | Test an toàn liên quan (ví dụ `tests/test_safety_rules.py`) và case red-team |
 | CI, release | Test tương ứng trong `.github/workflows/ci.yml` (`tests/delivery`, `tests/evals/test_audit_remediation_gate.py`) |
