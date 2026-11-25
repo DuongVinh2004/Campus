@@ -25,7 +25,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "scripts"), str(ROOT / "services/api/src")
     str(ROOT / ".tooling/knowledge-platform-20261023/site-packages")]
 from campus247.infrastructure.knowledge.storage import FileKnowledgeStorage, ReadThroughKnowledgeStorage, checked_path
 from knowledge_parser_runtime import resolve_parser_python
-from runtime_routes import api_path_allowed, is_served_path, not_found_response
+from runtime_routes import api_path_allowed, apply_security_headers, is_served_path, not_found_response
 
 STATE = checked_path(ROOT / "infra/local/knowledge-platform-20261023", ROOT)
 PGROOT = checked_path(ROOT / ".tooling/knowledge-postgres-20261023/pgsql", ROOT)
@@ -781,6 +781,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         response = await call_next(request)
         if path.startswith("/v1/student-preparations"):
             response.headers["Cache-Control"] = "no-store"
+        apply_security_headers(response.headers)
         return response
 
     if frontend_port is not None:

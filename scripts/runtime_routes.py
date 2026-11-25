@@ -58,6 +58,24 @@ def api_path_allowed(path: str) -> bool:
     return path in ALLOWED_API_PATHS or path.startswith(ALLOWED_API_PREFIXES)
 
 
+# Baseline headers on every response from the single browser origin (8015). Routes that already set a stricter header (for example
+# "Content-Security-Policy: sandbox" on document downloads) keep it. The web never frames its own pages (certificate previews use
+# a sandboxed srcdoc iframe, which these headers do not affect), so framing by any site is refused.
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Content-Security-Policy": "frame-ancestors 'none'",
+}
+
+
+def apply_security_headers(headers) -> None:
+    """Add each baseline header the response does not already carry."""
+    for name, value in SECURITY_HEADERS.items():
+        if name not in headers:
+            headers[name] = value
+
+
 NOT_FOUND_HTML = (
     '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     "<title>Không tìm thấy trang — Campus 24/7</title>"
