@@ -40,6 +40,9 @@ coverage.xml
 # Node & Next.js
 node_modules/
 .next/
+# Isolated build destinations (next.config.ts CAMPUS_NEXT_DIST_DIR). Tailwind skips ignored paths; without this it scanned a
+# turbopack cache in apps/web/.next-stitch-redesign and emitted a broken class (CSS optimizer warning in every build).
+.next-stitch-*/
 out/
 .pnpm-store/
 
