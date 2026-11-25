@@ -78,7 +78,7 @@ export function IdeaCards({ actorId, canCreate, sourceRequest, onOpen, onShare }
   const lifecycle = useRef<AbortController | null>(null);
   const [pending,setPending]=useActorRouteState<Record<string,string>>(owner.scope,JSON.stringify(["idea-pending-writes",actorId]),()=>({}));
   const formTitle = useRef<HTMLHeadingElement>(null);
-  const appliedSource = useRef<{ actorId: string; sequence: number }>();
+  const appliedSource = useRef<{ actorId: string; sequence: number } | undefined>(undefined);
   const editorGeneration = useRef(0);
   const headers = { "X-Campus-Reader-Actor": actorId };
 
