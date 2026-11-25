@@ -9,14 +9,13 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
+from typing import Any
 from urllib.parse import quote
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 
-from campus247.infrastructure.identity.oidc import OidcClient, OidcConfig, OidcError, new_pkce
-from campus247.infrastructure.identity.oidc_accounts import OidcAccountStore, resolve_account, safe_next
-from campus247.infrastructure.identity.oidc_session import OidcSessionAdapter
+from campus247.ports.oidc import OidcError, new_pkce, safe_next
 
 LOG = logging.getLogger("campus247.oidc")
 ATTEMPT_COOKIE = "oidc_attempt"
@@ -41,8 +40,9 @@ def _failure(code: str, *, keep_attempt: bool = False) -> RedirectResponse:
     return response
 
 
-def create_oidc_router(config: OidcConfig, client: OidcClient, store: OidcAccountStore, sessions: OidcSessionAdapter,
-                       *, clock=lambda: datetime.now(UTC)) -> APIRouter:
+def create_oidc_router(config: Any, client: Any, store: Any, sessions: Any, *, clock=lambda: datetime.now(UTC)) -> APIRouter:
+    """`config`, `client`, `store` and `sessions` are the OidcConfig, OidcClient, OidcAccountStore and OidcSessionAdapter the caller built
+    (infrastructure/identity/oidc*.py); this layer only calls them."""
     router = APIRouter(tags=["Authentication"])
 
     @router.get("/v1/auth/providers")
@@ -78,7 +78,7 @@ def create_oidc_router(config: OidcConfig, client: OidcClient, store: OidcAccoun
         try:
             tokens = await client.exchange_code(code, attempt["verifier"])
             claims = await client.verify_id_token(tokens["id_token"], nonce=attempt["nonce"])
-            account = resolve_account(config, store, claims, now=clock())
+            account = store.resolve(config, claims, now=clock())
         except OidcError as failure:
             LOG.warning("oidc_login_refused code=%s", failure.code)
             return _failure(failure.code)

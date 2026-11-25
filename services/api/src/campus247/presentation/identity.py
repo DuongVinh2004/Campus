@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
-from fastapi import HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import Response, JSONResponse
 
