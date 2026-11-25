@@ -1,7 +1,8 @@
 "use client";
 import { useT } from "@/lib/i18n";
 import Link from "next/link";
-import { Bell, Inbox, SlidersHorizontal } from "lucide-react";
+import { Bell, Inbox, RefreshCw, SlidersHorizontal } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AssistantTrackingClient, type Notification, type Subscription, type TrackingTrigger } from "@/lib/assistant-tracking";
@@ -61,9 +62,7 @@ function ActorNotifications() {
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <button className="fluent-btn-secondary" disabled={busy} onClick={() => void run(load)}>
-          {t("ncx.10")}
-        </button>
+        <IconButton label={t("ncx.10")} variant="outline" disabled={busy} onClick={() => void run(load)} icon={<RefreshCw size={18} />} />
         {!configured && (
           <p role="status" className="text-sm font-medium text-[var(--text-secondary)]">
             {t("ncx.11")}

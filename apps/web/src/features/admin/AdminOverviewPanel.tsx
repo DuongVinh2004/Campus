@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { usePolling } from "@/lib/use-polling";
+import { IconButton } from "@/components/shared/IconButton";
 import {
   AlertTriangle,
   Building2,
@@ -223,16 +224,14 @@ export function AdminOverviewPanel() {
               Cập nhật lúc {formatVnTime(lastUpdated)}
             </span>
           )}
-          <button
-            type="button"
+          <IconButton
             data-testid="admin-refresh"
+            label="Làm mới"
+            variant="outline"
             onClick={fetchData}
             disabled={loading}
-            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] disabled:opacity-50"
-          >
-            <RefreshCw className={`h-4 w-4 shrink-0 ${loading ? "animate-spin" : ""}`} aria-hidden="true" />
-            Làm mới
-          </button>
+            icon={<RefreshCw size={18} className={loading ? "animate-spin" : ""} />}
+          />
         </div>
       </header>
 

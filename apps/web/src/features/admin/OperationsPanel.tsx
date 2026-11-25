@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AlertTriangle, CheckCircle2, CircleHelp, RefreshCw, ShieldAlert, XOctagon } from "lucide-react";
 import { ApiClientError } from "../../lib/api/client";
+import { IconButton } from "@/components/shared/IconButton";
 import { assessStatus, overallLevel, type Finding, type Level } from "../../lib/ops-assess";
 import { opsStatusApi, type OpsStatus } from "../../lib/ops-status-api";
 
@@ -148,10 +149,7 @@ export function OperationsPanel({ refreshMs = REFRESH_MS }: { refreshMs?: number
             {LEVEL_TEXT[overall]} · cập nhật {time(status.generated_at)} · {status.workers_reporting} tiến trình API
           </p>
         </div>
-        <button type="button" onClick={() => void load()} aria-label="Làm mới trạng thái vận hành"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-lg border px-4 text-sm">
-          <RefreshCw className="h-4 w-4" aria-hidden="true" /> Làm mới
-        </button>
+        <IconButton label="Làm mới trạng thái vận hành" variant="outline" onClick={() => void load()} icon={<RefreshCw size={18} />} />
       </header>
       {error ? <p role="alert" className="text-sm text-[var(--color-danger,#c0392b)]">Không làm mới được: {error}. Đang hiện số liệu lần trước.</p> : null}
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
