@@ -526,6 +526,24 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.router.routes[0:0] = ops_branches
     register_ops_errors(app)
     app.state.campus_ops = ops_service
+
+    # Official announcements (F1): audience from the local directory accounts; all routes and jobs sit behind the announcements.* flags.
+    from campus247.application.announcements.service import AnnouncementService
+    from campus247.infrastructure.identity.directory_recipients import LocalRecipientDirectory
+    from campus247.presentation.announcements import create_announcements_router, register_announcement_errors
+
+    def announcement_accounts():
+        accounts = list(directory_adapter.directory()["accounts"])
+        local = campus_adapter.student.directory()
+        accounts.append({"role": "STUDENT", "subject_id": local["subject_id"], "faculty_code": None, "class_code": None})
+        accounts.append({"role": "KNOWLEDGE_ADMIN", "subject_id": owner_adapter.directory()["owner_id"]})
+        return accounts
+
+    announcement_service = AnnouncementService(ops_service.store, LocalRecipientDirectory(announcement_accounts), enabled=feature_service.enabled,
+                                               signing_key=settings.CONFIRMATION_SIGNING_KEY)
+    app.include_router(create_announcements_router(announcement_service))
+    register_announcement_errors(app)
+    app.state.announcements = announcement_service
     from campus247.presentation.learning import create_learning_router
     app.include_router(create_learning_router(learning_service))
     app.state.learning_service = learning_service
@@ -643,6 +661,9 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 async def start_jobs():
                     jobs = [gated("knowledge_schedules", platform.schedules.serve)]
                     jobs.append(gated("exam_reminders", lambda: run_reminders(ops_service.store, student_subjects)))
+                    from campus247.application.announcements.jobs import announcement_jobs
+                    for job_name, job_factory in announcement_jobs(announcement_service):
+                        jobs.append(gated(job_name, job_factory))
                     if learning_service is not None:
                         from campus247.application.campus_ops.reminder_job import run_exit_ticket_reminders
                         jobs.append(gated("exit_ticket_reminders", lambda: run_exit_ticket_reminders(learning_service, ops_service.store)))
