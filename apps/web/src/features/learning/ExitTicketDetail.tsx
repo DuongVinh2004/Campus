@@ -1,4 +1,6 @@
 "use client";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 
 import { useT, type MessageKey } from "@/lib/i18n";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -432,6 +434,6 @@ export function ExitTicketDetail({ actorId, ticketId, staff, canManage, material
     {visible?.state === "CLOSED" && review?.published && <section className={styles.stack} aria-label={t("etdx.53")}>
       <h4>{t("etdx.53")}</h4><p className={styles.exitAnswer}>{review.published.explanation}</p>
     </section>}
-    <button type="button" disabled={busy} onClick={() => void work(async signal => { await readCurrent(signal); })}>{t("etdx.61")}</button>
+    <IconButton label={t("etdx.61")} disabled={busy} onClick={() => void work(async signal => { await readCurrent(signal); })} icon={<RefreshCw size={17} />} />
   </section>;
 }

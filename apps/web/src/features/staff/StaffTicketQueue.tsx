@@ -14,6 +14,7 @@ import {
   RotateCcw,
   X,
 } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import {
   staffButton,
   staffPrimary,
@@ -439,15 +440,7 @@ export function StaffTicketQueue({
 
         <div className="flex items-center gap-3">
           {onRefresh && (
-            <button
-              type="button"
-              onClick={onRefresh}
-              aria-label="Làm mới hàng đợi"
-              className={staffButton}
-            >
-              <RefreshCw className="h-4 w-4" aria-hidden="true" />
-              <span>Làm mới</span>
-            </button>
+            <IconButton label="Làm mới hàng đợi" variant="outline" onClick={onRefresh} icon={<RefreshCw size={18} />} />
           )}
 
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--surface-subtle)] px-3.5 py-1.5 text-xs text-[var(--text-primary)]">

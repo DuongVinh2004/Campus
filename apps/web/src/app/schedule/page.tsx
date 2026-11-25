@@ -6,6 +6,7 @@ import { AppShell } from "../../components/AppShell";
 import { ScheduleView, type ScheduleEntry } from "../../features/schedule/ScheduleView";
 import { AsyncState, type AsyncStatus } from "../../components/AsyncState";
 import { RefreshCw, AlertTriangle } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import { ApiClient } from "../../lib/api/client";
 import { UnavailableStudentSurface } from "../../features/assistance/UnavailableStudentSurface";
 import { WeekSchedule } from "../../features/schedule/WeekSchedule";
@@ -141,15 +142,13 @@ function LegacySchedulePage() {
             </p>
           </div>
 
-          <button
-            type="button"
+          <IconButton
+            label={status === "loading" ? "Đang đồng bộ..." : "Đồng bộ lại"}
+            variant="outline"
             onClick={fetchSchedule}
             disabled={status === "loading"}
-            className="fluent-btn-secondary text-xs"
-          >
-            <RefreshCw className={`h-4 w-4 text-slate-500 ${status === "loading" ? "animate-spin" : ""}`} />
-            <span>{status === "loading" ? "Đang đồng bộ..." : "Đồng bộ lại"}</span>
-          </button>
+            icon={<RefreshCw size={18} className={status === "loading" ? "animate-spin" : ""} />}
+          />
         </header>
 
         {/* Stale Data Alert with Retry Action */}

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, Pencil } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import { useEffect, useRef, type ReactNode } from "react";
 
 export const primaryButton = "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60";
@@ -33,7 +34,7 @@ export function SummaryRow({ label, children, onEdit, editable = true }: { label
       <dt className="text-sm text-slate-500 dark:text-slate-400">{label}</dt>
       <dd className="mt-1 whitespace-pre-wrap break-words text-base font-medium">{children || "Không cung cấp"}</dd>
     </div>
-    {editable && onEdit && <button type="button" onClick={onEdit} aria-label={`Sửa ${label.toLowerCase()}`} className={`${secondaryButton} -my-2 shrink-0`}>Sửa</button>}
+    {editable && onEdit && <IconButton label={`Sửa ${label.toLowerCase()}`} onClick={onEdit} className="shrink-0" icon={<Pencil size={18} />} />}
   </div>;
 }
 

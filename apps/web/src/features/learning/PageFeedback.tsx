@@ -1,4 +1,6 @@
 "use client";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 
 import { useT, type MessageKey } from "@/lib/i18n";
 import { useEffect, useId, useRef, useState } from "react";
@@ -263,6 +265,6 @@ export function SessionPageFeedback({ actorId, sessionId, startsAt, timeZone, ca
       </li>)}
     </ul> : <p>{t("pfx.34")}</p>)}
     {error && <p role="alert">{error}</p>}
-    {summary?.state !== "NOT_OPENED" && <button type="button" onClick={() => setReload(reload + 1)}>{t("pfx.35")}</button>}
+    {summary?.state !== "NOT_OPENED" && <IconButton label={t("pfx.35")} onClick={() => setReload(reload + 1)} icon={<RefreshCw size={17} />} />}
   </section>;
 }

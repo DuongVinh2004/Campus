@@ -17,6 +17,7 @@ import {
   UserCheck,
   XCircle,
 } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import {
   ApiClientError,
   problemMessage,
@@ -319,14 +320,7 @@ export function StaffTicketsConsole({ initialId = null }: StaffTicketsConsolePro
                 />
                 <span className="font-medium">Của tôi</span>
               </label>
-              <button
-                type="button"
-                onClick={() => loadQueue()}
-                className="inline-flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] min-h-[44px] px-2 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-              >
-                <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-                Làm mới
-              </button>
+              <IconButton label="Làm mới" onClick={() => loadQueue()} icon={<RefreshCw size={18} />} />
             </div>
 
             <div className="relative">

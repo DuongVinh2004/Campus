@@ -1,4 +1,6 @@
 "use client";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 
 import { useT } from "@/lib/i18n";
 import { useEffect, useRef, useState } from "react";
@@ -274,7 +276,7 @@ export function IdeaCards({ actorId, canCreate, sourceRequest, onOpen, onShare }
       <IdeaSourceSummary source={row.source} onOpen={onOpen} />
       <OwnProse value={row} />
     </li>)}</ul>
-    <button type="button" disabled={busy} onClick={() => { setError(""); setReload(value => value + 1); }}>{t("icx.62")}</button>
+    <IconButton label={t("icx.62")} disabled={busy} onClick={() => { setError(""); setReload(value => value + 1); }} icon={<RefreshCw size={17} />} />
   </section>;
 }
 

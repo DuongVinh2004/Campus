@@ -1,4 +1,6 @@
 "use client";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import { useCallback,useEffect,useMemo,useRef,useState } from "react";
 import { LearningGateway } from "../../lib/data/api/learning-gateway";
 import styles from "./learning.module.css";
@@ -104,7 +106,7 @@ export function LearningPresentation({offeringId,versionId,actorId,canManage,pag
   async function end(){if(!current)return;setBusy(true);try{const ended=await api.write<Session>(`/presentations/${current.id}/end`,{});currentRef.current=ended;setCurrent(ended);setSessions(previous=>previous.filter(item=>item.id!==current.id));}catch(e){setError(e instanceof Error?e.message:"Chưa kết thúc được phiên.");}finally{setBusy(false);}}
   return <section className={`${styles.panel} ${styles.strip}`} aria-label="Theo dõi trang giảng viên"><h3>Trang giảng viên đang trình bày</h3>{error&&<p role="alert">{error}</p>}<div className={styles.row}>
     {canManage&&<button disabled={busy} onClick={()=>void start()}>Bắt đầu trình bày tài liệu này</button>}
-    <button onClick={()=>{setError("");void reload();}}>Tải lại phiên trình bày</button>
+    <IconButton label="Tải lại phiên trình bày" onClick={()=>{setError("");void reload();}} icon={<RefreshCw size={17} />} />
     {sessions.map((session,index)=><button key={session.id} aria-pressed={session.id===current?.id} onClick={()=>{setError("");setCurrent(session);}}>Chọn phiên trình bày {index+1} · trang {session.page_no}</button>)}
     {current&&<><p>{current.status==="ACTIVE"?`Đang trình bày trang ${current.page_no}. Chọn Theo giảng viên trong trình đọc để theo dõi.`:"Phiên trình bày đã kết thúc."}</p>{current.host_id===actorId&&current.status==="ACTIVE"&&<button disabled={busy} onClick={()=>void end()}>Kết thúc trình bày</button>}<button onClick={()=>setCurrent(null)}>Rời phiên trình bày</button></>}
     {!sessions.length&&!current&&<p>Chưa có phiên trình bày tài liệu này.</p>}

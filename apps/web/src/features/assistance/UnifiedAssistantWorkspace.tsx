@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { PanelLeftClose, PanelLeftOpen, SquarePen, Settings2 } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, RefreshCw, SquarePen, Settings2 } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import { useChatMenu } from "@/components/AppShell";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PanelResizeHandle } from "@/components/shared/PanelResizeHandle";
@@ -103,7 +104,7 @@ export function UnifiedAssistantWorkspace({ compact = false }: { compact?: boole
       ...(active?.id ? { sourceBinding: { conversationId: active.id, messageId: Object.keys(active.citations).find(key => active.citations[key].some(item => item.citation.citation_id === citation.citation_id))!, citation } } : {}) }));
     setCitationItems(items); setDrawer(true);
   }
-  const conversationControls = active?.id && <div className="flex flex-wrap gap-2 border-b p-2 text-xs"><button type="button" disabled={runtime.busy} onClick={() => void runtime.reload()}>Đọc lại lịch sử</button>{active.cursor && <button type="button" disabled={runtime.busy} onClick={() => void runtime.loadMore()}>Đọc tiếp messages</button>}{active.turnId && <button type="button" disabled={runtime.busy} onClick={() => void runtime.readReceipt()}>Kiểm tra receipt lượt gửi</button>}{active.cursor && <p role="status">Đã khôi phục một phần; đọc hết trước khi tiếp tục.</p>}</div>;
+  const conversationControls = active?.id && <div className="flex flex-wrap gap-2 border-b p-2 text-xs"><IconButton label="Đọc lại lịch sử" disabled={runtime.busy} onClick={() => void runtime.reload()} icon={<RefreshCw size={16} />} />{active.cursor && <button type="button" disabled={runtime.busy} onClick={() => void runtime.loadMore()}>Đọc tiếp messages</button>}{active.turnId && <button type="button" disabled={runtime.busy} onClick={() => void runtime.readReceipt()}>Kiểm tra receipt lượt gửi</button>}{active.cursor && <p role="status">Đã khôi phục một phần; đọc hết trước khi tiếp tục.</p>}</div>;
   if (!capabilities || !active || runtime.authenticationRequired) return <section className="m-4 rounded-xl border bg-white p-5 dark:bg-slate-950" aria-label="Kết nối trợ lý">
     <h2 className="mb-2 font-semibold">{runtime.authenticationRequired ? "Đăng nhập để tiếp tục hỏi đáp" : "Kết nối trợ lý học vụ"}</h2>
     <p role={runtime.error ? "alert" : "status"}>{runtime.error || "Đang kiểm tra phiên đăng nhập…"}</p>

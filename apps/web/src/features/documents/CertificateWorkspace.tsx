@@ -1,4 +1,6 @@
 "use client";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 
 import React, { useCallback, useEffect, useState } from "react";
 import { FileAttachmentInput } from "../../components/shared/FileAttachmentInput";
@@ -163,7 +165,7 @@ export function CertificateWorkspace({ staff = false, embedded = false }: { staf
       <p className="text-sm">Biểu mẫu, lệ phí và thời gian trả kết quả được xác định theo hướng dẫn của đơn vị tiếp nhận.</p><div className="flex gap-4 mt-3">{guidance.sources.map(s => <button key={s.id} onClick={() => void run(async () => setSource(await gateway.source(s.id)))}>{s.locator} — mở nguồn</button>)}</div></details>}
     {source && <section className={panel}><h2 className="font-semibold">{source.title} · {source.locator}</h2><a href={source.url} target="_blank" rel="noreferrer" className="text-blue-600">Trang phát hành nguồn</a>
       <pre className="whitespace-pre-wrap max-h-80 overflow-auto text-xs mt-3">{source.content_text}</pre><button onClick={() => setSource(null)}>Đóng nguồn</button></section>}
-    {actor && view === "form" && <div className={`campus-workflow-grid ${staff ? "" : "campus-form-layout"}`}><aside className={panel}><div className="flex justify-between"><h2 className="font-bold">{staff ? "Hồ sơ đã gửi" : "Hồ sơ của tôi"}</h2><button disabled={busy} onClick={() => void load()}>Làm mới</button></div>
+    {actor && view === "form" && <div className={`campus-workflow-grid ${staff ? "" : "campus-form-layout"}`}><aside className={panel}><div className="flex justify-between"><h2 className="font-bold">{staff ? "Hồ sơ đã gửi" : "Hồ sơ của tôi"}</h2><IconButton label="Làm mới" variant="outline" disabled={busy} onClick={() => void load()} icon={<RefreshCw size={18} />} /></div>
       {!staff && <button disabled={busy} className="fluent-btn-primary mt-3 w-full" onClick={() => { setSelected(null); setForm(emptyForm); setPreview(null); setResult(""); setNote(""); setNotice(""); window.history.replaceState(window.history.state, "", window.location.pathname); }}>Chuẩn bị hồ sơ mới</button>}
       {rows.length === 0 && !busy && <p className="text-sm mt-4">Chưa có hồ sơ.</p>}
       <ul className="space-y-3 mt-4">{rows.map(r => <li key={r.id}><button disabled={busy} onClick={() => void select(r)} aria-pressed={selected?.id === r.id} className="campus-record-option text-left w-full rounded-lg border p-3 text-sm">
