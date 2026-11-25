@@ -251,6 +251,8 @@ export function WeekSchedule() {
 
   useEffect(() => {
     if (!isDialogOpen) return;
+    // Move keyboard focus into the modal so screen-reader and keyboard users start inside it (WCAG 2.4.3).
+    dialogRef.current?.querySelector<HTMLElement>("input, select, textarea")?.focus();
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         closeDialog();
