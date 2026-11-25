@@ -17,8 +17,8 @@ describe("WeekSchedule in English", () => {
   it("translates headings, week buttons, day names, empty states and the event dialog", async () => {
     render(<LanguageProvider><WeekSchedule /></LanguageProvider>);
     expect(await screen.findByRole("heading", { name: "Timetable" })).toBeInTheDocument();
-    expect(screen.getByText("Previous week")).toBeInTheDocument();
-    expect(screen.getByText("Next week")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Previous week" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Next week" })).toBeInTheDocument();
     expect(screen.getByText("Monday")).toBeInTheDocument();
     expect(screen.getByText("Sunday")).toBeInTheDocument();
     expect(await screen.findByText("No classes or events this week.")).toBeInTheDocument();

@@ -199,7 +199,7 @@ describe("WeekSchedule", () => {
 
     const personalCard = screen.getByTestId("schedule-event-personal-1");
     const deleteBtn = personalCard.querySelector("button:last-child")!;
-    expect(deleteBtn).toHaveTextContent("Xóa");
+    expect(deleteBtn).toHaveAccessibleName("Xóa");
 
     fireEvent.click(deleteBtn);
 
