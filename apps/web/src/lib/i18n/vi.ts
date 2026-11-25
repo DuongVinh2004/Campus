@@ -21,6 +21,8 @@ export const vi = {
   "nav.documents": "Thêm tài liệu",
   "nav.crawl": "Nguồn tự động",
   "nav.notifications": "Thông báo",
+  "nav.announcements": "Thông báo nhà trường",
+  "nav.announcementsManage": "Soạn thông báo",
   "nav.privacy": "Quyền riêng tư",
   "nav.studentPortal": "Cổng sinh viên",
   "nav.oneStop": "Một cửa HUCE",

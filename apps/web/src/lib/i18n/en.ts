@@ -22,6 +22,8 @@ export const en: Record<MessageKey, string> = {
   "nav.documents": "Add documents",
   "nav.crawl": "Automatic sources",
   "nav.notifications": "Notifications",
+  "nav.announcements": "Announcements",
+  "nav.announcementsManage": "Compose announcement",
   "nav.privacy": "Privacy",
   "nav.studentPortal": "Student portal",
   "nav.oneStop": "HUCE one-stop service",

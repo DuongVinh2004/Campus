@@ -25,7 +25,17 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F0.6 API admin | XONG | 354ee37 | `tests/features/test_feature_admin_api.py` |
 | F0.7 web | XONG | xem log | vitest `features.test.tsx` (4), `FeatureFlagsPanel.test.tsx` (3); `tsc --noEmit` sạch; nav lọc trong AppShell (chỉ stage phần của tôi, phần dở của chủ dự án để nguyên) |
 | F0.8 quan sát + acceptance | MỘT PHẦN | xem log | khối `features` trong ops status + `FeatureService.summary()` (test). Chưa làm: ô hiển thị trên OperationsPanel, cảnh báo hết hạn, kịch bản web_acceptance tắt rooms |
-| F1 … F8 | CHƯA LÀM | — | |
+| F1.1 domain | XONG | fcc1362 | `domain/announcements.py`; `tests/announcements/test_announcements_flow.py` |
+| F1.2 danh bạ + gold 40 bộ | XONG | fcc1362 | `test_audience_gold_and_perf.py`: 40/40 bộ trùng truy vấn SQL tham chiếu độc lập |
+| F1.3 lưu trữ + phát theo lô | XONG | fcc1362 | bảng `ann_*` trong campus-ops.sqlite3; tiêm lỗi 11 điểm + giữa lô: mỗi người đúng 1 delivery + 1 thông báo; 30 000 người trong 1,6 s (`evals/results/announcements-20261126/perf.json`) |
+| F1.4 API | XONG | fcc1362 | `test_announcements_api.py`; đổi `PUT /{id}` thành `PUT /{id}/draft` (để cờ tách route soạn và route đọc) |
+| F1.5 job + cờ | XONG | fcc1362 | 4 job qua `run_gated`; hẹn giờ ≤ 60 s kiểm bằng đồng hồ giả |
+| F1.6 đồng bộ kho tri thức | MỘT PHẦN | — | `AnnouncementService` có móc `knowledge_sync.publish/revoke`, test thu hồi/hết hạn bằng bản giả; CHƯA nối adapter vào `KnowledgePlatform.upload()` và chưa có test RAG provider giả |
+| F1.7 web | MỘT PHẦN | xem log | hộp thư, chi tiết (`?id=`), soạn có đếm người nhận trực tiếp, vitest 4; CHƯA có: thống kê, hàng đợi duyệt, thu hồi/sửa trên giao diện, thẻ trang chủ, nút trong học liệu, trang công khai riêng |
+| F1.8 tool chat | CHƯA LÀM | — | |
+| F2 … F8 | CHƯA LÀM | — | |
+
+- Trang động `[id]` không chạy được trên 8015 vì `runtime_routes.page_routes()` liệt kê trang tĩnh; chi tiết thông báo dùng `/announcements?id=`.
 
 ## Hồi quy đã chạy (lượt này)
 

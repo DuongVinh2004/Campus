@@ -12,6 +12,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   Bell,
+  Megaphone,
   BookOpen,
   Building2,
   Bot,
@@ -90,6 +91,8 @@ const knowledgeNavigation: NavigationItem[] = [
   { key: "rooms", label: "nav.rooms", href: "/rooms", icon: Building2, roles: ["student", "staff"] },
   { key: "staff", label: "nav.staffQueue", href: "/staff", icon: LayoutDashboard, roles: ["staff"] },
   { key: "notifications", label: "nav.notifications", href: "/notifications", icon: Bell, roles: ["student", "staff", "admin"] },
+  { key: "announcements", label: "nav.announcements", href: "/announcements", icon: Megaphone, roles: ["student", "staff", "admin"] },
+  { key: "announcementsManage", label: "nav.announcementsManage", href: "/announcements/manage", icon: Megaphone, roles: ["staff", "admin"] },
   { key: "admin", label: "nav.adminOverview", href: "/admin", icon: Settings2, roles: ["admin"] },
   { key: "knowledge", label: "nav.knowledgeSources", href: "/knowledge/sources", icon: BookOpen, roles: ["admin"] },
   { key: "privacy", label: "nav.privacy", href: "/privacy", icon: ShieldCheck, roles: ["student", "guest", "admin"] },

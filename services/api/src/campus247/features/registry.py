@@ -130,7 +130,7 @@ FEATURES: tuple[FeatureDefinition, ...] = (
     _f("web.pwa", "Ứng dụng web cài được (PWA)", "web", kind="ui", client_visible=True),
     _f("web.i18n_en", "Giao diện tiếng Anh", "web", kind="ui"),
     # ---- new in this series: all off by default
-    _f("announcements.publish", "Soạn và gửi thông báo chính thức", "announcements", default=False, depends_on=("notifications.inbox",), api_prefixes=("/v1/announcements",),
+    _f("announcements.publish", "Soạn và gửi thông báo chính thức", "announcements", default=False, depends_on=("notifications.inbox",), api_prefixes=("/v1/announcements",), pages=("announcements/manage",), nav_keys=("announcementsManage",),
        jobs=("announcement_publisher", "announcement_reconcile", "announcement_expiry", "announcement_ack_reminders")),
     _f("announcements.inbox", "Xem thông báo chính thức", "announcements", default=False, depends_on=("notifications.inbox",),
        api_patterns=(r"^/v1/announcements/(mine|public)$", r"^/v1/announcements/(?!drafts$|authored$|approvals$)[^/:]+$", r"^/v1/announcements/[^/:]+/ack$"), pages=("announcements",), nav_keys=("announcements",)),
