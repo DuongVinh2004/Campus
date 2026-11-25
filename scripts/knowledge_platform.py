@@ -481,12 +481,27 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         from campus247.bootstrap.learning import configure_learning_ai
         configure_learning_ai(learning_service, gateway, enabled=True)
     factory = RetrievalContextFactory(scope_resolver=LocalScope(), configured_tenant_id=TENANT, configured_campus_id="HUCE")
+    # Feature flags (F0): values from the profile file, the legacy environment variables and admin overrides saved in the state folder.
+    from campus247.application.features.service import FeatureService
+    from campus247.features.registry import feature_for_page
+    from campus247.infrastructure.feature_profile import load_feature_profile
+    from campus247.infrastructure.repositories.sqlite_feature_flags import FeatureStore
+    feature_profile = os.environ.get("CAMPUS247_PROFILE", "local")
+    wired_features = {"learning.core"} if learning_service is not None else set()
+    if learning_ai_flag == "true":
+        wired_features.add("learning.ai_explanations")
+    if os.environ.get("CAMPUS247_OIDC_CONFIG"):
+        wired_features.add("identity.oidc")
+    feature_service = FeatureService(
+        store=FeatureStore(checked_path(identity_root / "feature-flags.sqlite3", ROOT)),
+        profile_values=load_feature_profile(feature_profile, ROOT / "infra/profiles"), env=dict(os.environ),
+        wired=frozenset(wired_features), signing_key=settings.CONFIRMATION_SIGNING_KEY, profile=feature_profile)
     os.environ["CAMPUS247_IDEMPOTENCY_DB"] = str(bundle["action-idempotency.sqlite3"] if bundle else checked_path(STATE / "action-idempotency.sqlite3", ROOT))
     conversations = SQLiteConversationRepository(bundle["conversations.sqlite3"] if bundle else checked_path(STATE / "conversations.sqlite3", ROOT))
     app = create_app(runtime_settings=settings, synthetic_tenant_id=TENANT, retrieval_context_factory=factory,
         knowledge_runtime=runtime, llm_gateway=gateway, claim_verifier=verifier,
         conversation_repository=conversations,
-        identity_adapter_override=campus_adapter)
+        identity_adapter_override=campus_adapter, feature_service=feature_service)
     app.router.routes[:] = [route for route in app.router.routes
         if getattr(route, "path", None) not in {"/docs", "/docs/oauth2-redirect", "/redoc", "/openapi.json"}]
     app.docs_url = app.redoc_url = app.openapi_url = None
@@ -616,14 +631,20 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     student = campus_adapter.student.directory()
                     return {student["student_code"]: student["subject_id"]}.get
 
+                from campus247.application.features.jobs import run_gated
+
+                def gated(job, make):
+                    # The job runs only while its feature is on; switching it off stops it, switching it on starts it again.
+                    return asyncio.create_task(run_gated(lambda: feature_service.job_enabled(job), make, name=job))
+
                 async def start_jobs():
-                    jobs = [asyncio.create_task(platform.schedules.serve())]
-                    jobs.append(asyncio.create_task(run_reminders(ops_service.store, student_subjects)))
+                    jobs = [gated("knowledge_schedules", platform.schedules.serve)]
+                    jobs.append(gated("exam_reminders", lambda: run_reminders(ops_service.store, student_subjects)))
                     if learning_service is not None:
                         from campus247.application.campus_ops.reminder_job import run_exit_ticket_reminders
-                        jobs.append(asyncio.create_task(run_exit_ticket_reminders(learning_service, ops_service.store)))
+                        jobs.append(gated("exit_ticket_reminders", lambda: run_exit_ticket_reminders(learning_service, ops_service.store)))
                     from campus247.application.knowledge.freshness_reminders import run_freshness_reminders
-                    jobs.append(asyncio.create_task(run_freshness_reminders(
+                    jobs.append(gated("freshness_reminders", lambda: run_freshness_reminders(
                         freshness_service, ops_service.store, lambda: [owner_adapter.directory()["owner_id"]])))
                     from campus247.application.knowledge.release_check import ReleaseWatch, run_release_watch
                     from campus247.observability.ops_metrics import OPS as release_check_ops
@@ -634,7 +655,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                             cwd=str(ROOT), stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
                         asyncio.create_task(check.wait())
 
-                    jobs.append(asyncio.create_task(run_release_watch(ReleaseWatch(
+                    jobs.append(gated("release_check", lambda: run_release_watch(ReleaseWatch(
                         lambda: (runtime.current or {}).get("release_id"), start_release_check,
                         lambda: release_check_ops.gauges.get("in_flight", 0) > 3))))
 
@@ -645,12 +666,12 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     import httpx
                     alert_client, alert_cache = httpx.AsyncClient(trust_env=False), ProbeCache()
                     alert_manager = AlertManager(STATE / "ops-alerts", build_notifier(os.environ))
-                    jobs.append(asyncio.create_task(run_alerts(
+                    jobs.append(gated("alerts", lambda: run_alerts(
                         alert_manager, lambda: build_status(ops_config, client=alert_client, cache=alert_cache))))
                     if learning_service is not None:
-                        jobs.append(asyncio.create_task(learning_worker()))
+                        jobs.append(gated("learning_worker", learning_worker))
                         if learning_service.accessible_text_pipeline is not None:
-                            jobs.append(asyncio.create_task(learning_service.serve_accessible_text()))
+                            jobs.append(gated("accessible_text", learning_service.serve_accessible_text))
                     return jobs
 
                 def standby():
@@ -794,6 +815,9 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 return RedirectResponse("/chat" if not page_path else "/knowledge/sources")
             if not is_served_path(page_path):
                 return not_found_response(request)
+            page_owner = feature_for_page(page_path)
+            if page_owner is not None and not feature_service.enabled(page_owner):
+                return not_found_response(request)  # the feature behind this page is switched off
             return await proxy_frontend(page_path, request, frontend_port)
     return app
 

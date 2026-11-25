@@ -20,7 +20,7 @@ STATIC_FILES = frozenset({"sw.js", "manifest.webmanifest", "favicon.ico"})
 ALLOWED_API_PREFIXES = (
     "/v1/knowledge/", "/v1/conversations", "/v1/privacy/", "/v1/assistant/", "/v1/student-preparations", "/v1/learning/",
     "/v1/rooms", "/v1/tickets", "/v1/students/me/schedule", "/v1/staff/tickets", "/v1/notifications",
-    "/v1/admin/overview", "/v1/admin/operations/", "/v1/answer-gap-reports",
+    "/v1/admin/overview", "/v1/admin/operations/", "/v1/answer-gap-reports", "/v1/features", "/v1/admin/features",
 )
 ALLOWED_API_PATHS = frozenset({"/v1/users/me", "/v1/auth/logout"})
 

@@ -1,0 +1,5 @@
+# Feature values for the local profile. Keys must exist in campus247/features/registry.py (unknown keys stop the start-up).
+# Anything not listed uses the registry default; new features of the F series default to off.
+schema = "campus247-features-v1"
+profile = "local"
+[features]

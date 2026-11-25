@@ -1,0 +1,8 @@
+# Feature values for the cloud profile. Learning is off here until ClamAV for Linux exists (memory: rollout-phase1-state).
+schema = "campus247-features-v1"
+profile = "cloud"
+[features]
+"learning.core" = false
+"learning.ai_explanations" = false
+"chat.answer_cache" = false
+"chat.verbatim_skip" = "off"
