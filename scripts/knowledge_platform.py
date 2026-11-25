@@ -701,7 +701,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         actor = campus_adapter.resolve_token(token)
         response = JSONResponse({"user_id": actor.subject_id, "roles": [r.value for r in actor.roles],
             "is_synthetic_identity": actor.is_synthetic, "identity_provider":"local", "university_identity_verified":False}, headers={"Cache-Control":"no-store"})
-        response.set_cookie("auth_token", token, httponly=True, samesite="strict", max_age=3600)
+        # Secure whenever the request arrived over HTTPS (directly, or through the reverse proxy that sets X-Forwarded-Proto).
+        response.set_cookie("auth_token", token, httponly=True, samesite="strict", max_age=3600, secure=request.url.scheme == "https")
         return response
 
     from campus247.application.assistance.state_storage import ConversationMetadata, StateScope
