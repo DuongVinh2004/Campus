@@ -168,3 +168,12 @@ def test_snapshot_hides_server_only_flags_and_reasons(tmp_path):
     snap = make(tmp_path).snapshot(client_only=True)
     assert "chat.answer_cache" not in snap["features"] and snap["features"]["chat.assistant"] is True
     assert set(snap) == {"version", "features"}
+
+
+def test_summary_counts_for_the_ops_page(tmp_path):
+    svc = make(tmp_path, wired=frozenset())
+    base = svc.summary()
+    assert base["overrides"] == 0 and base["restart_required"] >= 1 and base["store_error"] is False
+    change(svc, person(), "rooms.booking", False)
+    after = svc.summary()
+    assert after["overrides"] == 1 and after["off"] == base["off"] + 1

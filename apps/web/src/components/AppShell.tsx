@@ -4,6 +4,8 @@ import { clearLegacyLocalToken, sessionLoginHref } from "../features/chat/local-
 import { LearningSessionNotice, PreservedActivity, useLearningSession } from "../features/learning/learning-session";
 import { ChatDraftActor, chatDraftActorScope } from "../features/chat/route-drafts";
 import { useUnreadNotifications } from "../lib/use-unread-notifications";
+import { useNavEnabled } from "../lib/features";
+import { NAV_FEATURE } from "../lib/feature-registry.generated";
 
 import React, { type ReactNode, createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
@@ -201,7 +203,7 @@ export function AppShell({
       .catch(() => { if (active) setLocalActor(previous => checkSessionOnResume && previous ? previous : null); });
     return () => { active = false; };
   }, [operational, checkSessionOnResume]);
-  const navItems = operational ? knowledgeNavigation.filter(item => item.roles.includes(userRole)) : isPublic
+  const allNavItems = operational ? knowledgeNavigation.filter(item => item.roles.includes(userRole)) : isPublic
     ? publicNavigation
     : navigation
         .filter((item) => item.roles.includes(userRole))
@@ -212,6 +214,9 @@ export function AppShell({
             ? { ...item, href: "/knowledge/sources" }
             : item
         );
+  // A feature switched off by an administrator (F0) disappears from the menu; external links stay.
+  const navEnabled = useNavEnabled(NAV_FEATURE);
+  const navItems = allNavItems.filter(item => (item as { external?: boolean }).external || navEnabled(item.key));
 
   useEffect(() => {
     setMobileOpen(false);

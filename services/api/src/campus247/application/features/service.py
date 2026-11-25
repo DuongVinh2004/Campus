@@ -255,6 +255,13 @@ class FeatureService:
                 "cost": f.cost})
         return {"version": version, "profile": self.profile, "store_error": self.store_error, "items": items}
 
+    def summary(self) -> dict[str, Any]:
+        """Counts for the operations page: features off, admin overrides in force, features waiting for a restart."""
+        data = self.admin_items()
+        items = data["items"]
+        return {"off": sum(1 for i in items if not i["effective_for_all"]), "overrides": sum(1 for i in items if i["configured"]["source"] == "override"),
+                "restart_required": sum(1 for i in items if "NOT_WIRED_RESTART_REQUIRED" in i["off_reasons"]), "store_error": data["store_error"]}
+
     # ------------------------------------------------------------ change flow
     @staticmethod
     def require_admin(actor: IdentityContext) -> None:

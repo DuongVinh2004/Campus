@@ -149,10 +149,19 @@ class ToolRegistry:
         return cls(tools={t.tool_id: t for t in defs})
 
     def has_tool(self, tool_id: str) -> bool:
-        return tool_id in self._tools
+        return tool_id in self._tools and self._allowed(tool_id)
+
+    @staticmethod
+    def _allowed(tool_id: str) -> bool:
+        from campus247.features.runtime import tool_allowed  # F0: a tool whose feature is off is invisible and refused
+        return tool_allowed(tool_id)
+
+    def available_tool_ids(self) -> list[str]:
+        """Tools to offer the model: the ones whose feature is on."""
+        return [tool_id for tool_id in self._tools if self._allowed(tool_id)]
 
     def get_tool(self, tool_id: str) -> ToolDefinition:
-        if tool_id not in self._tools:
+        if tool_id not in self._tools or not self._allowed(tool_id):
             raise ToolValidationError(f"Unknown tool ID: '{tool_id}'")
         return self._tools[tool_id]
 

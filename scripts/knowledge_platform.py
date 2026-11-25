@@ -496,6 +496,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         store=FeatureStore(checked_path(identity_root / "feature-flags.sqlite3", ROOT)),
         profile_values=load_feature_profile(feature_profile, ROOT / "infra/profiles"), env=dict(os.environ),
         wired=frozenset(wired_features), signing_key=settings.CONFIRMATION_SIGNING_KEY, profile=feature_profile)
+    from campus247.features import runtime as feature_runtime
+    feature_runtime.install(feature_service)
     os.environ["CAMPUS247_IDEMPOTENCY_DB"] = str(bundle["action-idempotency.sqlite3"] if bundle else checked_path(STATE / "action-idempotency.sqlite3", ROOT))
     conversations = SQLiteConversationRepository(bundle["conversations.sqlite3"] if bundle else checked_path(STATE / "conversations.sqlite3", ROOT))
     app = create_app(runtime_settings=settings, synthetic_tenant_id=TENANT, retrieval_context_factory=factory,
@@ -541,6 +543,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         model_urls={"embedding": "http://127.0.0.1:18081/info", "reranker": "http://127.0.0.1:18082/info"},
         gateway_url=gateway_url,
         gateway_token=read_token(gateway_token_file) if gateway_url and gateway_token_file else None,
+        features=lambda: feature_service.summary(),
         background=lambda: {"leader": bool(getattr(getattr(app.state, "background_leader", None), "is_leader", False)),
                             "learning_worker": getattr(app.state, "learning_worker_status", "disabled")})
     app.include_router(create_admin_ops_router(ops_config))
