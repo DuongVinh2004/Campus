@@ -407,7 +407,8 @@ export function WeekSchedule() {
           {isLoading && (
             <div
               role="status"
-              className="campus-panel flex flex-col items-center justify-center p-12 text-center text-sm text-[var(--text-secondary)]"
+              // Reserve about the height of the week grid so it does not push the page down when the data arrives (layout shift).
+              className="campus-panel flex min-h-[32rem] flex-col items-center justify-center p-12 text-center text-sm text-[var(--text-secondary)]"
             >
               <RefreshCw className="mb-3 h-6 w-6 animate-spin text-[var(--color-primary)]" aria-hidden="true" />
               <span>{t("week.3")}</span>
