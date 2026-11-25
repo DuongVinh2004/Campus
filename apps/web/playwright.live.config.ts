@@ -8,7 +8,8 @@ export default defineConfig({
   timeout: 90_000,
   expect: { timeout: 12_000 },
   use: {
-    baseURL: "http://127.0.0.1:3115",
+    // The only runtime is 8015 (the old 3115 entry no longer exists); CAMPUS_BASE_URL points it elsewhere.
+    baseURL: process.env.CAMPUS_BASE_URL ?? "http://127.0.0.1:8015",
     headless: true,
     actionTimeout: 15_000,
     navigationTimeout: 20_000,
