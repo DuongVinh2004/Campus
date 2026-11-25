@@ -566,6 +566,24 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         current_release=lambda: (runtime.current or {}).get("release_id"), enabled=lambda: feature_service.enabled("chat.evidence_receipts"))
     app.include_router(create_answer_receipts_router(receipt_service))
     app.state.answer_receipts = receipt_service
+
+    # Proactive assistant (F6): signals of one person -> "things to do today" and inbox nudges. No model calls.
+    from campus247.application.proactive.engine import ProactiveEngine
+    from campus247.application.proactive.providers import AnnouncementProvider, ExamProvider, TicketProvider
+    from campus247.presentation.nudges import create_nudges_router
+
+    def nudge_subjects():
+        return [a["subject_id"] for a in announcement_accounts() if a["role"] == "STUDENT"]
+
+    def nudge_student_subject(student_code):
+        student = campus_adapter.student.directory()
+        return student["subject_id"] if student["student_code"] == student_code else None
+
+    proactive_engine = ProactiveEngine(
+        ops_service.store, [ExamProvider(ops_service.store, nudge_student_subject), AnnouncementProvider(ops_service.store), TicketProvider(ops_service.store)],
+        enabled=feature_service.enabled, subjects=nudge_subjects)
+    app.include_router(create_nudges_router(proactive_engine))
+    app.state.proactive = proactive_engine
     from campus247.presentation.learning import create_learning_router
     app.include_router(create_learning_router(learning_service))
     app.state.learning_service = learning_service
@@ -685,6 +703,9 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     jobs.append(gated("exam_reminders", lambda: run_reminders(ops_service.store, student_subjects)))
                     from campus247.application.announcements.jobs import announcement_jobs
                     for job_name, job_factory in announcement_jobs(announcement_service):
+                        jobs.append(gated(job_name, job_factory))
+                    from campus247.application.announcements.jobs import proactive_jobs
+                    for job_name, job_factory in proactive_jobs(proactive_engine):
                         jobs.append(gated(job_name, job_factory))
                     if learning_service is not None:
                         from campus247.application.campus_ops.reminder_job import run_exit_ticket_reminders

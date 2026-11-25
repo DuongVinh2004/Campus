@@ -38,7 +38,12 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F4.2 support_spans + biên nhận + API | MỘT PHẦN | xem log | `rag_v2/outcome/support_spans.py`: 200 cặp máy sinh từ `data/rag_v2_index/units.jsonl`, ≥ 99 % đoạn chứa đủ số (`tests/rag_v2/test_support_spans.py`); kho + service + `GET /v1/answer-receipts/{id}` có test (`tests/features/test_answer_receipts.py`); CHƯA nối ghi biên nhận từ luồng chat (cần F4.1) |
 | F4.3 giao diện huy hiệu/tô đoạn | CHƯA LÀM | — | |
 | F4.4 số đo trang chất lượng | CHƯA LÀM | — | |
-| G-PG, F2, F3, F5, F6, F7, F8 | CHƯA LÀM | — | hết ngân sách của lượt chạy này; tiếp tục ở lượt sau theo thứ tự README §3 |
+| F6.1 domain/chính sách | XONG | xem log | `application/proactive/engine.py`; mức gấp, stage, giờ yên lặng (21:59/22:00/06:59/07:00), trần 3/ngày, khóa idempotency |
+| F6.2 provider nguồn có sẵn | MỘT PHẦN | xem log | EXAM, TICKET_NEED_INFO có; CHƯA có EXIT_TICKET_CLOSING, PRACTICE_DUE, TRACKED_ITEM |
+| F6.3 provider nguồn mới | MỘT PHẦN | xem log | ANNOUNCEMENT_ACK, ANNOUNCEMENT_URGENT_UNREAD có; PROCEDURE_DRAFT, POLICY_CHANGE chờ F5, F3 |
+| F6.4 job + bản tin + chuyển giao + mô phỏng | XONG | xem log | mô phỏng 14 ngày × 40 sinh viên khớp oracle độc lập 100 % (so từng khóa và giờ gửi); khởi động lại mỗi phút ngày đầu: cùng tập nhắc, không đôi; 30 000 người trong một lượt (`evals/results/proactive-20261126/perf.json`); job nhắc thi cũ dừng khi `proactive.nudges` bật |
+| F6.5 API + web | MỘT PHẦN | xem log | API `/v1/nudges/*` có test (done/snooze/restore/tùy chọn/404 người lạ); CHƯA có khối "Việc cần làm" trên trang chủ và mục tùy chọn trên giao diện |
+| G-PG, F2, F3, F5, F7, F8 | CHƯA LÀM | — | hết ngân sách của lượt chạy này; tiếp tục ở lượt sau theo thứ tự README §3 (F2 chờ G-PG; F5 chờ F2) |
 
 - Trang động `[id]` không chạy được trên 8015 vì `runtime_routes.page_routes()` liệt kê trang tĩnh; chi tiết thông báo dùng `/announcements?id=`.
 
@@ -47,3 +52,7 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 - `tests/features` 70 đạt; `tests/test_runtime_routes.py` đạt; `tests/architecture` đạt; `tests/rag_v2` 418 đạt, 1 lỗi `INDEX_OUTSIDE_WORKSPACE` (môi trường, `tests/rag_v2/test_i2_lifecycle.py`).
 - `tests/operations/test_runtime_audit_fixes.py`: 30 lỗi `must stay inside workspace` giống hệt ở commit gốc 6888822 (đã kiểm bằng worktree) → có sẵn từ trước, không do đợt này.
 - vitest toàn bộ: 8 lỗi do `/v1/features` lấy mất mock fetch của test khác; đã sửa bằng cách tắt tự tải trong NODE_ENV=test, 5 tệp liên quan chạy lại đạt (cần chạy lại toàn bộ ở cuối).
+
+- Hồi quy đầy đủ `run_full_regression.py --ci` (lượt này, 26/11): 2362 đạt, 1 lỗi `tests/unit/learning_pptx/test_pptx.py::test_internal_literal_chart_workbook_is_supported`; lỗi này giống hệt ở commit gốc 6888822 (kiểm bằng worktree) nên có sẵn từ trước. Kết quả ở `evals/results/f-series-regression-20261126/`. Lệnh `--ci` không chạy `tests/features`, `tests/announcements`, `tests/proactive`; ba thư mục này chạy riêng và đạt.
+- vitest toàn bộ: 173 tệp, 1004 ca đạt (sau khi sửa tự tải cờ trong NODE_ENV=test).
+- Không áp migration nào; không chạm DB vận hành; không gọi provider thật; chưa khởi động lại runtime 8015 (không kiểm bằng `web_acceptance.mjs`).

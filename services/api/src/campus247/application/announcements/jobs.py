@@ -25,3 +25,8 @@ def announcement_jobs(service) -> list[tuple[str, object]]:
             ("announcement_reconcile", _loop("reconcile", 3600, service.run_reconcile_once)),
             ("announcement_expiry", _loop("expiry", 300, service.run_expiry_once)),
             ("announcement_ack_reminders", _loop("ack", 900, service.run_ack_reminders_once))]
+
+
+def proactive_jobs(engine) -> list[tuple[str, object]]:
+    """F6 loops, kept beside the other gated loops: nudges every 5 minutes, the digest check every 5 minutes (one send per person per day)."""
+    return [("proactive_nudges", _loop("nudges", 300, engine.run_once)), ("proactive_digest", _loop("digest", 300, engine.run_digest_once))]

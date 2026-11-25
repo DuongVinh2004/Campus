@@ -1,6 +1,6 @@
 {
   "recipients": 30000,
-  "seconds": 1.73,
+  "seconds": 2.35,
   "batch": 1000,
   "deliveries": 30000,
   "notifications": 30000,

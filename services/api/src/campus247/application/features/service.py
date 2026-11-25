@@ -230,8 +230,12 @@ class FeatureService:
         owner = next((f.key for f in self.features.values() if tool_id in f.tools), None)
         return True if owner is None else self.enabled(owner, actor)
 
+    SUPERSEDED_BY = {"exam_reminders": "proactive.nudges"}  # the old exam reminder stops when its replacement is on, so nobody is nudged twice
+
     def job_enabled(self, job: str) -> bool:
         owner = next((f.key for f in self.features.values() if job in f.jobs), None)
+        if job in self.SUPERSEDED_BY and self.enabled(self.SUPERSEDED_BY[job]):
+            return False
         return True if owner is None else self.enabled(owner)
 
     # ------------------------------------------------------------ admin view

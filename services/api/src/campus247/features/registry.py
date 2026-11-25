@@ -148,7 +148,7 @@ FEATURES: tuple[FeatureDefinition, ...] = (
     _f("chat.evidence_receipts", "Biên nhận bằng chứng câu trả lời", "chat", default=False, depends_on=("chat.assistant",), api_prefixes=("/v1/answer-receipts",)),
     _f("chat.evidence_ui", "Hiển thị bằng chứng", "chat", kind="ui", default=False, depends_on=("chat.evidence_receipts",)),
     _f("agent.procedures", "Agent làm thủ tục", "agent", kind="ai", default=False, depends_on=("policy.rules", "services.preparations", "tickets.student"), api_prefixes=("/v1/procedures",), tools=("procedure_check", "procedure_draft"), cost="model_calls"),
-    _f("proactive.nudges", "Nhắc việc chủ động", "proactive", default=False, depends_on=("notifications.inbox",), api_prefixes=("/v1/proactive",), jobs=("proactive_nudges",)),
+    _f("proactive.nudges", "Nhắc việc chủ động", "proactive", default=False, depends_on=("notifications.inbox",), api_prefixes=("/v1/nudges",), jobs=("proactive_nudges",)),
     _f("proactive.digest", "Bản tin tuần", "proactive", default=False, depends_on=("proactive.nudges",), jobs=("proactive_digest",)),
     _f("learning.tutor", "Gia sư hỏi gợi mở", "learning", kind="ai", default=False, depends_on=("learning.practice",), api_patterns=(rf"^{_LRN}/tutor/.*$",), cost="model_calls"),
     _f("learning.mastery_map", "Bản đồ nắm vững", "learning", default=False, depends_on=("learning.practice",), api_patterns=(rf"^{_LRN}/mastery/.*$",)),
