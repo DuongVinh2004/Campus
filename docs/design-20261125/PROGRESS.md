@@ -33,7 +33,12 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F1.6 đồng bộ kho tri thức | MỘT PHẦN | — | `AnnouncementService` có móc `knowledge_sync.publish/revoke`, test thu hồi/hết hạn bằng bản giả; CHƯA nối adapter vào `KnowledgePlatform.upload()` và chưa có test RAG provider giả |
 | F1.7 web | MỘT PHẦN | xem log | hộp thư, chi tiết (`?id=`), soạn có đếm người nhận trực tiếp, vitest 4; CHƯA có: thống kê, hàng đợi duyệt, thu hồi/sửa trên giao diện, thẻ trang chủ, nút trong học liệu, trang công khai riêng |
 | F1.8 tool chat | CHƯA LÀM | — | |
-| F2 … F8 | CHƯA LÀM | — | |
+| F4.0 provider phát lại | CHƯA LÀM | — | cần sổ ghi phản hồi provider theo băm yêu cầu; chưa có sẵn trong repo |
+| F4.1 `checks`/`rejected_counts` trong Outcome | CHƯA LÀM | — | chặn bởi F4.0 (phải chứng minh không đổi hành vi trước khi sửa mã RAG) |
+| F4.2 support_spans + biên nhận + API | MỘT PHẦN | xem log | `rag_v2/outcome/support_spans.py`: 200 cặp máy sinh từ `data/rag_v2_index/units.jsonl`, ≥ 99 % đoạn chứa đủ số (`tests/rag_v2/test_support_spans.py`); kho + service + `GET /v1/answer-receipts/{id}` có test (`tests/features/test_answer_receipts.py`); CHƯA nối ghi biên nhận từ luồng chat (cần F4.1) |
+| F4.3 giao diện huy hiệu/tô đoạn | CHƯA LÀM | — | |
+| F4.4 số đo trang chất lượng | CHƯA LÀM | — | |
+| G-PG, F2, F3, F5, F6, F7, F8 | CHƯA LÀM | — | hết ngân sách của lượt chạy này; tiếp tục ở lượt sau theo thứ tự README §3 |
 
 - Trang động `[id]` không chạy được trên 8015 vì `runtime_routes.page_routes()` liệt kê trang tĩnh; chi tiết thông báo dùng `/announcements?id=`.
 

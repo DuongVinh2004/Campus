@@ -145,7 +145,7 @@ FEATURES: tuple[FeatureDefinition, ...] = (
     _f("policy.conflicts", "Phát hiện mâu thuẫn quy chế", "policy", default=False, depends_on=("policy.graph_v2",), api_prefixes=("/v1/policy-conflicts",)),
     _f("policy.impact_announcements", "Soạn thông báo từ tác động", "policy", default=False, depends_on=("policy.impact", "announcements.publish")),
     _f("policy.impact_user_notices", "Báo người dùng đã hỏi quy chế đổi", "policy", default=False, depends_on=("policy.impact", "notifications.inbox", "chat.history")),
-    _f("chat.evidence_receipts", "Biên nhận bằng chứng câu trả lời", "chat", default=False, depends_on=("chat.assistant",), api_prefixes=("/v1/evidence",)),
+    _f("chat.evidence_receipts", "Biên nhận bằng chứng câu trả lời", "chat", default=False, depends_on=("chat.assistant",), api_prefixes=("/v1/answer-receipts",)),
     _f("chat.evidence_ui", "Hiển thị bằng chứng", "chat", kind="ui", default=False, depends_on=("chat.evidence_receipts",)),
     _f("agent.procedures", "Agent làm thủ tục", "agent", kind="ai", default=False, depends_on=("policy.rules", "services.preparations", "tickets.student"), api_prefixes=("/v1/procedures",), tools=("procedure_check", "procedure_draft"), cost="model_calls"),
     _f("proactive.nudges", "Nhắc việc chủ động", "proactive", default=False, depends_on=("notifications.inbox",), api_prefixes=("/v1/proactive",), jobs=("proactive_nudges",)),

@@ -544,6 +544,28 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.include_router(create_announcements_router(announcement_service))
     register_announcement_errors(app)
     app.state.announcements = announcement_service
+
+    # Answer receipts (F4.2): the owner re-checks an answer against the current release. Writing them from the chat path waits for F4.1.
+    from campus247.application.answer_evidence.receipts import AnswerReceiptService
+    from campus247.infrastructure.repositories.sqlite_answer_receipts import AnswerReceiptStore
+    from campus247.presentation.answer_receipts import create_answer_receipts_router
+    unit_hashes: dict = {}
+
+    def current_unit_sha(unit_id):
+        if not unit_hashes:
+            index_units = Path(os.environ.get("CAMPUS247_RAG_V2_INDEX", "data/rag_v2_index"))
+            index_units = (index_units if index_units.is_absolute() else ROOT / index_units) / "units.jsonl"
+            if index_units.is_file():
+                for line in index_units.read_text(encoding="utf-8").splitlines():
+                    unit = json.loads(line)
+                    unit_hashes[unit["unit_id"]] = hashlib.sha256(unit["text"].encode("utf-8")).hexdigest()
+        return unit_hashes.get(unit_id)
+
+    receipt_service = AnswerReceiptService(
+        AnswerReceiptStore(checked_path(identity_root / "answer-receipts.sqlite3", ROOT)), current_unit_sha=current_unit_sha,
+        current_release=lambda: (runtime.current or {}).get("release_id"), enabled=lambda: feature_service.enabled("chat.evidence_receipts"))
+    app.include_router(create_answer_receipts_router(receipt_service))
+    app.state.answer_receipts = receipt_service
     from campus247.presentation.learning import create_learning_router
     app.include_router(create_learning_router(learning_service))
     app.state.learning_service = learning_service
