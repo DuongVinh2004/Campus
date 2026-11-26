@@ -106,17 +106,27 @@ try {
 
   await ask(student.page, "Em muốn xin giấy xác nhận sinh viên để vay vốn ngân hàng");
   check((await student.page.getByRole("button", { name: "Bắt đầu cùng trợ lý" }).count()) > 0, "chat: the procedure card appears");
+  // A student may start at most 10 procedures a day (cancelled ones count): a repeated QA run can reach it, which is not a fault.
   await student.page.getByRole("button", { name: "Bắt đầu cùng trợ lý" }).first().click();
-  await student.page.waitForURL(/services\/procedures\?run=/, { timeout: 15000 });
-  await student.page.waitForTimeout(1500);
-  check((await student.page.getByRole("button", { name: "Lưu thông tin" }).count()) > 0, "procedure page shows the form (nothing is sent without the confirm button)");
-  await student.page.screenshot({ path: path.join(root, "infra/local/qa-acceptance/f-series-procedure.png") });
+  const opened = await student.page.waitForURL(/services\/procedures\?run=/, { timeout: 15000 }).then(() => true).catch(() => false);
+  if (opened) {
+    await student.page.waitForTimeout(1500);
+    check((await student.page.getByRole("button", { name: "Lưu thông tin" }).count()) > 0, "procedure page shows the form (nothing is sent without the confirm button)");
+    await student.page.screenshot({ path: path.join(root, "infra/local/qa-acceptance/f-series-procedure.png") });
+  } else {
+    const alert = await student.page.getByRole("alert").first().innerText({ timeout: 5000 }).catch(() => "");
+    check(/quá nhiều thủ tục/.test(alert), `procedure card: the daily limit (10 starts) is reached and explained to the student ("${alert.slice(0, 60)}")`);
+  }
   const runs = await (await student.context.request.get(BASE + "/v1/procedures/runs")).json();
   for (const run of runs.items ?? []) if (["STARTED", "COLLECTING"].includes(run.state)) await student.context.request.post(`${BASE}/v1/procedures/runs/${run.id}:cancel`);
 
   // Procedure submit through the API: a real ticket is created (labelled as an automatic check), and a replayed confirm creates no second one.
   const api = student.context.request;
-  const started = await (await api.post(BASE + "/v1/procedures/runs", { data: { procedure_id: "student-certificate" } })).json();
+  const startedReply = await api.post(BASE + "/v1/procedures/runs", { data: { procedure_id: "student-certificate" } });
+  if (startedReply.status() === 429) {
+    console.log("skip procedure submit: the student's daily limit of 10 starts is reached (run again tomorrow or with another account)");
+  } else {
+  const started = await startedReply.json();
   const filled = await api.put(`${BASE}/v1/procedures/runs/${started.id}/fields`, { data: { row_version: started.row_version,
     fields: { purpose: "Vay vốn", copies: 1, note: "Kiểm thử tự động F-series (dữ liệu thử), có thể đóng" } } });
   const filledRun = filled.status() === 200 ? await filled.json() : {};
@@ -132,6 +142,7 @@ try {
   const listed = (tickets.items ?? tickets.tickets ?? []).filter((t) => t.code === code).length;
   check(filled.status() === 200 && first.status() === 200 && done.state === "SUBMITTED" && !!code && listed === 1 && (replay.ticket?.code ?? replay.ticket_code) === code,
     `procedure: submit creates one ticket (fields HTTP ${filled.status()} v${filledRun.row_version}, confirm HTTP ${first.status()}, state ${done.state}, ticket ${code}, listed ${listed}, replay HTTP ${again.status()})`);
+  }
 
   // Image and voice input: real engines on this machine (Tesseract in the WSL sandbox, the local recognizer on 18083).
   const png = fs.readFileSync(path.join(root, ".pytest-tmp/ocr-sample.png"));
