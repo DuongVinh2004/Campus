@@ -181,5 +181,6 @@ export const PAGE_FEATURE: Record<string, FeatureKey> = {
   "announcements": "announcements.inbox",
   "knowledge/policy-rules": "policy.rules",
   "policy/simulator": "policy.simulator",
+  "knowledge/policy-impact": "policy.impact",
   "services/procedures": "agent.procedures"
 };
