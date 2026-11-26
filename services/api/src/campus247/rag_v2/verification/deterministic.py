@@ -322,7 +322,10 @@ def check_statement(stmt: Statement, units_by_id: Mapping[str, Unit]) -> Stateme
     reasons = []
     if not _dates(text) <= _dates(source) or not _day_months(text) <= _day_months(source):
         reasons.append("DATE_NOT_IN_SOURCE")
-    if not _codes(text) <= _codes(source):
+    # A cohort the source covers by a range ("K69" under "K70 trở về trước" / "K70_and_earlier") is stated by the source.
+    ranged = source.replace("_and_earlier", " trở về trước")
+    unstated = {code for code in _codes(text) - _codes(source) if not (re.fullmatch(r"k\d{2,3}", code) and covers(ranged, code))}
+    if unstated:
         reasons.append("CODE_NOT_IN_SOURCE")
     # Dates are compared as dates above; their digits are not stray numbers.
     numbers = {_number(m.group()) for m in NUMBER.finditer(_value_text(_without_dates(text)))}

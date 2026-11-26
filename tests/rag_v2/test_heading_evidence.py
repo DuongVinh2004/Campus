@@ -94,3 +94,14 @@ def test_a_row_under_a_label_only_page_is_packed_without_the_page():
     learning = row("71CS — Học phần tiên quyết — 608825 → 608807 > Học phần 608807 - 3", "608807 - 3\nHọc máy", uid="h" * 16)
     selected, truncated = pack_context([learning], {"c": page}.get, budget=10_000)
     assert list(selected) == ["h" * 16] and not truncated
+
+
+def test_a_cohort_inside_the_sources_range_is_not_an_unstated_code():
+    unit = row("K70_and_earlier_verify_individual_row — Ngành Quản lý dự án > Học phần 511381 – 7", "511381 – 7\nKhóa luận tốt nghiệp",
+               title="K70_and_earlier_verify_individual_row — Ngành Quản lý dự án")
+    from dataclasses import replace
+    units = {"a" * 16: replace(unit, scope=Scope())}             # the row declares no cohort of its own
+    assert check_statement(Statement("Ngành Quản lý dự án (K69): học phần 511381 – 7 là Khóa luận tốt nghiệp.", ("a" * 16,)), units).passed
+    wrong = check_statement(Statement("Ngành Quản lý dự án (K71): học phần 511381 – 7 là Khóa luận tốt nghiệp.", ("a" * 16,)), units)
+    assert not wrong.passed                                     # K71 is outside "K70 trở về trước"
+    assert not check_statement(Statement("Học phần CS101 là Khóa luận tốt nghiệp.", ("a" * 16,)), units).passed
