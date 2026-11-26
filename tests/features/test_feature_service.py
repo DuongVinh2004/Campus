@@ -177,3 +177,13 @@ def test_summary_counts_for_the_ops_page(tmp_path):
     change(svc, person(), "rooms.booking", False)
     after = svc.summary()
     assert after["overrides"] == 1 and after["off"] == base["off"] + 1
+
+
+def test_summary_lists_overrides_that_end_within_a_day(tmp_path):
+    svc = make(tmp_path)
+    soon = (NOW + timedelta(hours=3)).isoformat().replace("+00:00", "Z")
+    later = (NOW + timedelta(days=3)).isoformat().replace("+00:00", "Z")
+    change(svc, person(), "rooms.booking", False, expires_at=soon, idem="k1")
+    change(svc, person(), "notifications.inbox", False, expires_at=later, idem="k2")
+    ending = svc.summary()["expiring_soon"]
+    assert [e["key"] for e in ending] == ["rooms.booking"]

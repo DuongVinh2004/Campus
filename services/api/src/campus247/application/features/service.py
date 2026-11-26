@@ -260,11 +260,16 @@ class FeatureService:
         return {"version": version, "profile": self.profile, "store_error": self.store_error, "items": items}
 
     def summary(self) -> dict[str, Any]:
-        """Counts for the operations page: features off, admin overrides in force, features waiting for a restart."""
+        """Counts for the operations page: features off, admin overrides in force, features waiting for a restart, and the
+        overrides that end within 24 hours (when they end the feature silently returns to its configured default)."""
         data = self.admin_items()
         items = data["items"]
+        horizon = _iso(self.clock() + timedelta(hours=24))
+        ending = sorted((i["configured"]["expires_at"], i["key"]) for i in items
+                        if i["configured"]["source"] == "override" and i["configured"].get("expires_at") and i["configured"]["expires_at"] <= horizon)
         return {"off": sum(1 for i in items if not i["effective_for_all"]), "overrides": sum(1 for i in items if i["configured"]["source"] == "override"),
-                "restart_required": sum(1 for i in items if "NOT_WIRED_RESTART_REQUIRED" in i["off_reasons"]), "store_error": data["store_error"]}
+                "restart_required": sum(1 for i in items if "NOT_WIRED_RESTART_REQUIRED" in i["off_reasons"]), "store_error": data["store_error"],
+                "expiring_soon": [{"key": key, "expires_at": at} for at, key in ending]}
 
     # ------------------------------------------------------------ change flow
     @staticmethod

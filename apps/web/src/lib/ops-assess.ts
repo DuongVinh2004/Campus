@@ -120,6 +120,16 @@ export function assessStatus(status: OpsStatus): Finding[] {
       value: backup.last ? `${backup.last.age_hours ?? "?"} giờ trước${backup.last.ok ? "" : " (lỗi)"}` : "chưa có bản nào",
       detail: backup.offsite ? undefined : "Chưa có bản sao ngoài máy." });
   }
+  const features = status.features;
+  if (features) {
+    const ending = features.expiring_soon ?? [];
+    const level: Level = features.store_error ? "crit" : features.restart_required || ending.length ? "warn" : "ok";
+    findings.push({ id: "features", label: "Cờ tính năng", level,
+      value: `${features.off} tắt · ${features.overrides} ghi đè`,
+      detail: features.store_error ? "Không đọc được kho cờ: đang dùng giá trị mặc định."
+        : [features.restart_required ? `${features.restart_required} cờ cần khởi động lại mới có tác dụng.` : "",
+           ending.length ? `Sắp hết hạn trong 24 giờ: ${ending.map((e) => e.key).join(", ")}.` : ""].filter(Boolean).join(" ") || undefined });
+  }
   return findings;
 }
 
