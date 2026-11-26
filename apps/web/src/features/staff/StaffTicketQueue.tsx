@@ -455,11 +455,11 @@ export function StaffTicketQueue({
       {/* Search & Sort Toolbar */}
       <div className={`${staffSurface} flex flex-wrap items-center justify-between gap-3 p-3 shadow-xs border border-[var(--border-color)] bg-[var(--surface-card)]`}>
         <div className="relative min-w-[280px] flex-1">
-          <span className="sr-only">Tìm theo mã, tên sinh viên hoặc tiêu đề...</span>
           <Search className="absolute left-3 top-3 h-4 w-4 text-[var(--text-secondary)]" aria-hidden="true" />
           <input
             type="search"
             placeholder="Tìm theo mã, tên sinh viên hoặc tiêu đề..."
+            aria-label="Tìm theo mã, tên sinh viên hoặc tiêu đề"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`${staffField} pl-9`}

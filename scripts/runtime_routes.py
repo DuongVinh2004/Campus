@@ -82,7 +82,7 @@ NOT_FOUND_HTML = (
     '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     "<title>Không tìm thấy trang — Campus 24/7</title>"
     "<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f3f1ea;color:#13343b;font:16px/1.6 system-ui,sans-serif}"
-    "main{max-width:28rem;padding:2rem;text-align:center}h1{font:600 2rem Georgia,serif;margin:0 0 .5rem}"
+    "main{max-width:28rem;padding:2rem;text-align:center}h1{font:600 2rem system-ui,'Segoe UI',sans-serif;margin:0 0 .5rem}"
     "a{display:inline-block;margin-top:1rem;padding:.7rem 1.4rem;border-radius:.6rem;background:#14615f;color:#fff;text-decoration:none}</style></head>"
     "<body><main><h1>Không tìm thấy trang</h1><p>Địa chỉ này không tồn tại hoặc chưa được mở trong phiên bản hiện tại.</p>"
     '<a href="/chat">Về trợ lý học vụ</a></main></body></html>'

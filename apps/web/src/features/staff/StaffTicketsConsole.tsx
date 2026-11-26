@@ -333,6 +333,7 @@ export function StaffTicketsConsole({ initialId = null }: StaffTicketsConsolePro
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm mã hồ sơ, tiêu đề, sinh viên..."
+                aria-label="Tìm hồ sơ theo mã, tiêu đề hoặc sinh viên"
                 className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] min-h-[44px]"
               />
             </div>
