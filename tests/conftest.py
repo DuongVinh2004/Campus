@@ -30,3 +30,16 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(evidence)
         elif name in WINDOWS_TOOLING_FILES or any(item.name.startswith(prefix) for prefix in WINDOWS_LAUNCHER_TESTS):
             item.add_marker(tooling)
+
+
+@pytest.fixture(autouse=True)
+def _no_feature_service_left_installed():
+    """The app factory installs its feature service process-wide (campus247.features.runtime). Without this, a test that built
+    the app left its flags in force for every later test: in the full run, answer-cache and verbatim-skip tests then read the
+    installed service instead of their own environment and failed, while passing alone."""
+    yield
+    try:
+        from campus247.features import runtime
+    except ImportError:
+        return
+    runtime.uninstall()
