@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Callable
 
 from campus247.domain.policy_rules import engine
+from campus247.domain.policy_rules.match import extract_values, rank_topics
 from campus247.domain.policy_rules.rule import canonical_sha256, source_hashes, structural_issues, verbatim_issues
 from campus247.domain.policy_rules.variables import Vocabulary
 from campus247.domain.policy_rules.verify import check_vectors, generate_vectors, input_variables
@@ -74,6 +75,25 @@ class PolicyRulesService:
                         "rule_count": len(recs), "effective_from": min(eff) if eff else None,
                         "cohorts": [r["body"]["applies"].get("cohorts") for r in recs]})
         return out
+
+    def match(self, text: str) -> dict:
+        """Chat entry: which published topic (if any) the sentence is about, with values found verbatim in it."""
+        text = (text or "").strip()
+        if not text or len(text) > 1000:
+            raise OpsError(422, "POLICY_TEXT_INVALID", "Câu hỏi cần từ 1 đến 1000 ký tự.")
+        topics = self.topics()
+        extra = {}
+        for t in topics:
+            try:
+                extra[t["topic"]] = " ".join(f["label"] for f in self.form(t["topic"])["fields"])
+            except OpsError:
+                extra[t["topic"]] = ""
+        ranked = rank_topics(text, topics, extra)
+        if not ranked or (len(ranked) > 1 and ranked[0]["score"] == ranked[1]["score"]):
+            return {"matches": ranked, "topic": None, "values": {}, "evidence": []}
+        best = ranked[0]["topic"]
+        values, evidence = extract_values(text, self.form(best)["fields"])
+        return {"matches": ranked, "topic": best, "label": ranked[0]["label"], "values": values, "evidence": evidence}
 
     def form(self, topic: str, as_of=None, cohort=None, program=None) -> dict:
         chosen, _ = engine.select_rules(self.records(), topic, as_of, cohort, program)

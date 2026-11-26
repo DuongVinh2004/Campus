@@ -179,5 +179,6 @@ export const PAGE_FEATURE: Record<string, FeatureKey> = {
   "admin": "admin.overview",
   "announcements/manage": "announcements.publish",
   "announcements": "announcements.inbox",
-  "policy/simulator": "policy.simulator"
+  "policy/simulator": "policy.simulator",
+  "services/procedures": "agent.procedures"
 };

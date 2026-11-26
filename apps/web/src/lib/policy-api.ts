@@ -20,9 +20,14 @@ export interface PolicyResult {
   rule: { rule_id: string; version: number } | null; disclaimer_code: string;
 }
 
+export interface PolicyMatch { matches: { topic: string; label: string; score: number }[]; topic: string | null; label?: string; values: Record<string, number>; evidence: { var: string; snippet: string }[] }
+
+export const POLICY_PREFILL_KEY = "policy-simulator-prefill";
+
 const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });
 
 export const policyApi = {
+  match: (text: string) => client().post<PolicyMatch>("/v1/policy-simulator/match", { text }),
   topics: () => client().get<{ topics: PolicyTopic[] }>("/v1/policy-simulator/topics"),
   form: (topic: string, cohort?: string) =>
     client().get<PolicyForm>(`/v1/policy-simulator/topics/${encodeURIComponent(topic)}/form${cohort ? `?cohort=${encodeURIComponent(cohort)}` : ""}`),

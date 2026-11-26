@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { policyApi, type PolicyField, type PolicyForm, type PolicyResult, type PolicyTopic, type ProofNode } from "../../lib/policy-api";
+import { policyApi, POLICY_PREFILL_KEY, type PolicyField, type PolicyForm, type PolicyResult, type PolicyTopic, type ProofNode } from "../../lib/policy-api";
 
 const OUTCOME_LABEL: Record<PolicyResult["outcome"], string> = {
   SATISFIED: "Đạt điều kiện", NOT_SATISFIED: "Chưa đạt điều kiện", UNDETERMINED: "Chưa đủ thông tin để kết luận",
@@ -85,6 +85,18 @@ export function PolicySimulator() {
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { policyApi.topics().then(r => setTopics(r.topics)).catch(e => setError(message(e))); }, []);
+  // Values the chat card found in the student's own sentence; they only pre-fill the form and are never evaluated until the student presses the button.
+  useEffect(() => {
+    let prefill: { topic?: string; values?: Record<string, unknown> } | null = null;
+    try {
+      const raw = window.sessionStorage.getItem(POLICY_PREFILL_KEY);
+      if (raw) { prefill = JSON.parse(raw); window.sessionStorage.removeItem(POLICY_PREFILL_KEY); }
+    } catch { /* storage is optional */ }
+    if (!prefill?.topic) return;
+    const wanted = prefill;
+    setTopic(wanted.topic as string); setError(null);
+    policyApi.form(wanted.topic as string).then(f => { setForm(f); setValues(wanted.values ?? {}); }).catch(e => setError(message(e)));
+  }, []);
   useEffect(() => () => { if (debounce.current) clearTimeout(debounce.current); }, []);
 
   const choose = useCallback((t: string) => {

@@ -234,3 +234,29 @@ def test_performance_p95_under_50ms(svc):
         times.append((time.perf_counter() - t) * 1000)
     times.sort()
     assert times[94] < 50, times[-5:]
+
+
+def test_match_finds_topic_and_only_verbatim_values(svc):
+    hit = svc.match("Em nghỉ 25 tiết trong môn có 45 tiết thì có sao không?")
+    assert hit["topic"] == "ATTENDANCE_REQUIREMENT"
+    # two period fields share one unit word, so no value is guessed
+    assert hit["values"] == {} and hit["evidence"] == []
+    none = svc.match("Thư viện mở cửa lúc mấy giờ?")
+    assert none["topic"] is None and none["values"] == {}
+    with pytest.raises(OpsError):
+        svc.match("   ")
+
+
+def test_match_values_are_literally_in_the_sentence(svc):
+    for q in ["Em có 120 tín chỉ tích lũy, điểm trung bình 2,6 thì có đủ điều kiện tốt nghiệp không?",
+              "điểm quá trình 6 điểm, thi 4 điểm thì có đạt học phần không"]:
+        hit = svc.match(q)
+        for ev in hit["evidence"]:
+            assert ev["snippet"] in q
+            assert hit["values"][ev["var"]] is not None
+
+
+def test_match_endpoint_works_for_students(svc):
+    r = client(svc, STUDENT).post("/v1/policy-simulator/match", json={"text": "Em nghỉ học 25 tiết có sao không"})
+    assert r.status_code == 200 and "matches" in r.json()
+    assert client(svc, STUDENT).post("/v1/policy-simulator/match", json={"text": ""}).status_code == 422

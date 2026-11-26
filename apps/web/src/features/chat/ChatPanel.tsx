@@ -26,6 +26,10 @@ import {
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { AnswerFeedback, type FeedbackRating } from "./AnswerFeedback";
 import { GapReport } from "./GapReport";
+import { ChatSuggestionCards } from "./ChatSuggestionCards";
+import { ImageInput } from "../input/ImageInput";
+import { ReadAloud } from "../input/ReadAloud";
+import { FeatureGate } from "../../lib/features";
 import { ThemeToggle } from "../../components/ThemeToggle";
 
 import { FAILED_GUIDANCE, type AgentProgress } from "./sse";
@@ -756,6 +760,7 @@ export function ChatPanel({
             {messages.length > 0 && (
               <div className="space-y-6">
                 {messages.map((message, messageIndex) => {
+                  const lastUserIndex = messages.map(item => item.role).lastIndexOf("user");
                   const isUser = message.role === "user";
                   const isSystem = message.role === "system";
                   const isFailed = message.status === "failed" || message.status === "unknown";
@@ -791,6 +796,7 @@ export function ChatPanel({
                         <div className="campus-chat-user-bubble max-w-[85%] sm:max-w-[70%] px-5 py-3 rounded-2xl rounded-tr-xs bg-[#2250D3] text-white text-[15px] leading-relaxed break-words shadow-sm">
                           <p className="m-0 whitespace-pre-wrap">{message.content}</p>
                         </div>
+                        {messageIndex === lastUserIndex && !isStreaming && <div className="w-full mt-2"><ChatSuggestionCards text={message.content} /></div>}
                       </article>
                     );
                   }
@@ -966,6 +972,7 @@ export function ChatPanel({
                                 <Copy className="w-4 h-4" />
                               )}
                             </button>
+                            <FeatureGate feature="output.read_aloud"><ReadAloud text={message.content} /></FeatureGate>
                             {onFeedbackSubmit && SERVER_ID.test(message.id) && <AnswerFeedback
                               answerId={message.id}
                               onFeedbackSubmit={onFeedbackSubmit}
@@ -1047,6 +1054,7 @@ export function ChatPanel({
                     </button>
                   )}
             </form>
+            {!disabled && <FeatureGate feature="input.image"><ImageInput onSend={(text) => onSendMessage?.(text)} /></FeatureGate>}
 
             <p className="mt-1.5 mb-1 text-center text-[11px] text-slate-400 dark:text-slate-500">
               {t("chat.37")}

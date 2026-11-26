@@ -25,6 +25,10 @@ class EvaluateBody(BaseModel):
     program: Optional[str] = Field(default=None, max_length=40)
 
 
+class MatchBody(BaseModel):
+    text: str = Field(max_length=1000)
+
+
 class WhatIfBody(EvaluateBody):
     vary: str = Field(max_length=80)
     points: int = Field(default=11, ge=2, le=41)
@@ -93,6 +97,12 @@ def create_policy_rules_router(service, *, now=time.monotonic) -> APIRouter:
         who = get_current_identity(request)
         limited(who)
         return out(service.evaluate(body.topic, body.inputs, as_of=body.as_of, cohort=body.cohort, program=body.program))
+
+    @r.post("/v1/policy-simulator/match")
+    def match(body: MatchBody, request: Request):
+        who = get_current_identity(request)
+        limited(who)
+        return out(service.match(body.text))
 
     @r.post("/v1/policy-simulator/what-if")
     def what_if(body: WhatIfBody, request: Request):
