@@ -25,7 +25,7 @@ def pages(room):
 
 @pytest.fixture
 def flags(monkeypatch):
-    on = {"learning.mastery_map": True, "learning.ai_explanations": False}
+    on = {"learning.mastery_map": True, "learning.tutor": True, "learning.ai_explanations": False}
     monkeypatch.setattr(runtime, "value", lambda key, fallback: on.get(key, fallback))
     return on
 
@@ -170,6 +170,21 @@ def test_the_ladder_points_to_the_page_then_narrows_and_opens_the_solution_only_
     answer(room, choice_id, ["b"])
     solution = hint(room, choice_id, solution=True).json()
     assert solution["level"] == 3 and "Xem trang 1." in solution["hint"]
+
+
+def test_with_the_tutor_on_a_wrong_answer_keeps_the_answer_hidden_until_the_threshold(room, flags):
+    _, choice_id, short_id = published_set(room)
+    plain = answer(room, choice_id, ["b"])
+    assert plain["answer"] == ["a"]                                                   # tutor off: shown at once, as before
+    enable_tutor(room, reveal_after_attempts=2)
+    first = call(room.client, "POST", f"/practice-items/{short_id}/attempts", room.student, json={"text": "gỗ"}).json()
+    assert first["correct"] is False and "accepted" not in first and "explanation" not in first and "citations" not in first
+    assert first["tutor"] == {"hint_available": True, "wrong_attempts": 1, "solution_after": 2}
+    second = call(room.client, "POST", f"/practice-items/{short_id}/attempts", room.student, json={"text": "nhôm"}).json()
+    assert second["accepted"] == ["thép", "Thép xây dựng"]                          # the threshold reached: the answer is shown
+    assert answer(room, choice_id, ["a"])["answer"] == ["a"]                         # a right answer always shows it
+    flags["learning.tutor"] = False
+    assert "answer" in answer(room, choice_id, ["b"])                                # feature off: never hidden
 
 
 def test_a_reply_is_kept_only_as_a_hash_and_a_question_has_at_most_six_hints(room, flags):

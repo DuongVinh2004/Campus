@@ -42,6 +42,14 @@ def _stamp(value: datetime) -> str:
 
 
 class LearningPractice:
+    def tutor_guides(self, state, offering_id):
+        """The tutor settings of a class while its tutor is on (feature `learning.tutor` and the lecturer's switch), else None."""
+        from campus247.features import runtime
+        if not getattr(self, "tutor_available", False) or runtime.value("learning.tutor", False) is not True:
+            return None
+        settings = self.tutor_settings_of(state, offering_id)
+        return settings if settings["tutor_enabled"] else None
+
     def mastery_on(self) -> bool:
         """F7 mastery tracking: needs its storage (migration 0033 on PostgreSQL) and the `learning.mastery_map` feature."""
         from campus247.features import runtime
@@ -189,6 +197,14 @@ class LearningPractice:
             following = next_review(previous, correct=correct, now=now)
             state["practice_reviews"][key] = {"ease": following.ease, "interval_days": following.interval_days, "repetitions": following.repetitions,
                                               "due_at": _stamp(following.due_at)}
+            guide = self.tutor_guides(state, row["offering_id"])
+            if not correct and guide is not None:
+                wrong = sum(1 for a in state["practice_attempts"].values() if a["item_id"] == item["id"] and a["student_id"] == actor.subject_id and not a["correct"])
+                if wrong < guide["reveal_after_attempts"]:
+                    # The class uses the tutor: the answer stays hidden until the lecturer's threshold, so the student can try again
+                    # with a hint (F7). The answer is still graded and scheduled like any other.
+                    return {"correct": False, "tutor": {"hint_available": True, "wrong_attempts": wrong, "solution_after": guide["reveal_after_attempts"]},
+                            "next_review_at": _stamp(following.due_at), **({"mastery": mastery} if mastery else {})}
             return {"correct": correct, "answer": item["answer"], "accepted": item["accepted"] if item["kind"] == "short_answer" else [],
                     "explanation": item["explanation"], "citations": item["citations"], "next_review_at": _stamp(following.due_at),
                     **({"mastery": mastery} if mastery else {})}
