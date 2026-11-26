@@ -39,7 +39,8 @@ class RagV2Units:
                 for line in handle:
                     u = json.loads(line)
                     units[u["unit_id"]] = {"text": unit_body(u["text"]), "path": u["path"], "version_id": u["version_id"],
-                        "document_id": u["document_id"], "doc_title": u["doc_title"], "doc_family": u["doc_family"]}
+                        "document_id": u["document_id"], "doc_title": u["doc_title"], "doc_family": u["doc_family"],
+                        "scope": u.get("scope") or {}, "effective_from": u.get("effective_from"), "effective_until": u.get("effective_until")}
             self._units, self._mtime = units, mtime
 
     def get(self, unit_id: str) -> dict | None:
@@ -49,6 +50,14 @@ class RagV2Units:
     def text(self, unit_id: str) -> str | None:
         u = self.get(unit_id)
         return u["text"] if u else None
+
+    def rows(self):
+        """Every unit as a plain dict (for release snapshots)."""
+        self._load()
+        for unit_id, u in self._units.items():
+            yield {"unit_id": unit_id, "document_id": u["document_id"], "version_id": u["version_id"], "doc_family": u["doc_family"],
+                   "doc_title": u["doc_title"], "path": u["path"], "text": u["text"], "scope": u.get("scope") or {},
+                   "effective_from": u.get("effective_from"), "effective_until": u.get("effective_until")}
 
     def release(self) -> dict:
         try:

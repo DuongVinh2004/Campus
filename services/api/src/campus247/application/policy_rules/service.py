@@ -341,6 +341,15 @@ class PolicyRulesService:
                 stale.append({"rule_id": rec["rule_id"], "version": rec["version"], "units": changed})
         return stale
 
+    def rules_citing(self, unit_ids: set[str]) -> list[dict]:
+        """Published or stale rules whose sources include any of the given units."""
+        out = []
+        for rec in self.store.current_records(("PUBLISHED", "STALE")):
+            hit = sorted(set(rec["source_hashes"]) & unit_ids)
+            if hit:
+                out.append({"rule_id": rec["rule_id"], "version": rec["version"], "status": rec["status"], "units": hit})
+        return out
+
     def summary(self) -> dict:
         recs = self.store.current_records(("PUBLISHED", "STALE", "RETIRED"))
         return {"active": sum(1 for r in recs if r["status"] == "PUBLISHED"), "stale": sum(1 for r in recs if r["status"] == "STALE")}

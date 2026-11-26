@@ -88,7 +88,7 @@ def test_error_codes(tmp_path):
     p = lambda key, **b: c.post(f"/v1/admin/features/{key}/preview", json={"reason": "Lý do đủ dài", "expected_version": 0, **b}, headers=h)  # noqa: E731
     assert p("nope.x", value=False).json()["code"] == "FEATURE_UNKNOWN" and p("nope.x", value=False).status_code == 404
     assert p("core.auth", value=False).status_code == 422 and p("core.auth", value=False).json()["code"] == "FEATURE_LOCKED"
-    assert p("policy.impact", value=True).json()["code"] == "FEATURE_DEPENDENCY_OFF"
+    assert p("policy.simulator", value=True).json()["code"] == "FEATURE_DEPENDENCY_OFF"
     assert p("rooms.booking", value="maybe").json()["code"] == "FEATURE_VALUE_INVALID"
     pv = p("rooms.booking", value=False).json()
     no_key = c.post("/v1/admin/features/confirm", json={"preview_id": pv["preview_id"], "confirmation_token": pv["confirmation_token"]}, headers=h)

@@ -583,6 +583,21 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     register_policy_rule_errors(app)
     app.state.policy_rules = policy_rules
 
+    # Policy change impact (F3): per-release unit snapshots, diff, dependants, fact conflicts. Admin-only, counts and unit paths only.
+    from campus247.application.policy_impact.service import ImpactService, SnapshotStore
+    from campus247.presentation.policy_impact import create_policy_impact_router
+
+    def index_facts():
+        facts_file = rag_units.index_dir / "facts.jsonl"
+        return [json.loads(line) for line in facts_file.read_text(encoding="utf-8").splitlines()] if facts_file.is_file() else []
+
+    impact_service = ImpactService(
+        SnapshotStore(checked_path(STATE / "release-units", ROOT)), rag_units.rows, lambda: rag_units.release()["release_id"],
+        report_dir=checked_path(STATE / "release-impact", ROOT), rules_citing=policy_rules.rules_citing,
+        eval_dir=ROOT / "evals" / "datasets", facts=index_facts)
+    app.include_router(create_policy_impact_router(impact_service))
+    app.state.policy_impact = impact_service
+
     # Proactive assistant (F6): signals of one person -> "things to do today" and inbox nudges. No model calls.
     from campus247.application.proactive.engine import ProactiveEngine
     from campus247.application.proactive.providers import AnnouncementProvider, ExamProvider, TicketProvider
@@ -722,6 +737,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                         jobs.append(gated(job_name, job_factory))
                     from campus247.application.policy_rules.jobs import run_rule_staleness
                     jobs.append(gated("policy_rule_staleness", lambda: run_rule_staleness(policy_rules)))
+                    from campus247.application.policy_impact.jobs import run_impact_snapshot
+                    jobs.append(gated("impact_snapshot", lambda: run_impact_snapshot(impact_service)))
                     from campus247.application.announcements.jobs import proactive_jobs
                     for job_name, job_factory in proactive_jobs(proactive_engine):
                         jobs.append(gated(job_name, job_factory))
