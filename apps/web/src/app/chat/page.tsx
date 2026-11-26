@@ -37,8 +37,9 @@ function rememberConversation(id: string | null, mode: "push" | "replace" = "rep
   if (url.href !== window.location.href) window.history[mode === "push" ? "pushState" : "replaceState"](window.history.state, "", url);
 }
 
-function citationItems(citations: StreamCitation[], conversationId?: string | null, messageId?: string | null): CitationItem[] {
+function citationItems(citations: StreamCitation[], conversationId?: string | null, messageId?: string | null, answerText?: string): CitationItem[] {
   return citations.map(({ citation }) => ({
+    ...(answerText ? { answerText } : {}),
     id: citation.citation_id, sourceId: citation.source_id, title: citation.source_title, documentRef: citation.version_label,
     quote: citation.quote || "", isSimulation: citation.source_status === "SYNTHETIC",
     validityStatus: ["CURRENT", "SYNTHETIC"].includes(citation.source_status) ? "active" : "stale",
@@ -159,7 +160,7 @@ function ExistingChatPage() {
           if (!current()) return;
           for (const message of page.messages) {
             if (restored.some((item) => item.id === message.id)) throw new Error("Duplicate history identity");
-            const mapped = citationItems(message.final?.citations || [], conversationId, message.id);
+            const mapped = citationItems(message.final?.citations || [], conversationId, message.id, message.content);
             if (message.final) sets[message.id] = mapped;
             restored.push({ id: message.id, role: message.role, content: message.content,
               timestamp: new Date(message.createdAt).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
@@ -283,7 +284,7 @@ function ExistingChatPage() {
         waitingRunRef.current = snapshot.agentProgress?.runId || snapshot.runId || null;
         setWaitingClarification(true);
       }
-      const mapped = citationItems(snapshot.citations, conversationIdRef.current, snapshot.messageId);
+      const mapped = citationItems(snapshot.citations, conversationIdRef.current, snapshot.messageId, snapshot.text);
       showAssistant(snapshot.text, snapshot.phase === "abstained" ? "abstained"
         : snapshot.finishStatus === "cancelled" ? "stopped" : "success", mapped,
         snapshot.messageId || undefined, snapshot.citations, snapshot.responseClass);

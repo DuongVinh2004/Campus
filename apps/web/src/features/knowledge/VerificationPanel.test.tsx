@@ -32,3 +32,16 @@ describe("VerificationPanel", () => {
     expect((await screen.findByRole("alert")).textContent).toContain("Chỉ quản trị");
   });
 });
+
+describe("rejectedSpike", () => {
+  const day = (d: string, n: number) => ({ day: d, by_reason: { NUMBER_NOT_IN_SOURCE: n } });
+  it("flags a day with more than twice the 7-day average, and at least five drops", async () => {
+    const { rejectedSpike } = await import("./VerificationPanel");
+    const week = ["2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25"].map(d => day(d, 2));
+    expect(rejectedSpike([...week, day("2026-11-26", 5)])).toEqual({ day: "2026-11-26", count: 5, average: 2 });
+    expect(rejectedSpike([...week, day("2026-11-26", 4)])).toBeNull();            // 4 <= 2 x 2
+    expect(rejectedSpike([day("2026-11-26", 4)])).toBeNull();                       // below the minimum of 5
+    expect(rejectedSpike([day("2026-11-26", 6)])).toEqual({ day: "2026-11-26", count: 6, average: 0 });
+    expect(rejectedSpike([])).toBeNull();
+  });
+});

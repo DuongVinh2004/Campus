@@ -10,6 +10,8 @@ export interface AnswerReceipt {
   receipt_id: string; created_at: string; release_id: string; outcome_kind: string;
   statements: ReceiptStatement[]; rejected_counts: Record<string, number>;
   now: { release_id: string | null; sources_changed: number; sources_removed: number; impact_run_id: string | null };
+  /** Set by the server for staff who work on answers (SUPPORT_OFFICER, KNOWLEDGE_ADMIN): reason codes may be shown. */
+  show_reason_codes?: boolean;
 }
 
 const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });

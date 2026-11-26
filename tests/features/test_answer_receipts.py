@@ -158,3 +158,24 @@ def test_receipts_of_chunk_level_citations_are_bound_by_evidence_hash_and_docume
     opened = service.open(OWNER, rid)
     assert [s["status_now"] for s in opened["sources"]] == ["UNCHANGED", "CHANGED", "REMOVED"]
     assert opened["now"]["sources_changed"] == 1 and opened["now"]["sources_removed"] == 1
+
+
+def test_only_staff_who_work_on_answers_are_told_to_show_reason_codes(tmp_path):
+    _, service = make(tmp_path)
+    rid = record(service)
+    app = FastAPI()
+    register_ops_errors(app)
+    app.include_router(create_answer_receipts_router(service))
+
+    @app.middleware("http")
+    async def who(request, call_next):
+        role = IdentityRole(request.headers["x-role"])
+        request.state.identity = IdentityContext(subject_id=OWNER, external_subject="x", issuer="l", roles=(role,), display_name="x",
+                                                 auth_time=NOW, expires_at=NOW + timedelta(hours=1),
+                                                 student_code="S1" if role == IdentityRole.STUDENT else None)
+        return await call_next(request)
+
+    c = TestClient(app)
+    seen = {role: c.get(f"/v1/answer-receipts/{rid}", headers={"x-role": role}).json()["show_reason_codes"]
+            for role in ("STUDENT", "SUPPORT_OFFICER", "KNOWLEDGE_ADMIN", "LECTURER")}
+    assert seen == {"STUDENT": False, "SUPPORT_OFFICER": True, "KNOWLEDGE_ADMIN": True, "LECTURER": False}

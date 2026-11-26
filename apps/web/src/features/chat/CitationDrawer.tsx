@@ -4,6 +4,8 @@ import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { CitationSource, type CitationSourceBinding } from "./CitationSource";
 import { useSourceReviewStates } from "../../lib/use-source-review-states";
 import { FileTextIcon, XIcon, ShieldCheckIcon, AlertTriangleIcon, ArrowRightIcon } from "../../components/Icons";
+import { useFeature } from "../../lib/features";
+import { markNumbers } from "./markNumbers";
 
 export interface CitationItem {
   id: string;
@@ -21,6 +23,8 @@ export interface CitationItem {
   isAuthorized?: boolean;
   /** Knowledge source id, used only to look up whether the source is overdue for review. */
   sourceId?: string;
+  /** The answer this source supports: its numbers are marked in the quote while chat.evidence_ui is on (F4.3). */
+  answerText?: string;
 }
 
 export interface CitationDrawerProps {
@@ -37,6 +41,7 @@ export function CitationDrawer({
   onReportIssue,
 }: CitationDrawerProps) {
   const t = useT();
+  const evidenceUi = useFeature("chat.evidence_ui");
   const reviewStates = useSourceReviewStates(citations.flatMap((cite) => (cite.sourceId ? [cite.sourceId] : [])), isOpen);
   const getValidityBadge = (status?: string) => {
     switch (status) {
@@ -220,8 +225,11 @@ export function CitationDrawer({
                       boxShadow: "inset 0 1px 2px rgba(0,0,0,0.02)",
                     }}
                   >
-                    "{cite.quote}"
+                    "{evidenceUi && cite.answerText ? markNumbers(cite.quote, cite.answerText).nodes : cite.quote}"
                   </blockquote>
+                  {evidenceUi && cite.answerText && markNumbers(cite.quote, cite.answerText).marked > 0 && (
+                    <p style={{ margin: "6px 0 0", fontSize: "12px" }}>Số liệu được tô có trong câu trả lời và đã được đối chiếu với đoạn nguồn này.</p>
+                  )}
 
                   {/* Actions & Report Issue */}
                   <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", alignItems: "stretch", gap: "16px", paddingTop: "12px", borderTop: "1px dashed var(--color-border, #e2e8f0)" }}>
