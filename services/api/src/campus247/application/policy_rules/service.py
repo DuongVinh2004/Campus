@@ -316,6 +316,29 @@ class PolicyRulesService:
         self.store.audit(now, by, "RULE_PUBLISHED", body["rule_id"], version, {"release_id": rel["release_id"]})
         return {"rule_id": body["rule_id"], "version": version, "status": "PUBLISHED"}
 
+    def draft_view(self, actor: IdentityContext, draft_id: str) -> dict:
+        """One draft for the authoring page: its body, who wrote it, every review and whether it validates now."""
+        self.require_author(actor)
+        draft = self._draft(draft_id)
+        report = self.validate_body(draft["body"])
+        return {"id": draft_id, "rule_id": draft["rule_id"], "body": draft["body"], "origin": draft["origin"], "row_version": draft["row_version"],
+                "author": draft["author_subject_id"], "updated_at": draft["updated_at"],
+                "reviews": [{"verdict": r["verdict"], "note": r["note"], "reviewer": r["reviewer_subject_id"], "at": r["at"]}
+                            for r in self.store.reviews(draft_id)],
+                "issues": report["issues"], "vector_count": len(report["vectors"]), "mismatches": report["mismatches"]}
+
+    def rule_view(self, actor: IdentityContext, rule_id: str) -> dict:
+        """A rule's versions (newest first) with the body of the current one."""
+        self.require_author(actor)
+        versions = self.store.versions(rule_id)
+        if not versions:
+            raise OpsError(404, "RULE_NOT_FOUND", "Không có luật với mã này.")
+        latest = versions[-1]
+        return {"rule_id": rule_id, "current": {"version": latest["version"], "status": latest["status"], "body": latest["body"],
+                                                 "published_at": latest["published_at"], "published_by": latest["published_by"],
+                                                 "release_id": latest["release_id"]},
+                "versions": [{"version": v["version"], "status": v["status"], "published_at": v["published_at"]} for v in reversed(versions)]}
+
     def vectors(self, actor: IdentityContext, rule_id: str, version: int) -> dict:
         self.require_reviewer(actor)
         vectors = self.store.vectors(rule_id, version)

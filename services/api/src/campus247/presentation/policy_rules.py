@@ -119,6 +119,14 @@ def create_policy_rules_router(service, *, now=time.monotonic) -> APIRouter:
     def create_draft(body: DraftBody, request: Request):
         return out(service.create_draft(get_current_identity(request), body.body, body.origin), 201)
 
+    @r.get("/v1/policy-rules/drafts/{draft_id}")
+    def draft_view(draft_id: str, request: Request):
+        return out(service.draft_view(get_current_identity(request), draft_id))
+
+    @r.get("/v1/policy-rules/rules/{rule_id}")
+    def rule_view(rule_id: str, request: Request):
+        return out(service.rule_view(get_current_identity(request), rule_id))
+
     @r.put("/v1/policy-rules/drafts/{draft_id}")
     def update_draft(draft_id: str, body: DraftUpdate, request: Request):
         return out(service.update_draft(get_current_identity(request), draft_id, body.body, body.row_version))

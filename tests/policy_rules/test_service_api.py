@@ -275,3 +275,22 @@ def test_units_reader_follows_the_serving_index_when_it_changes(tmp_path):
     assert units.text("u") == "Điều 1 cũ" and units.release()["release_id"] == "r1"
     serving["dir"] = tmp_path / "b"
     assert units.text("u") == "Điều 1 mới" and units.release()["release_id"] == "r2"
+
+
+def test_http_draft_and_rule_views_for_the_authoring_page(svc):
+    body = attendance_body(svc)
+    body["description"] = "bản sửa để xem"
+    draft = svc.create_draft(CONTRIB, body)
+    svc.review(ADMIN, draft["id"], "needs_source", "cần thêm trích dẫn khoản 3")
+    c = client(svc, CONTRIB)
+    view = c.get(f"/v1/policy-rules/drafts/{draft['id']}")
+    assert view.status_code == 200
+    data = view.json()
+    assert data["body"]["description"] == "bản sửa để xem" and data["issues"] == [] and data["vector_count"] > 10
+    assert [(r["verdict"], r["note"]) for r in data["reviews"]] == [("needs_source", "cần thêm trích dẫn khoản 3")]
+    rule = c.get("/v1/policy-rules/rules/attendance-requirement").json()
+    assert rule["current"]["status"] == "PUBLISHED" and rule["current"]["body"]["rule_id"] == "attendance-requirement"
+    assert [v["version"] for v in rule["versions"]] == [1]
+    assert c.get("/v1/policy-rules/rules/khong-co").status_code == 404
+    assert c.get("/v1/policy-rules/drafts/khong-co").status_code == 404
+    assert client(svc, STUDENT).get(f"/v1/policy-rules/drafts/{draft['id']}").status_code == 403

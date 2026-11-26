@@ -42,7 +42,7 @@ const PAGES = {
 };
 const PUBLIC_PAGES = ["/login", "/offline"];
 // Pages behind a feature flag that is off by default: they must stay hidden (404) until the flag is turned on.
-const FLAGGED_OFF = { owner: ["/knowledge/policy-graph"], student: ["/policy/simulator", "/services/procedures"] };
+const FLAGGED_OFF = { owner: ["/knowledge/policy-graph", "/knowledge/policy-rules"], student: ["/policy/simulator", "/services/procedures"] };
 // Requests that are expected to be refused for a role (the page shows its own message for them).
 // owner: the policy graph back end is not part of the operational runtime, and its page says so.
 const EXPECTED_REFUSALS = { staff: [/\/v1\/assistant\/conversations/], anon: [/\/v1\/users\/me/], owner: [/\/v1\/policy-graph\//] };
