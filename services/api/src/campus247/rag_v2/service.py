@@ -123,7 +123,10 @@ def _fact_kind(u):
 
 
 # Demonstratives that leave a question without its own subject ("việc này thì sao?"), the only case for a topic-less ask-back.
-_VAGUE = re.compile(r"\b(?:viec|chuyen|lich|cai|vu|van de|truong hop|thu tuc|khoan|muc|dieu)\s+(?:nay|do|ay|kia|tren|vua roi)\b")
+# The intent router restates "cái này áp dụng cho tụi em ko?" as "Quy định này có áp dụng cho sinh viên không?": a document
+# named only by "này" is just as unnamed.
+_VAGUE = re.compile(r"\b(?:viec|chuyen|lich|cai|vu|van de|truong hop|thu tuc|khoan|muc|dieu|quy dinh|quyet dinh|van ban|"
+                    r"thong bao|chinh sach|quy che)\s+(?:nay|do|ay|kia|tren|vua roi)\b")
 
 
 def vague_reference(question: str) -> bool:

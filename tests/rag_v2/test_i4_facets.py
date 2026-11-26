@@ -160,6 +160,9 @@ async def test_a_topicless_ask_back_on_a_question_that_names_its_subject_is_retr
 async def test_a_pronoun_only_question_still_gets_the_topic_ask_back_without_a_retry():
     from campus247.rag_v2.service import vague_reference
     assert vague_reference("Việc này thì sao ạ?") and not vague_reference("Điều kiện bảo lưu là gì?")
+    # The intent router's restatement of "cái này áp dụng cho tụi em ko z?" names no document either.
+    assert vague_reference("Quy định này có áp dụng cho sinh viên chúng em không?")
+    assert not vague_reference("Quyết định 94 áp dụng cho khóa nào?")
     gateway = AskBack(answer_on_second=False)
     result = await answer(gateway=gateway, index=index(), question="Vụ đó thì sao ạ?")
     assert result.kind == "clarify" and len(gateway.calls) <= 1
