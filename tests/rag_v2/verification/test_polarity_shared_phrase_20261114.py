@@ -66,3 +66,12 @@ def test_words_that_only_look_like_a_negator_once_folded_are_not_negators():
     assert folded_mismatch("Sinh viên được mang nước uống.", "Cấm mang nước uống.")
     assert folded_mismatch("Sinh vien duoc mang nuoc uong.", "Cam mang nuoc uong.")
     assert folded_mismatch("Sinh viên được miễn học phí.", "Sinh viên được miễn học phí, trừ sinh viên học lại.")
+
+
+def test_repeating_the_list_negator_for_each_item_is_not_an_added_negation():
+    from campus247.rag_v2.verification.deterministic import _polarity_fold
+    source = ("6. Trang phục gọn gàng, lịch sự, tư thế ngồi học phải ngay ngắn, nghiêm túc. Không: nói chuyện, đi lại tự do, "
+              "sử dụng điện thoại di động, sử dụng máy tính xách tay.")
+    check = lambda s: _polarity_mismatch(_polarity_fold(s), _polarity_fold(source))
+    assert not check("Không được sử dụng điện thoại di động và không được sử dụng máy tính xách tay trong giờ thực hành.")
+    assert check("Không được sử dụng điện thoại di động và không được trang phục gọn gàng.")   # second negator governs nothing listed

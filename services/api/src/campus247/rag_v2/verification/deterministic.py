@@ -262,6 +262,8 @@ def _polarity_mismatch(statement: str, source: str) -> bool:
         # The statement spans clauses ("...; hoặc quá 4 lần không liên tiếp ...") that the sentence split put
         # apart: an extra negator is fine when the same negator and the word after it stand in the row.
         for match in p.finditer(statement):
+            if listed_after(match.group(), statement[match.end():]):
+                continue   # "không được dùng A và không được dùng B" restates "Không: A, B" item by item
             tail = re.match(r"(?:\s+\w+){1,3}", statement[match.end():])
             first = re.match(r"\s+\w+", statement[match.end():])
             if not tail or not first or not re.search(
@@ -277,7 +279,10 @@ def _polarity_mismatch(statement: str, source: str) -> bool:
 
     if len(source) <= STRICT_SOURCE_CHARS and any(strict_mismatch(p) for p in patterns):
         return True
-    if any(Counter(p.findall(statement)) - Counter(p.findall(source)) for p in patterns):
+    def unlisted(p) -> Counter:
+        # Negators that repeat the one in front of a colon list for each of its items are not added negators.
+        return Counter(m.group() for m in p.finditer(statement) if not listed_after(m.group(), statement[m.end():]))
+    if any(unlisted(p) - Counter(p.findall(source)) for p in patterns):
         return True
     for pattern in patterns:
         # A negator of the statement must govern the same words in the row.
