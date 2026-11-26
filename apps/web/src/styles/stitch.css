@@ -87,6 +87,8 @@ html.dark { --color-border: #243050; --border-color: #243050; --text-secondary: 
 [data-campus-ui] :is(.fluent-input, .campus-input), .campus-auth .fluent-input, .campus-dialog .fluent-input { border: 1px solid var(--border-color); background: var(--surface-card); color: var(--text-primary); border-radius: 8px; font-size: 14px; box-shadow: none; }
 [data-campus-ui] :is(input, textarea, select):not([type=checkbox]):not([type=radio]) { min-width: 0; max-width: 100%; }
 [data-campus-ui] :is(input[type=checkbox], input[type=radio]), .campus-dialog :is(input[type=checkbox], input[type=radio]) { min-width: 18px; min-height: 18px; width: 18px; height: 18px; accent-color: var(--color-primary); vertical-align: middle; }
+/* The label toggles its checkbox, so the label is the tap target: at least 24px tall (WCAG 2.2 target size, AA). */
+:is([data-campus-ui], .campus-dialog) label:has(> input:is([type=checkbox], [type=radio])) { min-height: 24px; }
 [data-campus-ui] textarea { min-height: 112px; }
 [data-campus-ui] h1 { font-size: clamp(22px, 2.1vw, 28px); line-height: 1.35; font-weight: 700; letter-spacing: -.025em; }
 [data-campus-ui] h2 { line-height: 1.4; }
