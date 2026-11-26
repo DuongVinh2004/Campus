@@ -4,10 +4,17 @@ import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "../../../components/AppShell";
 import { ProcedureRunner } from "../../../features/procedures/ProcedureRunner";
+import { MyProcedures } from "../../../features/procedures/MyProcedures";
 
 function Content() {
   const params = useSearchParams();
-  return <ProcedureRunner runId={params.get("run") ?? undefined} procedureId={params.get("procedure") ?? undefined} />;
+  const runId = params.get("run") ?? undefined;
+  return (
+    <>
+      <ProcedureRunner runId={runId} procedureId={params.get("procedure") ?? undefined} />
+      <MyProcedures currentRunId={runId} />
+    </>
+  );
 }
 
 export default function ProcedurePage() {
