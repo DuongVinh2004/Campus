@@ -770,6 +770,12 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     jobs.append(gated("policy_rule_staleness", lambda: run_rule_staleness(policy_rules)))
                     from campus247.application.policy_impact.jobs import run_impact_snapshot
                     jobs.append(gated("impact_snapshot", lambda: run_impact_snapshot(impact_service)))
+                    from campus247.application.policy_impact.jobs import run_answer_source_notices
+
+                    def answer_notice(owner, title, body, link):
+                        with ops_service.store.tx() as c:
+                            ops_service.store.notify(c, owner, "ANSWER_SOURCE_CHANGED", title, body, link)
+                    jobs.append(gated("answer_source_notices", lambda: run_answer_source_notices(receipt_service, answer_notice)))
                     from campus247.application.procedures.jobs import run_procedure_expiry
                     jobs.append(gated("procedure_expiry", lambda: run_procedure_expiry(procedure_service)))
                     from campus247.application.announcements.jobs import proactive_jobs

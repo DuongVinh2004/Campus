@@ -40,6 +40,28 @@ class AnswerReceiptService:
             self.on_error(error)
             return None
 
+    def notify_changed_sources(self, notify, *, now_iso: str | None = None) -> int:
+        """F3.7: tell the owner, once per answer, that an answer still in retention rests on a source edited or removed since.
+
+        `notify(owner, title, body, link)` writes the in-app notice. The notice carries no question, answer or source text.
+        """
+        now_iso = now_iso or self.clock().isoformat(timespec="seconds")
+        sent = 0
+        for row in self.store.active(now_iso):
+            if row is None:
+                continue
+            opened = self.open(row["owner_subject_id"], row["receipt_id"])
+            if not (opened["now"]["sources_changed"] or opened["now"]["sources_removed"]):
+                continue
+            if not self.store.mark_notified(row["receipt_id"], now_iso):
+                continue
+            moment = row["created_at"][:16].replace("T", " ")
+            notify(row["owner_subject_id"], "Nguồn của một câu trả lời đã thay đổi",
+                   f"Câu trả lời bạn nhận lúc {moment} (giờ UTC) dựa trên quy định đã được sửa đổi hoặc gỡ sau đó. Hãy hỏi lại để có thông tin mới nhất.",
+                   f"/chat?conversation_id={row['conversation_id']}")
+            sent += 1
+        return sent
+
     def open_for_message(self, owner: str, conversation_id: str, message_id: str) -> dict:
         row = self.store.for_message(conversation_id, message_id)
         if row is None:

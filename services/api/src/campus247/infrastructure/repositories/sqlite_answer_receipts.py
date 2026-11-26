@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS answer_receipts(
   receipt_id TEXT PRIMARY KEY, owner_subject_id TEXT NOT NULL, conversation_id TEXT NOT NULL, message_id TEXT NOT NULL,
   release_id TEXT NOT NULL, binding_sha256 TEXT NOT NULL, outcome_kind TEXT NOT NULL, statements_sha256 TEXT NOT NULL,
   sources TEXT NOT NULL, checks TEXT NOT NULL, rejected_counts TEXT NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL,
-  UNIQUE(conversation_id, message_id))
+  UNIQUE(conversation_id, message_id));
+CREATE TABLE IF NOT EXISTS answer_receipt_notices(receipt_id TEXT PRIMARY KEY, notified_at TEXT NOT NULL);
 """
 
 
@@ -25,7 +26,7 @@ class AnswerReceiptStore:
         self.path = Path(path)
         with closing(self._connect()) as db:
             enable_wal(db)
-            db.execute(SCHEMA)
+            db.executescript(SCHEMA)
 
     def _connect(self) -> sqlite3.Connection:
         db = sqlite3.connect(self.path, timeout=5, isolation_level=None)
@@ -50,9 +51,21 @@ class AnswerReceiptStore:
             r = db.execute("SELECT receipt_id FROM answer_receipts WHERE conversation_id=? AND message_id=?", (conversation_id, message_id)).fetchone()
         return self.get(r["receipt_id"]) if r else None
 
+    def active(self, now_iso: str, *, limit: int = 5000) -> list[dict]:
+        """Receipts still within their conversation's retention and not yet the subject of a source-change notice."""
+        with closing(self._connect()) as db:
+            rows = db.execute("SELECT r.receipt_id FROM answer_receipts r LEFT JOIN answer_receipt_notices n ON n.receipt_id=r.receipt_id "
+                              "WHERE r.expires_at>? AND n.receipt_id IS NULL ORDER BY r.created_at LIMIT ?", (now_iso, limit)).fetchall()
+        return [self.get(r["receipt_id"]) for r in rows]
+
+    def mark_notified(self, receipt_id: str, now_iso: str) -> bool:
+        with closing(self._connect()) as db:
+            return db.execute("INSERT OR IGNORE INTO answer_receipt_notices VALUES(?,?)", (receipt_id, now_iso)).rowcount == 1
+
     def delete_conversation(self, conversation_id: str) -> int:
         """The only deletion: when the conversation is deleted or expires (privacy request), its receipts go with it."""
         with closing(self._connect()) as db:
+            db.execute("DELETE FROM answer_receipt_notices WHERE receipt_id IN (SELECT receipt_id FROM answer_receipts WHERE conversation_id=?)", (conversation_id,))
             return db.execute("DELETE FROM answer_receipts WHERE conversation_id=?", (conversation_id,)).rowcount
 
     def purge_expired(self, now_iso: str) -> int:

@@ -179,3 +179,19 @@ def test_only_staff_who_work_on_answers_are_told_to_show_reason_codes(tmp_path):
     seen = {role: c.get(f"/v1/answer-receipts/{rid}", headers={"x-role": role}).json()["show_reason_codes"]
             for role in ("STUDENT", "SUPPORT_OFFICER", "KNOWLEDGE_ADMIN", "LECTURER")}
     assert seen == {"STUDENT": False, "SUPPORT_OFFICER": True, "KNOWLEDGE_ADMIN": True, "LECTURER": False}
+
+
+def test_owners_are_told_once_when_an_answer_rests_on_a_changed_source(tmp_path):
+    store, service = make(tmp_path)
+    changed = record(service)                                                         # cites u2 (edited) and u3 (removed)
+    unchanged = record(service, message_id="m2", sources=[{"unit_id": "u1", "text_sha256": "hash-1", "path": "Điều 10", "doc_title": "Quy chế", "page": 4}],
+                       checks=[{"deterministic": "PASSED", "verbatim": True, "semantic": "SKIPPED_VERBATIM", "unit_ids": ["u1"]}])
+    record(service, message_id="m3", expires_at=(NOW - timedelta(seconds=1)).isoformat(timespec="seconds"))   # out of retention
+    sent = []
+    assert service.notify_changed_sources(lambda *args: sent.append(args)) == 1
+    owner, title, body, link = sent[0]
+    assert owner == OWNER and link == "/chat?conversation_id=c1" and "sửa đổi hoặc gỡ" in body
+    assert "580.500" not in body + title                                             # no answer text in the notice
+    assert service.notify_changed_sources(lambda *args: sent.append(args)) == 0       # once per answer
+    assert unchanged and changed
+    assert store.delete_conversation("c1") == 3                                       # notices go with the conversation
