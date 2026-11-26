@@ -27,6 +27,7 @@ import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { AnswerFeedback, type FeedbackRating } from "./AnswerFeedback";
 import { GapReport } from "./GapReport";
 import { ChatSuggestionCards } from "./ChatSuggestionCards";
+import { AnswerEvidence } from "./AnswerEvidence";
 import { ImageInput } from "../input/ImageInput";
 import { ReadAloud } from "../input/ReadAloud";
 import { FeatureGate } from "../../lib/features";
@@ -102,6 +103,7 @@ export interface ChatPanelProps {
   headerActions?: ReactNode;
   hideHeader?: boolean;
   chatContext?: ReactNode;
+  conversationId?: string;
   onComposerTools?: () => void;
   onComposerSettings?: () => void;
   onOpenHistory?: () => void;
@@ -427,7 +429,7 @@ export function ChatPanel({
   onClearMessages,
   citationCount,
   onOpenCitations,
-  historyContent, headerActions, hideHeader = false, chatContext, onComposerTools, onComposerSettings, onOpenHistory, composerValue, initialDraft = "", onComposerChange, disabled = false, audience, initialSidebarOpen = true,
+  historyContent, headerActions, hideHeader = false, chatContext, conversationId, onComposerTools, onComposerSettings, onOpenHistory, composerValue, initialDraft = "", onComposerChange, disabled = false, audience, initialSidebarOpen = true,
 }: ChatPanelProps) {
   const t = useT();
   const operational = process.env.NEXT_PUBLIC_KNOWLEDGE_PLATFORM === "true";
@@ -954,6 +956,10 @@ export function ChatPanel({
                               </div>
                             )}
                           </div>
+                        )}
+
+                        {conversationId && SERVER_ID.test(message.id) && !isFailed && !isAbstained && !isProvisional && !isStopped && (
+                          <FeatureGate feature="chat.evidence_ui"><AnswerEvidence conversationId={conversationId} messageId={message.id} /></FeatureGate>
                         )}
 
                         {/* Bottom Actions Toolbar */}

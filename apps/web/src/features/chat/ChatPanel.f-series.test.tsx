@@ -6,6 +6,7 @@ import { ChatPanel, type ChatMessage } from "./ChatPanel";
 const flags = vi.hoisted(() => ({ on: false }));
 vi.mock("../../lib/features", () => ({ FeatureGate: ({ children }: { children: React.ReactNode }) => (flags.on ? <>{children}</> : null) }));
 vi.mock("./ChatSuggestionCards", () => ({ ChatSuggestionCards: ({ text }: { text: string }) => (flags.on ? <div data-testid="cards">{text}</div> : null) }));
+vi.mock("./AnswerEvidence", () => ({ AnswerEvidence: ({ messageId }: { messageId: string }) => <div data-testid="evidence">{messageId}</div> }));
 vi.mock("../input/ImageInput", () => ({ ImageInput: () => <div data-testid="image-input" /> }));
 vi.mock("../input/ReadAloud", () => ({ ReadAloud: ({ text }: { text: string }) => <button type="button">Đọc to: {text}</button> }));
 
@@ -41,5 +42,19 @@ describe("F-series pieces mounted in the chat", () => {
     flags.on = true;
     render(<ChatPanel messages={messages} disabled />);
     expect(screen.queryByTestId("image-input")).toBeNull();
+  });
+
+  it("shows the evidence line only for answers the server stored, in a known conversation, with the flag on", () => {
+    const stored: ChatMessage[] = [{ id: "01a17d81-7b84-7918-add2-763596212c5f", role: "assistant", status: "success", content: "Có căn cứ." }, { id: "assistant-2", role: "assistant", status: "success", content: "Cục bộ." }];
+    flags.on = true;
+    render(<ChatPanel messages={stored} conversationId="c1" />);
+    expect(screen.getAllByTestId("evidence").map(n => n.textContent)).toEqual(["01a17d81-7b84-7918-add2-763596212c5f"]);
+    cleanup();
+    render(<ChatPanel messages={stored} />);
+    expect(screen.queryByTestId("evidence")).toBeNull();
+    cleanup();
+    flags.on = false;
+    render(<ChatPanel messages={stored} conversationId="c1" />);
+    expect(screen.queryByTestId("evidence")).toBeNull();
   });
 });

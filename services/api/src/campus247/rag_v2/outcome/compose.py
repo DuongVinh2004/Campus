@@ -4,11 +4,14 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from campus247.rag_v2.generation.contacts import restore
+from campus247.rag_v2.ingest.units import source_text
+from campus247.rag_v2.outcome.support_spans import find_support
 from campus247.rag_v2.types import (
     Citation,
     Outcome,
     RefuseReason,
     Statement,
+    StatementCheck,
     StatementVerdict,
     Understanding,
     Unit,
@@ -61,14 +64,20 @@ def build_outcome(
     candidates = len(units_by_id) if candidate_count is None else candidate_count
     semantic_valid = (semantic_results is not None and len(semantic_results) == len(verdicts)
                       and all(type(item) is bool for item in semantic_results))
-    accepted, citations, accepted_facets = [], {}, []
+    accepted, citations, accepted_facets, checks = [], {}, [], []
+    rejected: dict[str, int] = {}
     for index, verdict in enumerate(verdicts):
-        if not verdict.passed or not check_statement(verdict.statement, units_by_id).passed:
+        rechecked = check_statement(verdict.statement, units_by_id) if verdict.passed else verdict
+        if not verdict.passed or not rechecked.passed:
+            for code in (verdict.reasons if not verdict.passed else rechecked.reasons) or ("UNVERIFIED",):
+                rejected[code] = rejected.get(code, 0) + 1
             continue
         if semantic_valid:
             if not semantic_results[index]:
+                rejected["SEMANTIC_UNSUPPORTED"] = rejected.get("SEMANTIC_UNSUPPORTED", 0) + 1
                 continue
         elif semantic_required:
+            rejected["SEMANTIC_UNSUPPORTED"] = rejected.get("SEMANTIC_UNSUPPORTED", 0) + 1
             continue
         stmt = verdict.statement
         units = [units_by_id[ref] for ref in stmt.unit_ids]
@@ -76,6 +85,7 @@ def build_outcome(
         if text is None:
             continue
         accepted.append(Statement(text, stmt.unit_ids))
+        checks.append(_check(text, units, semantic_valid))
         accepted_facets.append(facet_of[index] if index < len(facet_of) else "")
         for unit in units:
             # The whole indivisible unit is an exact quote containing every
@@ -109,7 +119,19 @@ def build_outcome(
         text += "\n\n" + note
     return Outcome("partial" if partial else "answer", text, tuple(accepted), tuple(citations.values()),
                    partial_note=note, suggestions=tuple(suggestions), preface=scope_note,
-                   groups=_groups(facets, accepted_facets))
+                   groups=_groups(facets, accepted_facets), checks=tuple(checks), rejected_counts=rejected)
+
+
+def _check(text: str, units: Sequence[Unit], semantic_ran: bool) -> StatementCheck:
+    wanted = " ".join(text.split())
+    bodies = [(unit.unit_id, source_text(unit)) for unit in units]
+    verbatim = any(wanted and wanted in " ".join(body.split()) for _, body in bodies)
+    spans = []
+    for unit_id, body in bodies:
+        found = find_support(text, body)
+        if found:
+            spans.append((unit_id, found[0], found[1]))
+    return StatementCheck("PASSED", verbatim, "PASSED" if semantic_ran else "NOT_RUN", tuple(spans))
 
 
 def _groups(facets: Sequence[tuple[str, str]], accepted_facets: Sequence[str]) -> tuple[tuple[str, tuple[int, ...]], ...]:

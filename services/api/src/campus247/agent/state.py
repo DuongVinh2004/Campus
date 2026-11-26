@@ -93,6 +93,9 @@ class DraftResponse:
     guidance: tuple[str, ...] = ()   # Server-derived next-step suggestions shown after the answer.
     # Layout only: grounded claims grouped by the part of the question they answer (user's words, claim indexes).
     claim_groups: tuple[tuple[str, tuple[int, ...]], ...] = ()
+    # Evidence display only (F4.1): per-claim checks and counts of dropped statements; never part of the answer text.
+    claim_checks: tuple[Any, ...] = ()
+    rejected_counts: dict[str, int] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

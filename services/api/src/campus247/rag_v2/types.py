@@ -104,6 +104,15 @@ class Citation:
 
 
 @dataclass(frozen=True)
+class StatementCheck:
+    """What one accepted statement went through (F4.1). Display data only: it never changes a decision."""
+    deterministic: str                         # always "PASSED" for an accepted statement; rejected ones are never listed
+    verbatim: bool                             # the statement is a literal substring of a cited source body
+    semantic: str                              # "PASSED" or "NOT_RUN" (a verbatim skip is reported through `verbatim`)
+    support_spans: tuple[tuple[str, int, int], ...] = ()   # (unit_id, start, end) inside the source body
+
+
+@dataclass(frozen=True)
 class Outcome:
     kind: OutcomeKind
     text: str                                  # user-facing Vietnamese text (fixed or built from verified statements)
@@ -118,3 +127,7 @@ class Outcome:
     # Set only when two or more parts were answered; presentation uses it for layout, never for content.
     groups: tuple[tuple[str, tuple[int, ...]], ...] = ()
     trace: Mapping[str, object] = field(default_factory=dict)  # finite counters/codes only, never question text
+    # Parallel to `statements` (same length) when built by build_outcome; empty otherwise.
+    checks: tuple[StatementCheck, ...] = ()
+    # Reason code -> number of statements dropped for it (counts only; the dropped text is never kept).
+    rejected_counts: Mapping[str, int] = field(default_factory=dict)

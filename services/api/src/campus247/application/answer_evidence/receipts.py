@@ -38,6 +38,12 @@ class AnswerReceiptService:
             self.on_error(error)
             return None
 
+    def open_for_message(self, owner: str, conversation_id: str, message_id: str) -> dict:
+        row = self.store.for_message(conversation_id, message_id)
+        if row is None:
+            raise OpsError(404, "RECEIPT_NOT_FOUND", "Không tìm thấy biên nhận.")
+        return self.open(owner, row["receipt_id"])
+
     def open(self, owner: str, receipt_id: str) -> dict:
         row = self.store.get(receipt_id)
         if row is None or row["owner_subject_id"] != owner or row["expires_at"] <= self.clock().isoformat(timespec="seconds"):

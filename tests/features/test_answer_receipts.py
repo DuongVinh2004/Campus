@@ -104,3 +104,36 @@ def test_route_returns_404_for_a_stranger(tmp_path):
     ok = c.get(f"/v1/answer-receipts/{rid}", headers={"x-user": OWNER})
     assert ok.status_code == 200 and ok.headers["cache-control"] == "no-store" and ok.json()["now"]["sources_changed"] == 1
     assert c.get(f"/v1/answer-receipts/{rid}", headers={"x-user": OTHER}).status_code == 404
+
+
+def test_record_receipt_binds_sources_by_hash_and_by_message_route_is_owner_only(tmp_path):
+    import json
+    from types import SimpleNamespace
+    from campus247.application.answer_evidence.record import record_receipt
+    store, service = make(tmp_path)
+    cite = SimpleNamespace(citation_json=json.dumps({"unit_id": "u1", "source_title": "Quy chế", "release_id": "rel-1", "locator": {"section_path": "Điều 10", "page_start": 4}}))
+    message = SimpleNamespace(id="m9", citations=(cite,))
+    result = SimpleNamespace(response_class="grounded_answer", evidence={
+        "statements": ["Học phí 580.500 đồng"], "rejected_counts": {"NUMBER_NOT_IN_SOURCE": 1},
+        "checks": [{"deterministic": "PASSED", "verbatim": True, "semantic": "PASSED", "unit_ids": ["u1"]}]})
+    expires = (NOW + timedelta(days=30)).isoformat(timespec="seconds")
+    rid = record_receipt(service, owner=OWNER, conversation_id="c9", message=message, result=result, expires_at=expires, release_id="rel-1")
+    assert rid
+    opened = service.open_for_message(OWNER, "c9", "m9")
+    assert opened["receipt_id"] == rid and opened["sources"][0]["status_now"] == "UNCHANGED"
+    # a statement citing a unit missing from the index cannot be bound: no receipt rather than a wrong one
+    result.evidence["checks"][0]["unit_ids"] = ["gone"]
+    assert record_receipt(service, owner=OWNER, conversation_id="c9", message=SimpleNamespace(id="m10", citations=()), result=result, expires_at=expires, release_id="rel-1") is None
+    app = FastAPI()
+    register_ops_errors(app)
+    app.include_router(create_answer_receipts_router(service))
+
+    @app.middleware("http")
+    async def who(request, call_next):
+        request.state.identity = IdentityContext(subject_id=request.headers["x-user"], external_subject="x", issuer="l", roles=(IdentityRole.STUDENT,),
+                                                 display_name="x", auth_time=NOW, expires_at=NOW + timedelta(hours=1), student_code="S1")
+        return await call_next(request)
+
+    c = TestClient(app)
+    assert c.get("/v1/answer-receipts/by-message/c9/m9", headers={"x-user": OWNER}).json()["receipt_id"] == rid
+    assert c.get("/v1/answer-receipts/by-message/c9/m9", headers={"x-user": OTHER}).status_code == 404

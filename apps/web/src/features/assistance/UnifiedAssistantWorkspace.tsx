@@ -151,7 +151,7 @@ export function UnifiedAssistantWorkspace({ compact = false }: { compact?: boole
       {(!historyOpen || mobileHistory) && <button type="button" className="campus-history-reopen" aria-label="Mở danh sách hội thoại" title="Mở danh sách hội thoại" onClick={() => setHistoryOpen(true)}><PanelLeftOpen size={18} /></button>}
       <ChatPanel messages={active.messages} isStreaming={runtime.busy} onSendMessage={value => void runtime.send(value)} onStopStreaming={runtime.stop}
       onClearMessages={runtime.newChat} composerValue={active.input} onComposerChange={runtime.input}
-      hideHeader
+      hideHeader conversationId={active.id || undefined}
       chatContext={<div className="campus-conversation-context"><span title={active.summary?.title || "Chat mới"}>{!active.id ? active.mode === "temporary" ? "Chat tạm thời mới" : "Chat mới" : active.summary?.title || "Hội thoại đang mở"}</span><HistoryActions label="Thao tác cuộc trò chuyện" actions={[
         { label: "Thông tin hội thoại", run: () => setDetailsOpen(true) },
         { label: "Tiện ích học vụ", run: () => setToolsOpen(true) },

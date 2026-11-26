@@ -10,6 +10,11 @@ from campus247.presentation.identity import get_current_identity
 def create_answer_receipts_router(service) -> APIRouter:
     r = APIRouter(tags=["Answer evidence"])
 
+    @r.get("/v1/answer-receipts/by-message/{conversation_id}/{message_id}")
+    def open_for_message(conversation_id: str, message_id: str, request: Request):
+        who = get_current_identity(request)
+        return JSONResponse(service.open_for_message(who.subject_id, conversation_id, message_id), headers={"Cache-Control": "no-store"})
+
     @r.get("/v1/answer-receipts/{receipt_id}")
     def open_receipt(receipt_id: str, request: Request):
         who = get_current_identity(request)

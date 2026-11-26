@@ -83,6 +83,8 @@ class FinalChatResult:
     content: str
     citations: tuple[StreamCitation, ...] = ()
     agent_run_id: str | None = None
+    # In-memory only (never persisted or sent): what the evidence receipt is built from.
+    evidence: dict | None = None
 
 
 class StreamFailure(Exception):
@@ -128,6 +130,19 @@ def _grounded_citations(state: AgentState) -> tuple[StreamCitation, ...]:
     if {citation.turn_citation_id for citation in resolved} != refs:
         raise ValueError("unknown citation reference")
     return tuple(resolved)
+
+
+def _evidence(state: AgentState, citations) -> dict | None:
+    draft = state.draft
+    checks = getattr(draft, "claim_checks", ())
+    claims = getattr(draft, "grounded_claims", ())
+    if not checks or len(checks) != len(claims):
+        return None
+    unit_of = {c.turn_citation_id: json.loads(c.citation_json).get("unit_id") for c in citations}
+    return {"statements": [claim.text for claim in claims],
+            "checks": [{"deterministic": c.deterministic, "verbatim": c.verbatim, "semantic": c.semantic,
+                        "unit_ids": [unit_of[ref] for ref in claim.citation_ids if unit_of.get(ref)]} for c, claim in zip(checks, claims)],
+            "rejected_counts": dict(getattr(draft, "rejected_counts", {}) or {})}
 
 
 def prepare_chat_result(state: AgentState) -> FinalChatResult:
@@ -208,8 +223,8 @@ def _prepare_chat_result(state: AgentState) -> FinalChatResult:
             if "AI_PARTIAL_COVERAGE" in state.errors:
                 return FinalChatResult(status, "partial_answer", content +
                     "\n\n" + note_block(state.draft.partial_note or
-                    "Thông tin hiện có chỉ đủ cho một phần câu hỏi. Tôi chưa có đủ nguồn để xác minh phần còn thiếu.") + guidance, citations)
-            return FinalChatResult(status, "grounded_answer", content + guidance, citations)
+                    "Thông tin hiện có chỉ đủ cho một phần câu hỏi. Tôi chưa có đủ nguồn để xác minh phần còn thiếu.") + guidance, citations, evidence=_evidence(state, citations))
+            return FinalChatResult(status, "grounded_answer", content + guidance, citations, evidence=_evidence(state, citations))
         if state.route == Route.PERSONAL_SCHEDULE:
             return FinalChatResult(status, "tool_result", state.draft.text)
         logging.getLogger("campus247.chat").warning("stream_prepare_failure site=3")
