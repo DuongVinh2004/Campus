@@ -624,7 +624,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
 
     # Proactive assistant (F6): signals of one person -> "things to do today" and inbox nudges. No model calls.
     from campus247.application.proactive.engine import ProactiveEngine
-    from campus247.application.proactive.providers import AnnouncementProvider, ExamProvider, TicketProvider
+    from campus247.application.proactive.providers import (AnnouncementProvider, ExamProvider, ExitTicketProvider, PracticeDueProvider,
+        ProcedureDraftProvider, TicketProvider, sqlite_learning_snapshot)
     from campus247.presentation.nudges import create_nudges_router
 
     def nudge_subjects():
@@ -634,9 +635,14 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         student = campus_adapter.student.directory()
         return student["subject_id"] if student["student_code"] == student_code else None
 
-    proactive_engine = ProactiveEngine(
-        ops_service.store, [ExamProvider(ops_service.store, nudge_student_subject), AnnouncementProvider(ops_service.store), TicketProvider(ops_service.store)],
-        enabled=feature_service.enabled, subjects=nudge_subjects)
+    nudge_providers = [ExamProvider(ops_service.store, nudge_student_subject), AnnouncementProvider(ops_service.store), TicketProvider(ops_service.store),
+                       ProcedureDraftProvider(ops_service.store, lambda pid: getattr(procedure_service.procedures.get(pid), "title", None))]
+    learning_repository = getattr(learning_service, "repository", None)
+    if learning_repository is not None and hasattr(learning_repository, "path"):
+        # The local learning store is SQLite: exit tickets and practice reviews are read from it, read-only.
+        snapshot = sqlite_learning_snapshot(learning_repository.path, learning_repository.tenant_id)
+        nudge_providers += [ExitTicketProvider(snapshot), PracticeDueProvider(snapshot)]
+    proactive_engine = ProactiveEngine(ops_service.store, nudge_providers, enabled=feature_service.enabled, subjects=nudge_subjects)
     app.include_router(create_nudges_router(proactive_engine))
     app.state.proactive = proactive_engine
     from campus247.presentation.learning import create_learning_router
