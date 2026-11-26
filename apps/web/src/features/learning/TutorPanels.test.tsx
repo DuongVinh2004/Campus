@@ -106,3 +106,20 @@ describe("mastery views", () => {
     expect(await screen.findByText("Lớp có dưới 5 sinh viên nên bản đồ không hiển thị số liệu.")).toBeTruthy();
   });
 });
+
+describe("concept proposals", () => {
+  it("asks the model for proposals and lists them for approval", async () => {
+    let proposed = false;
+    calls.request.mockImplementation((path: string) => {
+      if (path.endsWith("/map")) return Promise.resolve({ suppressed: true, students: "<5", concepts: [], items: [] });
+      if (path.endsWith("/concepts")) return Promise.resolve({ concepts: proposed ? [{ id: "c9", label: "Khả năng chịu nén", description: "", status: "PROPOSED", revision: 1 }] : [] });
+      return Promise.reject(new Error("404"));
+    });
+    calls.write.mockImplementation(() => { proposed = true; return Promise.resolve({ proposed: [{ id: "c9" }] }); });
+    render(<ClassMastery offeringId="o1" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Đề xuất khái niệm bằng AI" }));
+    expect(await screen.findByText("Đã thêm 1 đề xuất chờ duyệt.")).toBeTruthy();
+    expect(await screen.findByText("Khả năng chịu nén")).toBeTruthy();
+    expect(calls.write).toHaveBeenCalledWith("/mastery/offerings/o1/concept-suggestions", {});
+  });
+});

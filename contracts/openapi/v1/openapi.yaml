@@ -112,6 +112,8 @@ paths:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1tutor~1offerings~1{offering_id}~1settings"
   /v1/learning/tutor/practice-items/{item_id}/hints:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1tutor~1practice-items~1{item_id}~1hints"
+  /v1/learning/mastery/offerings/{offering_id}/concept-suggestions:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1mastery~1offerings~1{offering_id}~1concept-suggestions"
   /v1/learning/sessions/{session_id}/practice-sets:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1practice-sets"
   /v1/learning/exit-tickets/{ticket_id}:

@@ -76,6 +76,14 @@ def register_tutor_routes(router, read_endpoint, write_endpoint, actor, service)
         return Response(map_csv(result), media_type="text/csv; charset=utf-8",
                         headers={"Cache-Control": "no-store", "Content-Disposition": 'attachment; filename="ban-do-nam-vung.csv"'})
 
+    @router.post("/mastery/offerings/{offering_id}/concept-suggestions", name="learning_concept_suggestions")
+    async def suggest(request: Request, offering_id: UUID):
+        from campus247.features import runtime
+        current = actor(request, write=True)
+        result = await service.suggest_concepts(current, str(offering_id), still_valid=lambda: actor(request, write=True),
+                                                model_allowed=runtime.value("learning.ai_explanations", False) is True)
+        return JSONResponse(result, headers={"Cache-Control": "no-store"})
+
     @router.post("/tutor/practice-items/{item_id}/hints", name="learning_tutor_hint")
     async def hint(request: Request, item_id: UUID, body: LearningHintInput):
         from campus247.features import runtime

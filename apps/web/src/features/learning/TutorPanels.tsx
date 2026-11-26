@@ -159,6 +159,8 @@ function ConceptManager({ offeringId, onChanged }: { offeringId: string; onChang
   const [description, setDescription] = useState("");
   const [pages, setPages] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const load = useCallback(async () => {
     try { setConcepts((await gateway.request<{ concepts: Concept[] }>(`/mastery/offerings/${offeringId}/concepts`)).concepts); setError(null); }
     catch (caught) { setError(problem(caught, t)); }
@@ -178,9 +180,21 @@ function ConceptManager({ offeringId, onChanged }: { offeringId: string; onChang
     try { await gateway.write(`/mastery/concepts/${concept.id}`, { revision: concept.revision, status }, "PATCH"); await load(); onChanged(); }
     catch (caught) { setError(problem(caught, t)); }
   }
+  async function suggest() {
+    setBusy(true);
+    setNote(null);
+    try {
+      const result = await gateway.write<{ proposed: Concept[] }>(`/mastery/offerings/${offeringId}/concept-suggestions`, {});
+      setNote(t("tut.53", { n: result.proposed.length }));
+      await load();
+    } catch (caught) { setError(problem(caught, t)); }
+    finally { setBusy(false); }
+  }
   return (
     <section aria-label={t("tut.31")} className={styles.stack}>
       <h4>{t("tut.31")}</h4>
+      <button type="button" disabled={busy} onClick={() => void suggest()}>{t("tut.52")}</button>
+      {note && <p role="status">{note}</p>}
       {error && <p role="alert">{error}</p>}
       {!concepts ? <p role="status">{t("tut.44")}</p> : (
         <ul>

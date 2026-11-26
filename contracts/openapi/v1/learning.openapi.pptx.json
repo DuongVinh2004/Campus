@@ -5,6 +5,74 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/v1/learning/mastery/offerings/{offering_id}/concept-suggestions": {
+      "post": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Concept Suggestions",
+        "operationId": "learning_post_mastery_offerings_offering_id_concept_suggestions",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
     "/v1/learning/mastery/offerings/{offering_id}/concepts": {
       "get": {
         "tags": [

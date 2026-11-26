@@ -255,3 +255,39 @@ def test_without_the_system_ai_feature_no_model_is_called(room, flags):
     flags["learning.ai_explanations"] = False
     answer(room, choice_id, ["b"])
     assert hint(room, choice_id).json()["origin"] == "TEMPLATE" and gateway.calls == 0
+
+
+# ------------------------------------------------------------------------------------------------ concepts proposed by a model
+def suggest(room, who=None):
+    return call(room.client, "POST", f"/mastery/offerings/{room.oid}/concept-suggestions", who or room.teacher, json={})
+
+
+def test_model_proposals_are_checked_by_code_and_wait_for_the_lecturer(room, flags):
+    _, choice_id, _ = published_set(room)
+    concept(room, "Đã có")
+    page = f"{room.version_id}:1"
+    gateway = allow_model(room, flags, [{"concepts": [
+        {"label": "Khả năng chịu nén", "description": "Bê tông chịu nén tốt.", "pages": [page], "items": [choice_id]},
+        {"label": "đã có", "pages": [page]},                                   # label already used (case-insensitive)
+        {"label": "Trang ngoài lớp", "pages": ["00000000-0000-0000-0000-000000000000:1"]},   # page of no file of this class
+        {"label": "Không gắn gì", "pages": [], "items": ["khong-co"]},           # nothing of this class to link
+        {"label": "x", "pages": [page]},                                         # label too short
+    ]}])
+    result = suggest(room)
+    assert result.status_code == 200, result.text
+    body = result.json()
+    assert [c["label"] for c in body["proposed"]] == ["Khả năng chịu nén"] and body["dropped"] == 4
+    assert body["proposed"][0]["status"] == "PROPOSED" and body["proposed"][0]["origin"] == "MODEL_CANDIDATE" and gateway.calls == 1
+    seen = call(room.client, "GET", f"/mastery/offerings/{room.oid}/concepts", room.student).json()["concepts"]
+    assert "Khả năng chịu nén" not in [c["label"] for c in seen]                 # a student sees it only after approval
+    approved = call(room.client, "PATCH", f"/mastery/concepts/{body['proposed'][0]['id']}", room.teacher, json={"revision": 1, "status": "APPROVED"})
+    assert approved.status_code == 200 and approved.json()["status"] == "APPROVED"
+
+
+def test_proposals_need_the_ai_feature_an_allowed_source_and_a_lecturer(room, flags):
+    published_set(room)
+    assert suggest(room).json()["code"] == "LEARNING_AI_UNAVAILABLE"            # system AI feature off
+    allow_model(room, flags, [])
+    assert suggest(room, room.student).status_code in {403, 404}
+    room.service.ai_source_hashes = frozenset()
+    assert suggest(room).json()["code"] == "LEARNING_AI_SOURCE_NOT_APPROVED"

@@ -732,6 +732,8 @@ export const vi = {
   "tut.49": "Đã ngừng",
   "tut.50": "Câu này đã dùng hết lượt gợi ý.",
   "tut.51": "Giảng viên chưa bật gia sư cho lớp này.",
+  "tut.52": "Đề xuất khái niệm bằng AI",
+  "tut.53": "Đã thêm {n} đề xuất chờ duyệt.",
   "pfx.1": "Khó hiểu",
   "pfx.2": "Cần thêm ví dụ",
   "pfx.3": "Nghi lỗi tài liệu",

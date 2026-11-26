@@ -733,6 +733,8 @@ export const en: Record<MessageKey, string> = {
   "tut.49": "Retired",
   "tut.50": "No hints left for this question.",
   "tut.51": "The lecturer has not turned the tutor on for this class.",
+  "tut.52": "Suggest concepts with AI",
+  "tut.53": "Added {n} proposals waiting for review.",
   "pfx.1": "Hard to understand",
   "pfx.2": "Needs another example",
   "pfx.3": "Possible mistake in the material",
