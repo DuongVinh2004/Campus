@@ -596,6 +596,11 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     register_procedure_errors(app)
     app.state.procedures = procedure_service
 
+    # Image input (F8.1): one PNG -> text through a local Tesseract executable (CAMPUS247_INPUT_OCR_TESSERACT); 503 while it is not installed.
+    from campus247.application.input_media.image_ocr import ImageOcrService, TesseractCliEngine
+    from campus247.presentation.input_media import create_input_media_router
+    app.include_router(create_input_media_router(ImageOcrService(TesseractCliEngine(), temp_root=checked_path(STATE / "input-image-tmp", ROOT))))
+
     # Policy change impact (F3): per-release unit snapshots, diff, dependants, fact conflicts. Admin-only, counts and unit paths only.
     from campus247.application.policy_impact.service import ImpactService, SnapshotStore
     from campus247.presentation.policy_impact import create_policy_impact_router
