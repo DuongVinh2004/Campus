@@ -156,7 +156,8 @@ export const NAV_FEATURE: Record<string, FeatureKey> = {
   "crawl": "knowledge.crawl",
   "admin": "admin.overview",
   "announcementsManage": "announcements.publish",
-  "announcements": "announcements.inbox"
+  "announcements": "announcements.inbox",
+  "policySimulator": "policy.simulator"
 };
 export const PAGE_FEATURE: Record<string, FeatureKey> = {
   "chat": "chat.assistant",
@@ -177,5 +178,6 @@ export const PAGE_FEATURE: Record<string, FeatureKey> = {
   "knowledge/policy-graph": "knowledge.policy_graph",
   "admin": "admin.overview",
   "announcements/manage": "announcements.publish",
-  "announcements": "announcements.inbox"
+  "announcements": "announcements.inbox",
+  "policy/simulator": "policy.simulator"
 };

@@ -94,6 +94,7 @@ const knowledgeNavigation: NavigationItem[] = [
   { key: "announcements", label: "nav.announcements", href: "/announcements", icon: Megaphone, roles: ["student", "staff", "admin"] },
   { key: "announcementsManage", label: "nav.announcementsManage", href: "/announcements/manage", icon: Megaphone, roles: ["staff", "admin"] },
   { key: "admin", label: "nav.adminOverview", href: "/admin", icon: Settings2, roles: ["admin"] },
+  { key: "policySimulator", label: "nav.policySimulator", href: "/policy/simulator", icon: ShieldCheck, roles: ["student", "staff", "admin"] },
   { key: "knowledge", label: "nav.knowledgeSources", href: "/knowledge/sources", icon: BookOpen, roles: ["admin"] },
   { key: "privacy", label: "nav.privacy", href: "/privacy", icon: ShieldCheck, roles: ["student", "guest", "admin"] },
 ];

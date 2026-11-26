@@ -23,6 +23,7 @@ export const vi = {
   "nav.notifications": "Thông báo",
   "nav.announcements": "Thông báo nhà trường",
   "nav.announcementsManage": "Soạn thông báo",
+  "nav.policySimulator": "Kiểm tra điều kiện quy chế",
   "nav.privacy": "Quyền riêng tư",
   "nav.studentPortal": "Cổng sinh viên",
   "nav.oneStop": "Một cửa HUCE",
