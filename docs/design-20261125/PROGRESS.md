@@ -72,6 +72,17 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 
 - Trang động `[id]` không chạy được trên 8015 vì `runtime_routes.page_routes()` liệt kê trang tĩnh; chi tiết thông báo dùng `/announcements?id=`.
 
+## Kiểm trên runtime 8015 (26/11, sau khi nối chat/RAG; chủ dự án đã đồng ý chạy)
+
+Đã khởi động lại API và frontend 8015/3015 bằng mã mới (snapshot giao diện `frontend-knowledge-fseries-20261126-02`, snapshot cũ giữ nguyên để khôi phục).
+
+- **Cổng RAG `rag_regression_gate.py run --quick` (provider thật): KHÔNG ĐẠT, 1 điểm.** safety 20/20 và stop 35/35, 0 lỗi, p90 5,9 s; `core` có 1 câu bị chấm "sai" (`NAT-R2-A3-0089-vague`, hỏi tổng tín chỉ ngành công trình thủy K67 trở đi và có tính hai môn thể dục/quân sự không), cả hai lần chạy đều sai, baseline 0. Cùng nội dung "K71CTT ghi tổng 180TC, không tính GDTC/GDQP" đã được chấm "helpful" hàng chục lần trước đó; lần này câu trả lời có bố cục tách mục `###` (commit `e7d969c`, 25/11, đến sau lần chạy cổng gần nhất 16/11, nên chưa từng được gate). F-series không đổi văn bản câu trả lời (test chứng minh), nên nguyên nhân nhiều khả năng là bố cục cũ + bộ chấm, CHƯA kiểm bằng chạy lại có/không bố cục. Baseline KHÔNG được cập nhật.
+- **`web_acceptance.mjs`: 474 kiểm đạt, 0 lỗi** (lần đầu 4 lỗi vì `/knowledge/policy-graph` trả 404 do cờ `knowledge.policy_graph` mặc định tắt; kịch bản đã sửa để kiểm "trang tắt cờ phải ẩn", gồm `/policy/simulator` và `/services/procedures`).
+- **`scripts/qa/f_series_check.mjs`: 10 kiểm đạt.** Chủ sở hữu bật 6 cờ trong 40 phút, sinh viên hỏi thật: thẻ "Kiểm tra điều kiện" hiện dưới câu hỏi, mở được trình mô phỏng, thẻ thủ tục và trang `/services/procedures` hiện, nút đọc to hiện ghi chú "chưa có giọng đọc tiếng Việt" (máy không có giọng vi), dòng "2 ý đã kiểm với nguồn" xuất hiện sau câu trả lời thật; sau đó cờ được gỡ (`ff_overrides` rỗng). Một câu hỏi đi qua provider thật.
+- **Lỗi tìm thấy nhờ chạy thật và đã sửa (55ea773):** câu trả lời trên runtime trích dẫn theo đơn vị cấp đoạn nguồn (mã băm từ `chunk_id`), không phải mã trong `units.jsonl`, nên biên nhận không bao giờ ghi được; ngoài ra chỉ mục đang phục vụ khác chỉ mục nền lúc khởi động. Sau sửa: biên nhận gắn với `evidence_sha256` và phiên bản tài liệu của trích dẫn, bộ đọc đơn vị đi theo chỉ mục đang phục vụ. Trang chat thật là `app/chat/page.tsx` (không phải `UnifiedAssistantWorkspace`), đã truyền `conversationId` ở đó.
+- Hồi quy Python `--ci` sau các sửa này: 2 374 đạt, 1 lỗi cũ `test_pptx`.
+- Chưa kiểm: nút "Gửi hồ sơ" và tạo ticket thật trên 8015 (chỉ kiểm tới trang điền; phiên thủ tục thử đã hủy), nhận diện ảnh (Tesseract chưa cài, 503), đọc to bằng giọng thật.
+
 ## Hồi quy lượt 3 (26/11, sau khi nối chat/RAG)
 
 - `run_full_regression.py --ci`: 2 374 đạt, 1 lỗi cũ `tests/unit/learning_pptx/test_pptx.py::test_internal_literal_chart_workbook_is_supported` (giống commit gốc).
