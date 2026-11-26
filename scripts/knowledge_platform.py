@@ -662,12 +662,13 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.include_router(create_freshness_router(freshness_service))
 
     # Which sources are behind answers people mark "not helpful": counts per source only, no question and no person.
-    from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_gap_recording, attach_quality_recording
+    from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_gap_recording, attach_quality_recording, attach_verification_recording
     from campus247.presentation.knowledge_quality import create_quality_router
     quality_store = AnswerQualityStore(STATE / "answer-quality.sqlite3")
     feedback = getattr(app.state, "feedback_service", None)  # absent in the rehearsal/learning-only apps: nothing to record then
     if feedback is not None:
         attach_quality_recording(feedback, quality_store)
+    attach_verification_recording(quality_store)  # counts of kept and dropped statements per day (F4.4); no text, no person
     attach_gap_recording(quality_store)  # refusals counted under the sources they pointed at; no question, answer or person
     app.include_router(create_quality_router(quality_store, freshness_service))
     # P2 (owner approved the consent text 2026-11-21): a student's own report of missing information, redacted, kept 90 days.

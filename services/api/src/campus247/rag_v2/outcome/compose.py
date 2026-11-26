@@ -96,7 +96,7 @@ def build_outcome(
             )
     if not accepted:
         reason = "unverified" if candidates or verdicts else "no_source"
-        return Outcome("refuse", REFUSAL_MESSAGES[reason], reason=reason, suggestions=tuple(suggestions))
+        return Outcome("refuse", REFUSAL_MESSAGES[reason], reason=reason, suggestions=tuple(suggestions), rejected_counts=rejected)
     incomplete = len(accepted) < len(verdicts) or coverage < 1.0 or bool(missing_parts)
     # An answer that holds for several scopes (cohort, programme, term) is complete for what the sources say;
     # the server then invites the user to narrow it down instead of calling it incomplete.

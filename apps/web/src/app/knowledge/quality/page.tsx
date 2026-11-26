@@ -3,6 +3,7 @@
 import React from "react";
 import { AppShell } from "../../../components/AppShell";
 import { AnswerQualityPanel } from "../../../features/knowledge/AnswerQualityPanel";
+import { VerificationPanel } from "../../../features/knowledge/VerificationPanel";
 import { StudentGapReports } from "../../../features/knowledge/StudentGapReports";
 
 export default function KnowledgeQualityPage() {
@@ -16,6 +17,7 @@ export default function KnowledgeQualityPage() {
           </div>
         </header>
         <AnswerQualityPanel />
+        <VerificationPanel />
         <StudentGapReports />
       </div>
     </AppShell>
