@@ -37,11 +37,11 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F1.6 đồng bộ kho tri thức | MỘT PHẦN (chưa nối: cần quyết định về luồng nhận tài liệu) | — | `KnowledgePlatform.upload` là luồng async có `IntakeMetadata`, duyệt và phát hành riêng; nối thông báo vào đó đổi luồng tri thức nên chưa làm. `AnnouncementService` có móc `knowledge_sync.publish/revoke`, test thu hồi/hết hạn bằng bản giả; CHƯA nối adapter vào `KnowledgePlatform.upload()` và chưa có test RAG provider giả |
 | F1.7 web | MỘT PHẦN | xem log | hộp thư, chi tiết (`?id=`), soạn có đếm người nhận trực tiếp, vitest 4; CHƯA có: thống kê, hàng đợi duyệt, thu hồi/sửa trên giao diện, thẻ trang chủ, nút trong học liệu, trang công khai riêng |
 | F1.8 tool chat | CHƯA LÀM | — | |
-| F4.0 provider phát lại | CHƯA LÀM | — | cần sổ ghi phản hồi provider theo băm yêu cầu; chưa có sẵn trong repo |
-| F4.1 `checks`/`rejected_counts` trong Outcome | CHƯA LÀM | — | chặn bởi F4.0 (phải chứng minh không đổi hành vi trước khi sửa mã RAG) |
-| F4.2 support_spans + biên nhận + API | MỘT PHẦN | xem log | `rag_v2/outcome/support_spans.py`: 200 cặp máy sinh từ `data/rag_v2_index/units.jsonl`, ≥ 99 % đoạn chứa đủ số (`tests/rag_v2/test_support_spans.py`); kho + service + `GET /v1/answer-receipts/{id}` có test (`tests/features/test_answer_receipts.py`); CHƯA nối ghi biên nhận từ luồng chat (cần F4.1) |
-| F4.3 giao diện huy hiệu/tô đoạn | CHƯA LÀM | — | |
-| F4.4 số đo trang chất lượng | CHƯA LÀM | — | |
+| F4.0 provider phát lại | THAY BẰNG CÁCH KHÁC | e22f560 | không có sổ ghi phản hồi provider trong repo nên không dựng được bằng chứng phát lại; thay bằng 3 bằng chứng: (1) F4.1 chỉ thêm trường, test `tests/rag_v2/test_outcome_checks.py` chứng minh kind/text/statements/citations/partial_note giống hệt khi bỏ hai trường mới; (2) tập test lỗi trước và sau thay đổi trùng nhau (95 lỗi + 47 lỗi cấu hình, đều do môi trường thiếu `pdfplumber`…); (3) `tests/rag_v2/test_graph_integration.py` (graph thật) vẫn đạt. Cổng `rag_regression_gate.py run --quick` với provider thật CHƯA chạy (tốn chi phí, cần bạn đồng ý) |
+| F4.1 `checks`/`rejected_counts` trong Outcome | XONG | 1149130 | `rag_v2/types.py` (`StatementCheck`, 2 trường mới có mặc định), `outcome/compose.py` tính tại `build_outcome`, `DraftResponse.claim_checks/rejected_counts`; không đổi quyết định, ngưỡng, prompt, model, chỉ mục |
+| F4.2 support_spans + biên nhận + API | XONG | 1149130 | thêm `FinalChatResult.evidence` (chỉ trong bộ nhớ) → `application/answer_evidence/record.py` ghi biên nhận sau khi lưu tin nhắn, lỗi kho không làm hỏng câu trả lời (test `test_failing_receipt_store_never_breaks_the_answer`); thêm `GET /v1/answer-receipts/by-message/{conversation}/{message}`; ghi biên nhận chỉ chạy khi cờ `chat.evidence_receipts` bật; đoạn đỡ: 200 cặp máy sinh, ≥ 99 % đoạn chứa đủ số |
+| F4.3 giao diện bằng chứng | MỘT PHẦN | 1149130 | `features/chat/AnswerEvidence.tsx` (cờ `chat.evidence_ui`): dòng "n ý đã kiểm · m ý bị loại", chi tiết huy hiệu chữ (Nguyên văn / Đã đối chiếu / Đã kiểm số liệu), cảnh báo nguồn đã đổi; mã lý do ẩn với sinh viên. CHƯA làm: tô `<mark>` đoạn đỡ trong ngăn nguồn, hộp thoại biên nhận, mã lý do cho cán bộ (D5) |
+| F4.4 số đo trang chất lượng | XONG | e22f560 | bảng `verification_counts` (ngày × loại, chỉ số đếm), bộ quan sát `attach_verification_recording`, `GET /v1/knowledge/answer-quality/verification`, thẻ "Kiểm chứng câu trả lời" trên `/knowledge/quality`; cảnh báo tăng gấp đôi chưa làm |
 | F6.1 domain/chính sách | XONG | xem log | `application/proactive/engine.py`; mức gấp, stage, giờ yên lặng (21:59/22:00/06:59/07:00), trần 3/ngày, khóa idempotency |
 | F6.2 provider nguồn có sẵn | MỘT PHẦN | xem log | EXAM, TICKET_NEED_INFO có; CHƯA có EXIT_TICKET_CLOSING, PRACTICE_DUE, TRACKED_ITEM |
 | F6.3 provider nguồn mới | MỘT PHẦN | xem log | ANNOUNCEMENT_ACK, ANNOUNCEMENT_URGENT_UNREAD có; PROCEDURE_DRAFT, POLICY_CHANGE chờ F5, F3 |
@@ -55,7 +55,7 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F2.4 vector tự sinh + gold | MỘT PHẦN | 6ad64a4 | vector BOUNDARY/COMBINATORIAL so với oracle độc lập (`verify.py`); gold 316 ca (6 chủ đề, 40–81 ca mỗi chủ đề) viết từ câu chữ quy chế, span do code kiểm, khớp 100 %; gold do chính mô hình viết luật tạo, chưa độc lập với người; báo cáo ở `evals/results/policy-rules-20261126/` |
 | F2.5 API | XONG | 6ad64a4 | `/v1/policy-simulator/{topics,form,evaluate,what-if}` (cờ `policy.simulator`) và `/v1/policy-rules/*` (cờ `policy.rules`); 30 lượt/phút/người; đầu vào không lưu, chỉ đếm theo (ngày, chủ đề, kết quả) |
 | F2.6 giao diện | MỘT PHẦN | d367d7e | trang `/policy/simulator` (chủ đề → biểu mẫu → kết luận, cây chứng minh `role="tree"`, ngưỡng, thanh trượt "Nếu thay đổi", miễn trừ cố định) + vitest 2; CHƯA có trang quản trị luật `/knowledge/policy-rules` |
-| F2.7 nối vào chat | CHƯA LÀM | — | đụng luồng chat |
+| F2.7 nối vào chat | XONG (thẻ gợi ý, không đổi agent) | 9e716cd | `POST /v1/policy-simulator/match`: chủ đề theo từ chung; giá trị chỉ lấy khi con số đứng cạnh từ đơn vị chỉ ứng với đúng một biến (nếu nhiều biến cùng đơn vị thì không đoán); thẻ "Kiểm tra điều kiện" dưới câu hỏi mới nhất, giá trị chuyển sang trình mô phỏng qua `sessionStorage`, không đặt lên URL. Agent/RAG không bị đổi |
 | F2.8 mã hóa ≥ 5 chủ đề thật | XONG | 6ad64a4 | 6 chủ đề từ Quy chế đào tạo HUCE (QĐ 1486): nghỉ học quá 20 % (Điều 9.3), đạt học phần (9.4), cảnh báo học tập (11.1), buộc thôi học (11.2), điều kiện tốt nghiệp (13.1), giảm hạng tốt nghiệp (13.3); mọi `quote` là chuỗi con nguyên văn, hằng số có trong `quote` (code kiểm qua `scripts/policy_rules_seed.py --check`). Chưa có cán bộ duyệt trên giao diện; cờ `policy.simulator` mặc định tắt |
 | F3.1/F3.2 ảnh chụp theo release, so khác, phân loại | XONG | 4190d62 | `domain/policy_impact/diff.py`; 64 cặp đột biến có nhãn đạt 100 % (≥ 99 % yêu cầu), cả chỉ mục 9 071 đơn vị so khác ≪ 60 s; lưu `<STATE>/release-units/<release>.jsonl.gz` atomic, giữ 20 release |
 | F3.3 phụ thuộc | MỘT PHẦN | 4190d62 | luật F2 và ca eval (`gold_unit_ids`) có; CHƯA có nút đồ thị, thông báo F1, FAQ dựng sẵn, nhóm bị ảnh hưởng (F3.7) |
@@ -63,14 +63,21 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F3 API + job | XONG | 4190d62 | `/v1/policy-impact/{releases,report,snapshot,analyze}` (chỉ quản trị), job `impact_snapshot` |
 | F3.6–F3.8 (mâu thuẫn có model, báo người dùng, soạn thông báo, giao diện) | CHƯA LÀM | — | |
 | F5.1–F5.5 playbook + máy trạng thái + API + hết hạn | XONG (không có bước model) | 08d2ff3 | 3 thủ tục `config/procedures/*.toml` (giấy xác nhận, phúc khảo, nghỉ học tạm thời có kiểm tra điều kiện dẫn nguyên văn Điều 14.1.d); preview → confirm → đúng 1 ticket; nhận diện và tách trường tất định, mọi giá trị phải có trong câu; 9 test |
-| F5.6/F5.7 nối chat, giao diện, đề xuất phản hồi bằng model | CHƯA LÀM | — | |
+| F5.6/F5.7 nối chat và giao diện | XONG (không có tool cho model) | 9e716cd | thẻ "Làm thủ tục cùng trợ lý" (dùng `runs:from-text` chỉ đọc); trang `/services/procedures` (`ProcedureRunner`: điền, xem trước, nút "Gửi hồ sơ" duy nhất, hủy); giá trị trợ lý điền có chú thích. CHƯA làm: tool `procedure.suggest/status` cho model, đề xuất phản hồi bằng model, danh sách "Thủ tục của tôi" |
 | F7.1 BKT, F7.4 bộ lọc gợi ý + gợi ý mẫu | XONG (phần thuần) | b744094 | `domain/learning/{mastery,tutor_hints}.py`; bản đồ lớp k ≥ 5; 8 test |
 | F7.2/F7.3/F7.5/F7.6 lưu trữ, API, giao diện | BỊ CHẶN một phần | — | cần migration `0033` Postgres (chờ duyệt hash theo guard); không áp vào DB vận hành |
 | F8.1 API ảnh → chữ | XONG (engine cắm được) | 02744f6 | kiểm PNG nghiêm ngặt (chữ ký, IHDR, CRC, IEND, kích thước, 4 MB), tệp tạm luôn bị xóa kể cả khi lỗi, 20 ảnh/ngày; engine là Tesseract CLI qua `CAMPUS247_INPUT_OCR_TESSERACT` — máy này chưa cài nên trả 503 `OCR_UNAVAILABLE`; gold 120 ảnh CHƯA đo |
-| F8.2/F8.3 giao diện ảnh, đọc to | MỘT PHẦN | c25f933 | `features/input/{ImageInput,ReadAloud}.tsx` + vitest 5; CHƯA gắn vào `ChatPanel.tsx` (tệp đang có thay đổi dở của chủ dự án) |
+| F8.2/F8.3 giao diện ảnh, đọc to | XONG (đã gắn chat) | 9e716cd | `ChatPanel.tsx`: `ImageInput` dưới ô soạn (cờ `input.image`), `ReadAloud` ở thanh công cụ mỗi câu trả lời (cờ `output.read_aloud`); chữ từ ảnh chỉ gửi sau khi người dùng sửa và bấm Gửi |
 | F8.4–F8.6 giọng nói | BỊ CHẶN | — | cần đồng ý tải mô hình ASR (quy tắc không tải ngoài) và bộ âm thanh tiếng Việt D6b |
 
 - Trang động `[id]` không chạy được trên 8015 vì `runtime_routes.page_routes()` liệt kê trang tĩnh; chi tiết thông báo dùng `/announcements?id=`.
+
+## Hồi quy lượt 3 (26/11, sau khi nối chat/RAG)
+
+- `run_full_regression.py --ci`: 2 374 đạt, 1 lỗi cũ `tests/unit/learning_pptx/test_pptx.py::test_internal_literal_chart_workbook_is_supported` (giống commit gốc).
+- Các thư mục `--ci` không chạy (announcements, chat SSE, features, policy_*, procedures, input_media, proactive, rag_v2, runtime_routes, architecture, answer_feedback): 990 đạt, 8 lỗi đều ở `tests/rag_v2/test_i2_lifecycle.py` (`INDEX_OUTSIDE_WORKSPACE`, môi trường). Trước khi sửa mã RAG, cùng 8 ca đó đã lỗi giống hệt (so sánh bằng cách tạm bỏ thay đổi ở `types.py`/`compose.py`).
+- vitest toàn bộ: 1 025 đạt, 2 lỗi ở `src/features/rooms/RoomFinder.test.tsx`; tệp `RoomFinder.tsx` đang có thay đổi dở của chủ dự án (chưa commit) và không thuộc F-series. `tsc --noEmit` sạch.
+- Chưa khởi động lại runtime 8015, chưa chạy `web_acceptance.mjs`, chưa chạy cổng `rag_regression_gate.py` với provider thật; các cờ mới đều mặc định tắt.
 
 ## Hồi quy lượt 2 (26/11, sau F2/F3/F5/F7/F8)
 
