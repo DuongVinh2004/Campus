@@ -1,0 +1,96 @@
+{
+  "rule_id": "graduation-honors-demotion",
+  "topic": "HONORS_DEMOTION",
+  "version": 1,
+  "description": "Hạng tốt nghiệp xuất sắc/giỏi giảm một mức nếu học lại quá 5% chương trình hoặc từng bị kỷ luật từ cảnh cáo.",
+  "conclusion": {
+    "code": "HONORS_DEMOTED",
+    "label": "Hạng tốt nghiệp (xuất sắc, giỏi) bị giảm một mức",
+    "source": {
+      "unit_id": "cab2f2d1c64f7edf",
+      "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+      "path": "Điều 13 > Khoản 3",
+      "quote": "hạng tốt\nnghiệp của sinh viên có điểm trung bình tích lũy loại xuất sắc và giỏi sẽ bị giảm\nđi một mức"
+    }
+  },
+  "applies": {
+    "audiences": [
+      "STUDENT"
+    ],
+    "cohorts": {
+      "from": null,
+      "to": null
+    },
+    "programs": [
+      "*"
+    ],
+    "effective": {
+      "from": null,
+      "to": null
+    }
+  },
+  "when": {
+    "id": "g",
+    "all": [
+      {
+        "id": "c0",
+        "pred": {
+          "var": "gpa.cumulative",
+          "op": ">=",
+          "value": 3.2,
+          "unit": "point4"
+        },
+        "source": {
+          "unit_id": "c7f069ea15ed0010",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 10 > Khoản 4",
+          "quote": "Từ 3,2 đến cận 3,6: Giỏi"
+        }
+      },
+      {
+        "id": "g1",
+        "any": [
+          {
+            "id": "c1",
+            "pred": {
+              "var": "retake.credit_ratio",
+              "op": ">",
+              "value": 5,
+              "unit": "percent"
+            },
+            "source": {
+              "unit_id": "fd009919541bf9cf",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 13 > Khoản 3 > Điểm a",
+              "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+            }
+          },
+          {
+            "id": "c2",
+            "pred": {
+              "var": "discipline.level",
+              "op": "in",
+              "value": [
+                "WARNING",
+                "SUSPENSION"
+              ]
+            },
+            "source": {
+              "unit_id": "8cc2eec0f7312ea9",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 13 > Khoản 3 > Điểm b",
+              "quote": "kỷ luật từ mức cảnh cáo trở lên"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "exceptions": [],
+  "supersedes": [],
+  "on_undetermined": {
+    "refer_to": "ACADEMIC_SERVICES",
+    "service_kind": "GENERAL_SUPPORT"
+  },
+  "graph_refs": []
+}

@@ -1,0 +1,101 @@
+{
+  "rule_id": "graduation-eligibility",
+  "topic": "GRADUATION_ELIGIBILITY",
+  "version": 1,
+  "description": "Điều kiện cần để xét tốt nghiệp: đủ chương trình, điểm trung bình tích lũy từ 2,0, không bị truy cứu hình sự, không đang bị đình chỉ.",
+  "conclusion": {
+    "code": "ELIGIBLE_TO_GRADUATE",
+    "label": "Đủ điều kiện xét công nhận tốt nghiệp",
+    "source": {
+      "unit_id": "d2cb2e30724ca42e",
+      "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+      "path": "Điều 13 > Khoản 1",
+      "quote": "Sinh viên được Trường xét và công nhận tốt nghiệp cử nhân, kỹ sư/kiến\ntrúc sư khi có đủ các điều kiện sau"
+    }
+  },
+  "applies": {
+    "audiences": [
+      "STUDENT"
+    ],
+    "cohorts": {
+      "from": null,
+      "to": null
+    },
+    "programs": [
+      "*"
+    ],
+    "effective": {
+      "from": null,
+      "to": null
+    }
+  },
+  "when": {
+    "id": "g",
+    "all": [
+      {
+        "id": "c1",
+        "pred": {
+          "var": "graduation.requirements_complete",
+          "op": "=",
+          "value": true
+        },
+        "source": {
+          "unit_id": "ca5f47f4f03daaed",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 13 > Khoản 1 > Điểm a",
+          "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+        }
+      },
+      {
+        "id": "c2",
+        "pred": {
+          "var": "gpa.cumulative",
+          "op": ">=",
+          "value": 2,
+          "unit": "point4"
+        },
+        "source": {
+          "unit_id": "6d5491f97471f4b0",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 13 > Khoản 1 > Điểm b",
+          "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+        }
+      },
+      {
+        "id": "c3",
+        "pred": {
+          "var": "criminal.liability",
+          "op": "=",
+          "value": false
+        },
+        "source": {
+          "unit_id": "9346811296109432",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 13 > Khoản 1 > Điểm c",
+          "quote": "không bị truy cứu trách nhiệm hình sự"
+        }
+      },
+      {
+        "id": "c4",
+        "pred": {
+          "var": "discipline.level",
+          "op": "!=",
+          "value": "SUSPENSION"
+        },
+        "source": {
+          "unit_id": "9346811296109432",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 13 > Khoản 1 > Điểm c",
+          "quote": "không đang trong thời gian bị kỷ luật ở mức đình chỉ học tập"
+        }
+      }
+    ]
+  },
+  "exceptions": [],
+  "supersedes": [],
+  "on_undetermined": {
+    "refer_to": "ACADEMIC_SERVICES",
+    "service_kind": "GENERAL_SUPPORT"
+  },
+  "graph_refs": []
+}

@@ -117,7 +117,7 @@ def test_change_flow_errors_and_idempotency(tmp_path):
     assert code(lambda: svc.preview_change(admin, "rooms.booking", value=False, reason="short", expected_version=0)) == "FEATURE_VALUE_INVALID"
     assert code(lambda: svc.preview_change(admin, "chat.verbatim_skip", value="weird", reason="x" * 12, expected_version=0)) == "FEATURE_VALUE_INVALID"
     assert code(lambda: svc.preview_change(admin, "rooms.booking", value=False, reason="x" * 12, expected_version=0, expires_at="2020-01-01T00:00:00Z")) == "FEATURE_VALUE_INVALID"
-    assert code(lambda: svc.preview_change(admin, "policy.rules", value=True, reason="x" * 12, expected_version=0)) == "FEATURE_DEPENDENCY_OFF"
+    assert code(lambda: svc.preview_change(admin, "policy.impact", value=True, reason="x" * 12, expected_version=0)) == "FEATURE_DEPENDENCY_OFF"
     pv = svc.preview_change(admin, "rooms.booking", value=False, reason="Bảo trì phòng tầng 3", expected_version=0)
     assert "data_kept" in pv["impact"] and pv["change"]["from"] is True
     assert code(lambda: svc.confirm_change(admin, pv["preview_id"], "", "i1")) == "CONFIRMATION_REQUIRED"

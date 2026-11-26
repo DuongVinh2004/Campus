@@ -1,0 +1,77 @@
+{
+  "rule_id": "course-pass",
+  "topic": "COURSE_PASS",
+  "version": 1,
+  "description": "Điểm học phần dưới 4,0 là loại không đạt (F); từ 4,0 trở lên là loại đạt.",
+  "conclusion": {
+    "code": "PASSED",
+    "label": "Đạt học phần (điểm học phần từ 4,0 trở lên)",
+    "source": {
+      "unit_id": "686c639234150b83",
+      "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+      "path": "Điều 9 > Khoản 4 > Điểm a",
+      "quote": "Loại đạt có phân mức"
+    }
+  },
+  "applies": {
+    "audiences": [
+      "STUDENT"
+    ],
+    "cohorts": {
+      "from": null,
+      "to": null
+    },
+    "programs": [
+      "*"
+    ],
+    "effective": {
+      "from": null,
+      "to": null
+    }
+  },
+  "when": {
+    "id": "g",
+    "all": [
+      {
+        "id": "c1",
+        "pred": {
+          "var": "grade.course_score",
+          "op": ">=",
+          "value": 4,
+          "unit": "point10"
+        },
+        "source": {
+          "unit_id": "686c639234150b83",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 9 > Khoản 4 > Điểm a",
+          "quote": "D: từ 4,0 đến 4,9"
+        }
+      },
+      {
+        "id": "n1",
+        "not": {
+          "id": "c2",
+          "pred": {
+            "var": "grade.course_score",
+            "op": "<",
+            "value": 4,
+            "unit": "point10"
+          },
+          "source": {
+            "unit_id": "fb98af8dfc96cde4",
+            "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+            "path": "Điều 9 > Khoản 4 > Điểm c",
+            "quote": "F: dưới 4,0"
+          }
+        }
+      }
+    ]
+  },
+  "exceptions": [],
+  "supersedes": [],
+  "on_undetermined": {
+    "refer_to": "ACADEMIC_SERVICES",
+    "service_kind": "GENERAL_SUPPORT"
+  },
+  "graph_refs": []
+}

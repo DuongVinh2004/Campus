@@ -1,0 +1,22 @@
+{
+ "topic": "ACADEMIC_WARNING",
+ "rule": {
+  "rule_id": "academic-warning",
+  "version": 1,
+  "content_sha256": "396474b3544ab8b4f5710af68872140f74fbde31fe57c4a7ebb9cb90455e2529"
+ },
+ "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+ "vectors_by_origin": {
+  "BOUNDARY": 160,
+  "COMBINATORIAL": 80,
+  "GOLD_MODEL": 44
+ },
+ "gold": {
+  "total": 44,
+  "match": 44,
+  "mismatch_pending": 0,
+  "decided": 0,
+  "rate": 1.0
+ },
+ "evidence": "scenarios authored from the regulation wording by the same model that wrote the rules; source spans and quotes checked by code; engine checked against an independent two-valued oracle; not measured with real users"
+}

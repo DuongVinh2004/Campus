@@ -1,0 +1,22 @@
+{
+ "topic": "HONORS_DEMOTION",
+ "rule": {
+  "rule_id": "graduation-honors-demotion",
+  "version": 1,
+  "content_sha256": "a50fb6f283b4084c73f19fb6ff9f869ec56e48cb00170ff44a7c830e2f0c2e11"
+ },
+ "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+ "vectors_by_origin": {
+  "BOUNDARY": 62,
+  "COMBINATORIAL": 178,
+  "GOLD_MODEL": 81
+ },
+ "gold": {
+  "total": 81,
+  "match": 81,
+  "mismatch_pending": 0,
+  "decided": 0,
+  "rate": 1.0
+ },
+ "evidence": "scenarios authored from the regulation wording by the same model that wrote the rules; source spans and quotes checked by code; engine checked against an independent two-valued oracle; not measured with real users"
+}

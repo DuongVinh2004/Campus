@@ -1,0 +1,911 @@
+{
+ "rule_id": "graduation-eligibility",
+ "authored_from": "regulation wording (units.jsonl)",
+ "cases": [
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 1.99, truy cứu hình sự=False, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": false,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 1.99, truy cứu hình sự=False, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": false,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 1.99, truy cứu hình sự=False, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": false,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 1.99, truy cứu hình sự=False, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": false,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 1.99, truy cứu hình sự=True, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": true,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 1.99, truy cứu hình sự=True, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": true,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 1.99, truy cứu hình sự=True, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": true,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 1.99, truy cứu hình sự=True, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": true,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.0, truy cứu hình sự=False, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": false,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.0, truy cứu hình sự=False, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": false,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.0, truy cứu hình sự=False, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": false,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.0, truy cứu hình sự=False, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": false,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.0, truy cứu hình sự=True, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": true,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.0, truy cứu hình sự=True, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": true,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.0, truy cứu hình sự=True, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": true,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.0, truy cứu hình sự=True, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": true,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.01, truy cứu hình sự=False, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": false,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.01, truy cứu hình sự=False, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": false,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.01, truy cứu hình sự=False, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": false,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.01, truy cứu hình sự=False, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": false,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.01, truy cứu hình sự=True, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": true,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.01, truy cứu hình sự=True, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": true,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.01, truy cứu hình sự=True, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": true,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 2.01, truy cứu hình sự=True, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": true,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 3.0, truy cứu hình sự=False, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": false,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 3.0, truy cứu hình sự=False, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": false,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 3.0, truy cứu hình sự=False, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": false,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 3.0, truy cứu hình sự=False, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": false,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 3.0, truy cứu hình sự=True, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": true,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 3.0, truy cứu hình sự=True, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": true,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 3.0, truy cứu hình sự=True, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": true,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=True, điểm tích lũy 3.0, truy cứu hình sự=True, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": true,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": true,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9346811296109432",
+    "quote": "không bị truy cứu trách nhiệm hình sự"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 1.99, truy cứu hình sự=False, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": false,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 1.99, truy cứu hình sự=False, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": false,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 1.99, truy cứu hình sự=False, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": false,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 1.99, truy cứu hình sự=False, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": false,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 1.99, truy cứu hình sự=True, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": true,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 1.99, truy cứu hình sự=True, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": true,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 1.99, truy cứu hình sự=True, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": true,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 1.99, truy cứu hình sự=True, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 1.99,
+    "criminal.liability": true,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.0, truy cứu hình sự=False, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": false,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.0, truy cứu hình sự=False, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": false,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.0, truy cứu hình sự=False, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": false,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.0, truy cứu hình sự=False, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": false,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.0, truy cứu hình sự=True, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": true,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.0, truy cứu hình sự=True, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": true,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.0, truy cứu hình sự=True, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": true,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.0, truy cứu hình sự=True, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.0,
+    "criminal.liability": true,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.01, truy cứu hình sự=False, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": false,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.01, truy cứu hình sự=False, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": false,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.01, truy cứu hình sự=False, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": false,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.01, truy cứu hình sự=False, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": false,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.01, truy cứu hình sự=True, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": true,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.01, truy cứu hình sự=True, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": true,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.01, truy cứu hình sự=True, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": true,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 2.01, truy cứu hình sự=True, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 2.01,
+    "criminal.liability": true,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 3.0, truy cứu hình sự=False, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": false,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 3.0, truy cứu hình sự=False, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": false,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 3.0, truy cứu hình sự=False, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": false,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 3.0, truy cứu hình sự=False, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": false,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 3.0, truy cứu hình sự=True, kỷ luật NONE",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": true,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 3.0, truy cứu hình sự=True, kỷ luật REPRIMAND",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": true,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 3.0, truy cứu hình sự=True, kỷ luật WARNING",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": true,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Đủ chương trình=False, điểm tích lũy 3.0, truy cứu hình sự=True, kỷ luật SUSPENSION",
+   "inputs": {
+    "graduation.requirements_complete": false,
+    "gpa.cumulative": 3.0,
+    "criminal.liability": true,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "ca5f47f4f03daaed",
+    "quote": "Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác"
+   }
+  },
+  {
+   "description": "Chưa biết gì",
+   "inputs": {},
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "6d5491f97471f4b0",
+    "quote": "Điểm trung bình tích lũy của toàn khóa học đạt từ (2.0) trở lên"
+   }
+  }
+ ]
+}

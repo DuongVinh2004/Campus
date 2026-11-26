@@ -1,0 +1,21 @@
+{
+ "topic": "ATTENDANCE_REQUIREMENT",
+ "rule": {
+  "rule_id": "attendance-requirement",
+  "version": 1,
+  "content_sha256": "edc40048c8f920615ff94ed6da1e02003e60f49dfb92af56da78c3b45606f79e"
+ },
+ "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+ "vectors_by_origin": {
+  "BOUNDARY": 18,
+  "GOLD_MODEL": 43
+ },
+ "gold": {
+  "total": 43,
+  "match": 43,
+  "mismatch_pending": 0,
+  "decided": 0,
+  "rate": 1.0
+ },
+ "evidence": "scenarios authored from the regulation wording by the same model that wrote the rules; source spans and quotes checked by code; engine checked against an independent two-valued oracle; not measured with real users"
+}

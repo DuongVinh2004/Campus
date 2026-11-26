@@ -1,0 +1,22 @@
+{
+ "topic": "FORCED_WITHDRAWAL_WARNINGS",
+ "rule": {
+  "rule_id": "forced-withdrawal-warnings",
+  "version": 1,
+  "content_sha256": "dc2b51845a57f414c1193d78ec27b82f65b6f5bb969867739764fff00259539b"
+ },
+ "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+ "vectors_by_origin": {
+  "BOUNDARY": 39,
+  "COMBINATORIAL": 33,
+  "GOLD_MODEL": 40
+ },
+ "gold": {
+  "total": 40,
+  "match": 40,
+  "mismatch_pending": 0,
+  "decided": 0,
+  "rate": 1.0
+ },
+ "evidence": "scenarios authored from the regulation wording by the same model that wrote the rules; source spans and quotes checked by code; engine checked against an independent two-valued oracle; not measured with real users"
+}

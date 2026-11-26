@@ -1,0 +1,62 @@
+{
+  "rule_id": "attendance-requirement",
+  "topic": "ATTENDANCE_REQUIREMENT",
+  "version": 1,
+  "description": "Nghỉ không có lý do chính đáng quá 20% thời lượng của học phần thì nhận điểm F cho học phần đó.",
+  "conclusion": {
+    "code": "NO_ATTENDANCE_F",
+    "label": "Không bị điểm F do nghỉ học quá mức cho phép",
+    "source": {
+      "unit_id": "9cfbe01c0aca8f15",
+      "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+      "path": "Điều 9 > Khoản 3",
+      "quote": "Sinh viên nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế của học phần nào sẽ nhận điểm F"
+    }
+  },
+  "applies": {
+    "audiences": [
+      "STUDENT"
+    ],
+    "cohorts": {
+      "from": null,
+      "to": null
+    },
+    "programs": [
+      "*"
+    ],
+    "effective": {
+      "from": null,
+      "to": null
+    }
+  },
+  "when": {
+    "id": "g",
+    "all": [
+      {
+        "id": "n1",
+        "not": {
+          "id": "c1",
+          "pred": {
+            "var": "attendance.absent_ratio",
+            "op": ">",
+            "value": 20,
+            "unit": "percent"
+          },
+          "source": {
+            "unit_id": "9cfbe01c0aca8f15",
+            "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+            "path": "Điều 9 > Khoản 3",
+            "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+          }
+        }
+      }
+    ]
+  },
+  "exceptions": [],
+  "supersedes": [],
+  "on_undetermined": {
+    "refer_to": "ACADEMIC_SERVICES",
+    "service_kind": "GENERAL_SUPPORT"
+  },
+  "graph_refs": []
+}

@@ -567,6 +567,22 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.include_router(create_answer_receipts_router(receipt_service))
     app.state.answer_receipts = receipt_service
 
+    # Executable policy rules (F2): rules cite rag_v2 units verbatim; evaluated by pure code, no model.
+    from campus247.application.policy_rules.service import PolicyRulesService
+    from campus247.domain.policy_rules.variables import load_vocabulary
+    from campus247.infrastructure.knowledge.rag_v2_units import RagV2Units
+    from campus247.infrastructure.repositories.sqlite_policy_rules import PolicyRulesStore
+    from campus247.presentation.policy_rules import create_policy_rules_router, register_policy_rule_errors
+    rules_index = Path(os.environ.get("CAMPUS247_RAG_V2_INDEX", "data/rag_v2_index"))
+    rag_units = RagV2Units(rules_index if rules_index.is_absolute() else ROOT / rules_index)
+    policy_rules = PolicyRulesService(
+        PolicyRulesStore(checked_path(identity_root / "policy-rules.sqlite3", ROOT)), load_vocabulary(ROOT / "config/policy/variables.toml"),
+        rag_units.text, rag_units.release, signing_key=settings.CONFIRMATION_SIGNING_KEY, enabled=feature_service.enabled)
+    policy_rules.seed_from_directory(ROOT / "config/policy/rules", ROOT / "config/policy/gold")
+    app.include_router(create_policy_rules_router(policy_rules))
+    register_policy_rule_errors(app)
+    app.state.policy_rules = policy_rules
+
     # Proactive assistant (F6): signals of one person -> "things to do today" and inbox nudges. No model calls.
     from campus247.application.proactive.engine import ProactiveEngine
     from campus247.application.proactive.providers import AnnouncementProvider, ExamProvider, TicketProvider
@@ -704,6 +720,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     from campus247.application.announcements.jobs import announcement_jobs
                     for job_name, job_factory in announcement_jobs(announcement_service):
                         jobs.append(gated(job_name, job_factory))
+                    from campus247.application.policy_rules.jobs import run_rule_staleness
+                    jobs.append(gated("policy_rule_staleness", lambda: run_rule_staleness(policy_rules)))
                     from campus247.application.announcements.jobs import proactive_jobs
                     for job_name, job_factory in proactive_jobs(proactive_engine):
                         jobs.append(gated(job_name, job_factory))

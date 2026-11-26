@@ -38,7 +38,9 @@ _DIGITS = {"khong": 0, "mot": 1, "hai": 2, "ba": 3, "bon": 4, "tu": 4, "nam": 5,
 def _word_numbers(folded: str) -> set[int]:
     """Numbers 0..100 written in Vietnamese words found inside a folded text."""
     found: set[int] = set()
-    words = folded.split()
+    words = re.findall(r"[a-z]+", folded)
+    if "nhat" in words:  # "năm thứ nhất"
+        found.add(1)
     for i in range(len(words)):
         for n in range(1, 5):
             chunk = words[i:i + n]

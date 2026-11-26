@@ -139,7 +139,7 @@ FEATURES: tuple[FeatureDefinition, ...] = (
        api_patterns=(r"^/v1/announcements/approvals$", r"^/v1/announcements/[^/:]+:(approve|reject)$")),
     _f("announcements.chat_tool", "Chatbot tra thông báo", "announcements", kind="ai", default=False, depends_on=("announcements.inbox", "chat.assistant"), tools=("announcements_lookup",)),
     _f("policy.graph_v2", "Đồ thị quy chế trên v2", "policy", default=False, depends_on=("knowledge.policy_graph",)),
-    _f("policy.rules", "Quy chế thành luật chạy được", "policy", default=False, depends_on=("policy.graph_v2",), api_prefixes=("/v1/policy-rules",)),
+    _f("policy.rules", "Quy chế thành luật chạy được", "policy", default=False, depends_on=("knowledge.sources",), api_prefixes=("/v1/policy-rules",), jobs=("policy_rule_staleness",)),
     _f("policy.simulator", "Mô phỏng nếu-thì", "policy", default=False, depends_on=("policy.rules", "chat.assistant"), api_prefixes=("/v1/policy-simulator",)),
     _f("policy.impact", "Tác động khi quy chế đổi", "policy", default=False, depends_on=("policy.graph_v2",), api_prefixes=("/v1/policy-impact",)),
     _f("policy.conflicts", "Phát hiện mâu thuẫn quy chế", "policy", default=False, depends_on=("policy.graph_v2",), api_prefixes=("/v1/policy-conflicts",)),
