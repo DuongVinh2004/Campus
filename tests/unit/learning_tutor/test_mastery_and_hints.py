@@ -97,3 +97,24 @@ def test_template_fallback_and_levels():
     assert "Điểm D là đạt." in t3["hint"]
     assert level_for(1, reveal_after=2) == 1 and level_for(2, reveal_after=3) == 2 and level_for(3, reveal_after=3) == 3
     assert level_for(1, reveal_after=3, asked_more=True) == 2 and level_for(1, reveal_after=3, asked_solution=True) == 3
+
+
+def test_a_number_glued_to_its_unit_still_leaks_and_the_page_pointer_does_not():
+    from campus247.domain.learning.tutor_hints import leaks, verbatim
+    # Found by the real-provider evaluation (evals/results/tutor-20261126): the quote "Tổng: 180TC (...)" gave the answer 180 away.
+    assert leaks("Tổng: 180TC (Không tính HP giáo dục thể chất)", ["180"])
+    assert leaks("tổng (180) tín chỉ", ["180"]) and leaks("180 tín chỉ", ["180"])
+    assert not leaks("1.800 sinh viên, mục 18, năm 2180", ["180"])
+    assert not leaks("Xem lại trang 1: dòng ghi tổng tín chỉ", ["1"], page_no=1)
+    assert leaks("Xem lại trang 2: có 1 lần", ["1"], page_no=2)
+    assert hint_issues("Xem lại trang 1 nhé.", "Tổng: 180TC (Không tính)", "Dòng cuối. Tổng: 180TC (Không tính) giáo dục", level=1,
+                       correct_answers=["180"], page_no=1) == ["LEAKS_ANSWER"]
+    assert verbatim("Tổng:  180TC\n(Không tính)", "x Tổng: 180TC (Không tính) y") and not verbatim("Tổng: 185TC", "Tổng: 180TC")
+
+
+def test_numbers_are_compared_by_value_and_the_quotable_sentences_never_give_the_answer():
+    from campus247.domain.learning.tutor_hints import leaks, quotable
+    assert leaks("Tần suất khám: 01 năm/ lần", ["1"])          # "01" is 1 (found by the second real-provider run)
+    assert not leaks("đọc mục 1.2 ở trang 3", ["2"])            # a section number is not the answer 2
+    page = "Tổng: 180TC (Không tính GDTC). Chương trình đào tạo gồm các khối kiến thức chung. Xem bảng ở cuối trang."
+    assert all("180" not in s for s in quotable(page, ["180"])) and quotable(page, ["180"])

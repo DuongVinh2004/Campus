@@ -17,22 +17,42 @@ def fold(text: str) -> str:
     return " ".join("".join(c for c in text if unicodedata.category(c) != "Mn").split())
 
 
-def leaks(text: str, answers) -> bool:
-    """Whether the text gives away an answer: a long answer as any substring, a short one ("Nén", "12") as a whole word.
+def leaks(text: str, answers, *, page_no: int | None = None) -> bool:
+    """Whether the text gives away an answer.
 
-    A whole-word match may also block a harmless text that happens to use the word; the caller then shows less, the safe side."""
+    A number leaks wherever it stands between non-digits ("180TC", "180 tín chỉ", "(180)"); a long answer as any substring;
+    a short word ("Nén") as a whole word. "trang <page_no>" (the page the hint points to) is not an answer. A match may also
+    block a harmless text that happens to use the word or number; the caller then shows less, the safe side."""
     blob = fold(text)
+    if page_no is not None:
+        blob = re.sub(rf"\btrang\s+{page_no}(?!\d)", " ", blob)
     for answer in answers:
         a = fold(answer)
-        if a and (a in blob if len(a) >= 4 else re.search(rf"(?<!\w){re.escape(a)}(?!\w)", blob)):
+        if not a:
+            continue
+        if re.fullmatch(r"[\d.,]+", a):
+            # Compared by value with every number of the text: "01" is 1, "180TC" holds 180; "1.2" (a section) is not 2.
+            wanted = {a.lstrip("0") or "0", re.sub(r"[.,]", "", a).lstrip("0") or "0"}
+            for token in re.findall(r"\d+(?:[.,]\d+)*", blob):
+                if (token.lstrip("0") or "0") in wanted or (re.sub(r"[.,]", "", token).lstrip("0") or "0") in wanted:
+                    return True
+            continue
+        elif a in blob if len(a) >= 4 else re.search(rf"(?<!\w){re.escape(a)}(?!\w)", blob):
             return True
     return False
 
 
-def hint_issues(hint: str, quote: str, page_text: str, *, level: int, correct_answers: list[str], correct_labels: list[str] | None = None) -> list[str]:
+def verbatim(quote: str, page_text: str) -> bool:
+    """The quote appears on the page word for word; runs of spaces and line breaks count as one space."""
+    wanted = " ".join(quote.split())
+    return len(wanted) >= MIN_QUOTE_CHARS and wanted in " ".join(page_text.split())
+
+
+def hint_issues(hint: str, quote: str, page_text: str, *, level: int, correct_answers: list[str], correct_labels: list[str] | None = None,
+                page_no: int | None = None) -> list[str]:
     """Reason codes; empty list means the hint may be shown."""
     issues = []
-    if len(quote) < MIN_QUOTE_CHARS or quote not in page_text:
+    if not verbatim(quote, page_text):
         issues.append("QUOTE_NOT_VERBATIM")
     if not hint.strip() or len(hint) > MAX_HINT_CHARS:
         issues.append("HINT_LENGTH")
@@ -41,11 +61,16 @@ def hint_issues(hint: str, quote: str, page_text: str, *, level: int, correct_an
     if _MARKDOWN.search(hint):
         issues.append("HINT_MARKDOWN")
     if level in (1, 2):
-        if leaks(hint + " " + quote, correct_answers):
+        if leaks(hint + " " + quote, correct_answers, page_no=page_no):
             issues.append("LEAKS_ANSWER")
         if _OPTION_CODE.search(fold(hint)) or any(re.search(rf"\b(?:dap an|phuong an)\s*\(?{re.escape(l.casefold())}\)?\b", fold(hint)) for l in correct_labels or ()):
             issues.append("LEAKS_OPTION_CODE")
     return issues
+
+
+def quotable(page_text: str, answers) -> list[str]:
+    """Sentences of the page a level 1-2 hint may quote: long enough and not giving an answer away (whitespace as on the page)."""
+    return [s for s in _sentences(page_text) if not leaks(s, answers)]
 
 
 def _sentences(text: str) -> list[str]:

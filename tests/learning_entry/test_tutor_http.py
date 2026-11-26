@@ -291,3 +291,24 @@ def test_proposals_need_the_ai_feature_an_allowed_source_and_a_lecturer(room, fl
     assert suggest(room, room.student).status_code in {403, 404}
     room.service.ai_source_hashes = frozenset()
     assert suggest(room).json()["code"] == "LEARNING_AI_SOURCE_NOT_APPROVED"
+
+
+class Failing:
+    """The remote gateway reports a provider refusal as its own error type (GatewayCallFailed), not EgressViolationError."""
+    calls = 0
+
+    async def generate(self, request):
+        from campus247.infrastructure.llm.remote_gateway import GatewayCallFailed
+        Failing.calls += 1
+        raise GatewayCallFailed("EgressViolationError")
+
+
+def test_a_gateway_refusal_gives_the_template_hint_not_an_error(room, flags):
+    _, choice_id, _ = published_set(room)
+    allow_model(room, flags, [])
+    room.service.ai_gateway = Failing()
+    answer(room, choice_id, ["b"])
+    result = hint(room, choice_id)
+    assert result.status_code == 200 and result.json()["origin"] == "TEMPLATE" and Failing.calls == 1
+    refused = suggest(room)
+    assert refused.status_code == 403 and refused.json()["code"] == "LEARNING_AI_EGRESS_DENIED"
