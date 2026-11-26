@@ -1,6 +1,6 @@
 # Tiến độ thực thi đợt F-series (nhánh `feat/f-series-20261126`)
 
-Cập nhật lần cuối: 26/11/2026. Mỗi gói con ghi trạng thái: XONG (đã chạy kiểm trong lượt làm), ĐANG LÀM, CHƯA LÀM, BỊ CHẶN.
+Cập nhật lần cuối: 26/11/2026 (lượt 2). Mỗi gói con ghi trạng thái: XONG (đã chạy kiểm trong lượt làm), ĐANG LÀM, CHƯA LÀM, BỊ CHẶN.
 Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả năng dùng với người dùng thật chưa đo.
 
 ## Quyết định ghi lại khi làm
@@ -12,6 +12,10 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 - `/v1/auth/oidc*` vẫn nằm trong `BLOCKED_LEGACY_API_PREFIXES` của `runtime_routes.py` (quyết định có sẵn của chủ dự án): cờ `identity.oidc` có sẵn nhưng route vẫn bị chặn ở lớp ngoài; không đổi ở đợt này.
 - Trang `knowledge/policy-graph` bị tắt mặc định theo §5.6 của tài liệu F0 (`knowledge.policy_graph` = tắt); G-PG bật lại.
 - Tick `crawl` và `auto_publication` chạy trong tiến trình worker ingest riêng (không phải API); cờ của chúng hiện chỉ có tác dụng ở API (route), chưa dừng tick trong worker.
+- Tiền tố route F2/F3 theo registry đã có: mô phỏng ở `/v1/policy-simulator/*`, soạn luật ở `/v1/policy-rules/*`, tác động `/v1/policy-impact/*`, mâu thuẫn `/v1/policy-conflicts` (khác tài liệu thiết kế dùng `/v1/policy/*`, để cờ gate khớp tiền tố).
+- Phụ thuộc cờ `policy.rules`, `policy.impact`, `policy.conflicts` đổi từ `policy.graph_v2` sang `knowledge.sources`: luật và ảnh chụp trích thẳng đơn vị v2, không cần đồ thị. `policy.simulator` vẫn phụ thuộc `policy.rules`.
+- F5: ticket được tạo bằng `submit_ticket` với khóa idempotency `procedure-run:<run_id>` rồi mới cập nhật phiên sang `SUBMITTED` (hai giao dịch, an toàn khi lặp lại), khác tài liệu muốn chung một giao dịch.
+- F2.8: luật do mô hình soạn từ quy chế đã phát hành, code kiểm nguyên văn; chưa qua duyệt của cán bộ trên giao diện (chưa có trang quản trị luật). Mọi tính năng mới mặc định TẮT.
 
 ## Bảng gói con
 
@@ -43,11 +47,39 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F6.3 provider nguồn mới | MỘT PHẦN | xem log | ANNOUNCEMENT_ACK, ANNOUNCEMENT_URGENT_UNREAD có; PROCEDURE_DRAFT, POLICY_CHANGE chờ F5, F3 |
 | F6.4 job + bản tin + chuyển giao + mô phỏng | XONG | xem log | mô phỏng 14 ngày × 40 sinh viên khớp oracle độc lập 100 % (so từng khóa và giờ gửi); khởi động lại mỗi phút ngày đầu: cùng tập nhắc, không đôi; 30 000 người trong một lượt (`evals/results/proactive-20261126/perf.json`); job nhắc thi cũ dừng khi `proactive.nudges` bật |
 | F6.5 API + web | MỘT PHẦN | xem log | API `/v1/nudges/*` có test (done/snooze/restore/tùy chọn/404 người lạ); CHƯA có khối "Việc cần làm" trên trang chủ và mục tùy chọn trên giao diện |
-| G-PG, F2, F3, F5, F7, F8 | CHƯA LÀM | — | hết ngân sách của lượt chạy này; tiếp tục ở lượt sau theo thứ tự README §3 (F2 chờ G-PG; F5 chờ F2) |
+| G-PG.1 đọc đơn vị v2 | XONG | 6ad64a4 | `infrastructure/knowledge/rag_v2_units.py` (văn bản nguyên văn, đường dẫn, release/binding); dùng cho luật, thủ tục, ảnh chụp F3 |
+| G-PG.2/G-PG.3 đồ thị v2 + nối 8015 | CHƯA LÀM | — | đồ thị (`/v1/policy-graph`) vẫn ẩn trên v2; F2 và F3 được làm độc lập với đồ thị (luật trích thẳng đơn vị v2), nên không bị chặn |
+| F2.1 từ vựng biến, ngôn ngữ luật, parser biểu thức | XONG | f723dda | `config/policy/variables.toml` (24 biến), `domain/policy_rules/{variables,rule}.py`; không dùng `eval` |
+| F2.2 bộ đánh giá ba trị, chọn luật, ngoại lệ, ngưỡng | XONG | f723dda | `domain/policy_rules/engine.py`; 14 test gồm bảng Kleene, đơn điệu và ba-trị bằng vòng lặp có seed, p95 < 50 ms |
+| F2.3 kho luật, nháp → duyệt → phát hành, `STALE` | XONG | 6ad64a4 | `sqlite_policy_rules.py` + `application/policy_rules/service.py`; preview/confirm HMAC, idempotency, audit, bản cũ `RETIRED` vẫn tra được; job `policy_rule_staleness` |
+| F2.4 vector tự sinh + gold | MỘT PHẦN | 6ad64a4 | vector BOUNDARY/COMBINATORIAL so với oracle độc lập (`verify.py`); gold 316 ca (6 chủ đề, 40–81 ca mỗi chủ đề) viết từ câu chữ quy chế, span do code kiểm, khớp 100 %; gold do chính mô hình viết luật tạo, chưa độc lập với người; báo cáo ở `evals/results/policy-rules-20261126/` |
+| F2.5 API | XONG | 6ad64a4 | `/v1/policy-simulator/{topics,form,evaluate,what-if}` (cờ `policy.simulator`) và `/v1/policy-rules/*` (cờ `policy.rules`); 30 lượt/phút/người; đầu vào không lưu, chỉ đếm theo (ngày, chủ đề, kết quả) |
+| F2.6 giao diện | MỘT PHẦN | d367d7e | trang `/policy/simulator` (chủ đề → biểu mẫu → kết luận, cây chứng minh `role="tree"`, ngưỡng, thanh trượt "Nếu thay đổi", miễn trừ cố định) + vitest 2; CHƯA có trang quản trị luật `/knowledge/policy-rules` |
+| F2.7 nối vào chat | CHƯA LÀM | — | đụng luồng chat |
+| F2.8 mã hóa ≥ 5 chủ đề thật | XONG | 6ad64a4 | 6 chủ đề từ Quy chế đào tạo HUCE (QĐ 1486): nghỉ học quá 20 % (Điều 9.3), đạt học phần (9.4), cảnh báo học tập (11.1), buộc thôi học (11.2), điều kiện tốt nghiệp (13.1), giảm hạng tốt nghiệp (13.3); mọi `quote` là chuỗi con nguyên văn, hằng số có trong `quote` (code kiểm qua `scripts/policy_rules_seed.py --check`). Chưa có cán bộ duyệt trên giao diện; cờ `policy.simulator` mặc định tắt |
+| F3.1/F3.2 ảnh chụp theo release, so khác, phân loại | XONG | 4190d62 | `domain/policy_impact/diff.py`; 64 cặp đột biến có nhãn đạt 100 % (≥ 99 % yêu cầu), cả chỉ mục 9 071 đơn vị so khác ≪ 60 s; lưu `<STATE>/release-units/<release>.jsonl.gz` atomic, giữ 20 release |
+| F3.3 phụ thuộc | MỘT PHẦN | 4190d62 | luật F2 và ca eval (`gold_unit_ids`) có; CHƯA có nút đồ thị, thông báo F1, FAQ dựng sẵn, nhóm bị ảnh hưởng (F3.7) |
+| F3.4/F3.5 mâu thuẫn tất định | XONG | 4190d62 | `domain/policy_impact/conflicts.py`: 20 mâu thuẫn tìm đủ, 20 ca nhiễu 0 dương tính giả; API `GET /v1/policy-conflicts` |
+| F3 API + job | XONG | 4190d62 | `/v1/policy-impact/{releases,report,snapshot,analyze}` (chỉ quản trị), job `impact_snapshot` |
+| F3.6–F3.8 (mâu thuẫn có model, báo người dùng, soạn thông báo, giao diện) | CHƯA LÀM | — | |
+| F5.1–F5.5 playbook + máy trạng thái + API + hết hạn | XONG (không có bước model) | 08d2ff3 | 3 thủ tục `config/procedures/*.toml` (giấy xác nhận, phúc khảo, nghỉ học tạm thời có kiểm tra điều kiện dẫn nguyên văn Điều 14.1.d); preview → confirm → đúng 1 ticket; nhận diện và tách trường tất định, mọi giá trị phải có trong câu; 9 test |
+| F5.6/F5.7 nối chat, giao diện, đề xuất phản hồi bằng model | CHƯA LÀM | — | |
+| F7.1 BKT, F7.4 bộ lọc gợi ý + gợi ý mẫu | XONG (phần thuần) | b744094 | `domain/learning/{mastery,tutor_hints}.py`; bản đồ lớp k ≥ 5; 8 test |
+| F7.2/F7.3/F7.5/F7.6 lưu trữ, API, giao diện | BỊ CHẶN một phần | — | cần migration `0033` Postgres (chờ duyệt hash theo guard); không áp vào DB vận hành |
+| F8.1 API ảnh → chữ | XONG (engine cắm được) | 02744f6 | kiểm PNG nghiêm ngặt (chữ ký, IHDR, CRC, IEND, kích thước, 4 MB), tệp tạm luôn bị xóa kể cả khi lỗi, 20 ảnh/ngày; engine là Tesseract CLI qua `CAMPUS247_INPUT_OCR_TESSERACT` — máy này chưa cài nên trả 503 `OCR_UNAVAILABLE`; gold 120 ảnh CHƯA đo |
+| F8.2/F8.3 giao diện ảnh, đọc to | MỘT PHẦN | c25f933 | `features/input/{ImageInput,ReadAloud}.tsx` + vitest 5; CHƯA gắn vào `ChatPanel.tsx` (tệp đang có thay đổi dở của chủ dự án) |
+| F8.4–F8.6 giọng nói | BỊ CHẶN | — | cần đồng ý tải mô hình ASR (quy tắc không tải ngoài) và bộ âm thanh tiếng Việt D6b |
 
 - Trang động `[id]` không chạy được trên 8015 vì `runtime_routes.page_routes()` liệt kê trang tĩnh; chi tiết thông báo dùng `/announcements?id=`.
 
-## Hồi quy đã chạy (lượt này)
+## Hồi quy lượt 2 (26/11, sau F2/F3/F5/F7/F8)
+
+- `run_full_regression.py --ci`: 2 370 đạt, 1 lỗi cũ `tests/unit/learning_pptx/test_pptx.py::test_internal_literal_chart_workbook_is_supported` (giống ở commit gốc); bằng chứng ở `evals/results/f-series-regression-20261126/run2`.
+- Chạy riêng: `tests/features tests/announcements tests/proactive tests/policy_rules tests/policy_impact tests/procedures tests/input_media tests/unit/learning_tutor` 182 đạt; `tests/architecture` và `tests/test_runtime_routes.py` đạt.
+- vitest toàn bộ: 175 tệp, 1 011 ca đạt; `tsc --noEmit` sạch.
+- Chưa khởi động lại runtime 8015, chưa chạy `web_acceptance.mjs`; chưa áp migration nào; không gọi provider thật.
+
+## Hồi quy đã chạy (lượt 1)
 
 - `tests/features` 70 đạt; `tests/test_runtime_routes.py` đạt; `tests/architecture` đạt; `tests/rag_v2` 418 đạt, 1 lỗi `INDEX_OUTSIDE_WORKSPACE` (môi trường, `tests/rag_v2/test_i2_lifecycle.py`).
 - `tests/operations/test_runtime_audit_fixes.py`: 30 lỗi `must stay inside workspace` giống hệt ở commit gốc 6888822 (đã kiểm bằng worktree) → có sẵn từ trước, không do đợt này.
