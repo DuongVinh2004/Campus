@@ -34,7 +34,7 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F1.3 lưu trữ + phát theo lô | XONG | fcc1362 | bảng `ann_*` trong campus-ops.sqlite3; tiêm lỗi 11 điểm + giữa lô: mỗi người đúng 1 delivery + 1 thông báo; 30 000 người trong 1,6 s (`evals/results/announcements-20261126/perf.json`) |
 | F1.4 API | XONG | fcc1362 | `test_announcements_api.py`; đổi `PUT /{id}` thành `PUT /{id}/draft` (để cờ tách route soạn và route đọc) |
 | F1.5 job + cờ | XONG | fcc1362 | 4 job qua `run_gated`; hẹn giờ ≤ 60 s kiểm bằng đồng hồ giả |
-| F1.6 đồng bộ kho tri thức | MỘT PHẦN | — | `AnnouncementService` có móc `knowledge_sync.publish/revoke`, test thu hồi/hết hạn bằng bản giả; CHƯA nối adapter vào `KnowledgePlatform.upload()` và chưa có test RAG provider giả |
+| F1.6 đồng bộ kho tri thức | MỘT PHẦN (chưa nối: cần quyết định về luồng nhận tài liệu) | — | `KnowledgePlatform.upload` là luồng async có `IntakeMetadata`, duyệt và phát hành riêng; nối thông báo vào đó đổi luồng tri thức nên chưa làm. `AnnouncementService` có móc `knowledge_sync.publish/revoke`, test thu hồi/hết hạn bằng bản giả; CHƯA nối adapter vào `KnowledgePlatform.upload()` và chưa có test RAG provider giả |
 | F1.7 web | MỘT PHẦN | xem log | hộp thư, chi tiết (`?id=`), soạn có đếm người nhận trực tiếp, vitest 4; CHƯA có: thống kê, hàng đợi duyệt, thu hồi/sửa trên giao diện, thẻ trang chủ, nút trong học liệu, trang công khai riêng |
 | F1.8 tool chat | CHƯA LÀM | — | |
 | F4.0 provider phát lại | CHƯA LÀM | — | cần sổ ghi phản hồi provider theo băm yêu cầu; chưa có sẵn trong repo |
@@ -46,7 +46,7 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 | F6.2 provider nguồn có sẵn | MỘT PHẦN | xem log | EXAM, TICKET_NEED_INFO có; CHƯA có EXIT_TICKET_CLOSING, PRACTICE_DUE, TRACKED_ITEM |
 | F6.3 provider nguồn mới | MỘT PHẦN | xem log | ANNOUNCEMENT_ACK, ANNOUNCEMENT_URGENT_UNREAD có; PROCEDURE_DRAFT, POLICY_CHANGE chờ F5, F3 |
 | F6.4 job + bản tin + chuyển giao + mô phỏng | XONG | xem log | mô phỏng 14 ngày × 40 sinh viên khớp oracle độc lập 100 % (so từng khóa và giờ gửi); khởi động lại mỗi phút ngày đầu: cùng tập nhắc, không đôi; 30 000 người trong một lượt (`evals/results/proactive-20261126/perf.json`); job nhắc thi cũ dừng khi `proactive.nudges` bật |
-| F6.5 API + web | MỘT PHẦN | xem log | API `/v1/nudges/*` có test (done/snooze/restore/tùy chọn/404 người lạ); CHƯA có khối "Việc cần làm" trên trang chủ và mục tùy chọn trên giao diện |
+| F6.5 API + web | MỘT PHẦN | xem log | API `/v1/nudges/*` có test (done/snooze/restore/tùy chọn/404 người lạ); khối "Việc cần làm" trên trang chủ (Xong / Hoãn 1 ngày) đã có, sau cờ `proactive.nudges`, vitest 2 + `HomeOverview` đạt; CHƯA có mục tùy chọn nhắc trên giao diện |
 | G-PG.1 đọc đơn vị v2 | XONG | 6ad64a4 | `infrastructure/knowledge/rag_v2_units.py` (văn bản nguyên văn, đường dẫn, release/binding); dùng cho luật, thủ tục, ảnh chụp F3 |
 | G-PG.2/G-PG.3 đồ thị v2 + nối 8015 | CHƯA LÀM | — | đồ thị (`/v1/policy-graph`) vẫn ẩn trên v2; F2 và F3 được làm độc lập với đồ thị (luật trích thẳng đơn vị v2), nên không bị chặn |
 | F2.1 từ vựng biến, ngôn ngữ luật, parser biểu thức | XONG | f723dda | `config/policy/variables.toml` (24 biến), `domain/policy_rules/{variables,rule}.py`; không dùng `eval` |
