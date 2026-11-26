@@ -29,6 +29,7 @@ import { GapReport } from "./GapReport";
 import { ChatSuggestionCards } from "./ChatSuggestionCards";
 import { AnswerEvidence } from "./AnswerEvidence";
 import { ImageInput } from "../input/ImageInput";
+import { VoiceInput } from "../input/VoiceInput";
 import { ReadAloud } from "../input/ReadAloud";
 import { FeatureGate } from "../../lib/features";
 import { ThemeToggle } from "../../components/ThemeToggle";
@@ -1061,6 +1062,7 @@ export function ChatPanel({
                   )}
             </form>
             {!disabled && <FeatureGate feature="input.image"><ImageInput onSend={(text) => onSendMessage?.(text)} /></FeatureGate>}
+            {!disabled && <FeatureGate feature="input.voice"><VoiceInput onSend={(text) => onSendMessage?.(text)} /></FeatureGate>}
 
             <p className="mt-1.5 mb-1 text-center text-[11px] text-slate-400 dark:text-slate-500">
               {t("chat.37")}

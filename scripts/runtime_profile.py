@@ -14,14 +14,14 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 PROFILE_DIR = Path(__file__).resolve().parents[1] / "infra" / "profiles"
-COMPONENTS = ("postgres", "frontend", "gateway", "api", "worker", "scanner")
+COMPONENTS = ("postgres", "frontend", "gateway", "api", "worker", "scanner", "asr")
 
 _SCHEMA = {
     "api": {"workers": int, "max_in_flight_per_worker": int, "provider_concurrency": int},
     "postgres": {"shared_buffers": str, "max_connections": int},
     "gateway": {"port": int, "daily_usd_cap": str, "daily_call_cap": int},
     "memory": {"reserve_mb": int, "postgres_mb": int, "frontend_mb": int, "api_worker_mb": int, "worker_mb": int,
-               "gateway_mb": int, "scanner_mb": int},
+               "gateway_mb": int, "scanner_mb": int, "asr_mb": int},
 }
 
 
@@ -47,6 +47,7 @@ class Profile:
     gateway_port: int
     daily_usd_cap: str
     daily_call_cap: int
+    asr_mb: int = 0
 
     def required_mb(self, components) -> int:
         """Estimated MB needed to start `components` now, including the safety reserve."""
@@ -55,7 +56,7 @@ class Profile:
             raise ValueError(f"unknown component: {sorted(unknown)}")
         sizes = {"postgres": self.postgres_mb, "frontend": self.frontend_mb, "gateway": self.gateway_mb,
                  "api": self.api_worker_mb * self.api_workers, "worker": self.worker_mb,
-                 "scanner": self.scanner_mb}
+                 "scanner": self.scanner_mb, "asr": self.asr_mb}
         return self.reserve_mb + sum(sizes[item] for item in set(components))
 
 
@@ -98,7 +99,7 @@ def load_profile(name: str, directory: Path = PROFILE_DIR) -> Profile:
     return Profile(name, api["workers"], api["max_in_flight_per_worker"], api["provider_concurrency"],
                    pg["shared_buffers"], pg["max_connections"], mem["reserve_mb"], mem["postgres_mb"],
                    mem["frontend_mb"], mem["api_worker_mb"], mem["worker_mb"], mem["gateway_mb"], mem["scanner_mb"],
-                   gw["port"], gw["daily_usd_cap"], gw["daily_call_cap"])
+                   gw["port"], gw["daily_usd_cap"], gw["daily_call_cap"], mem["asr_mb"])
 
 
 def available_memory_mb() -> int:

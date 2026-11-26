@@ -601,7 +601,11 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     # CAMPUS247_INPUT_OCR_WSL_RUNTIME (workspace-relative bundle) runs the pinned Linux Tesseract of the learning OCR in WSL + bubblewrap.
     from campus247.application.input_media.image_ocr import ImageOcrService, configured_engine
     from campus247.presentation.input_media import create_input_media_router
-    app.include_router(create_input_media_router(ImageOcrService(configured_engine(ROOT), temp_root=checked_path(STATE / "input-image-tmp", ROOT))))
+    # Voice input (F8.5): the local recognizer of scripts/serve_asr.py on loopback 18083 (503 while it is not running).
+    from campus247.application.input_media.voice import VoiceService
+    app.include_router(create_input_media_router(
+        ImageOcrService(configured_engine(ROOT), temp_root=checked_path(STATE / "input-image-tmp", ROOT)),
+        VoiceService(os.environ.get("CAMPUS247_ASR_URL", "http://127.0.0.1:18083"), STATE / "asr-sidecar.token")))
 
     # Policy change impact (F3): per-release unit snapshots, diff, dependants, fact conflicts. Admin-only, counts and unit paths only.
     from campus247.application.policy_impact.service import ImpactService, SnapshotStore

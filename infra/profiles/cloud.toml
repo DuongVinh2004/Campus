@@ -27,3 +27,6 @@ worker_mb = 300
 gateway_mb = 150
 # ClamAV daemon (learning-module upload scanning): measured 960 MB resident, 972 MB peak on 2026-11-17.
 scanner_mb = 1000
+# Local speech recognition (F8.4, faster-whisper small int8, 4 threads): measured 384 MB resident after load and three
+# clips, 697 MB peak, on 2026-11-26. Loaded lazily by scripts/serve_asr.py only while free RAM >= asr_mb + 500 MB.
+asr_mb = 700
