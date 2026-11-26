@@ -583,6 +583,19 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     register_policy_rule_errors(app)
     app.state.policy_rules = policy_rules
 
+    # Procedure agent (F5): deterministic playbooks over the ticket service; the student confirms every write.
+    from campus247.application.campus_ops.service import SERVICE_KINDS
+    from campus247.application.procedures.service import ProcedureService
+    from campus247.domain.procedures import load_procedures
+    from campus247.presentation.procedures import create_procedures_router, register_procedure_errors
+    procedure_service = ProcedureService(
+        ops_service.store, ops_service,
+        load_procedures(ROOT / "config/procedures", service_kinds=set(SERVICE_KINDS), unit_text=rag_units.text),
+        signing_key=settings.CONFIRMATION_SIGNING_KEY, enabled=feature_service.enabled)
+    app.include_router(create_procedures_router(procedure_service))
+    register_procedure_errors(app)
+    app.state.procedures = procedure_service
+
     # Policy change impact (F3): per-release unit snapshots, diff, dependants, fact conflicts. Admin-only, counts and unit paths only.
     from campus247.application.policy_impact.service import ImpactService, SnapshotStore
     from campus247.presentation.policy_impact import create_policy_impact_router
@@ -739,6 +752,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     jobs.append(gated("policy_rule_staleness", lambda: run_rule_staleness(policy_rules)))
                     from campus247.application.policy_impact.jobs import run_impact_snapshot
                     jobs.append(gated("impact_snapshot", lambda: run_impact_snapshot(impact_service)))
+                    from campus247.application.procedures.jobs import run_procedure_expiry
+                    jobs.append(gated("procedure_expiry", lambda: run_procedure_expiry(procedure_service)))
                     from campus247.application.announcements.jobs import proactive_jobs
                     for job_name, job_factory in proactive_jobs(proactive_engine):
                         jobs.append(gated(job_name, job_factory))

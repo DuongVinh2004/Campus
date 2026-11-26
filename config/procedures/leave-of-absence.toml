@@ -1,0 +1,50 @@
+id = "leave-of-absence"
+version = 1
+title = "Nghỉ học tạm thời"
+service_kind = "GENERAL_SUPPORT"
+description = "Xin nghỉ học tạm thời và bảo lưu kết quả đã học."
+roles = ["STUDENT"]
+sources = ["ca7e7f59750a2242", "3390e777f53ee429", "23782cea3a79cbd5", "42ef05f36314f96d"]
+
+[[fields]]
+key = "reason_kind"
+label = "Lý do"
+type = "enum"
+values = ["MILITARY", "INTERNATIONAL_EVENT", "MEDICAL", "PERSONAL"]
+required = true
+
+[[fields]]
+key = "completed_semesters"
+label = "Số học kỳ đã học tại Trường"
+type = "integer"
+min = 0
+max = 20
+required = true
+
+[[fields]]
+key = "duration_semesters"
+label = "Số học kỳ muốn nghỉ"
+type = "integer"
+min = 1
+max = 4
+required = true
+
+[[fields]]
+key = "detail"
+label = "Mô tả chi tiết"
+type = "text"
+min = 10
+max = 1000
+required = true
+extract = true
+
+[[checks]]
+id = "personal-needs-one-semester"
+when = { field = "reason_kind", op = "=", value = "PERSONAL" }
+require = { field = "completed_semesters", op = ">=", value = 1 }
+message = "Nghỉ vì lý do cá nhân khác chỉ được xét khi đã học tối thiểu 01 học kỳ ở Trường."
+source = { unit_id = "42ef05f36314f96d", quote = "đã phải học tối thiểu 01 học kỳ ở Trường" }
+
+[ticket]
+title_template = "Nghỉ học tạm thời — {reason_kind}"
+summary_fields = ["reason_kind", "completed_semesters", "duration_semesters", "detail"]

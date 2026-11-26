@@ -1,0 +1,35 @@
+id = "grade-appeal"
+version = 1
+title = "Phúc khảo kết quả học tập"
+service_kind = "GRADE_APPEAL"
+description = "Đề nghị chấm lại bài thi kết thúc học phần."
+roles = ["STUDENT"]
+checks = []
+
+[[fields]]
+key = "course_code"
+label = "Mã học phần"
+type = "string"
+pattern = "^[A-Za-z0-9]{4,12}$"
+required = true
+extract = true
+
+[[fields]]
+key = "semester"
+label = "Học kỳ"
+type = "string"
+pattern = "^[0-9A-Za-zÀ-ỹ /.-]{3,40}$"
+required = true
+
+[[fields]]
+key = "reason"
+label = "Lý do đề nghị phúc khảo"
+type = "text"
+min = 10
+max = 1000
+required = true
+extract = true
+
+[ticket]
+title_template = "Phúc khảo {course_code} — {semester}"
+summary_fields = ["course_code", "semester", "reason"]
