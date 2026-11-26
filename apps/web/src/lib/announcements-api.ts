@@ -19,6 +19,9 @@ export interface DraftInput {
   title: string; body: string; category: string; priority: AnnouncementPriority; audience: Audience; expires_at: string;
   publish_at?: string | null; requires_ack?: boolean; ack_deadline?: string | null;
 }
+export interface StatsGroup { key: string; delivered: number; read: number; acked: number }
+export interface AnnouncementStats { delivered: number; read: number; acked: number; read_rate: number; by_faculty: StatsGroup[]; by_cohort: StatsGroup[]; timeline: { hour: string; reads: number }[] }
+export interface WithdrawPreview { preview_id: string; confirmation_token: string; expires_at: string; summary: { delivered: number; knowledge_revoked: boolean } }
 export interface PublishPreview { preview_id: string; confirmation_token: string; summary: { total: number; needs_approval: boolean; knowledge_sync: boolean; publish_at: string | null }; warnings: string[] }
 
 const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });
@@ -35,5 +38,11 @@ export const announcementsApi = {
   publishPreview: (id: string) => client().post<PublishPreview>(`/v1/announcements/${encodeURIComponent(id)}:publish-preview`),
   publishConfirm: (previewId: string, token: string) =>
     client().post<{ id: string; status: string }>("/v1/announcements:publish-confirm", { preview_id: previewId, confirmation_token: token }, { "Idempotency-Key": newKey() }),
-  stats: (id: string) => client().get<{ delivered: number; read: number; acked: number; read_rate: number }>(`/v1/announcements/${encodeURIComponent(id)}/stats`),
+  stats: (id: string) => client().get<AnnouncementStats>(`/v1/announcements/${encodeURIComponent(id)}/stats`),
+  approvals: () => client().get<{ items: AnnouncementSummary[] }>("/v1/announcements/approvals"),
+  approve: (id: string, note: string, rowVersion: number) => client().post(`/v1/announcements/${encodeURIComponent(id)}:approve`, { note, row_version: rowVersion }),
+  reject: (id: string, note: string, rowVersion: number) => client().post(`/v1/announcements/${encodeURIComponent(id)}:reject`, { note, row_version: rowVersion }),
+  withdrawPreview: (id: string, reason: string) => client().post<WithdrawPreview>(`/v1/announcements/${encodeURIComponent(id)}:withdraw-preview`, { reason }),
+  withdrawConfirm: (previewId: string, token: string) =>
+    client().post<{ id: string; status: string }>("/v1/announcements:withdraw-confirm", { preview_id: previewId, confirmation_token: token }, { "Idempotency-Key": newKey() }),
 };

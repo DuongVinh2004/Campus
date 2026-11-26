@@ -3,6 +3,7 @@
 import React from "react";
 import { AppShell } from "../../../components/AppShell";
 import { AnnouncementCompose } from "../../../features/announcements/AnnouncementCompose";
+import { AnnouncementManager } from "../../../features/announcements/AnnouncementManager";
 
 export default function ManageAnnouncementsPage() {
   return (
@@ -15,6 +16,7 @@ export default function ManageAnnouncementsPage() {
           </div>
         </header>
         <AnnouncementCompose />
+        <AnnouncementManager />
       </div>
     </AppShell>
   );
