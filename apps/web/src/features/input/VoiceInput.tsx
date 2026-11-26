@@ -96,7 +96,7 @@ export function VoiceInput({ onSend, recorder: makeRecorder = microphoneRecorder
       {state !== "recording"
         ? <button type="button" disabled={state === "working"} onClick={() => void start()}>Ghi âm câu hỏi</button>
         : <button type="button" onClick={() => void stop()}>Dừng ghi ({seconds}/{MAX_SECONDS} giây)</button>}
-      <p><small>Âm thanh chỉ được nhận dạng trên máy chủ của trường và không được lưu.</small></p>
+      <p className="text-xs">Âm thanh chỉ được nhận dạng trên máy chủ của trường và không được lưu.</p>
       {state === "working" && <p role="status">Đang nhận dạng giọng nói…</p>}
       {error && <p role="alert">{error}</p>}
       {state === "ready" && (

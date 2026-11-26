@@ -1,6 +1,8 @@
 // UI audit of the running app (default http://127.0.0.1:8015): every page of every role at desktop and phone size.
 //
-//   node scripts/qa/ui_audit.mjs [--base http://127.0.0.1:8015] [--out infra/local/qa-acceptance/ui-audit]
+//   node scripts/qa/ui_audit.mjs [--base http://127.0.0.1:8015] [--out infra/local/qa-acceptance/ui-audit] [--fseries]
+//
+// --fseries also opens the pages behind the F-series flags (run it while scripts/qa/f_series_check.mjs --keep has them on).
 //
 // For each page and viewport it records, and the report lists: a page-level horizontal scroll (layout wider than the screen),
 // no <h1> or more than one, buttons/links without an accessible name, form fields without a label, images without alt,
@@ -23,6 +25,10 @@ const PAGES = {
   owner: ["/admin", "/knowledge", "/knowledge/sources", "/knowledge/documents", "/knowledge/freshness", "/knowledge/quality", "/knowledge/crawl", "/announcements/manage"],
   public: ["/login", "/offline"],
 };
+if (process.argv.includes("--fseries")) {
+  PAGES.student.push("/policy/simulator", "/services/procedures");
+  PAGES.owner.push("/knowledge/policy-rules", "/admin/features");
+}
 const VIEWPORTS = { desktop: { width: 1360, height: 860 }, phone: { width: 390, height: 844 } };
 fs.mkdirSync(OUT, { recursive: true });
 

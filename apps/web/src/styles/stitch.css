@@ -89,6 +89,15 @@ html.dark { --color-border: #243050; --border-color: #243050; --text-secondary: 
 [data-campus-ui] :is(input[type=checkbox], input[type=radio]), .campus-dialog :is(input[type=checkbox], input[type=radio]) { min-width: 18px; min-height: 18px; width: 18px; height: 18px; accent-color: var(--color-primary); vertical-align: middle; }
 /* The label toggles its checkbox, so the label is the tap target: at least 24px tall (WCAG 2.2 target size, AA). */
 :is([data-campus-ui], .campus-dialog) label:has(> input:is([type=checkbox], [type=radio])) { min-height: 24px; }
+/* Data tables without their own styling (feature flags, policy rules): padded left-aligned cells; on a narrow screen the table
+   scrolls sideways instead of squeezing a column to one word per line. Tables that carry utility classes are left alone. */
+[data-campus-ui] :is(table.campus-table, .campus-knowledge table:not([class])) { width: 100%; border-collapse: collapse; font-size: 14px; }
+[data-campus-ui] :is(table.campus-table, .campus-knowledge table:not([class])) :is(th, td) { padding: 8px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-color); }
+[data-campus-ui] :is(table.campus-table, .campus-knowledge table:not([class])) th { font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+@media (max-width: 640px) {
+  [data-campus-ui] :is(table.campus-table, .campus-knowledge table:not([class])) { display: block; overflow-x: auto; }
+  [data-campus-ui] :is(table.campus-table, .campus-knowledge table:not([class])) td { min-width: 7rem; }
+}
 [data-campus-ui] textarea { min-height: 112px; }
 [data-campus-ui] h1 { font-size: clamp(22px, 2.1vw, 28px); line-height: 1.35; font-weight: 700; letter-spacing: -.025em; }
 [data-campus-ui] h2 { line-height: 1.4; }

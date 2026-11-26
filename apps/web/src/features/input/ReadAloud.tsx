@@ -42,7 +42,7 @@ export function ReadAloud({ text }: { text: string }) {
   const stop = useCallback(() => { window.speechSynthesis.cancel(); setSpeaking(false); }, []);
 
   if (!ready) return null;
-  if (!voice) return <p><small>Thiết bị chưa có giọng đọc tiếng Việt.</small></p>;
+  if (!voice) return <p className="text-xs">Thiết bị chưa có giọng đọc tiếng Việt.</p>;
   return (
     <div role="group" aria-label="Đọc to câu trả lời">
       {speaking ? <button onClick={stop}>Dừng đọc</button> : <button onClick={start}>Đọc to</button>}

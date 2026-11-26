@@ -135,7 +135,8 @@ export function PolicySimulator() {
           <ul className="space-y-2">
             {topics.map(t => (
               <li key={t.topic}>
-                <button aria-pressed={topic === t.topic} onClick={() => choose(t.topic)}>
+                <button aria-pressed={topic === t.topic} onClick={() => choose(t.topic)}
+                  className="w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-4 py-3 text-left text-sm leading-relaxed hover:bg-[var(--surface-subtle)] aria-pressed:border-[var(--color-primary)] aria-pressed:bg-[var(--color-primary-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]">
                   <strong>{t.label}</strong>{t.description ? <span> — {t.description}</span> : null}
                 </button>
               </li>
