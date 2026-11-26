@@ -17,9 +17,11 @@ def sha(text: str) -> str:
 class AnswerReceiptService:
     def __init__(self, store, *, current_unit_sha: Callable[[str], str | None], current_release: Callable[[], str | None],
                  enabled: Callable[[], bool] = lambda: True, impact_run_for: Callable[[list[str]], str | None] | None = None,
-                 clock: Callable[[], datetime] | None = None, on_error: Callable[[Exception], None] = lambda e: None):
+                 clock: Callable[[], datetime] | None = None, on_error: Callable[[Exception], None] = lambda e: None,
+                 version_state: Callable[[str | None, str | None], str] | None = None):
         self.store, self.current_unit_sha, self.current_release = store, current_unit_sha, current_release
         self.enabled, self.impact_run_for, self.on_error = enabled, impact_run_for, on_error
+        self.version_state = version_state
         self.clock = clock or (lambda: datetime.now(timezone.utc))
 
     def record(self, *, owner: str, conversation_id: str, message_id: str, release_id: str, binding_sha256: str, outcome_kind: str,
@@ -51,8 +53,11 @@ class AnswerReceiptService:
         changed = removed = 0
         sources = []
         for source in row["sources"]:
-            now_sha = self.current_unit_sha(source["unit_id"])
-            status = "REMOVED" if now_sha is None else "UNCHANGED" if now_sha == source["text_sha256"] else "CHANGED"
+            if self.version_state is not None and source.get("version_id"):
+                status = self.version_state(source["version_id"], source.get("document_id"))
+            else:
+                now_sha = self.current_unit_sha(source["unit_id"])
+                status = "REMOVED" if now_sha is None else "UNCHANGED" if now_sha == source["text_sha256"] else "CHANGED"
             changed += status == "CHANGED"
             removed += status == "REMOVED"
             sources.append({"unit_id": source["unit_id"], "path": source.get("path"), "doc_title": source.get("doc_title"), "page": source.get("page"), "status_now": status})

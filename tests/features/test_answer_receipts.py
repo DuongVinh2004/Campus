@@ -137,3 +137,24 @@ def test_record_receipt_binds_sources_by_hash_and_by_message_route_is_owner_only
     c = TestClient(app)
     assert c.get("/v1/answer-receipts/by-message/c9/m9", headers={"x-user": OWNER}).json()["receipt_id"] == rid
     assert c.get("/v1/answer-receipts/by-message/c9/m9", headers={"x-user": OTHER}).status_code == 404
+
+
+def test_receipts_of_chunk_level_citations_are_bound_by_evidence_hash_and_document_version(tmp_path):
+    import json
+    from types import SimpleNamespace
+    from campus247.application.answer_evidence.record import record_receipt
+    served = {"versions": {"ver-new"}, "documents": {"doc-a", "doc-b"}}
+    state = lambda version, document: "UNCHANGED" if version in served["versions"] else "CHANGED" if document in served["documents"] else "REMOVED"
+    store = AnswerReceiptStore(tmp_path / "r.sqlite3")
+    service = AnswerReceiptService(store, current_unit_sha=lambda unit_id: None, current_release=lambda: "rel-2", clock=lambda: NOW, version_state=state)
+    cites = [{"unit_id": "chunk-unit-1", "evidence_sha256": "e" * 64, "document_version_id": "ver-new", "source_id": "doc-a", "source_title": "Quy chế", "release_id": "rel-1", "locator": {"section_path": "Điều 3", "page_start": 2}},
+             {"unit_id": "chunk-unit-2", "evidence_sha256": "f" * 64, "document_version_id": "ver-old", "source_id": "doc-b", "source_title": "Học phí", "release_id": "rel-1", "locator": {"page_start": 1}},
+             {"unit_id": "chunk-unit-3", "evidence_sha256": "d" * 64, "document_version_id": "ver-gone", "source_id": "doc-z", "source_title": "Cũ", "release_id": "rel-1", "locator": {"page_start": 1}}]
+    message = SimpleNamespace(id="m1", citations=tuple(SimpleNamespace(citation_json=json.dumps(c)) for c in cites))
+    result = SimpleNamespace(response_class="grounded_answer", evidence={"statements": ["a", "b", "c"], "rejected_counts": {},
+        "checks": [{"deterministic": "PASSED", "verbatim": False, "semantic": "PASSED", "unit_ids": [c["unit_id"]]} for c in cites]})
+    rid = record_receipt(service, owner=OWNER, conversation_id="c1", message=message, result=result, expires_at=(NOW + timedelta(days=30)).isoformat(timespec="seconds"), release_id="rel-1")
+    assert rid and store.get(rid)["sources"][0]["text_sha256"] == "e" * 64
+    opened = service.open(OWNER, rid)
+    assert [s["status_now"] for s in opened["sources"]] == ["UNCHANGED", "CHANGED", "REMOVED"]
+    assert opened["now"]["sources_changed"] == 1 and opened["now"]["sources_removed"] == 1

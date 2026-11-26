@@ -260,3 +260,18 @@ def test_match_endpoint_works_for_students(svc):
     r = client(svc, STUDENT).post("/v1/policy-simulator/match", json={"text": "Em nghỉ học 25 tiết có sao không"})
     assert r.status_code == 200 and "matches" in r.json()
     assert client(svc, STUDENT).post("/v1/policy-simulator/match", json={"text": ""}).status_code == 422
+
+
+def test_units_reader_follows_the_serving_index_when_it_changes(tmp_path):
+    import json as _json
+    from campus247.infrastructure.knowledge.rag_v2_units import RagV2Units
+    for name, text, release in (("a", "Điều 1 cũ", "r1"), ("b", "Điều 1 mới", "r2")):
+        (tmp_path / name).mkdir()
+        (tmp_path / name / "units.jsonl").write_text(_json.dumps({"unit_id": "u", "text": text, "path": "p", "version_id": "v", "document_id": "d",
+                                                                 "doc_title": "t", "doc_family": "f"}) + "\n", encoding="utf-8")
+        (tmp_path / name / "manifest.json").write_text(_json.dumps({"release_id": release}), encoding="utf-8")
+    serving = {"dir": tmp_path / "a"}
+    units = RagV2Units(lambda: serving["dir"])
+    assert units.text("u") == "Điều 1 cũ" and units.release()["release_id"] == "r1"
+    serving["dir"] = tmp_path / "b"
+    assert units.text("u") == "Điều 1 mới" and units.release()["release_id"] == "r2"

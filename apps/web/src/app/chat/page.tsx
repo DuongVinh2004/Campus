@@ -508,6 +508,7 @@ function ExistingChatPage() {
             retainUntilAcknowledged
             disabled={historyBlockedRef.current || status === "unauthorized"}
             historyContent={<ConversationHistory activeId={activeConversationId} revision={historyRevision} onSelect={id => switchConversation(id)} />}
+            conversationId={activeConversationId || undefined}
             messages={messages}
             isStreaming={isStreaming}
             onSendMessage={handleSendMessage}

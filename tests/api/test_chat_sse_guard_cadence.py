@@ -119,7 +119,7 @@ async def test_answer_receipt_is_written_after_the_message_is_saved(tmp_path):
     row = store.for_message(conversation.id, message_id)
     assert row and row["owner_subject_id"] == ACTOR and row["outcome_kind"] == "answer"
     assert TEXT not in str(row)  # the receipt keeps hashes, not the statement text
-    assert row["checks"][0]["verbatim"] is True and row["sources"][0]["text_sha256"].startswith("sha-")
+    assert row["checks"][0]["verbatim"] is True and len(row["sources"][0]["text_sha256"]) == 64 and row["sources"][0]["version_id"]
 
 
 @pytest.mark.asyncio
