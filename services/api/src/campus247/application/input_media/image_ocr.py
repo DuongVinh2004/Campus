@@ -1,6 +1,7 @@
 """F8.1: one PNG in, text out. The image is checked, handled in a private temp folder, and always deleted; nothing is stored."""
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import struct
@@ -114,6 +115,78 @@ class TesseractCliEngine:
         if done.returncode != 0:
             raise OcrUnavailable("tesseract returned an error")
         return parse_tsv(done.stdout)
+
+
+def _linux_path(path: Path, workspace: Path) -> str:
+    """/mnt/<drive>/... form of a Windows path inside the workspace (no symlinks or junctions on the way)."""
+    path, workspace = Path(path).absolute(), workspace.resolve(strict=True)
+    resolved = path.resolve(strict=True)
+    if ".." in path.parts or not resolved.is_relative_to(workspace):
+        raise OcrUnavailable("path outside the workspace")
+    for parent in (path, *path.parents):
+        if parent.is_symlink() or getattr(parent, "is_junction", lambda: False)():
+            raise OcrUnavailable("linked path")
+        if parent == workspace:
+            break
+    drive = resolved.drive.rstrip(":").lower()
+    if len(drive) != 1:
+        raise OcrUnavailable("not a drive path")
+    return "/mnt/" + drive + "/" + "/".join(resolved.parts[1:])
+
+
+class WslTesseractEngine:
+    """The pinned Linux Tesseract bundle of the learning OCR, run in WSL inside bubblewrap (no network, limits, owned process tree).
+
+    Configured by CAMPUS247_INPUT_OCR_WSL_RUNTIME (the bundle folder holding runtime/ and pins.json, inside the workspace). Every
+    image is checked again by the supervisor; the bundle and bubblewrap must match their pinned hashes or nothing runs.
+    """
+
+    def __init__(self, workspace: Path, bundle: Path, *, distribution: str = "Ubuntu", wsl: Path = Path("C:/Windows/System32/wsl.exe"),
+                 language: str = "vie"):
+        self.workspace = workspace.resolve(strict=True)
+        self.runtime = (bundle / "runtime").resolve(strict=True)
+        self.pins = json.loads((bundle / "pins.json").read_text(encoding="utf-8"))
+        self.supervisor = (self.workspace / "services/worker/src/campus247_worker/learning/image_ocr_supervisor.py").resolve(strict=True)
+        self.wsl, self.distribution, self.language = wsl, distribution, language
+        if not self.runtime.is_relative_to(self.workspace) or not wsl.is_file():
+            raise OcrUnavailable("wsl ocr runtime not usable")
+
+    def recognize(self, png_path: Path, *, timeout_s: float) -> list[dict]:
+        scope = png_path.parent
+        output = scope / "output"
+        output.mkdir()
+        request = scope / "request.json"
+        request.write_text(json.dumps({"png": _linux_path(png_path, self.workspace), "runtime": _linux_path(self.runtime, self.workspace),
+                                       "pins": self.pins, "language": self.language, "timeout_seconds": int(timeout_s)}), encoding="utf-8")
+        try:
+            done = subprocess.run([str(self.wsl), "-d", self.distribution, "--exec", "/usr/bin/python3", "-B",
+                                   _linux_path(self.supervisor, self.workspace), "--request", _linux_path(request, self.workspace)],
+                                  capture_output=True, timeout=timeout_s + 20, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+            raise OcrTimeout("ocr timeout") from None
+        except OSError:
+            raise OcrUnavailable("wsl failed to start") from None
+        try:
+            reply = json.loads(done.stdout.decode("utf-8", "replace").strip().splitlines()[-1])
+        except (ValueError, IndexError):
+            raise OcrUnavailable("no result from the sandbox") from None
+        if reply.get("error") == "OCR_TIMEOUT":
+            raise OcrTimeout("ocr timeout")
+        result = output / "result.tsv"
+        if reply.get("ok") is not True or not result.is_file() or result.stat().st_size > 2 * 1024 * 1024:
+            raise OcrUnavailable(str(reply.get("error", "sandbox refused"))[:64])
+        return parse_tsv(result.read_text(encoding="utf-8", errors="replace"))
+
+
+def configured_engine(workspace: Path) -> OcrEngine:
+    """The WSL sandbox when CAMPUS247_INPUT_OCR_WSL_RUNTIME names a bundle, else a native Tesseract (503 while none is set)."""
+    bundle = os.environ.get("CAMPUS247_INPUT_OCR_WSL_RUNTIME")
+    if bundle:
+        try:
+            return WslTesseractEngine(workspace, workspace / bundle)
+        except (OSError, ValueError, OcrUnavailable):
+            return TesseractCliEngine(exe="")
+    return TesseractCliEngine()
 
 
 class ImageOcrService:
