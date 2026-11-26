@@ -201,6 +201,10 @@ def analyze(question: str, history_turns: Sequence[str] = (), vocabulary=None) -
         ask_back = ("Mức này phụ thuộc vào " + " và ".join(SLOT_PHRASES[s] for s in missing) +
                     ". Bạn cho biết thêm để mình chỉ đúng mức hoặc thời hạn áp dụng cho bạn nhé.")
     from campus247.rag_v2.vocabulary import EMPTY
+    expansion = (vocabulary or EMPTY).expand(question)
+    if expansion and expansion not in fold(query):
+        # An initialism ("QLĐT") matches nothing in the documents' words; its full name does.
+        query = query + " " + expansion
     return Understanding(question, query, topics, cohort, program, year, qtype,
                          tuple(required), tuple(missing), prompt, out, ask_back,
                          scope_terms=(vocabulary or EMPTY).terms_in(question))

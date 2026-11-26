@@ -30,7 +30,7 @@ _STOP_ACCENTED = frozenset("""và của là có thì được đã để tại t
 đến nào mức năm khóa hệ hoặc gồm bằng sau trước ở ra vào như hay về nên nhưng mà cũng chỉ vẫn đang rất lên xuống dành áp nộp đóng bao
 mấy gì học thực hành sinh viên chương trình""".split())
 # In a document: the first word after "ngành" is capitalised, which marks where the name starts.
-_AFTER_MARKER = re.compile(rf"(?i:chuyên\s+ngành|ngành)\s+([A-ZÀ-ỸĐ][A-Za-zÀ-ỹĐđ0-9-]*(?:\s+{_WORD}){{0,5}})")
+_AFTER_MARKER = re.compile(rf"(?i:chuyên\s+ngành|ngành)\s+([A-ZÀ-ỸĐ][A-Za-zÀ-ỹĐđ0-9-]*(?:\s+{_WORD}){{0,8}})")
 # In a question (folded: lower case, no diacritics): the name ends at a stop word, a cohort or a digit. "trình" is a stop word
 # ("chương trình") except inside "công trình": "ngành công trình thủy" must not be cut down to "công".
 _QUESTION_AFTER_MARKER = re.compile(
@@ -46,9 +46,13 @@ def _clean(name: str) -> str:
 def _trim(name: str) -> str:
     """Cut a captured name at its first word that cannot belong to a name."""
     kept = []
-    for position, word in enumerate(name.split()):
+    words = name.split()
+    for position, word in enumerate(words):
         if position and word.casefold() in _STOP_ACCENTED:
-            break
+            # "Kinh tế và Quản lý đô thị": a capitalised word after "và" continues one compound name.
+            following = words[position + 1] if position + 1 < len(words) else ""
+            if not (word.casefold() == "và" and following[:1].isupper()):
+                break
         kept.append(word)
     return " ".join(kept)
 
@@ -57,7 +61,7 @@ def _usable(name: str, minimum: int = 3) -> bool:
     """A name to remember from the documents: three words or more, so single concepts ("kỹ thuật", "học kỳ") are not taken for majors."""
     words = name.split()
     folded = fold(name)
-    return (minimum <= len(words) <= 6 and len(name) <= 60 and not re.search(r"\d", name) and folded not in _GENERIC
+    return (minimum <= len(words) <= 9 and len(name) <= 80 and not re.search(r"\d", name) and folded not in _GENERIC
             and not folded.startswith(("dao tao ", "chuyen nganh ", "nganh ")) and not folded.endswith(" chuyen nganh"))
 
 
@@ -75,8 +79,17 @@ class Vocabulary:
     @classmethod
     def from_units(cls, units: Iterable) -> Vocabulary:
         counts: Counter[str] = Counter()
+        titles: set[str] = set()
         for unit in units:
             body, context = source_text(unit), context_text(unit)
+            title = getattr(unit, "doc_title", "") or ""
+            if title and title not in titles:
+                # A document title names its major ("... — Chuyên ngành Kinh tế và Quản lý đô thị (K71QD)"), once per document.
+                titles.add(title)
+                for match in _AFTER_MARKER.finditer(title):
+                    name = _trim(_clean(match.group(1)))
+                    if _usable(name):
+                        counts[fold(name)] += 1
             for match in _AFTER_MARKER.finditer(body):
                 name = _trim(_clean(match.group(1)))
                 if _usable(name):
@@ -92,8 +105,22 @@ class Vocabulary:
                         if i < len(values) and _usable(_clean(values[i])):
                             counts[fold(_clean(values[i]))] += 1
         majors = frozenset(counts)
-        aliases = {initialism(name): name for name in majors if initialism(name)}
+        # Initialisms of a name and of each part of a compound name ("Kinh tế và Quản lý đô thị": "qldt"), kept only when one
+        # major has it: an ambiguous initialism is left to the question's other words.
+        candidates: dict[str, set[str]] = {}
+        for name in majors:
+            for part in [name, *name.split(" va ")]:
+                alias = initialism(part)
+                if alias:
+                    candidates.setdefault(alias, set()).add(name)
+        aliases = {alias: next(iter(names)) for alias, names in candidates.items() if len(names) == 1}
         return cls(majors, aliases)
+
+    def expand(self, question: str) -> str:
+        """The full names of the initialisms a question uses ("QLĐT" -> "kinh te va quan ly do thi"), for the search query."""
+        text = fold(question)
+        names = [name for alias, name in self.aliases.items() if re.search(rf"(?<!\w){re.escape(alias)}(?!\w)", text)]
+        return " ".join(dict.fromkeys(names))
 
     def terms_in(self, question: str) -> tuple[str, ...]:
         """Scope names a question mentions: known majors, their initialisms, and any phrase after "ngành" (known or not)."""

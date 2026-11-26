@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable, Iterable
 
+from campus247.rag_v2.ingest.units import heading_text
 from campus247.rag_v2.types import Unit
 
 MAX_SOURCES = 8   # the semantic verifier refuses more than eight sources
@@ -11,6 +12,21 @@ MAX_SOURCES = 8   # the semantic verifier refuses more than eight sources
 
 def payload_bytes(unit: Unit) -> int:
     return len(json.dumps(unit.text, ensure_ascii=False).encode())
+
+
+def _keep_heading_row(unit: Unit, parent: Unit, selected: dict[str, Unit], room: int) -> int:
+    """A reviewed curriculum row whose headings say what the page does not (its semester, a prerequisite pair "A → B") is kept
+    beside its page: the page is a table whose column layout the text lost. Returns the bytes it used (0 when not kept)."""
+    if unit.kind != "curriculum_row" or unit.unit_id in selected or len(selected) >= MAX_SOURCES:
+        return 0
+    heading = heading_text(unit)
+    if not heading or heading == heading_text(parent) or heading in parent.text:
+        return 0
+    size = payload_bytes(unit)
+    if size > room:
+        return 0
+    selected[unit.unit_id] = unit
+    return size
 
 
 def pack_context(units: Iterable[Unit], chunk_unit: Callable[[str], Unit | None] | None, *,
@@ -31,11 +47,13 @@ def pack_context(units: Iterable[Unit], chunk_unit: Callable[[str], Unit | None]
         chunk_id = unit.chunk_ids[0] if unit.chunk_ids else None
         parent = chunk_unit(chunk_id) if chunk_unit is not None and chunk_id else None
         if parent is not None and chunk_id in parents_seen:
+            used += _keep_heading_row(unit, parent, selected, budget - used)
             continue
         if parent is not None and len(parents_seen) < max_parents and used + payload_bytes(parent) <= budget:
             parents_seen.add(chunk_id)
             selected[parent.unit_id] = parent
             used += payload_bytes(parent)
+            used += _keep_heading_row(unit, parent, selected, budget - used)
             continue
         # Parent unavailable or too large: fall back to the fine unit if it fits.
         if unit.unit_id not in selected and used + payload_bytes(unit) <= budget:

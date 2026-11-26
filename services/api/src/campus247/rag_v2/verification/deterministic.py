@@ -7,6 +7,7 @@ import unicodedata
 from collections.abc import Mapping
 
 from campus247.rag_v2.generation.contacts import restore
+from campus247.rag_v2.ingest.units import heading_text
 from campus247.rag_v2.scope_ranges import covers
 from campus247.rag_v2.types import Statement, StatementVerdict, Unit
 
@@ -286,7 +287,9 @@ def check_statement(stmt: Statement, units_by_id: Mapping[str, Unit]) -> Stateme
     text = restore(stmt.text, units)
     if text is None or not text.strip():
         return StatementVerdict(stmt, False, ("UNIT_NOT_CITED",))
-    source = "\n".join(unit.text for unit in units)
+    # A unit's section headings are part of its source (the semester of a curriculum row is a heading, not row text).
+    bodies = [(heading_text(unit) + "\n" + unit.text) if heading_text(unit) else unit.text for unit in units]
+    source = "\n".join(bodies)
     reasons = []
     if not _dates(text) <= _dates(source) or not _day_months(text) <= _day_months(source):
         reasons.append("DATE_NOT_IN_SOURCE")
@@ -294,11 +297,11 @@ def check_statement(stmt: Statement, units_by_id: Mapping[str, Unit]) -> Stateme
         reasons.append("CODE_NOT_IN_SOURCE")
     # Dates are compared as dates above; their digits are not stray numbers.
     numbers = {_number(m.group()) for m in NUMBER.finditer(_value_text(_without_dates(text)))}
-    source_numbers = {_number(m.group()) for unit in units
-                      for m in NUMBER.finditer(_value_text(_without_dates(unit.text)))}
+    source_numbers = {_number(m.group()) for body in bodies
+                      for m in NUMBER.finditer(_value_text(_without_dates(body)))}
     # Digits glued to letters in the source ("INT1234") are still the number the statement states.
-    source_numbers |= {_number(m.group()) for unit in units
-                       for m in re.finditer(r"\d+(?:[.,]\d+)*", normalized(_without_dates(unit.text)))}
+    source_numbers |= {_number(m.group()) for body in bodies
+                       for m in re.finditer(r"\d+(?:[.,]\d+)*", normalized(_without_dates(body)))}
     source_semesters = _semesters(source)
     source_numbers |= {str(n) for n in source_semesters}   # "học kỳ II" supports "học kỳ 2"
     percent = r"(\d+(?:[.,]\d+)?)\s*(?:%|phần trăm)"

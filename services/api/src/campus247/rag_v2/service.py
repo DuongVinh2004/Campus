@@ -102,9 +102,14 @@ def _uncovered(facets, facet_of, verdicts, supported=None):
     """
     if not facets or not any(facet_of):
         return []
-    covered = {facet for i, (facet, verdict) in enumerate(zip(facet_of, verdicts))
-               if facet and verdict.passed and (supported is None or (i < len(supported) and supported[i]))}
-    return [ask for facet_id, ask in facets if facet_id not in covered]
+    covering: dict[str, list[str]] = {}
+    for i, (facet, verdict) in enumerate(zip(facet_of, verdicts)):
+        if facet and verdict.passed and (supported is None or (i < len(supported) and supported[i])):
+            covering.setdefault(facet, []).append(verdict.statement.text)
+    # A part that asks "when" is answered only by a statement that says when: the model sometimes files an undated statement
+    # ("chỉ cần nộp 01 lần") under "hạn chót nộp là bao giờ", which would hide the missing date from the follow-up.
+    return [ask for facet_id, ask in facets
+            if facet_id not in covering or (_WHEN.search(fold(ask)) and not any(_TIME.search(fold(t)) for t in covering[facet_id]))]
 
 
 def _fact_kind(u):
@@ -116,6 +121,62 @@ def _fact_kind(u):
         return "fee"
     return None
 
+
+# Demonstratives that leave a question without its own subject ("việc này thì sao?"), the only case for a topic-less ask-back.
+_VAGUE = re.compile(r"\b(?:viec|chuyen|lich|cai|vu|van de|truong hop|thu tuc|khoan|muc|dieu)\s+(?:nay|do|ay|kia|tren|vua roi)\b")
+
+
+def vague_reference(question: str) -> bool:
+    """A short question that leans on a demonstrative instead of naming what it asks about."""
+    words = fold(question).split()
+    return bool(_VAGUE.search(" ".join(words))) and len(words) <= 12
+
+
+# A part of the question that asks "when": its answer is usually a dated line of the same notice ("Thời gian tiếp nhận hồ sơ").
+_WHEN = re.compile(r"\b(?:han|bao gio|khi nao|luc nao|thoi gian|thoi han|ngay nao|den ngay|truoc ngay|may gio)\b")
+FOCUS_UNITS = 6
+# Words that say when: a date, a day, month, week, hour, semester, or "sau khi / trước khi / đến hết".
+_TIME = re.compile(r"\d{1,2}/\d{1,2}|\b(?:ngay|thang|tuan|gio|hoc ky|nam hoc|sau khi|truoc khi|truoc ngay|den het|den ngay|hang nam|hang thang)\b")
+
+
+async def focus_units(u, uncovered, units, index, reranker, facts, chunk_unit):
+    """Evidence for the parts of a question the first draft could not answer, from the documents already in use.
+
+    Two sources, both limited to documents the first draft drew on (so the follow-up cannot wander to another topic): a
+    retrieval with the part's own words, and, when the part asks "when", the dated lines (deadline facts) of those
+    documents. Returned first-in-order so a size trim of the follow-up request keeps them.
+    """
+    documents = {unit.document_id for unit in units.values()}
+    found: dict[str, object] = {}
+    for ask in list(uncovered)[:3]:
+        if _WHEN.search(fold(ask)):
+            for fact in facts:
+                unit = index.get(fact.unit_id) if fact.kind == "deadline" else None
+                if unit is not None and unit.document_id in documents and unit.unit_id not in units:
+                    found.setdefault(unit.unit_id, unit)
+        try:
+            extra = await retrieve(replace(u, search_query=ask, scope_terms=()), index, reranker, rerank_deadline_s=0, final_limit=12)
+        except Exception:  # noqa: BLE001 -- the follow-up is optional; a failed extra retrieval keeps the first evidence
+            continue
+        kept = 0
+        for candidate in extra.candidates:
+            unit = index.get(candidate.unit_id)
+            if unit is None or unit.document_id not in documents or unit.unit_id in units or unit.unit_id in found:
+                continue
+            found[unit.unit_id] = unit
+            kept += 1
+            if kept >= FOCUS_UNITS:
+                break
+    if not found:
+        return units
+    packed, _ = pack_context(found.values(), chunk_unit, budget=CONTEXT_BYTES // 2, max_parents=3)
+    merged = {key: unit for key, unit in packed.items() if key not in units}
+    merged.update(units)
+    return merged
+
+
+# Topics whose sources are written per cohort (a plan, its courses, its fee); a general rule (Quy chế) is not among them.
+COHORT_BOUND_TOPICS = frozenset({"chuong_trinh", "hoc_phan", "hoc_phi"})
 
 _CONDITION = re.compile(
     r"\b(?:chi|ap dung|danh cho|doi voi|tru|ngoai tru|rieng|neu|khi|truong hop|khong|chua|"
@@ -194,9 +255,32 @@ class RagV2Service:
     """
 
     def __init__(self, facts: tuple[Fact, ...] = (), vocabulary=None):
+        self._cohort_cache = None
         self.facts = tuple(facts)
         # Scope names (majors and their initialisms) read from the documents of the loaded index.
         self.vocabulary = vocabulary or EMPTY_VOCABULARY
+
+    def unknown_cohort(self, u, index) -> Outcome | None:
+        """A curriculum, course or fee question about a cohort no source mentions (a future intake such as K74) is not answered
+        with another cohort's plan: the person is told which cohorts the sources cover. General rules still answer for any cohort."""
+        if not u.cohort or not set(u.topics) & COHORT_BOUND_TOPICS:
+            return None
+        key = id(index)
+        if self._cohort_cache is None or self._cohort_cache[0] != key:
+            cohorts = set()
+            for uid in index.all_ids():
+                unit = index.get(uid)
+                if unit is not None:
+                    cohorts.update(unit.scope.cohorts)
+            self._cohort_cache = (key, frozenset(cohorts))
+        known = self._cohort_cache[1]
+        if not known or u.cohort in known:
+            return None
+        listed = sorted(known, key=lambda c: int(re.sub(r"\D", "", c) or 0))
+        recent = ", ".join(listed[-4:])
+        return Outcome("refuse", f"Nguồn hiện có chưa có kế hoạch đào tạo, học phần hay học phí riêng cho {u.cohort}. "
+                       f"Các khóa có trong nguồn gần nhất: {recent}.", reason="no_source",
+                       suggestions=tuple(f"Kế hoạch đào tạo {c}" for c in listed[-2:]))
 
     def _declined(self, u, draft, units=()) -> Outcome:
         """The model decided the sources cannot answer: ask back, or refuse with a typed reason."""
@@ -239,6 +323,9 @@ class RagV2Service:
             return await finish(build_outcome(u))
         if not math.isfinite(deadline_s) or deadline_s <= 0:
             return await finish(build_outcome(u, infra_error=True))
+        unknown = self.unknown_cohort(u, index)
+        if unknown is not None:
+            return await finish(unknown)
         end = started + deadline_s
 
         def budget(cap, reserve=0):
@@ -361,7 +448,7 @@ class RagV2Service:
                 slow = False
                 malformed = False
                 verdicts, facet_of, facets = [], [], ()
-                carry, focus, repair = None, (), False
+                carry, focus, repair, subject_named = None, (), False, False
                 for attempt in range(2):
                     verdicts = []  # An unavailable attempt cannot reuse an earlier rejection.
                     trace.statement_rejections.clear()
@@ -373,6 +460,7 @@ class RagV2Service:
                         draft = await generate_draft(_GenerationGateway(gateway, reasons),
                             u.search_query, u, list(units.values()), deadline_ms=milliseconds,
                             max_output_tokens=1000 if repair else 900, focus=focus, relaxed=relaxed is not None, repair=repair,
+                            subject_named=subject_named,
                             scope_names=u.scope_terms)
                         statements = list(draft.statements)
                     except TimeoutError:
@@ -393,6 +481,12 @@ class RagV2Service:
                         if carry is not None:
                             verdicts, facet_of, facets = carry
                             break
+                        if (draft.decision == "clarify" and not draft.missing_slots and not attempt and not subject_named
+                                and not vague_reference(u.original) and generation_end - monotonic() >= 3.0):
+                            # A topic-less ask-back is for pronoun-only questions ("việc này thì sao?"); this one names its
+                            # subject, so the model is asked once more to answer or to say there is no source.
+                            subject_named = True
+                            continue
                         trace.latency_ms["generation"] = (monotonic() - phase) * 1000
                         return await done(self._declined(u, draft, units.values()), units)
                     malformed = draft.malformed
@@ -423,8 +517,10 @@ class RagV2Service:
                     uncovered = _uncovered(facets, facet_of, verdicts)
                     if (not attempt and uncovered and any(v.passed for v in verdicts)
                             and generation_end - monotonic() >= 3.0):
-                        # A multi-part question answered in part: one more request for the missing parts only.
+                        # A multi-part question answered in part: one more request for the missing parts only, with evidence looked
+                        # up for those parts (the first evidence was chosen for the whole question).
                         carry, focus, reasons = (verdicts, facet_of, facets), tuple(uncovered), ()
+                        units = await focus_units(u, uncovered, units, index, reranker, self.facts, chunk_unit)
                         continue
                     if (attempt or not verdicts or any(v.passed for v in verdicts)
                             or not reasons or not set(reasons) <= REPAIRABLE):

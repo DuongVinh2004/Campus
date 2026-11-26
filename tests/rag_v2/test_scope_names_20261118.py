@@ -75,3 +75,25 @@ async def test_a_table_that_is_written_along_the_named_major_is_left_to_the_norm
     result = await service.answer("Học phí thực hành ngành Trí tuệ nhân tạo bao nhiêu?", (), gateway=gateway,
                                   index=UnitIndex([practice, fee]), reranker=Reranker(), embed=None)
     assert gateway.requests and "650.000" in result.text and "không nêu riêng" not in (result.preface or "")
+
+
+
+def titled(title, uid):
+    return Unit(uid, (f"chunk-{uid}",), f"doc-{uid}", "v", title, "khac", "curriculum_row", "Học phần", 1,
+                f"⟦RAG_V2_CONTEXT⟧\n{title}\n⟦RAG_V2_SOURCE⟧\nHọc phần 381882 – 8 Thực tập tốt nghiệp", scope=Scope())
+
+
+def test_a_compound_major_from_a_document_title_gets_initialisms_for_each_part_and_expands_the_query():
+    from campus247.rag_v2.understanding.analyze import analyze
+    vocabulary = Vocabulary.from_units([titled("Kế hoạch giảng dạy CTĐT — Ngành Quản lý xây dựng — Chuyên ngành Kinh tế và Quản lý đô thị (K71QD)", "d" * 16)])
+    assert "kinh te va quan ly do thi" in vocabulary.majors and "quan ly xay dung" in vocabulary.majors
+    assert vocabulary.aliases["qldt"] == "kinh te va quan ly do thi"
+    understood = analyze("K69 QLĐT TTTN ĐATN TC", (), vocabulary)
+    assert "kinh te va quan ly do thi" in understood.search_query and understood.scope_terms == ("kinh te va quan ly do thi",)
+    assert analyze("Học phí K71 bao nhiêu?", (), vocabulary).search_query.count("kinh te") == 0     # nothing added without an initialism
+
+
+def test_an_initialism_two_majors_share_is_dropped():
+    vocabulary = Vocabulary.from_units([titled("Kế hoạch — Chuyên ngành Kinh tế và Quản lý đô thị", "e" * 16),
+                                        titled("Kế hoạch — Chuyên ngành Quy hoạch và Quản lý đô thị", "f" * 16)])
+    assert "qldt" not in vocabulary.aliases and vocabulary.expand("QLĐT K71") == ""

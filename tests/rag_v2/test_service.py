@@ -383,7 +383,8 @@ async def test_model_decision_not_to_answer_becomes_a_typed_outcome_without_veri
     gateway = Deciding(decision, "Bạn hỏi đợt nào?")
     result = await answer(gateway=gateway)
     assert result.kind == kind and result.reason == reason and not result.statements and not result.citations
-    assert [r.request_id for r in gateway.requests] == ["rag_v2_generation"]
+    # A topic-less ask-back on a question that names its subject gets one more generation request (service.vague_reference).
+    assert [r.request_id for r in gateway.requests] == ["rag_v2_generation"] * (2 if decision == "clarify" else 1)
     if kind == "clarify":
         # Model free text is never displayed; the server builds the question.
         assert "Bạn hỏi đợt nào?" not in result.text and "Câu hỏi chưa đủ rõ" in result.text
