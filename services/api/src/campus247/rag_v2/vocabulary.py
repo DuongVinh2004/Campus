@@ -31,9 +31,11 @@ _STOP_ACCENTED = frozenset("""và của là có thì được đã để tại t
 mấy gì học thực hành sinh viên chương trình""".split())
 # In a document: the first word after "ngành" is capitalised, which marks where the name starts.
 _AFTER_MARKER = re.compile(rf"(?i:chuyên\s+ngành|ngành)\s+([A-ZÀ-ỸĐ][A-Za-zÀ-ỹĐđ0-9-]*(?:\s+{_WORD}){{0,5}})")
-# In a question (folded: lower case, no diacritics): the name ends at a stop word, a cohort or a digit.
+# In a question (folded: lower case, no diacritics): the name ends at a stop word, a cohort or a digit. "trình" is a stop word
+# ("chương trình") except inside "công trình": "ngành công trình thủy" must not be cut down to "công".
 _QUESTION_AFTER_MARKER = re.compile(
-    rf"(?:chuyen\s+nganh|nganh)\s+((?!(?:{_STOP})\b)[a-z][a-z-]*(?:\s+(?!(?:{_STOP})\b)(?!k\d{{2,3}}\b)[a-z][a-z-]*){{0,5}})")
+    rf"(?:chuyen\s+nganh|nganh)\s+((?!(?:{_STOP})\b)[a-z][a-z-]*"
+    rf"(?:\s+(?:(?<=cong\s)trinh\b|(?!(?:{_STOP})\b)(?!k\d{{2,3}}\b)[a-z][a-z-]*)){{0,5}})")
 _GENERIC = frozenset(fold(w) for w in ("học", "đào tạo", "học phí", "nào", "gì", "này", "đó", "chính quy", "khác", "mình", "em", "tôi"))
 
 

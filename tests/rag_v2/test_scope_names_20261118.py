@@ -36,6 +36,9 @@ def test_a_question_names_scopes_from_the_vocabulary_or_after_the_word_nganh():
     assert vocabulary.terms_in("học phí ngành Kiến trúc K70 bao nhiêu") == ("kien truc",)    # unknown to the documents, named outright
     assert vocabulary.terms_in("Học phí K69 là bao nhiêu mỗi tín chỉ?") == ()
     assert EMPTY.terms_in("hoc phi nganh quan ly do thi va cong trinh bao nhieu") == ("quan ly do thi",)
+    # "trình" ends a name in "chương trình", but it is part of the name in "công trình" (this cut a major down to "công").
+    assert EMPTY.terms_in("Theo kế hoạch học tập của ngành công trình thủy khóa 67 trở đi thì phải học bao nhiêu tín chỉ") == ("cong trinh thuy",)
+    assert EMPTY.terms_in("học phí ngành kinh tế chương trình tiên tiến") == ("kinh te",)
 
 
 def test_a_name_missing_from_the_sources_is_found_and_cut_out_of_the_query():

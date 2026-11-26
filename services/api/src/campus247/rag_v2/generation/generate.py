@@ -88,6 +88,19 @@ PROVIDER_INPUT_BUDGET_BYTES = 27_000   # the gateway's bound is 28,000 including
 _FIXED_REQUEST_BYTES = len(GENERATION_PROMPT.encode()) + len(json.dumps(STATEMENTS_SCHEMA).encode()) + 1_200
 
 
+def _drop_index(selected: Sequence[Unit], scope_names: Sequence[str]) -> int:
+    """Which source to leave out when the request is too large: the lowest-ranked one, but not before the lowest-ranked one that does
+    not carry a name the question uses (a major, a programme). A source that names it is the one the answer is about, even when
+    general documents rank above it (a K71 curriculum table behind two general handbook pages)."""
+    names = [fold(name) for name in scope_names if name]
+    if names:
+        for index in range(len(selected) - 1, 0, -1):
+            text = fold(selected[index].text + " " + selected[index].doc_title)
+            if not any(name in text for name in names):
+                return index
+    return len(selected) - 1
+
+
 async def generate_draft(
     gateway: LlmGateway, question: str, understanding: Understanding, units: Sequence[Unit],
     *, deadline_ms: int, max_output_tokens: int, focus: Sequence[str] = (), relaxed: bool = False,
@@ -126,7 +139,7 @@ async def generate_draft(
         # whose twelve sources are large tables. Leave out the lowest-ranked sources until the request fits.
         if len(content.encode()) + _FIXED_REQUEST_BYTES <= PROVIDER_INPUT_BUDGET_BYTES or len(selected) <= 1:
             break
-        selected = selected[:-1]
+        del selected[_drop_index(selected, scope_names)]
     if len(content) > 90_000:
         raise ValueError("rag_v2 prompt exceeds bound")
     request = LlmRequest(
