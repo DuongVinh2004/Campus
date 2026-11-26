@@ -16,7 +16,8 @@ const arg = (name, fallback) => { const i = process.argv.indexOf(name); return i
 const BASE = arg("--base", "http://127.0.0.1:8015");
 const KEEP = process.argv.includes("--keep");
 const CREDS = path.join(root, "infra/local/knowledge-platform-20261023");
-const FLAGS = ["policy.rules", "policy.simulator", "agent.procedures", "chat.evidence_receipts", "chat.evidence_ui", "output.read_aloud"];
+const FLAGS = ["policy.rules", "policy.simulator", "agent.procedures", "chat.evidence_receipts", "chat.evidence_ui", "output.read_aloud",
+  "input.image", "input.voice"];
 
 const results = [];
 const check = (ok, message) => { results.push({ ok, message }); console.log(ok ? "ok  " : "FAIL", message); };
@@ -112,7 +113,44 @@ try {
   await student.page.screenshot({ path: path.join(root, "infra/local/qa-acceptance/f-series-procedure.png") });
   const runs = await (await student.context.request.get(BASE + "/v1/procedures/runs")).json();
   for (const run of runs.items ?? []) if (["STARTED", "COLLECTING"].includes(run.state)) await student.context.request.post(`${BASE}/v1/procedures/runs/${run.id}:cancel`);
+
+  // Procedure submit through the API: a real ticket is created (labelled as an automatic check), and a replayed confirm creates no second one.
+  const api = student.context.request;
+  const started = await (await api.post(BASE + "/v1/procedures/runs", { data: { procedure_id: "student-certificate" } })).json();
+  const filled = await api.put(`${BASE}/v1/procedures/runs/${started.id}/fields`, { data: { row_version: started.row_version,
+    fields: { purpose: "Vay vốn", copies: 1, note: "Kiểm thử tự động F-series (dữ liệu thử), có thể đóng" } } });
+  const filledRun = filled.status() === 200 ? await filled.json() : {};
+  const preview = await (await api.post(`${BASE}/v1/procedures/runs/${started.id}:submit-preview`)).json();
+  const key = crypto.randomUUID();
+  const confirm = () => api.post(BASE + "/v1/procedures/runs:submit-confirm", { data: { preview_id: preview.preview_id, confirmation_token: preview.confirmation_token }, headers: { "Idempotency-Key": key } });
+  const first = await confirm();
+  const done = first.status() === 200 ? await first.json() : {};
+  const again = await confirm();
+  const replay = again.status() === 200 ? await again.json() : {};
+  const tickets = await (await api.get(BASE + "/v1/tickets")).json();
+  const code = done.ticket?.code ?? done.ticket_code;
+  const listed = (tickets.items ?? tickets.tickets ?? []).filter((t) => t.code === code).length;
+  check(filled.status() === 200 && first.status() === 200 && done.state === "SUBMITTED" && !!code && listed === 1 && (replay.ticket?.code ?? replay.ticket_code) === code,
+    `procedure: submit creates one ticket (fields HTTP ${filled.status()} v${filledRun.row_version}, confirm HTTP ${first.status()}, state ${done.state}, ticket ${code}, listed ${listed}, replay HTTP ${again.status()})`);
+
+  // Image and voice input: real engines on this machine (Tesseract in the WSL sandbox, the local recognizer on 18083).
+  const png = fs.readFileSync(path.join(root, ".pytest-tmp/ocr-sample.png"));
+  const ocr = await api.post(BASE + "/v1/input/image:ocr", { multipart: { image: { name: "image.png", mimeType: "image/png", buffer: png } } });
+  const ocrText = ocr.status() === 200 ? (await ocr.json()).text : "";
+  check(ocr.status() === 200 && /Học phí/.test(ocrText) && /2026/.test(ocrText), `image input: OCR reads the rendered text (HTTP ${ocr.status()}: ${ocrText.replace(/\s+/g, " ").slice(0, 60)})`);
+  const webm = path.join(root, ".pytest-tmp/voice-sample.webm");
+  if (fs.existsSync(webm)) {
+    const voice = await api.post(BASE + "/v1/input/voice:transcribe", { multipart: { audio: { name: "voice.webm", mimeType: "audio/webm", buffer: fs.readFileSync(webm) } } });
+    const heard = voice.status() === 200 ? await voice.json() : {};
+    check(voice.status() === 200 && heard.language === "vi" && (heard.text ?? "").length > 40, `voice input: local recognizer answers (HTTP ${voice.status()}, ${heard.duration_s}s, ${(heard.text ?? "").slice(0, 50)})`);
+  }
   await student.context.close();
+
+  // The rules authoring page for the owner.
+  await owner.page.goto(BASE + "/knowledge/policy-rules", { waitUntil: "domcontentloaded" });
+  await owner.page.waitForTimeout(2500);
+  const rulesText = (await owner.page.locator("main").innerText()).replace(/\s+/g, " ");
+  check(/Luật từ quy chế/.test(rulesText) && /Đang áp dụng|Cần rà lại/.test(rulesText), "rules page: the owner sees the published rules with their status");
 } catch (error) {
   check(false, "script error: " + String(error.message).slice(0, 300));
 } finally {

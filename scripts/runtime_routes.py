@@ -22,7 +22,7 @@ ALLOWED_API_PREFIXES = (
     "/v1/rooms", "/v1/tickets", "/v1/students/me/schedule", "/v1/staff/tickets", "/v1/notifications",
     "/v1/admin/overview", "/v1/admin/operations/", "/v1/answer-gap-reports", "/v1/features", "/v1/admin/features",
     "/v1/announcements", "/v1/answer-receipts",
-    "/v1/nudges", "/v1/policy-simulator", "/v1/policy-rules", "/v1/policy-impact", "/v1/policy-conflicts", "/v1/procedures", "/v1/input/image",
+    "/v1/nudges", "/v1/policy-simulator", "/v1/policy-rules", "/v1/policy-impact", "/v1/policy-conflicts", "/v1/procedures", "/v1/input/image", "/v1/input/voice",
 )
 ALLOWED_API_PATHS = frozenset({"/v1/users/me", "/v1/auth/logout"})
 
