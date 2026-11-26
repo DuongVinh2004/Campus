@@ -11,7 +11,7 @@ from campus247.infrastructure.identity.local_learning import (
     LocalLearningIdentityAdapter,
 )
 
-LEARNING_REVISIONS = ("0023", "0024", "0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032")
+LEARNING_REVISIONS = ("0023", "0024", "0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032", "0033")
 
 
 def checked_learning_path(path: Path, workspace: Path) -> Path:
@@ -106,6 +106,7 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
             page_explanations_schema=schema_has("0027"), version_changes_schema=schema_has("0028"),
             exit_tickets_schema=schema_has("0029"), idea_cards_schema=schema_has("0030"),
             accessible_text_schema=schema_has("0031"), practice_schema=schema_has("0032"),
+            tutor_schema=schema_has("0033"),
         )
     blob_store = LearningBlobStore(paths["blob_directory"], workspace=workspace,
         max_total_bytes=config.get('storage_quota_bytes', 10 * 1024**3))
@@ -154,7 +155,8 @@ def load_local_learning(config_path: Path, *, workspace: Path, tenant_id: str,
         version_change_offerings=version_change_offerings, exit_ticket_offerings=exit_ticket_offerings, practice_offerings=practice_offerings,
         idea_card_offerings=idea_card_offerings, accessible_text_offerings=accessible_text_offerings,
         accessible_text_ocr_paused_offerings=ocr_paused_offerings,
-        accessible_text_byte_quota=ocr_quota)
+        accessible_text_byte_quota=ocr_quota,
+        tutor_available=config["storage"] == "sqlite" or schema_has("0033"))
     pptx = config.get('pptx_converter')
     if pptx is not None:
         if not isinstance(pptx, dict) or type(pptx.get('enabled')) is not bool:

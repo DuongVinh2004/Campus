@@ -70,7 +70,11 @@ def test_option_rates_respect_k():
 
 def test_hint_checks():
     quote = "Sinh viên có điểm D được tính là đạt học phần"
-    assert hint_issues("Hãy xem lại cách tính điểm D.", quote, PAGE, level=1, correct_answers=["Đạt"]) == []
+    assert hint_issues("Hãy xem lại cách tính điểm D.", quote, PAGE, level=1, correct_answers=["Đạt yêu cầu tối thiểu"]) == []
+    # A short answer leaks as a whole word, in the hint or in the quote ("đạt" is in the quote): the quote may not give it away either.
+    assert hint_issues("Hãy xem lại cách tính điểm D.", quote, PAGE, level=1, correct_answers=["Đạt"]) == ["LEAKS_ANSWER"]
+    assert hint_issues("Đáp án là Nén.", quote, PAGE, level=1, correct_answers=["Nén"]) == ["LEAKS_ANSWER"]
+    assert hint_issues("Xem lại cách tính điểm D.", quote, PAGE, level=1, correct_answers=["Nén"]) == []   # "nén" is nowhere
     assert "QUOTE_NOT_VERBATIM" in hint_issues("ok", "câu không có trong trang", PAGE, level=1, correct_answers=[])
     assert "QUOTE_NOT_VERBATIM" in hint_issues("ok", "ngắn", PAGE, level=1, correct_answers=[])
     assert "LEAKS_ANSWER" in hint_issues("Câu trả lời là điểm D được tính là đạt học phần", quote, PAGE, level=1, correct_answers=["điểm D được tính là đạt học phần"])
@@ -87,6 +91,8 @@ def test_template_fallback_and_levels():
     assert hint_issues(t1["hint"].replace("Xem lại trang 12: ", ""), t1["quote"], PAGE, level=1, correct_answers=[]) in ([], ["HINT_LENGTH"])
     t2 = template_hint(PAGE, "Điểm trung bình tích lũy tính theo trọng số nào?", 12, 2)
     assert len(t2["quote"]) >= len(t1["quote"])
+    avoided = template_hint(PAGE, "Điểm trung bình tích lũy tính theo trọng số nào?", 12, 1, avoid=[t1["quote"].split()[0]])
+    assert avoided["quote"] != t1["quote"] and hint_issues(avoided["hint"], avoided["quote"], PAGE, level=1, correct_answers=[t1["quote"].split()[0]]) in ([], ["QUOTE_NOT_VERBATIM"])
     t3 = template_hint(PAGE, "x", 12, 3, solution="Điểm D là đạt.")
     assert "Điểm D là đạt." in t3["hint"]
     assert level_for(1, reveal_after=2) == 1 and level_for(2, reveal_after=3) == 2 and level_for(3, reveal_after=3) == 3

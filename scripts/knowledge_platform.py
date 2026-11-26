@@ -279,7 +279,7 @@ async def components(*, rehearsal=None, learning_rehearsal=None):
         init=learning_rehearsal.verify_connection if learning_rehearsal else None)
     async with pool.acquire() as conn:
         revision = await conn.fetchval("SELECT version_num FROM alembic_version")
-        accepted_revisions = {"0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032"} if learning_rehearsal else ({"0020", "0021", "0022", "0023", "0024"} if rehearsal else {"0017", "0018", "0022", "0023", "0024"})
+        accepted_revisions = {"0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032", "0033"} if learning_rehearsal else ({"0020", "0021", "0022", "0023", "0024"} if rehearsal else {"0017", "0018", "0022", "0023", "0024"})
         if revision not in accepted_revisions:
             raise ValueError("Apply additive platform migrations before running services")
         if rehearsal and revision != json.loads(Path(rehearsal).read_text(encoding="utf-8"))["revision"]:

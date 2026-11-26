@@ -82,6 +82,11 @@ REVIEWED_ADDITIONS = {
     # four new learning.practice_* tables, indexes, one function and triggers only; no DROP/DELETE/TRUNCATE/ALTER/UPDATE of existing
     # data; downgrade() raises. Executed on a throwaway database by tests/learning_entry/test_practice_postgres.py.
     "0032_learning_practice.py": "cf9d3a1d8e2d98c8a31165570b7a415ae40d28e99da639eaca880d0574d07a7f",
+    # 0033 (learning concepts, mastery, tutor) approved by the owner in chat on 2026-11-26 ("tôi duyệt các phần đang vướng theo
+    # đề xuất của bạn"): linear 0032 -> 0033, creates four new learning.* tables (concepts, concept_mastery, tutor_settings,
+    # tutor_turns), indexes, one function and triggers only; no DROP/DELETE/TRUNCATE/ALTER/UPDATE of existing data; downgrade()
+    # raises. Executed on a throwaway database by tests/learning_entry/test_tutor_postgres.py.
+    "0033_learning_concepts_tutor.py": "94b852b5ab9063a25f8d989432751d8eec8b7140f569897ec5bf1c1461ad94fc",
 }
 SOURCE_ID = "019a0000-0000-7000-8000-000000000001"
 DOCUMENT_ID = "019a0000-0000-7000-8000-000000000002"

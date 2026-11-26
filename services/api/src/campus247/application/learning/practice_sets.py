@@ -42,6 +42,11 @@ def _stamp(value: datetime) -> str:
 
 
 class LearningPractice:
+    def mastery_on(self) -> bool:
+        """F7 mastery tracking: needs its storage (migration 0033 on PostgreSQL) and the `learning.mastery_map` feature."""
+        from campus247.features import runtime
+        return bool(getattr(self, "tutor_available", False)) and runtime.value("learning.mastery_map", False) is True
+
     # ------------------------------------------------------------------------------------------------ access
     def practice_session_access(self, state, actor, session_id, *, manage=False):
         session = state["sessions"].get(session_id)
@@ -102,6 +107,9 @@ class LearningPractice:
                 states[item_id] = ReviewState(review["ease"], review["interval_days"], review["repetitions"],
                                               datetime.fromisoformat(review["due_at"]) if review.get("due_at") else None) if review else ReviewState()
             picked = pick_session(states, now=now, size=SESSION_SIZE)
+            if self.mastery_on():
+                # SM-2 chose the questions; the weakest concept goes first (F7). Nothing else changes.
+                picked = self.mastery_order(state, actor.subject_id, picked, items, row)
             return self.practice_set_view(row, [self.practice_item_for_student(items[i]) for i in picked])
         require(kind == "practice_stats" and staff)
         students = sum(m["offering_id"] == offering["id"] and m["status"] == "ACTIVE" and m["role"] == "STUDENT" for m in state["members"].values())
@@ -171,6 +179,10 @@ class LearningPractice:
             attempt_id = generate_uuid7()
             state.setdefault("practice_attempts", {})[attempt_id] = {"id": attempt_id, "item_id": item["id"], "set_id": row["id"], "offering_id": row["offering_id"],
                                                                     "student_id": actor.subject_id, "correct": correct, "at": _stamp(now)}
+            if item["kind"] != "short_answer":
+                # The options chosen (ids only) feed the class map's distractor counts; free text is never kept.
+                state["practice_attempts"][attempt_id]["choices"] = sorted(chosen)
+            mastery = self.record_mastery(state, item, row, actor.subject_id, correct, now) if self.mastery_on() else []
             key = f"{item['id']}:{actor.subject_id}"
             old = state.setdefault("practice_reviews", {}).get(key)
             previous = ReviewState(old["ease"], old["interval_days"], old["repetitions"], datetime.fromisoformat(old["due_at"])) if old else ReviewState()
@@ -178,7 +190,8 @@ class LearningPractice:
             state["practice_reviews"][key] = {"ease": following.ease, "interval_days": following.interval_days, "repetitions": following.repetitions,
                                               "due_at": _stamp(following.due_at)}
             return {"correct": correct, "answer": item["answer"], "accepted": item["accepted"] if item["kind"] == "short_answer" else [],
-                    "explanation": item["explanation"], "citations": item["citations"], "next_review_at": _stamp(following.due_at)}
+                    "explanation": item["explanation"], "citations": item["citations"], "next_review_at": _stamp(following.due_at),
+                    **({"mastery": mastery} if mastery else {})}
 
         row, session, offering, _ = self.practice_set_access(state, actor, target, manage=True)
         require(row["status"] == "DRAFT", 409, "INVALID_SET_STATE", "Chỉ sửa bộ câu hỏi còn là bản nháp.")

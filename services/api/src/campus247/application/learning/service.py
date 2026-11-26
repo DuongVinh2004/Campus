@@ -18,6 +18,7 @@ from campus247.application.learning.accessible_text import (
     LearningAccessibleText,
 )
 from campus247.application.learning.practice_sets import PRACTICE_READS, PRACTICE_WRITES, LearningPractice
+from campus247.application.learning.tutor import TUTOR_READS, TUTOR_WRITES, LearningTutor
 from campus247.application.learning.exit_tickets import (
     EXIT_TICKET_READS,
     EXIT_TICKET_WRITES,
@@ -70,8 +71,8 @@ def reserved_upload_bytes(uploads, offering):
                if row["offering_id"] == offering and not row.get("reservation_released"))
 
 
-class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplanation, LearningPageFeedback, LearningVersionChanges, LearningExitTickets, LearningPractice, LearningIdeaCards, LearningAccessibleText):
-    def __init__(self, repository, blob_store, *, tenant_id, signing_key, scanner=None, directory=None, ai_gateway=None, ai_verifier=None, ai_source_hashes=(), optimize_pdf=False, pptx_converter=None, page_feedback_offerings=(), page_explanations_available=True, version_change_offerings=(), exit_ticket_offerings=(), practice_offerings=(), idea_card_offerings=(), accessible_text_offerings=(), accessible_text_ocr_paused_offerings=(), accessible_text_pipeline=None, accessible_text_byte_quota=12 * 1024**3):
+class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplanation, LearningPageFeedback, LearningVersionChanges, LearningExitTickets, LearningPractice, LearningTutor, LearningIdeaCards, LearningAccessibleText):
+    def __init__(self, repository, blob_store, *, tenant_id, signing_key, scanner=None, directory=None, ai_gateway=None, ai_verifier=None, ai_source_hashes=(), optimize_pdf=False, pptx_converter=None, page_feedback_offerings=(), page_explanations_available=True, version_change_offerings=(), exit_ticket_offerings=(), practice_offerings=(), idea_card_offerings=(), accessible_text_offerings=(), accessible_text_ocr_paused_offerings=(), accessible_text_pipeline=None, accessible_text_byte_quota=12 * 1024**3, tutor_available=True):
         require(bool(signing_key) and bool(tenant_id), 503, "LEARNING_UNAVAILABLE", "Chưa cấu hình học liệu.")
         self.repository, self.blobs, self.tenant_id = repository, blob_store, tenant_id
         self.signing_key = signing_key.encode()
@@ -91,6 +92,8 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
         self.accessible_text_byte_quota = accessible_text_byte_quota
         self.exit_ticket_offerings = frozenset(exit_ticket_offerings)
         self.practice_offerings = frozenset(practice_offerings)
+        # Concepts, mastery and the tutor need their own collections (PostgreSQL: migration 0033).
+        self.tutor_available = tutor_available
 
     @property
     def pptx_available(self):
@@ -220,6 +223,10 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
             require(bool(self.practice_offerings))
             async with self.repository.transaction() as s:
                 return copy.deepcopy(self.read_practice(s, actor, kind, target))
+        if kind in TUTOR_READS:
+            require(bool(self.practice_offerings) and self.tutor_available)
+            async with self.repository.transaction() as s:
+                return copy.deepcopy(self.read_tutor(s, actor, kind, target))
         if kind in EXIT_TICKET_READS:
             require(bool(self.exit_ticket_offerings))
             view = self.repository.read_view(actor, kind, target, params) if hasattr(self.repository, "read_view") else self.repository.transaction()
@@ -395,7 +402,7 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
                 details["change_set"] = self.change_projection(row, base_visible=True)
             elif action in {"exit-ticket-update", "exit-review-save"}:
                 details = self.preview_exit_action(s, actor, action, target, payload)
-            elif action in PRACTICE_WRITES:
+            elif action in PRACTICE_WRITES | TUTOR_WRITES:
                 raise LearningError(422, "PREVIEW_UNSUPPORTED", "Preview is not needed for this action.")
             elif action in EXIT_TICKET_WRITES:
                 raise LearningError(422, "PREVIEW_UNSUPPORTED", "Thao tác này không cần bản xem trước.")
@@ -529,6 +536,9 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
         elif action in PRACTICE_WRITES:
             require(bool(self.practice_offerings))
             self.authorize_practice_action(s, actor, action, target)
+        elif action in TUTOR_WRITES:
+            require(bool(self.practice_offerings) and self.tutor_available)
+            self.authorize_tutor_action(s, actor, action, target)
         elif action in EXIT_TICKET_WRITES:
             self.authorize_exit_action(s, actor, action, target)
         elif action in IDEA_WRITES:
@@ -545,6 +555,8 @@ class LearningService(LearningScanLifecycle, LearningExtensions, LearningExplana
             return self.command_idea(s, actor, action, target, p, supplied)
         if action in PRACTICE_WRITES:
             return self.command_practice(s, actor, action, target, p, supplied)
+        if action in TUTOR_WRITES:
+            return self.command_tutor(s, actor, action, target, p, supplied)
         if action in EXIT_TICKET_WRITES:
             return self.command_exit_ticket(s, actor, action, target, p, supplied)
         if action == "version-change-save":

@@ -98,6 +98,20 @@ paths:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1practice-sets~1{set_id}~1session"
   /v1/learning/practice-sets/{set_id}/stats:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1practice-sets~1{set_id}~1stats"
+  /v1/learning/mastery/offerings/{offering_id}/concepts:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1mastery~1offerings~1{offering_id}~1concepts"
+  /v1/learning/mastery/concepts/{concept_id}:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1mastery~1concepts~1{concept_id}"
+  /v1/learning/mastery/offerings/{offering_id}/me:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1mastery~1offerings~1{offering_id}~1me"
+  /v1/learning/mastery/offerings/{offering_id}/map:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1mastery~1offerings~1{offering_id}~1map"
+  /v1/learning/mastery/offerings/{offering_id}/map.csv:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1mastery~1offerings~1{offering_id}~1map.csv"
+  /v1/learning/tutor/offerings/{offering_id}/settings:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1tutor~1offerings~1{offering_id}~1settings"
+  /v1/learning/tutor/practice-items/{item_id}/hints:
+    $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1tutor~1practice-items~1{item_id}~1hints"
   /v1/learning/sessions/{session_id}/practice-sets:
     $ref: "./learning.openapi.pptx.json#/paths/~1v1~1learning~1sessions~1{session_id}~1practice-sets"
   /v1/learning/exit-tickets/{ticket_id}:

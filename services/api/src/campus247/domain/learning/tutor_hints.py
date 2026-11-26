@@ -17,6 +17,18 @@ def fold(text: str) -> str:
     return " ".join("".join(c for c in text if unicodedata.category(c) != "Mn").split())
 
 
+def leaks(text: str, answers) -> bool:
+    """Whether the text gives away an answer: a long answer as any substring, a short one ("Nén", "12") as a whole word.
+
+    A whole-word match may also block a harmless text that happens to use the word; the caller then shows less, the safe side."""
+    blob = fold(text)
+    for answer in answers:
+        a = fold(answer)
+        if a and (a in blob if len(a) >= 4 else re.search(rf"(?<!\w){re.escape(a)}(?!\w)", blob)):
+            return True
+    return False
+
+
 def hint_issues(hint: str, quote: str, page_text: str, *, level: int, correct_answers: list[str], correct_labels: list[str] | None = None) -> list[str]:
     """Reason codes; empty list means the hint may be shown."""
     issues = []
@@ -29,12 +41,8 @@ def hint_issues(hint: str, quote: str, page_text: str, *, level: int, correct_an
     if _MARKDOWN.search(hint):
         issues.append("HINT_MARKDOWN")
     if level in (1, 2):
-        blob = fold(hint + " " + quote)
-        for answer in correct_answers:
-            a = fold(answer)
-            if len(a) >= 4 and a in blob:
-                issues.append("LEAKS_ANSWER")
-                break
+        if leaks(hint + " " + quote, correct_answers):
+            issues.append("LEAKS_ANSWER")
         if _OPTION_CODE.search(fold(hint)) or any(re.search(rf"\b(?:dap an|phuong an)\s*\(?{re.escape(l.casefold())}\)?\b", fold(hint)) for l in correct_labels or ()):
             issues.append("LEAKS_OPTION_CODE")
     return issues
@@ -45,9 +53,14 @@ def _sentences(text: str) -> list[str]:
     return [p.strip() for p in parts if len(p.strip()) >= MIN_QUOTE_CHARS]
 
 
-def template_hint(page_text: str, question: str, page_no: int, level: int, *, solution: str | None = None, answer: str | None = None) -> dict:
-    """Deterministic fallback: the sentence of the page with most word overlap with the question, then the next one, then the solution."""
+def template_hint(page_text: str, question: str, page_no: int, level: int, *, solution: str | None = None, answer: str | None = None,
+                  avoid=()) -> dict:
+    """Deterministic fallback: the sentence of the page with most word overlap with the question, then the next one, then the solution.
+
+    At levels 1-2 a sentence that gives away an answer in `avoid` is never quoted (the same rule as for a model hint)."""
     sents = _sentences(page_text)
+    if level < 3 and avoid:
+        sents = [s for s in sents if not leaks(s, avoid)]
     q = set(fold(question).split())
     best = max(range(len(sents)), key=lambda i: (len(q & set(fold(sents[i]).split())), -i), default=None)
     if level >= 3:
