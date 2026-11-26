@@ -2,7 +2,7 @@ import React from "react";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const api = vi.hoisted(() => ({ authored: vi.fn(), approvals: vi.fn(), stats: vi.fn(), approve: vi.fn(), reject: vi.fn(), withdrawPreview: vi.fn(), withdrawConfirm: vi.fn() }));
+const api = vi.hoisted(() => ({ authored: vi.fn(), approvals: vi.fn(), stats: vi.fn(), approve: vi.fn(), reject: vi.fn(), withdrawPreview: vi.fn(), withdrawConfirm: vi.fn(), revisionPreview: vi.fn(), revisionConfirm: vi.fn() }));
 vi.mock("../../lib/announcements-api", () => ({ announcementsApi: api }));
 import { AnnouncementManager } from "./AnnouncementManager";
 
@@ -52,5 +52,22 @@ describe("AnnouncementManager", () => {
     expect((screen.getByRole("button", { name: "Từ chối" }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: "Duyệt" }));
     await waitFor(() => expect(api.approve).toHaveBeenCalledWith("a2", "", 5));
+  });
+
+  it("revises a sent announcement only with a change note and after the confirm step", async () => {
+    api.authored.mockResolvedValue({ items: [item()] });
+    api.revisionPreview.mockResolvedValue({ preview_id: "p", confirmation_token: "t", expires_at: "x", summary: { material: true, revision: 2 } });
+    api.revisionConfirm.mockResolvedValue({ id: "a1", revision: 2 });
+    render(<AnnouncementManager />);
+    fireEvent.click(await screen.findByRole("button", { name: "Số liệu và thao tác" }));
+    const previewButton = await screen.findByRole("button", { name: "Xem trước bản sửa" });
+    expect((previewButton as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.change(screen.getByLabelText("Ghi chú thay đổi (người nhận sẽ thấy)"), { target: { value: "Đổi phòng thi" } });
+    fireEvent.click(screen.getByLabelText(/Thay đổi quan trọng/));
+    fireEvent.click(previewButton);
+    expect((await screen.findByRole("dialog", { name: "Xác nhận sửa thông báo" })).textContent).toContain("người đã nhận sẽ được báo lại");
+    expect(api.revisionPreview).toHaveBeenCalledWith("a1", { change_note: "Đổi phòng thi", material: true });
+    fireEvent.click(screen.getByRole("button", { name: "Xác nhận sửa" }));
+    await waitFor(() => expect(api.revisionConfirm).toHaveBeenCalledWith("p", "t"));
   });
 });

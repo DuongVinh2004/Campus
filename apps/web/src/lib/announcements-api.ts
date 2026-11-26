@@ -42,6 +42,11 @@ export const announcementsApi = {
   approvals: () => client().get<{ items: AnnouncementSummary[] }>("/v1/announcements/approvals"),
   approve: (id: string, note: string, rowVersion: number) => client().post(`/v1/announcements/${encodeURIComponent(id)}:approve`, { note, row_version: rowVersion }),
   reject: (id: string, note: string, rowVersion: number) => client().post(`/v1/announcements/${encodeURIComponent(id)}:reject`, { note, row_version: rowVersion }),
+  revisionPreview: (id: string, changes: { title?: string; body?: string; change_note: string; material: boolean }) =>
+    client().post<{ preview_id: string; confirmation_token: string; expires_at: string; summary: { material: boolean; revision: number } }>(
+      `/v1/announcements/${encodeURIComponent(id)}:revision-preview`, changes),
+  revisionConfirm: (previewId: string, token: string) =>
+    client().post<{ id: string; revision: number }>("/v1/announcements:revision-confirm", { preview_id: previewId, confirmation_token: token }, { "Idempotency-Key": newKey() }),
   withdrawPreview: (id: string, reason: string) => client().post<WithdrawPreview>(`/v1/announcements/${encodeURIComponent(id)}:withdraw-preview`, { reason }),
   withdrawConfirm: (previewId: string, token: string) =>
     client().post<{ id: string; status: string }>("/v1/announcements:withdraw-confirm", { preview_id: previewId, confirmation_token: token }, { "Idempotency-Key": newKey() }),

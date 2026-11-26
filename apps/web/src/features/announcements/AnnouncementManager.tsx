@@ -61,6 +61,39 @@ function Withdraw({ item, onDone }: { item: AnnouncementSummary; onDone: () => v
   );
 }
 
+function Revise({ item, onDone }: { item: AnnouncementSummary; onDone: () => void }) {
+  const [title, setTitle] = useState(item.title);
+  const [body, setBody] = useState("");
+  const [note, setNote] = useState("");
+  const [material, setMaterial] = useState(false);
+  const [preview, setPreview] = useState<{ preview_id: string; confirmation_token: string; summary: { material: boolean; revision: number } } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <fieldset className="space-y-1">
+      <legend>Sửa thông báo đã gửi</legend>
+      <label>Tiêu đề<input value={title} maxLength={200} onChange={e => setTitle(e.target.value)} /></label>
+      <label>Nội dung mới (để trống nếu giữ nguyên)<textarea value={body} rows={4} onChange={e => setBody(e.target.value)} /></label>
+      <label>Ghi chú thay đổi (người nhận sẽ thấy)<input value={note} maxLength={300} onChange={e => setNote(e.target.value)} /></label>
+      <label><input type="checkbox" checked={material} onChange={e => setMaterial(e.target.checked)} /> Thay đổi quan trọng (báo lại cho người đã nhận)</label>
+      <button type="button" disabled={note.trim().length < 5} onClick={async () => {
+        setError(null);
+        const changes = { change_note: note.trim(), material, ...(title.trim() !== item.title ? { title: title.trim() } : {}), ...(body.trim() ? { body: body.trim() } : {}) };
+        try { setPreview(await announcementsApi.revisionPreview(item.id, changes)); } catch (e) { setError(message(e)); }
+      }}>Xem trước bản sửa</button>
+      {preview && (
+        <div role="dialog" aria-label="Xác nhận sửa thông báo">
+          <p>Lưu thành lần cập nhật {preview.summary.revision}{preview.summary.material ? "; người đã nhận sẽ được báo lại" : ""}.</p>
+          <button type="button" onClick={async () => {
+            try { await announcementsApi.revisionConfirm(preview.preview_id, preview.confirmation_token); setPreview(null); onDone(); } catch (e) { setError(message(e)); }
+          }}>Xác nhận sửa</button>
+          <button type="button" onClick={() => setPreview(null)}>Hủy</button>
+        </div>
+      )}
+      {error && <p role="alert">{error}</p>}
+    </fieldset>
+  );
+}
+
 function Approval({ item, onDone }: { item: AnnouncementSummary; onDone: () => void }) {
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -112,6 +145,7 @@ export function AnnouncementManager() {
               {open === item.id && (
                 <div className="space-y-2">
                   <Stats id={item.id} />
+                  {item.status === "PUBLISHED" && <Revise item={item} onDone={() => { setOpen(null); load(); }} />}
                   {item.status === "PUBLISHED" && <Withdraw item={item} onDone={() => { setOpen(null); load(); }} />}
                 </div>
               )}
