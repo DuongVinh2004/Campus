@@ -54,3 +54,43 @@ def test_a_plan_question_about_a_cohort_no_source_mentions_is_told_which_cohorts
     assert plan.kind == "refuse" and "K74" in plan.text and "K71" in plan.text
     rule = asyncio.run(answer(gateway=gateway, index=UnitIndex([k71, general]), question="Sinh viên K74 bị cảnh báo học tập khi nào?"))
     assert rule.kind != "refuse" or "K74" not in rule.text                 # a general rule is not blocked by the cohort
+
+
+def label_page(uid, label, chunk="c"):
+    return Unit(uid, (chunk,), "doc", "v", "K71 — Khoa học máy tính — nội dung PDF 71CS", "khac", "page", f"71CS — {label}", 1,
+                f"⟦RAG_V2_CONTEXT⟧\nK71\n⟦RAG_V2_SOURCE⟧\n71CS\n{label}:\n", scope=Scope(("K71",)))
+
+
+class Units:
+    def __init__(self, units):
+        self.units = {u.unit_id: u for u in units}
+
+    def get(self, uid):
+        return self.units.get(uid)
+
+    def all_ids(self):
+        return tuple(self.units)
+
+
+def test_label_pages_of_a_curriculum_move_behind_its_rows_and_are_not_pinned_back():
+    from campus247.rag_v2.retrieval.hybrid import _label_pages_last
+    from campus247.rag_v2.types import Candidate
+    labels = [label_page(f"{i:016d}", f"Học phần tiên quyết — 6088{i:02d} → 6088{i + 1:02d}") for i in range(5)]
+    learning = row("71CS — Học phần tiên quyết — 608825 → 608807 > Học phần 608807 - 3", "608807 - 3\nHọc máy", uid="h" * 16)
+    ranked = [Candidate(u.unit_id, i, None, 1 / (60 + i)) for i, u in enumerate([*labels, learning], 1)]
+    order, moved = _label_pages_last(ranked, Units([*labels, learning]))
+    assert [c.unit_id for c in order[:2]] == [labels[0].unit_id, "h" * 16]       # the first label keeps its place
+    assert moved == {u.unit_id for u in labels[1:]} and len(order) == len(ranked)  # nothing is dropped
+    # A short page of a document without rows of its own (a notice, a calendar line) is left where it is.
+    notice = [Unit(f"n{i:015d}", ("c",), "doc2", "v", "Thông báo", "khac", "page", "Thông báo", 1, "Hạn nộp: 20/10/2026", scope=Scope())
+              for i in range(3)]
+    order, moved = _label_pages_last([Candidate(u.unit_id, i, None, 0.1) for i, u in enumerate(notice, 1)], Units(notice))
+    assert not moved and [c.unit_id for c in order] == [u.unit_id for u in notice]
+
+
+def test_a_row_under_a_label_only_page_is_packed_without_the_page():
+    from campus247.rag_v2.generation.packing import pack_context
+    page = label_page("p" * 16, "Học phần tiên quyết — 608825 → 608807")
+    learning = row("71CS — Học phần tiên quyết — 608825 → 608807 > Học phần 608807 - 3", "608807 - 3\nHọc máy", uid="h" * 16)
+    selected, truncated = pack_context([learning], {"c": page}.get, budget=10_000)
+    assert list(selected) == ["h" * 16] and not truncated

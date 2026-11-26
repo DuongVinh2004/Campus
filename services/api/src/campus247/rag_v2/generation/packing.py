@@ -5,6 +5,7 @@ import json
 from collections.abc import Callable, Iterable
 
 from campus247.rag_v2.ingest.units import heading_text
+from campus247.rag_v2.retrieval.hybrid import label_only_page
 from campus247.rag_v2.types import Unit
 
 MAX_SOURCES = 8   # the semantic verifier refuses more than eight sources
@@ -46,6 +47,8 @@ def pack_context(units: Iterable[Unit], chunk_unit: Callable[[str], Unit | None]
             break
         chunk_id = unit.chunk_ids[0] if unit.chunk_ids else None
         parent = chunk_unit(chunk_id) if chunk_unit is not None and chunk_id else None
+        if parent is not None and unit.kind == "curriculum_row" and label_only_page(parent):
+            parent = None   # the page is only a label ("71CS / Học phần tiên quyết:"); the row with its headings says it all
         if parent is not None and chunk_id in parents_seen:
             used += _keep_heading_row(unit, parent, selected, budget - used)
             continue
