@@ -17,7 +17,7 @@ const BASE = arg("--base", "http://127.0.0.1:8015");
 const KEEP = process.argv.includes("--keep");
 const CREDS = path.join(root, "infra/local/knowledge-platform-20261023");
 const FLAGS = ["policy.rules", "policy.simulator", "agent.procedures", "chat.evidence_receipts", "chat.evidence_ui", "output.read_aloud",
-  "input.image", "input.voice"];
+  "input.image", "input.voice", "announcements.inbox", "announcements.publish", "policy.impact"];
 
 const results = [];
 const check = (ok, message) => { results.push({ ok, message }); console.log(ok ? "ok  " : "FAIL", message); };

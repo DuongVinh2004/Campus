@@ -38,9 +38,9 @@ export function AnnouncementDetailView({ id, onBack }: { id: string; onBack: () 
     } catch (e) { setError(message(e)); } finally { setAcking(false); }
   };
   return (
-    <article className="campus-card space-y-3" aria-labelledby="ann-title">
-      <button onClick={onBack}>← Về danh sách</button>
-      <h2 id="ann-title">{item.title}</h2>
+    <article className="campus-card space-y-3 p-4 sm:p-6" aria-labelledby="ann-title">
+      <button className="fluent-btn-ghost text-sm" onClick={onBack}>← Về danh sách</button>
+      <h2 id="ann-title" className="text-lg font-semibold">{item.title}</h2>
       <p><PriorityBadge priority={item.priority} /> {item.issuer_unit} · {item.code}{item.source_ref?.document_no ? ` · Văn bản ${item.source_ref.document_no}` : ""}</p>
       <div style={{ whiteSpace: "pre-wrap" }}>{item.body}</div>
       {item.revision > 1 && <p>Cập nhật lần {item.revision}{item.revisions?.length ? `: ${item.revisions[item.revisions.length - 1].change_note}` : ""}</p>}
@@ -51,7 +51,7 @@ export function AnnouncementDetailView({ id, onBack }: { id: string; onBack: () 
       <p>Hết hiệu lực: {new Date(item.expires_at).toLocaleString("vi-VN")}</p>
       {item.viewer === "recipient" && item.requires_ack && (item.needs_ack ? (
         <>
-          <button disabled={acking} onClick={() => void confirm()} aria-describedby="ack-deadline">Tôi đã đọc và hiểu</button>
+          <button className="fluent-btn-primary" disabled={acking} onClick={() => void confirm()} aria-describedby="ack-deadline">Tôi đã đọc và hiểu</button>
           <p id="ack-deadline">Hạn xác nhận: {item.ack_deadline ? new Date(item.ack_deadline).toLocaleString("vi-VN") : "—"}</p>
         </>
       ) : <p role="status">Bạn đã xác nhận đã đọc và hiểu.</p>)}
@@ -76,22 +76,23 @@ export function AnnouncementInbox({ initialId = null, publicOnly = false }: { in
   return (
     <section className="space-y-3" aria-label="Thông báo">
       {!publicOnly && (
-        <div role="tablist" className="flex gap-2">
+        <div role="tablist" className="flex flex-wrap gap-2">
           {([["active", "Đang hiệu lực"], ["unread", "Chưa đọc"], ["all", "Tất cả"]] as [Filter, string][]).map(([value, label]) => (
-            <button key={value} role="tab" aria-selected={filter === value} onClick={() => setFilter(value)}>{label}</button>
+            <button key={value} role="tab" aria-selected={filter === value} onClick={() => setFilter(value)}
+              className="min-h-9 rounded-full border border-[var(--border-color)] px-4 text-sm aria-selected:border-[var(--color-primary)] aria-selected:bg-[var(--color-primary-subtle)] aria-selected:font-semibold">{label}</button>
           ))}
         </div>
       )}
       {error && <p role="alert">{error}</p>}
       {!error && items === null && <p role="status">Đang tải…</p>}
       {items !== null && items.length === 0 && <p>Chưa có thông báo nào.</p>}
-      <ul>
+      <ul className="space-y-2">
         {(items ?? []).map(item => (
-          <li key={item.id}>
-            <button onClick={() => setOpenId(item.id)} aria-label={item.title}>
+          <li key={item.id} className="campus-card p-3">
+            <button className="w-full text-left font-medium" onClick={() => setOpenId(item.id)} aria-label={item.title}>
               <PriorityBadge priority={item.priority} /> {!item.read && !publicOnly && <span className="campus-badge">Mới</span>} {item.title}
             </button>
-            <div>{item.issuer_unit} · hết hạn {new Date(item.expires_at).toLocaleDateString("vi-VN")}{item.requires_ack ? (item.acked ? " · Đã xác nhận" : " · Cần xác nhận") : ""}</div>
+            <div className="mt-1 text-xs text-[var(--text-secondary)]">{item.issuer_unit} · hết hạn {new Date(item.expires_at).toLocaleDateString("vi-VN")}{item.requires_ack ? (item.acked ? " · Đã xác nhận" : " · Cần xác nhận") : ""}</div>
           </li>
         ))}
       </ul>

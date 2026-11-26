@@ -27,7 +27,7 @@ const PAGES = {
 };
 if (process.argv.includes("--fseries")) {
   PAGES.student.push("/policy/simulator", "/services/procedures");
-  PAGES.owner.push("/knowledge/policy-rules", "/admin/features");
+  PAGES.owner.push("/knowledge/policy-rules", "/knowledge/policy-impact", "/admin/features");
 }
 const VIEWPORTS = { desktop: { width: 1360, height: 860 }, phone: { width: 390, height: 844 } };
 fs.mkdirSync(OUT, { recursive: true });
