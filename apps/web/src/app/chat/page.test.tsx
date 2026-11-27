@@ -8,6 +8,7 @@ import { FAILED_GUIDANCE } from "../../features/chat/sse";
 vi.mock("../../features/chat/ConversationHistory", () => ({ ConversationHistory: () => null }));
 
 beforeEach(() => {
+  vi.restoreAllMocks(); // spyOn reuses a live spy, so call history from an earlier test would carry over.
   window.history.replaceState(null, "", "/chat");
   window.localStorage.removeItem("campus247_token");
 });
