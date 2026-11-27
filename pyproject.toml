@@ -17,12 +17,12 @@ dependencies = [
     "pgvector==0.5.1",
     "redis==6.4.0",
     "httpx==0.28.1",
-    "openai==3.57.0",
+    "openai==3.58.0",
     "tiktoken==0.14.0",
     "tzdata==2026.6",
     "pypdf==6.21.4",
     "python-multipart==0.0.34",
-    "pdfplumber==0.11.10",
+    "pdfplumber==0.11.11",
     "cryptography==50.0.2",
     "pyjwt==2.15.1",
     "structlog==26.1.0",
@@ -34,7 +34,7 @@ dependencies = [
     "opentelemetry-instrumentation-httpx==0.66b2",
     "opentelemetry-instrumentation-sqlalchemy==0.66b2",
     "opentelemetry-instrumentation-redis==0.66b2",
-    "langfuse==4.17.0",
+    "langfuse==4.18.0",
     "numpy==2.5.5",
     "scikit-learn==1.9.1",
 ]
@@ -44,7 +44,7 @@ dev = [
     "pytest==9.2.0",
     "pytest-asyncio==1.5.0",
     "jsonschema==4.26.0",
-    "pyyaml==6.0.3",
+    "pyyaml==6.0.4",
     "pytest-mock==3.17.0",
     "pytest-benchmark==5.3.1",
     "locust==2.47.0",
@@ -69,7 +69,7 @@ namespaces = true
 
 [tool.campus247.dependency-approval]
 reference = "DIRECT-HUMAN-2026-11-27-PYTHON-UPDATES-001"
-candidate-lock-sha256 = "a18e8eba9212ad803a9d7d4d82b159105f4e7ecda5b069780be86adab5d62338"
+candidate-lock-sha256 = "bf93b531b7b15916eca11153820db99bcf64767c380430fdff4f5341e71af6ee"
 review = "tests/unit/dependency_resolution/dependency-review.json"
 
 

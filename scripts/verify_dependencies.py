@@ -22,12 +22,12 @@ RUNTIME = ">=3.12,<3.14"
 # Owner approval in chat on 2026-11-16: the 2026-11-03 candidate plus tzdata==2026.6 (pure data package, needed for time-zone
 # aware tests on Windows). Earlier reference: DIRECT-HUMAN-2026-11-03-STACK-002 (sha256 251e0a8f...ce46, 133 packages).
 APPROVAL_REFERENCE = "DIRECT-HUMAN-2026-11-27-PYTHON-UPDATES-001"
-APPROVED_CANDIDATE_SHA256 = "a18e8eba9212ad803a9d7d4d82b159105f4e7ecda5b069780be86adab5d62338"
+APPROVED_CANDIDATE_SHA256 = "bf93b531b7b15916eca11153820db99bcf64767c380430fdff4f5341e71af6ee"
 APPROVED_ADDITIONAL_PACKAGE_COUNT = 134
 # Owner approval in chat on 2026-11-21 ("Duyệt nâng cấp"): security updates only, the 2026-11-16 candidate with these
 # exact version changes and no added or removed package: pypdf 6.19.0->6.21.4, langgraph 1.2.12->1.2.14 (direct pins);
 # pillow 12.3.0->13.0.0, certifi 2026.7.22->2026.10.18, brotli 1.2.0->1.2.1, langgraph-sdk 0.4.5->0.4.6 (transitive).
-# Owner approval in chat on 2026-11-27: the Python minor/patch group of pull request #41 plus the OpenTelemetry security
+# Owner approvals in chat on 2026-11-27: the Python minor/patch group of pull requests #41 and #59 plus the OpenTelemetry security
 # update (1.45.0->1.45.2), whose instrumentation family moves the approved prerelease from 0.66b0 to 0.66b2.
 # See tests/unit/dependency_resolution/SECURITY_UPDATE_20261127.md.
 # Explicit human approval on 2026-10-05 for only these prereleases within the
