@@ -102,7 +102,8 @@ def test_a_signature_hit_rejects_and_names_the_signature_for_audit_only(tmp_path
     assert raised.value.code == "MALWARE_DETECTED" and raised.value.signature == "Pdf.Exploit.Test-1"
 
 
-@pytest.mark.parametrize("reply", [b"stream: Can't allocate memory ERROR\0", b"garbage\0", b""])
+# An empty reply (the daemon closed without a verdict) is "unavailable" and retried: see the dropped-connection test.
+@pytest.mark.parametrize("reply", [b"stream: Can't allocate memory ERROR\0", b"garbage\0"])
 def test_anything_that_is_not_a_verdict_fails_closed(tmp_path, reply):
     async def go():
         async with FakeClamd(reply=reply) as daemon:
@@ -157,7 +158,8 @@ def test_daemon_down_hang_and_dropped_connection_all_fail_closed(tmp_path):
         async with FakeClamd(drop=True) as daemon:
             await scanner(daemon.port).scan(sample(tmp_path))
 
-    for case, code in ((down, "SCANNER_UNAVAILABLE"), (hang, "SCANNER_UNAVAILABLE"), (drop, "SCANNER_ERROR")):
+    # A dropped connection is what a daemon reloading its database does: "unavailable", so a retry window retries it.
+    for case, code in ((down, "SCANNER_UNAVAILABLE"), (hang, "SCANNER_UNAVAILABLE"), (drop, "SCANNER_UNAVAILABLE")):
         with pytest.raises(ScannerUnavailable) as raised:
             run(case())
         assert raised.value.code == code, case.__name__

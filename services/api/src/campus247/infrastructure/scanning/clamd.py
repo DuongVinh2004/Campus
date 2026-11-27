@@ -229,6 +229,11 @@ class ClamdScanner:
                 await writer.wait_closed()
             except OSError:
                 pass
+        if not reply:
+            # The daemon closed the connection without a verdict (it drops connections while it reloads its database). On
+            # Windows that shows up either as a reset (OSError above) or as this empty read: both are "unavailable", retried
+            # inside the window, and never a verdict.
+            raise ScannerUnavailable("SCANNER_UNAVAILABLE")
         signature = parse_reply(reply)
         if signature is not None:
             raise ScanRejected("MALWARE_DETECTED", signature)
