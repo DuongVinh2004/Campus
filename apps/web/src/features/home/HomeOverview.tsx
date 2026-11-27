@@ -15,6 +15,8 @@ import {
 } from "../../components/Icons";
 import { CapabilityBanner, type SystemOperationalStatus } from "../operations/CapabilityBanner";
 import { AsyncState, type AsyncStatus } from "../../components/AsyncState";
+import { FeatureGate } from "../../lib/features";
+import { TodayTasks } from "../proactive/TodayTasks";
 
 export interface UserSession {
   isAuthenticated: boolean;
@@ -150,6 +152,7 @@ export default function HomeOverview(props: HomePageProps) {
     <div className="campus-home">
       {systemStatus && <CapabilityBanner status={systemStatus} />}
       <header className="campus-home-intro"><h1>{t("homex.20")}</h1><p>{t("homex.21")}</p></header>
+      {isAuthenticated && <FeatureGate feature="proactive.nudges"><TodayTasks /></FeatureGate>}
       <section className="campus-home-assistant" aria-labelledby="home-assistant-title">
         <h2 id="home-assistant-title"><SparklesIcon size={20} />{t("homex.22")}</h2>
         <form action="/chat" method="GET" role="search" aria-label={t("homex.23")}>

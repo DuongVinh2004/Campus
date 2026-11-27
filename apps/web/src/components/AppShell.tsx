@@ -4,12 +4,15 @@ import { clearLegacyLocalToken, sessionLoginHref } from "../features/chat/local-
 import { LearningSessionNotice, PreservedActivity, useLearningSession } from "../features/learning/learning-session";
 import { ChatDraftActor, chatDraftActorScope } from "../features/chat/route-drafts";
 import { useUnreadNotifications } from "../lib/use-unread-notifications";
+import { useNavEnabled } from "../lib/features";
+import { NAV_FEATURE } from "../lib/feature-registry.generated";
 
 import React, { type ReactNode, createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
   Bell,
+  Megaphone,
   BookOpen,
   Building2,
   Bot,
@@ -88,7 +91,10 @@ const knowledgeNavigation: NavigationItem[] = [
   { key: "rooms", label: "nav.rooms", href: "/rooms", icon: Building2, roles: ["student", "staff"] },
   { key: "staff", label: "nav.staffQueue", href: "/staff", icon: LayoutDashboard, roles: ["staff"] },
   { key: "notifications", label: "nav.notifications", href: "/notifications", icon: Bell, roles: ["student", "staff", "admin"] },
+  { key: "announcements", label: "nav.announcements", href: "/announcements", icon: Megaphone, roles: ["student", "staff", "admin"] },
+  { key: "announcementsManage", label: "nav.announcementsManage", href: "/announcements/manage", icon: Megaphone, roles: ["staff", "admin"] },
   { key: "admin", label: "nav.adminOverview", href: "/admin", icon: Settings2, roles: ["admin"] },
+  { key: "policySimulator", label: "nav.policySimulator", href: "/policy/simulator", icon: ShieldCheck, roles: ["student", "staff", "admin"] },
   { key: "knowledge", label: "nav.knowledgeSources", href: "/knowledge/sources", icon: BookOpen, roles: ["admin"] },
   { key: "privacy", label: "nav.privacy", href: "/privacy", icon: ShieldCheck, roles: ["student", "guest", "admin"] },
 ];
@@ -201,7 +207,7 @@ export function AppShell({
       .catch(() => { if (active) setLocalActor(previous => checkSessionOnResume && previous ? previous : null); });
     return () => { active = false; };
   }, [operational, checkSessionOnResume]);
-  const navItems = operational ? knowledgeNavigation.filter(item => item.roles.includes(userRole)) : isPublic
+  const allNavItems = operational ? knowledgeNavigation.filter(item => item.roles.includes(userRole)) : isPublic
     ? publicNavigation
     : navigation
         .filter((item) => item.roles.includes(userRole))
@@ -212,6 +218,9 @@ export function AppShell({
             ? { ...item, href: "/knowledge/sources" }
             : item
         );
+  // A feature switched off by an administrator (F0) disappears from the menu; external links stay.
+  const navEnabled = useNavEnabled(NAV_FEATURE);
+  const navItems = allNavItems.filter(item => (item as { external?: boolean }).external || navEnabled(item.key));
 
   useEffect(() => {
     setMobileOpen(false);

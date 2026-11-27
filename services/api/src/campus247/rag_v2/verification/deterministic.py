@@ -7,6 +7,7 @@ import unicodedata
 from collections.abc import Mapping
 
 from campus247.rag_v2.generation.contacts import restore
+from campus247.rag_v2.ingest.units import heading_text
 from campus247.rag_v2.scope_ranges import covers
 from campus247.rag_v2.types import Statement, StatementVerdict, Unit
 
@@ -38,6 +39,22 @@ CODE = re.compile(
 # check and rejected correct statements.
 NEGATIVE = re.compile(r"\b(?:khong|chua|cam)\b")
 EXCEPTION = re.compile(r"\b(?:ngoai\s+tru|tru)\b")
+# The negators and the exception word as written with their diacritics. Folding makes other words look like them:
+# "chứa đựng" -> "chua", "cầm" -> "cam", "lưu trữ" / "nội trú" / "trụ sở" -> "tru".
+_POLARITY_WORDS = {"khong": "không", "chua": "chưa", "cam": "cấm", "tru": "trừ"}
+
+
+def _polarity_fold(text: str) -> str:
+    """Fold for the negation check, keeping a word that folds to a negator but is written with other diacritics apart from it.
+
+    A word written without diacritics ("khong", "chua") still counts as the negator: the text cannot tell, so it stays strict.
+    """
+    def keep_apart(match: re.Match) -> str:
+        word = match.group().casefold()
+        folded = _fold(word)
+        negator = _POLARITY_WORDS.get(folded)
+        return folded + "_" if negator and word not in (folded, negator) else match.group()
+    return _fold(re.sub(r"\w+", keep_apart, unicodedata.normalize("NFC", text)))
 
 
 def _number(value: str) -> str:
@@ -223,6 +240,18 @@ def _polarity_mismatch(statement: str, source: str) -> bool:
 
     statement, source = plain(statement), plain(source)
 
+    def listed_after(negator: str, after: str) -> bool:
+        """"Không: nói chuyện, ..., sử dụng điện thoại di động": a negator before a colon governs every item of its list,
+        so "không được sử dụng điện thoại" restates it. The item must stand in that list, before the sentence ends."""
+        words = after.split()
+        if words[:1] == ["duoc"]:
+            words = words[1:]
+        if len(words) < 2:
+            return False
+        item = r"(?<!\w)" + re.escape(" ".join(words[:2])) + r"(?!\w)"
+        return any(re.search(item, plain(listed.group(1))) for listed in
+                   re.finditer(r"(?<!\w)" + re.escape(negator) + r"\s*:\s*([^.;!?\n]+)", raw_source))
+
     def strict_mismatch(p) -> bool:
         supporting_text = plain(_supporting_sentences(statement, raw_source))
         stated, supporting = Counter(p.findall(statement)), Counter(p.findall(supporting_text))
@@ -233,6 +262,8 @@ def _polarity_mismatch(statement: str, source: str) -> bool:
         # The statement spans clauses ("...; hoặc quá 4 lần không liên tiếp ...") that the sentence split put
         # apart: an extra negator is fine when the same negator and the word after it stand in the row.
         for match in p.finditer(statement):
+            if listed_after(match.group(), statement[match.end():]):
+                continue   # "không được dùng A và không được dùng B" restates "Không: A, B" item by item
             tail = re.match(r"(?:\s+\w+){1,3}", statement[match.end():])
             first = re.match(r"\s+\w+", statement[match.end():])
             if not tail or not first or not re.search(
@@ -248,7 +279,10 @@ def _polarity_mismatch(statement: str, source: str) -> bool:
 
     if len(source) <= STRICT_SOURCE_CHARS and any(strict_mismatch(p) for p in patterns):
         return True
-    if any(Counter(p.findall(statement)) - Counter(p.findall(source)) for p in patterns):
+    def unlisted(p) -> Counter:
+        # Negators that repeat the one in front of a colon list for each of its items are not added negators.
+        return Counter(m.group() for m in p.finditer(statement) if not listed_after(m.group(), statement[m.end():]))
+    if any(unlisted(p) - Counter(p.findall(source)) for p in patterns):
         return True
     for pattern in patterns:
         # A negator of the statement must govern the same words in the row.
@@ -256,7 +290,8 @@ def _polarity_mismatch(statement: str, source: str) -> bool:
             first = re.match(r"\s+\w+", statement[match.end():])
             # The first word after the negator is enough: abbreviations ("học phần" / "HP") follow it.
             if first and not re.search(
-                    r"(?<!\w)" + re.escape(match.group()) + re.escape(first.group()) + r"(?!\w)", source):
+                    r"(?<!\w)" + re.escape(match.group()) + re.escape(first.group()) + r"(?!\w)", source) \
+                    and not listed_after(match.group(), statement[match.end():]):
                 return True
         for match in pattern.finditer(source):
             tail = re.match(_TAIL, source[match.end():])
@@ -286,19 +321,24 @@ def check_statement(stmt: Statement, units_by_id: Mapping[str, Unit]) -> Stateme
     text = restore(stmt.text, units)
     if text is None or not text.strip():
         return StatementVerdict(stmt, False, ("UNIT_NOT_CITED",))
-    source = "\n".join(unit.text for unit in units)
+    # A unit's section headings are part of its source (the semester of a curriculum row is a heading, not row text).
+    bodies = [(heading_text(unit) + "\n" + unit.text) if heading_text(unit) else unit.text for unit in units]
+    source = "\n".join(bodies)
     reasons = []
     if not _dates(text) <= _dates(source) or not _day_months(text) <= _day_months(source):
         reasons.append("DATE_NOT_IN_SOURCE")
-    if not _codes(text) <= _codes(source):
+    # A cohort the source covers by a range ("K69" under "K70 trở về trước" / "K70_and_earlier") is stated by the source.
+    ranged = source.replace("_and_earlier", " trở về trước")
+    unstated = {code for code in _codes(text) - _codes(source) if not (re.fullmatch(r"k\d{2,3}", code) and covers(ranged, code))}
+    if unstated:
         reasons.append("CODE_NOT_IN_SOURCE")
     # Dates are compared as dates above; their digits are not stray numbers.
     numbers = {_number(m.group()) for m in NUMBER.finditer(_value_text(_without_dates(text)))}
-    source_numbers = {_number(m.group()) for unit in units
-                      for m in NUMBER.finditer(_value_text(_without_dates(unit.text)))}
+    source_numbers = {_number(m.group()) for body in bodies
+                      for m in NUMBER.finditer(_value_text(_without_dates(body)))}
     # Digits glued to letters in the source ("INT1234") are still the number the statement states.
-    source_numbers |= {_number(m.group()) for unit in units
-                       for m in re.finditer(r"\d+(?:[.,]\d+)*", normalized(_without_dates(unit.text)))}
+    source_numbers |= {_number(m.group()) for body in bodies
+                       for m in re.finditer(r"\d+(?:[.,]\d+)*", normalized(_without_dates(body)))}
     source_semesters = _semesters(source)
     source_numbers |= {str(n) for n in source_semesters}   # "học kỳ II" supports "học kỳ 2"
     percent = r"(\d+(?:[.,]\d+)?)\s*(?:%|phần trăm)"
@@ -315,7 +355,8 @@ def check_statement(stmt: Statement, units_by_id: Mapping[str, Unit]) -> Stateme
     # must not count as a negator of every sentence taken from the document.
     polarity_source = "\n".join(unit.text.replace(unit.doc_title, " ", 1) if unit.doc_title else unit.text for unit in units)
     # Never stricter than before: a statement fails only when it fails against the full text and also without the title.
-    if _polarity_mismatch(_fold(text), _fold(source)) and _polarity_mismatch(_fold(text), _fold(polarity_source)):
+    if (_polarity_mismatch(_polarity_fold(text), _polarity_fold(source))
+            and _polarity_mismatch(_polarity_fold(text), _polarity_fold(polarity_source))):
         reasons.append("NEGATION_MISMATCH")
     if _scope_mismatch(text, units):
         reasons.append("SCOPE_MISMATCH")

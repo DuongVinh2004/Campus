@@ -85,6 +85,10 @@ async def test_v2_graph_to_existing_final_result_with_exact_unit_quote():
     assert citation["chunk_id"] == stack.row["chunk_id"]
     assert citation["source_id"] == stack.row["source_id"] and citation["locator"]["page_start"] == 1
     assert len(stack.authorizations) == 1
+    # F4.1: the same answer also carries what each statement was checked against, for the evidence receipt.
+    assert final.evidence["statements"] == [c.text for c in state.draft.grounded_claims]
+    assert final.evidence["checks"][0]["deterministic"] == "PASSED" and final.evidence["checks"][0]["unit_ids"] == [citation["unit_id"]]
+    assert final.evidence["rejected_counts"] == {}
 
 
 @pytest.mark.asyncio
@@ -92,6 +96,7 @@ async def test_partial_note_is_rendered_once_and_no_invalid_claim_escapes():
     stack = setup(gateway=FakeGateway(drafts=[[TEXT, "Nộp 999 hồ sơ."]]))
     final = prepare_chat_result(await stack.workflow.arun(stack.turn, retrieval_context=context()))
     assert final.response_class == "partial_answer" and "999" not in final.content
+    assert sum(final.evidence["rejected_counts"].values()) == 1 and "999" not in json.dumps(final.evidence["rejected_counts"])
     assert final.content.count("Mình chỉ xác minh được") == 1 and final.citations
 
 

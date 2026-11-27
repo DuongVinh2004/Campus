@@ -1,0 +1,169 @@
+# Tiến độ thực thi đợt F-series (nhánh `feat/f-series-20261126`)
+
+Cập nhật lần cuối: 26/11/2026 (lượt 2). Mỗi gói con ghi trạng thái: XONG (đã chạy kiểm trong lượt làm), ĐANG LÀM, CHƯA LÀM, BỊ CHẶN.
+Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả năng dùng với người dùng thật chưa đo.
+
+## Quyết định ghi lại khi làm
+
+- Tên route admin cờ dùng dấu `/` thay dấu `:` để khớp FastAPI: `POST /v1/admin/features/{key}/preview`, `POST /v1/admin/features/confirm`, `GET /v1/admin/features/audit`.
+- Token xác nhận của F0 là HMAC-SHA256 của `preview_id|actor|payload_hash` (khóa `CONFIRMATION_SIGNING_KEY`), không dùng `ConfirmationTokenService` vì lớp đó gắn với `ActionPreviewValue` (phiên, hội thoại). Cùng nguyên tắc: gắn người, nội dung, hết hạn 10 phút, dùng một lần.
+- Gate chạy BÊN TRONG middleware danh tính (thêm trước `IdentityMiddleware` trong `create_app`), nên thấy được người gọi; `operational_boundary` của runtime 8015 vẫn là lớp ngoài cùng.
+- Job nền được gắn cờ bằng `run_gated` (dừng task khi cờ tắt, chạy lại khi bật) thay vì sửa chữ ký từng `run_*`.
+- `/v1/auth/oidc*` vẫn nằm trong `BLOCKED_LEGACY_API_PREFIXES` của `runtime_routes.py` (quyết định có sẵn của chủ dự án): cờ `identity.oidc` có sẵn nhưng route vẫn bị chặn ở lớp ngoài; không đổi ở đợt này.
+- Trang `knowledge/policy-graph` bị tắt mặc định theo §5.6 của tài liệu F0 (`knowledge.policy_graph` = tắt); G-PG bật lại.
+- Tick `crawl` và `auto_publication` chạy trong tiến trình worker ingest riêng (không phải API); cờ của chúng hiện chỉ có tác dụng ở API (route), chưa dừng tick trong worker.
+- Tiền tố route F2/F3 theo registry đã có: mô phỏng ở `/v1/policy-simulator/*`, soạn luật ở `/v1/policy-rules/*`, tác động `/v1/policy-impact/*`, mâu thuẫn `/v1/policy-conflicts` (khác tài liệu thiết kế dùng `/v1/policy/*`, để cờ gate khớp tiền tố).
+- Phụ thuộc cờ `policy.rules`, `policy.impact`, `policy.conflicts` đổi từ `policy.graph_v2` sang `knowledge.sources`: luật và ảnh chụp trích thẳng đơn vị v2, không cần đồ thị. `policy.simulator` vẫn phụ thuộc `policy.rules`.
+- F5: ticket được tạo bằng `submit_ticket` với khóa idempotency `procedure-run:<run_id>` rồi mới cập nhật phiên sang `SUBMITTED` (hai giao dịch, an toàn khi lặp lại), khác tài liệu muốn chung một giao dịch.
+- F2.8: luật do mô hình soạn từ quy chế đã phát hành, code kiểm nguyên văn; chưa qua duyệt của cán bộ trên giao diện (chưa có trang quản trị luật). Mọi tính năng mới mặc định TẮT.
+
+## Bảng gói con
+
+| Gói | Trạng thái | Commit | Bằng chứng / ghi chú |
+|---|---|---|---|
+| F0.1 registry + resolution | XONG | 354ee37 | `tests/features/test_feature_service.py` |
+| F0.3 store + service + profile | XONG | 354ee37 | cùng tệp; lan truyền ≤ 2,5 s kiểm bằng đồng hồ giả |
+| F0.2 sổ cờ + quét route/trang | XONG | 354ee37 | `tests/features/test_feature_gate.py` (mỗi route phục vụ và mỗi trang thuộc một cờ) |
+| F0.4 gate middleware + trang | XONG | 354ee37 | ma trận tắt theo từng cờ có tiền tố API |
+| F0.5 job / tool / pipeline | XONG (trừ tick worker ingest) | xem log | `run_gated`, `ToolRegistry` ẩn tool tắt, `answer_cache`/`verbatim` đọc qua `features.runtime`; `tests/features/test_feature_tools.py` |
+| F0.6 API admin | XONG | 354ee37 | `tests/features/test_feature_admin_api.py` |
+| F0.7 web | XONG | xem log | vitest `features.test.tsx` (4), `FeatureFlagsPanel.test.tsx` (3); `tsc --noEmit` sạch; nav lọc trong AppShell (chỉ stage phần của tôi, phần dở của chủ dự án để nguyên) |
+| F0.8 quan sát + acceptance | XONG (trừ kịch bản tắt rooms) | 4b2746c | ô "Cờ tính năng" trên trang vận hành (số cờ tắt, ghi đè, cần khởi động lại; cảnh báo ghi đè hết hạn trong 24 giờ; nghiêm trọng khi kho cờ lỗi), `summary().expiring_soon`; test 14 + vitest. web_acceptance kiểm các trang tắt cờ phải 404. CHƯA: kịch bản tắt riêng `rooms` trong web_acceptance. |
+| F1.1 domain | XONG | fcc1362 | `domain/announcements.py`; `tests/announcements/test_announcements_flow.py` |
+| F1.2 danh bạ + gold 40 bộ | XONG | fcc1362 | `test_audience_gold_and_perf.py`: 40/40 bộ trùng truy vấn SQL tham chiếu độc lập |
+| F1.3 lưu trữ + phát theo lô | XONG | fcc1362 | bảng `ann_*` trong campus-ops.sqlite3; tiêm lỗi 11 điểm + giữa lô: mỗi người đúng 1 delivery + 1 thông báo; 30 000 người trong 1,6 s (`evals/results/announcements-20261126/perf.json`) |
+| F1.4 API | XONG | fcc1362 | `test_announcements_api.py`; đổi `PUT /{id}` thành `PUT /{id}/draft` (để cờ tách route soạn và route đọc) |
+| F1.5 job + cờ | XONG | fcc1362 | 4 job qua `run_gated`; hẹn giờ ≤ 60 s kiểm bằng đồng hồ giả |
+| F1.6 đồng bộ kho tri thức | MỘT PHẦN (chưa nối: cần quyết định về luồng nhận tài liệu) | — | `KnowledgePlatform.upload` là luồng async có `IntakeMetadata`, duyệt và phát hành riêng; nối thông báo vào đó đổi luồng tri thức nên chưa làm. `AnnouncementService` có móc `knowledge_sync.publish/revoke`, test thu hồi/hết hạn bằng bản giả; CHƯA nối adapter vào `KnowledgePlatform.upload()` và chưa có test RAG provider giả |
+| F1.7 web | XONG phần quản lý | d6bfe53 | hộp thư, chi tiết, soạn có đếm người nhận; trang quản lý: số liệu đã gửi/đọc/xác nhận theo khoa/khóa (nhóm < 5 gộp), thu hồi qua xem trước → xác nhận, hàng chờ duyệt (duyệt; từ chối phải có ghi chú); vitest 7. CHƯA: sửa thông báo đã gửi (revision) trên giao diện, thẻ trang chủ, nút trong học liệu. |
+| F1.8 tool chat | CHƯA LÀM | — | |
+| F4.0 provider phát lại | THAY BẰNG CÁCH KHÁC | e22f560 | không có sổ ghi phản hồi provider trong repo nên không dựng được bằng chứng phát lại; thay bằng 3 bằng chứng: (1) F4.1 chỉ thêm trường, test `tests/rag_v2/test_outcome_checks.py` chứng minh kind/text/statements/citations/partial_note giống hệt khi bỏ hai trường mới; (2) tập test lỗi trước và sau thay đổi trùng nhau (95 lỗi + 47 lỗi cấu hình, đều do môi trường thiếu `pdfplumber`…); (3) `tests/rag_v2/test_graph_integration.py` (graph thật) vẫn đạt. Cổng `rag_regression_gate.py run --quick` với provider thật CHƯA chạy (tốn chi phí, cần bạn đồng ý) |
+| F4.1 `checks`/`rejected_counts` trong Outcome | XONG | 1149130 | `rag_v2/types.py` (`StatementCheck`, 2 trường mới có mặc định), `outcome/compose.py` tính tại `build_outcome`, `DraftResponse.claim_checks/rejected_counts`; không đổi quyết định, ngưỡng, prompt, model, chỉ mục |
+| F4.2 support_spans + biên nhận + API | XONG | 1149130 | thêm `FinalChatResult.evidence` (chỉ trong bộ nhớ) → `application/answer_evidence/record.py` ghi biên nhận sau khi lưu tin nhắn, lỗi kho không làm hỏng câu trả lời (test `test_failing_receipt_store_never_breaks_the_answer`); thêm `GET /v1/answer-receipts/by-message/{conversation}/{message}`; ghi biên nhận chỉ chạy khi cờ `chat.evidence_receipts` bật; đoạn đỡ: 200 cặp máy sinh, ≥ 99 % đoạn chứa đủ số |
+| F4.3 giao diện bằng chứng | XONG (đoạn đỡ theo nguồn, không theo từng ý) | 1149130, b0d1b00 | dòng "n ý đã kiểm · m ý bị loại" + nút "Xem biên nhận" (hộp thoại: thời điểm, bản phát hành, từng ý với huy hiệu chữ + `aria-label`, từng nguồn với trạng thái hiện tại bằng chữ); mã lý do bằng chữ chỉ cho SUPPORT_OFFICER/KNOWLEDGE_ADMIN (máy chủ trả `show_reason_codes`, D5); ngăn nguồn tô `<mark>` các số liệu của câu trả lời trong đoạn trích; cảnh báo ý bị loại tăng > 2× trung bình 7 ngày (≥ 5) trên trang chất lượng. Khác tài liệu: biên nhận không lưu văn bản từng ý nên không tô được "đoạn đỡ cho ý 2"; tô theo số liệu trong từng nguồn. |
+| F4.4 số đo trang chất lượng | XONG | e22f560 | bảng `verification_counts` (ngày × loại, chỉ số đếm), bộ quan sát `attach_verification_recording`, `GET /v1/knowledge/answer-quality/verification`, thẻ "Kiểm chứng câu trả lời" trên `/knowledge/quality`; cảnh báo tăng gấp đôi chưa làm |
+| F6.1 domain/chính sách | XONG | xem log | `application/proactive/engine.py`; mức gấp, stage, giờ yên lặng (21:59/22:00/06:59/07:00), trần 3/ngày, khóa idempotency |
+| F6.2 provider nguồn có sẵn | XONG trừ TRACKED_ITEM | 3eda8c0 | EXAM, TICKET_NEED_INFO, EXIT_TICKET_CLOSING (phiếu ra lớp đang mở, chưa trả lời; không nhắc giảng viên), PRACTICE_DUE (câu ôn quá hạn SM-2, một nhắc mức LOW mỗi bộ và ngày); hai loại học liệu đọc kho SQLite học liệu chỉ-đọc (kho Postgres chưa có). CHƯA: TRACKED_ITEM (chưa có `assistant.tracking`). |
+| F6.3 provider nguồn mới | XONG trừ POLICY_CHANGE | 3eda8c0 | ANNOUNCEMENT_ACK, ANNOUNCEMENT_URGENT_UNREAD, PROCEDURE_DRAFT (hồ sơ thủ tục sửa được, để yên 3 ngày, chưa hết hạn); test 20. CHƯA: POLICY_CHANGE (cần F3.7 biết ai bị ảnh hưởng). |
+| F6.4 job + bản tin + chuyển giao + mô phỏng | XONG | xem log | mô phỏng 14 ngày × 40 sinh viên khớp oracle độc lập 100 % (so từng khóa và giờ gửi); khởi động lại mỗi phút ngày đầu: cùng tập nhắc, không đôi; 30 000 người trong một lượt (`evals/results/proactive-20261126/perf.json`); job nhắc thi cũ dừng khi `proactive.nudges` bật |
+| F6.5 API + web | MỘT PHẦN | xem log | API `/v1/nudges/*` có test (done/snooze/restore/tùy chọn/404 người lạ); khối "Việc cần làm" trên trang chủ (Xong / Hoãn 1 ngày) đã có, sau cờ `proactive.nudges`, vitest 2 + `HomeOverview` đạt; CHƯA có mục tùy chọn nhắc trên giao diện |
+| G-PG.1 đọc đơn vị v2 | XONG | 6ad64a4 | `infrastructure/knowledge/rag_v2_units.py` (văn bản nguyên văn, đường dẫn, release/binding); dùng cho luật, thủ tục, ảnh chụp F3 |
+| G-PG.2/G-PG.3 đồ thị v2 + nối 8015 | CHƯA LÀM | — | đồ thị (`/v1/policy-graph`) vẫn ẩn trên v2; F2 và F3 được làm độc lập với đồ thị (luật trích thẳng đơn vị v2), nên không bị chặn |
+| F2.1 từ vựng biến, ngôn ngữ luật, parser biểu thức | XONG | f723dda | `config/policy/variables.toml` (24 biến), `domain/policy_rules/{variables,rule}.py`; không dùng `eval` |
+| F2.2 bộ đánh giá ba trị, chọn luật, ngoại lệ, ngưỡng | XONG | f723dda | `domain/policy_rules/engine.py`; 14 test gồm bảng Kleene, đơn điệu và ba-trị bằng vòng lặp có seed, p95 < 50 ms |
+| F2.3 kho luật, nháp → duyệt → phát hành, `STALE` | XONG | 6ad64a4 | `sqlite_policy_rules.py` + `application/policy_rules/service.py`; preview/confirm HMAC, idempotency, audit, bản cũ `RETIRED` vẫn tra được; job `policy_rule_staleness` |
+| F2.4 vector tự sinh + gold | MỘT PHẦN | 6ad64a4 | vector BOUNDARY/COMBINATORIAL so với oracle độc lập (`verify.py`); gold 316 ca (6 chủ đề, 40–81 ca mỗi chủ đề) viết từ câu chữ quy chế, span do code kiểm, khớp 100 %; gold do chính mô hình viết luật tạo, chưa độc lập với người; báo cáo ở `evals/results/policy-rules-20261126/` |
+| F2.5 API | XONG | 6ad64a4 | `/v1/policy-simulator/{topics,form,evaluate,what-if}` (cờ `policy.simulator`) và `/v1/policy-rules/*` (cờ `policy.rules`); 30 lượt/phút/người; đầu vào không lưu, chỉ đếm theo (ngày, chủ đề, kết quả) |
+| F2.6 giao diện | XONG | d367d7e, b4a6462 | `/policy/simulator`; trang quản trị `/knowledge/policy-rules` (cờ `policy.rules`): luật với trạng thái bằng chữ + cảnh báo luật cần rà lại, bản nháp với kết quả kiểm tự động, sửa JSON, phán quyết người duyệt (ghi chú ≥ 8 ký tự), công bố/ngừng qua xem trước → xác nhận; API mới `GET /v1/policy-rules/drafts/{id}`, `GET /v1/policy-rules/rules/{id}`; test 107 + vitest 4; trên 8015 chủ dự án thấy danh sách luật. |
+| F2.7 nối vào chat | XONG (thẻ gợi ý, không đổi agent) | 9e716cd | `POST /v1/policy-simulator/match`: chủ đề theo từ chung; giá trị chỉ lấy khi con số đứng cạnh từ đơn vị chỉ ứng với đúng một biến (nếu nhiều biến cùng đơn vị thì không đoán); thẻ "Kiểm tra điều kiện" dưới câu hỏi mới nhất, giá trị chuyển sang trình mô phỏng qua `sessionStorage`, không đặt lên URL. Agent/RAG không bị đổi |
+| F2.8 mã hóa ≥ 5 chủ đề thật | XONG | 6ad64a4 | 6 chủ đề từ Quy chế đào tạo HUCE (QĐ 1486): nghỉ học quá 20 % (Điều 9.3), đạt học phần (9.4), cảnh báo học tập (11.1), buộc thôi học (11.2), điều kiện tốt nghiệp (13.1), giảm hạng tốt nghiệp (13.3); mọi `quote` là chuỗi con nguyên văn, hằng số có trong `quote` (code kiểm qua `scripts/policy_rules_seed.py --check`). Chưa có cán bộ duyệt trên giao diện; cờ `policy.simulator` mặc định tắt |
+| F3.1/F3.2 ảnh chụp theo release, so khác, phân loại | XONG | 4190d62 | `domain/policy_impact/diff.py`; 64 cặp đột biến có nhãn đạt 100 % (≥ 99 % yêu cầu), cả chỉ mục 9 071 đơn vị so khác ≪ 60 s; lưu `<STATE>/release-units/<release>.jsonl.gz` atomic, giữ 20 release |
+| F3.3 phụ thuộc | MỘT PHẦN | 4190d62 | luật F2 và ca eval (`gold_unit_ids`) có; CHƯA có nút đồ thị, thông báo F1, FAQ dựng sẵn, nhóm bị ảnh hưởng (F3.7) |
+| F3.4/F3.5 mâu thuẫn tất định | XONG | 4190d62 | `domain/policy_impact/conflicts.py`: 20 mâu thuẫn tìm đủ, 20 ca nhiễu 0 dương tính giả; API `GET /v1/policy-conflicts` |
+| F3 API + job | XONG | 4190d62 | `/v1/policy-impact/{releases,report,snapshot,analyze}` (chỉ quản trị), job `impact_snapshot` |
+| F3.6–F3.8 (mâu thuẫn có model, báo người dùng, soạn thông báo, giao diện) | MỘT PHẦN: giao diện | f2f4b2e | trang `/knowledge/policy-impact` (cờ `policy.impact`, mâu thuẫn dưới `policy.conflicts`): chụp + phân tích bản phát hành, đoạn đổi theo mức, số cũ → mới, luật và ca kiểm cần rà, mâu thuẫn dữ kiện với hai đoạn trích; vitest 2. CHƯA: kiểm mâu thuẫn bằng model (F3.6), báo người đã hỏi (F3.7), soạn thông báo từ thay đổi. |
+| F5.1–F5.5 playbook + máy trạng thái + API + hết hạn | XONG (không có bước model) | 08d2ff3 | 3 thủ tục `config/procedures/*.toml` (giấy xác nhận, phúc khảo, nghỉ học tạm thời có kiểm tra điều kiện dẫn nguyên văn Điều 14.1.d); preview → confirm → đúng 1 ticket; nhận diện và tách trường tất định, mọi giá trị phải có trong câu; 9 test |
+| F5.6/F5.7 nối chat và giao diện | XONG (không có tool cho model) | 9e716cd, 262001f | thẻ "Làm thủ tục cùng trợ lý"; trang `/services/procedures` + "Thủ tục của tôi" (dở trước, "Làm tiếp", mã hồ sơ đã gửi); trên 8015 đã gửi thật một hồ sơ tạo đúng một phiếu (HS-2026-000213, xác nhận lặp không tạo phiếu thứ hai); giới hạn 10 lần bắt đầu/ngày được báo cho sinh viên. CHƯA: tool `procedure.suggest/status` cho model, follow-up do model soạn. |
+| F7.1 BKT, F7.4 bộ lọc gợi ý + gợi ý mẫu | XONG, đã sửa 3 lỗ lọt đáp án | b744094, 5c6072a, fe2c38f | `domain/learning/{mastery,tutor_hints}.py`. Kiểm lại phát hiện: (1) đáp án ngắn < 4 chữ ("Nén") lọt; (2) số dính đơn vị ("180TC") lọt; (3) "01" = 1 lọt; đoạn trích chưa bị kiểm như gợi ý. Đã sửa: so số theo giá trị, từ ngắn theo ranh giới từ, kiểm cả đoạn trích, mẫu tất định không trích câu lộ đáp án. Test cũ chấp nhận đoạn trích chứa đáp án đã được sửa theo đúng tài liệu (§6.4). |
+| F7.2/F7.3/F7.5/F7.6 lưu trữ, API, giao diện | XONG | 5c6072a, 840b1c8, b6c3f48 | Migration `0033` (chủ dự án duyệt hash 26/11; ghi trong `infra/local/rag-fixture/fixture.py`), chạy thật trên CSDL Postgres tạm cùng 0032 (4 test đạt; CSDL tạm bị xóa sau test). Khái niệm (giảng viên tạo, model đề xuất → `PROPOSED` chờ duyệt), BKT cập nhật trong giao dịch ghi lượt làm (cờ `learning.mastery_map`), phiên ôn đưa khái niệm yếu lên trước, "Mức nắm vững của tôi", bản đồ lớp + CSV ẩn khi < 5 sinh viên, cài đặt gia sư theo lớp, thang gợi ý 1–3 (model chỉ với nguồn được phép, trần 30/ngày/SV và 500/ngày, 6 lượt/câu), khi bật gia sư thì lần sai chưa tới ngưỡng không lộ đáp án. Hợp đồng OpenAPI thêm 10 thao tác. Eval provider thật (`evals/results/tutor-20261126`, 100 câu điền số do máy sinh từ chỉ mục v2, đáp án kiểm bằng code): qua bộ lọc ngay lần đầu 94,4 % (≥ 80 %), 198 gợi ý model được hiện, 0 lộ đáp án, 0 trích sai nguyên văn (bỏ qua khoảng trắng; 196/198 khớp từng ký tự), 2 trang bị chính sách egress chặn → mẫu; 209 lượt gọi. Lần 1 và 2 giữ làm bằng chứng lỗi. CHƯA đo: tác dụng học tập với sinh viên thật; xu hướng 14 ngày trên bản đồ (chưa lưu lịch sử p_known); 8015 chưa bật lớp ôn tập nào (`practice_offerings` trống trong cấu hình local). |
+| F8.1 API ảnh → chữ | XONG (engine thật) | 02744f6, 5fe527c | Không tải gì mới: dùng bộ Tesseract 5 + `vie` đã ghim hash của OCR học liệu, chạy trong WSL + bubblewrap (không mạng, giới hạn RAM/CPU/thời gian, sở hữu cây tiến trình). Test thật (opt-in `CAMPUS247_INPUT_OCR_NATIVE=1`): ảnh 3 dòng tiếng Việt đọc đúng 24/24 từ, độ tin cậy 0,963. Bật trên runtime bằng `CAMPUS247_INPUT_OCR_WSL_RUNTIME=.tooling/learning-ocr-native-20261117-01`. |
+| F8.2/F8.3 giao diện ảnh, đọc to | XONG (đã gắn chat) | 9e716cd | `ChatPanel.tsx`: `ImageInput` dưới ô soạn (cờ `input.image`), `ReadAloud` ở thanh công cụ mỗi câu trả lời (cờ `output.read_aloud`); chữ từ ảnh chỉ gửi sau khi người dùng sửa và bấm Gửi |
+| F8.4–F8.6 giọng nói | XONG | 5f83505 | Chủ dự án đồng ý tải 26/11: `faster-whisper` 1.1.1 (venv riêng `.tooling/asr-20261126`, khóa `infra/asr/requirements.lock.txt`), mô hình `Systran/faster-whisper-small` (MIT, ghim commit + SHA-256), bộ kiểm FLEURS vi dev (CC-BY 4.0, SHA-256). `scripts/serve_asr.py` trên 18083 (loopback, token nội bộ, cổng RAM asr_mb 700 + 500 MB, nạp lười, gỡ sau 10 phút rảnh, âm thanh không lưu), `POST /v1/input/voice:transcribe` (30 lần/ngày/người), `VoiceInput` (ghi ≤ 60 s, sửa rồi mới Gửi). D6b (100 câu FLEURS, giọng người thật đọc, bản chép của người): beam 5 WER 18,96 %, RTF p95 0,593; qua WebM/Opus 32 kbit/s WER 19,32 %, RTF p95 0,566 (ngưỡng ≤ 20 %, ≤ 1,5). CHƯA đo: câu hỏi kiểu học vụ của người dùng thật; micro thật trên trình duyệt (test dùng bộ ghi giả). |
+
+- Trang động `[id]` không chạy được trên 8015 vì `runtime_routes.page_routes()` liệt kê trang tĩnh; chi tiết thông báo dùng `/announcements?id=`.
+
+## Lượt 5 (27/11): kiểm định lại chất lượng RAG, tính năng cốt lõi và giao diện
+
+Chủ dự án duyệt làm theo đề xuất tốt nhất, không hỏi lại. Mỗi lỗi RAG dưới đây được tìm bằng cách hỏi lại các câu cổng chấm chưa tốt rồi truy vết trong tiến trình bằng mô hình thật của runtime (`evals/runners/rag_trace_one.py`); sửa theo nguyên nhân chung, không sửa theo từng câu.
+
+- **Nguyên nhân gốc đã sửa:**
+  - `0329099`: phần còn thiếu được tìm bằng chính chữ của nó trong tài liệu đang dùng; tiêu đề mục là căn cứ; tên ngành ghép và viết tắt ("QLĐT"); khóa không có trong nguồn (K74); hỏi lại một lần khi câu đã nêu chủ đề.
+  - `3920496`: bỏ dấu biến "Chứa đựng" thành "chua", bị đọc là phủ định "chưa", làm câu "thẻ sinh viên được cấp sau khi nhập học" bị loại. Tương tự với "cầm", "lưu trữ", "nội trú". Ngoài ra, "Không: A, B, C" nay phủ định cả danh sách (câu hỏi laptop/điện thoại trong phòng máy).
+  - `c94b03b`: bước kiểm ngữ nghĩa loại dòng "K70 trở về trước" khi người hỏi K69. Đo 4 lần mỗi kiểu: 0/4 → 4/4, còn câu sai khóa vẫn 0/4.
+  - `bb87069`: 72 trang nhãn "71CS / Học phần tiên quyết:" giống hệt nhau chiếm hết 12 chỗ, đẩy dòng "Học máy" xuống thứ 13. Nay trang nhãn xếp sau, không bị ghim lại, và dòng được gói riêng.
+  - `1f4b8a3`: "quy định này" do router viết lại được coi là chưa nêu chủ đề (một câu holdout tụt ở gate 013947).
+  - `fced6b5`: câu có/không về hình thức nguồn không nhắc ("thích ứng") trả `no_source`.
+  - `033a5c5`: khóa nằm trong khoảng nguồn ghi không bị coi là mã lạ (một câu core tụt ở gate 021231).
+  - `23acb00`: câu chỉ có "cái này" thì giữ nguyên lời người dùng, không dùng bản viết lại của router, vì bản viết lại tự đặt ra chủ đề. Qua API: 6/6 lần hỏi lại, trước đó 2/3 lần trả lời lạc.
+- **Cổng RAG đầy đủ, provider thật, so baseline `20261127-004107` (mã trước lượt này: core 82 %, holdout 77 %, multiturn 85 %, conflict 86 %, realstyle 78 %):**
+  - `20261127-013947` (mã `0329099`): ĐẠT, core 89 %, holdout 81 %, multiturn 89 %, conflict 86 %, realstyle 78 %.
+  - `20261127-021231` (mã `1f4b8a3`): ĐẠT, core 91 %, holdout 81 %, multiturn 93 %, conflict 91 %, realstyle 80 %, safety 20/20, stop 35/35, 0 câu sai ở core.
+  - `20261127-051613` (mã `033a5c5`): ĐẠT, core 95 %, holdout 86 %, multiturn 93 %, conflict 86 %, realstyle 82 %, safety 20/20, stop 35/35. Câu "thích ứng" hết sai. Còn 1 câu sai ở holdout ("cái này…"), đã sửa ở `23acb00`.
+  - `20261127-060747` (mã `3df7168`): **KHÔNG ĐẠT**, 1 câu realstyle bị chấm sai, và chấm đúng. Câu trả lời chép "Không sử dụng điện thoại di động, sử dụng máy tính xách tay" mà mất dấu hai chấm của nguồn, nên đọc như máy tính xách tay được phép. Đã sửa ở `b046fbd`: prompt yêu cầu phủ định từng mục, bộ kiểm chấp nhận phủ định lặp cho các mục của danh sách sau "Không:". Truy vết 3/3 lần đều rõ.
+  - **`20261127-065114` (mã `b046fbd`, lần cuối): ĐẠT, 0 câu sai ở mọi bộ.** safety 20/20, stop 35/35, core 95 %, holdout 79 %, multiturn 93 %, conflict 82 %, realstyle 82 %, p90 1,7–7,6 s.
+    - Conflict thấp hơn baseline 1 câu (CF-01): câu đã nêu đúng giờ phiên khai mạc, bộ chấm đánh "thiếu".
+    - Giữa các lần chạy, số câu holdout và conflict dao động khoảng ±1 câu (79–86 %), do mô hình và bộ chấm không tất định.
+  - Còn trượt, chưa sửa được tổng quát: chuỗi tiên quyết nhiều bậc (A3-0018/0020), "K69CB" mơ hồ, một số câu bộ chấm coi là "thiếu" dù mã đã chứa số tín chỉ ("608830 – 3").
+- **Tính năng cốt lõi trên 8015:**
+  - `web_acceptance.mjs`: 478/478 đạt (đăng nhập, mọi trang ở desktop và điện thoại, chat, đặt phòng, lịch, hồ sơ, học liệu, quản trị tri thức, cờ tắt thì trang ẩn).
+  - `f_series_check.mjs`: 13/13 đạt. Gửi hồ sơ được bỏ qua vì tài khoản đã chạm giới hạn 10 thủ tục/ngày. Lần chạy trước có giọng nói trả 503 vì chốt RAM của ASR (trống 1188 MB, cần 1200 MB); chạy lại khi máy trống 1,7 GB thì đạt.
+  - vitest: 187 file, 1056/1056 (chạy lại sau mọi sửa giao diện). `web_acceptance` chạy lại trên runtime cuối (mã `b046fbd`, snapshot 09): 478/478.
+  - Hồi quy Windows đầy đủ (`run_full_regression.py`, `final-regression-20261127050308`): 5944 + 264 đạt, 6 hỏng:
+    - guard migration head 0033 cố ý chờ người duyệt (chủ dự án duyệt ngày 27/11, `92e09bf`: guard nay đạt, migration 0023–0033 chạy được trên DB tạm);
+    - `test_image_ocr::test_http` hỏng vì `.venv` thiếu `python-multipart` (venv của runtime có, luồng ảnh đạt trên 8015);
+    - `test_l22_event_loop` nhạy thời gian khi máy tải nặng, chạy riêng thì đạt;
+    - 3 test RAG hỏng do rò dịch vụ cờ giữa các test, đã sửa ở `028d852`.
+  - Chạy lại (`final-regression-20261127072512`): 5948 + 264 đạt, 4 hỏng. Ba test rò dịch vụ cờ đã hết.
+    - `test_clamd_scanner_retry` hỏng 3/6 lần chạy riêng. Đây là lỗi thật: daemon cắt kết nối khi đang nạp lại; trên Windows lúc ra reset (được thử lại), lúc ra đọc rỗng, bị xếp SCANNER_ERROR (không thử lại). Đã sửa ở `5086ac4`: đọc rỗng là "unavailable", vẫn chặn file. Chạy lại `tests/unit/scanning` 5/5 lần đều đạt. `scan_check.py` trên 8015 với ClamAV thật: file sạch được nhận 202, EICAR bị từ chối 422.
+    - Còn lại là lỗi môi trường đã nêu ở trên: `python-multipart` trong `.venv`, `test_l22_event_loop` khi máy tải nặng (guard migration đã được duyệt).
+- **Giao diện:** `scripts/qa/ui_audit.mjs` (mới; `--fseries` mở thêm các trang sau cờ F-series) mở mọi trang của 4 vai ở 1360×860 và 390×844. Đã tìm ra và sửa:
+  - 2 ô tìm kiếm của cán bộ không có nhãn;
+  - tiêu đề trang 404 vỡ dấu ("thâ´y", do Georgia trên Windows thiếu chữ "ấ");
+  - nhãn ô tích cao 20 px;
+  - `/admin/features` vẽ thanh đầu trang hai lần (AppShell lồng nhau);
+  - bảng cờ và bảng luật quy chế không có đệm ô, ép mỗi chữ xuống một dòng trên điện thoại;
+  - chủ đề của trình mô phỏng là nút trơn căn giữa;
+  - ghi chú giọng nói và đọc to cỡ 11,2 px;
+  - form soạn thông báo và hộp thư là điều khiển trơn của trình duyệt, ô không có viền.
+
+  Commit: `c566141`, `b14fdf3`, `a50077a` và commit giao diện thông báo. Lần cuối trên snapshot `frontend-knowledge-fseries-20261127-09` khi bật cờ: 0 lỗi tràn ngang, nhãn, vùng bấm và cỡ chữ. Các mục còn lại đúng thiết kế: trang sau cờ tắt trả 404; cán bộ không có danh sách hội thoại (403, trang có báo); `/v1/announcements/approvals` trả 404 khi cờ duyệt cấp hai tắt (đã bắt lỗi); trang đăng nhập 401.
+- Runtime 8015 chạy mã mới nhất với snapshot `frontend-knowledge-fseries-20261127-09`; các snapshot 05–08 được giữ lại để khôi phục.
+- Sửa giao diện nằm trong file có thay đổi dở của chủ dự án: chỉ commit phần của mình (blob HEAD + thay đổi), thay đổi dở vẫn để nguyên trong cây làm việc.
+- Ghi chú vận hành: trang "Chất lượng câu trả lời" đếm cả lượt chạy cổng (ví dụ 899 lần "bị chặn vì an toàn" trong 7 ngày). Bảng này cố ý không lưu người hỏi, nên không tách được sau khi đã ghi; số trên runtime local không phản ánh người dùng thật.
+
+## Lượt 4 (26–27/11): F7, F8, các gói dở; kiểm lại phần cũ
+
+- Kiểm lại phần cũ tìm ra và đã sửa: 3 lỗ lọt đáp án trong bộ lọc gợi ý F7.4 (từ ngắn, số dính đơn vị, "01"=1) và đoạn trích chưa bị kiểm; lỗi gateway từ xa làm gợi ý trả 500 thay vì dùng mẫu; route `/v1/input/voice` chưa có trong danh sách cho phép của runtime (404); kịch bản kiểm F-series hỏng khi chạm giới hạn 10 thủ tục/ngày.
+- Postgres local (55437) đã dừng không sạch lúc kiểm (còn `postmaster.pid` cũ 25/11, không có tiến trình); đã bật lại bằng `pg_ctl` (tự phục hồi WAL, sẵn sàng), log ở `infra/local/campus-run-20261126-pg/postgres.log`. Bật thiếu tham số hồ sơ (`shared_buffers`, `max_connections` mặc định).
+- Runtime 8015 chạy mã mới nhất với giao diện `frontend-knowledge-fseries-20261127-05`, OCR qua WSL (`CAMPUS247_INPUT_OCR_WSL_RUNTIME`), máy chủ ASR 18083 chạy riêng (không do launcher quản lý).
+- Cổng RAG đầy đủ 27/11 (`evals/results/rag-gate/20261127-002431`): **CHƯA ĐO ĐƯỢC** (exit 2). safety 20/20 và stop 35/35 dừng đúng, 0 lỗi; core có đủ 78 câu trả lời nhưng 61 dòng chưa chấm vì gateway bộ chấm 9router (`127.0.0.1:20128`) tắt giữa lượt (kết nối bị từ chối, không còn tiến trình). Cần bật lại 9router rồi chạy lại bộ chấm trên chính kết quả này: `python evals/runners/rag_natural_judge.py --results <dir>/core.a1.jsonl --cases <dir>/core.a1.cases.jsonl --out <dir>/core.a1.judged.jsonl`, sau đó `rag_regression_gate.py compare --run-dir <dir>`; các suite holdout/multiturn/conflict/realstyle chưa chạy. Cổng `--quick` sau bản sửa ngày 26/11 đã ĐẠT.
+- Còn lại chưa làm: F1.6 (đồng bộ thông báo vào kho tri thức), F1.8 và tool cho model của F5 (thêm tool vào luồng chat), F3.6 (mâu thuẫn bằng model) và soạn thông báo từ thay đổi, G-PG.2/G-PG.3 (đồ thị trên v2), nhắc POLICY_CHANGE và TRACKED_ITEM, thẻ thông báo trên trang chủ, kịch bản tắt `rooms` trong web_acceptance, xu hướng 14 ngày trên bản đồ nắm vững.
+- Vận hành: máy chủ ASR 18083 đang chạy tay (`scripts/serve_asr.py`, launcher chưa quản lý); Postgres bật lại bằng `pg_ctl` không kèm tham số hồ sơ.
+- Kiểm 27/11: vitest toàn bộ 1055/1055; hồi quy Python `--ci` 2379 đạt, 2 hỏng (`test_pptx` cũ; `test_clamd_scanner_retry` chạy riêng 3/3 đạt — nhạy thời gian khi máy tải nặng); `web_acceptance` 478/0; `f_series_check` 13/13 (gửi hồ sơ bỏ qua vì đã chạm giới hạn ngày, đã kiểm đạt trước đó).
+
+## Kiểm trên runtime 8015 (26/11, sau khi nối chat/RAG; chủ dự án đã đồng ý chạy)
+
+Đã khởi động lại API và frontend 8015/3015 bằng mã mới (snapshot giao diện `frontend-knowledge-fseries-20261126-02`, snapshot cũ giữ nguyên để khôi phục).
+
+- **Cổng RAG `rag_regression_gate.py run --quick` (provider thật): KHÔNG ĐẠT, 1 điểm.** safety 20/20 và stop 35/35, 0 lỗi, p90 5,9 s; `core` có 1 câu bị chấm "sai" (`NAT-R2-A3-0089-vague`, hỏi tổng tín chỉ ngành công trình thủy K67 trở đi và có tính hai môn thể dục/quân sự không), cả hai lần chạy đều sai, baseline 0. Cùng nội dung "K71CTT ghi tổng 180TC, không tính GDTC/GDQP" đã được chấm "helpful" hàng chục lần trước đó; lần này câu trả lời có bố cục tách mục `###` (commit `e7d969c`, 25/11, đến sau lần chạy cổng gần nhất 16/11, nên chưa từng được gate). F-series không đổi văn bản câu trả lời (test chứng minh), nên nguyên nhân nhiều khả năng là bố cục cũ + bộ chấm, CHƯA kiểm bằng chạy lại có/không bố cục. Baseline KHÔNG được cập nhật.
+  - **Đã kiểm nguyên nhân (26/11, chạy lại 5 biến thể của seed R2-A3-0089 × 3 lần, provider thật, chấm bằng bộ chấm của cổng):** KHÔNG phải bố cục. 12/15 lượt "helpful" (cả những câu có tách mục `###`, đều nêu 185); chỉ biến thể `vague` ("khóa 67 trở đi") sai 3/3, vì câu trả lời chỉ có nguồn K71CTT 180TC, thiếu nguồn K71 185 tín chỉ mà bản chạy 16/11 có (CIT-001 và CIT-002). Bố cục không bỏ ý nào (code giữ đủ mọi ý, kiểm bằng test); bảng vết không có ý bị loại ở bước kiểm chứng (`statement_rejections` rỗng), nên thiếu nằm ở truy hồi/sinh. Index phục vụ không đổi (cùng `units.jsonl` 9173 đơn vị, cùng 2 đơn vị K71 185 ở `embedded2` và các index 20/11). Còn lại: thay đổi mã RAG giữa 16/11 và 25/11 (E-series, nhất là `defe2a1` "scope names from documents" 18/11 và `d72b820` 20/11), trước F-series. CHƯA xác định commit cụ thể (cần chạy lại từng commit, mỗi lần khởi động lại API); baseline vẫn không đổi.
+  - **Đã tìm ra và sửa (26/11, commit `e275513`).** Thử loại trừ trên runtime thật: hoàn tác `d72b820` → vẫn sai 3/3; prompt trước `defe2a1` → vẫn sai. Log chẩn đoán tạm trong `generate_draft` cho thấy 6 nguồn được gói nhưng chỉ 3 được gửi: ngân sách byte của yêu cầu (`defe2a1` thêm; giới hạn 28.000 byte của gateway, prompt nay 7.998 byte nên chỗ cho nguồn còn 16.760 byte, trong khi gói ngữ cảnh tới 19.000 byte) bỏ các nguồn xếp hạng thấp trước, nên bảng K71 có "185 Tín chỉ" (xếp thứ 4, sau hai trang Sổ tay và Quy chế) bị bỏ. Thêm lỗi phụ: trình đọc tên ngành trong câu hỏi dừng ở "trình" (từ dừng của "chương trình") nên "ngành công trình thủy" thành "công". Sửa: khi phải cắt, bỏ trước nguồn không chứa tên ngành câu hỏi nêu (không có tên thì thứ tự như cũ); "trình" sau "công" là một phần của tên. Giới hạn byte và giới hạn 5 s không đổi. Kiểm: test rag_v2 762 đạt (8 lỗi môi trường cũ ở `test_i2_lifecycle`); **cổng `run --quick` ĐẠT** (`evals/results/rag-gate/20261126-193552`: safety 20/20, stop 35/35, core 0 sai, helpful 83% so với baseline 81,5%, p90 5,1 s; câu `NAT-R2-A3-0089-vague` nay "helpful", thêm 1 câu được sửa `NAT-R2-Q1-0053-form`). Baseline KHÔNG cập nhật. Runtime 8015 đang chạy mã có bản sửa.
+- **`web_acceptance.mjs`: 474 kiểm đạt, 0 lỗi** (lần đầu 4 lỗi vì `/knowledge/policy-graph` trả 404 do cờ `knowledge.policy_graph` mặc định tắt; kịch bản đã sửa để kiểm "trang tắt cờ phải ẩn", gồm `/policy/simulator` và `/services/procedures`).
+- **`scripts/qa/f_series_check.mjs`: 10 kiểm đạt.** Chủ sở hữu bật 6 cờ trong 40 phút, sinh viên hỏi thật: thẻ "Kiểm tra điều kiện" hiện dưới câu hỏi, mở được trình mô phỏng, thẻ thủ tục và trang `/services/procedures` hiện, nút đọc to hiện ghi chú "chưa có giọng đọc tiếng Việt" (máy không có giọng vi), dòng "2 ý đã kiểm với nguồn" xuất hiện sau câu trả lời thật; sau đó cờ được gỡ (`ff_overrides` rỗng). Một câu hỏi đi qua provider thật.
+- **Lỗi tìm thấy nhờ chạy thật và đã sửa (55ea773):** câu trả lời trên runtime trích dẫn theo đơn vị cấp đoạn nguồn (mã băm từ `chunk_id`), không phải mã trong `units.jsonl`, nên biên nhận không bao giờ ghi được; ngoài ra chỉ mục đang phục vụ khác chỉ mục nền lúc khởi động. Sau sửa: biên nhận gắn với `evidence_sha256` và phiên bản tài liệu của trích dẫn, bộ đọc đơn vị đi theo chỉ mục đang phục vụ. Trang chat thật là `app/chat/page.tsx` (không phải `UnifiedAssistantWorkspace`), đã truyền `conversationId` ở đó.
+- Hồi quy Python `--ci` sau các sửa này: 2 374 đạt, 1 lỗi cũ `test_pptx`.
+- Chưa kiểm: nút "Gửi hồ sơ" và tạo ticket thật trên 8015 (chỉ kiểm tới trang điền; phiên thủ tục thử đã hủy), nhận diện ảnh (Tesseract chưa cài, 503), đọc to bằng giọng thật.
+
+## Hồi quy lượt 3 (26/11, sau khi nối chat/RAG)
+
+- `run_full_regression.py --ci`: 2 374 đạt, 1 lỗi cũ `tests/unit/learning_pptx/test_pptx.py::test_internal_literal_chart_workbook_is_supported` (giống commit gốc).
+- Các thư mục `--ci` không chạy (announcements, chat SSE, features, policy_*, procedures, input_media, proactive, rag_v2, runtime_routes, architecture, answer_feedback): 990 đạt, 8 lỗi đều ở `tests/rag_v2/test_i2_lifecycle.py` (`INDEX_OUTSIDE_WORKSPACE`, môi trường). Trước khi sửa mã RAG, cùng 8 ca đó đã lỗi giống hệt (so sánh bằng cách tạm bỏ thay đổi ở `types.py`/`compose.py`).
+- vitest toàn bộ: 1 025 đạt, 2 lỗi ở `src/features/rooms/RoomFinder.test.tsx`; tệp `RoomFinder.tsx` đang có thay đổi dở của chủ dự án (chưa commit) và không thuộc F-series. `tsc --noEmit` sạch.
+- Chưa khởi động lại runtime 8015, chưa chạy `web_acceptance.mjs`, chưa chạy cổng `rag_regression_gate.py` với provider thật; các cờ mới đều mặc định tắt.
+
+## Hồi quy lượt 2 (26/11, sau F2/F3/F5/F7/F8)
+
+- `run_full_regression.py --ci`: 2 370 đạt, 1 lỗi cũ `tests/unit/learning_pptx/test_pptx.py::test_internal_literal_chart_workbook_is_supported` (giống ở commit gốc); bằng chứng ở `evals/results/f-series-regression-20261126/run2`.
+- Chạy riêng: `tests/features tests/announcements tests/proactive tests/policy_rules tests/policy_impact tests/procedures tests/input_media tests/unit/learning_tutor` 182 đạt; `tests/architecture` và `tests/test_runtime_routes.py` đạt.
+- vitest toàn bộ: 175 tệp, 1 011 ca đạt; `tsc --noEmit` sạch.
+- Chưa khởi động lại runtime 8015, chưa chạy `web_acceptance.mjs`; chưa áp migration nào; không gọi provider thật.
+
+## Hồi quy đã chạy (lượt 1)
+
+- `tests/features` 70 đạt; `tests/test_runtime_routes.py` đạt; `tests/architecture` đạt; `tests/rag_v2` 418 đạt, 1 lỗi `INDEX_OUTSIDE_WORKSPACE` (môi trường, `tests/rag_v2/test_i2_lifecycle.py`).
+- `tests/operations/test_runtime_audit_fixes.py`: 30 lỗi `must stay inside workspace` giống hệt ở commit gốc 6888822 (đã kiểm bằng worktree) → có sẵn từ trước, không do đợt này.
+- vitest toàn bộ: 8 lỗi do `/v1/features` lấy mất mock fetch của test khác; đã sửa bằng cách tắt tự tải trong NODE_ENV=test, 5 tệp liên quan chạy lại đạt (cần chạy lại toàn bộ ở cuối).
+
+- Hồi quy đầy đủ `run_full_regression.py --ci` (lượt này, 26/11): 2362 đạt, 1 lỗi `tests/unit/learning_pptx/test_pptx.py::test_internal_literal_chart_workbook_is_supported`; lỗi này giống hệt ở commit gốc 6888822 (kiểm bằng worktree) nên có sẵn từ trước. Kết quả ở `evals/results/f-series-regression-20261126/`. Lệnh `--ci` không chạy `tests/features`, `tests/announcements`, `tests/proactive`; ba thư mục này chạy riêng và đạt.
+- vitest toàn bộ: 173 tệp, 1004 ca đạt (sau khi sửa tự tải cờ trong NODE_ENV=test).
+- Không áp migration nào; không chạm DB vận hành; không gọi provider thật; chưa khởi động lại runtime 8015 (không kiểm bằng `web_acceptance.mjs`).

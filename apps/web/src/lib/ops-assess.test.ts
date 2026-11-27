@@ -119,3 +119,16 @@ describe("assessStatus", () => {
     expect(overallLevel([{ id: "a", label: "", value: "", level: "unknown" }, { id: "b", label: "", value: "", level: "warn" }])).toBe("warn");
   });
 });
+
+describe("feature flags finding", () => {
+  const find = (s: OpsStatus) => assessStatus(s).find((f) => f.id === "features");
+  it("is absent without the block, ok normally, warns on a restart or an override ending within a day, critical when the store fails", () => {
+    expect(find(status())).toBeUndefined();
+    expect(find(status({ features: { off: 12, overrides: 0, restart_required: 0, store_error: false } }))).toMatchObject({ level: "ok", value: "12 tắt · 0 ghi đè" });
+    const ending = find(status({ features: { off: 3, overrides: 1, restart_required: 0, store_error: false, expiring_soon: [{ key: "rooms.booking", expires_at: "x" }] } }));
+    expect(ending?.level).toBe("warn");
+    expect(ending?.detail).toBe("Sắp hết hạn trong 24 giờ: rooms.booking.");
+    expect(find(status({ features: { off: 3, overrides: 0, restart_required: 2, store_error: false } }))?.detail).toBe("2 cờ cần khởi động lại mới có tác dụng.");
+    expect(find(status({ features: { off: 0, overrides: 0, restart_required: 0, store_error: "disk" } }))?.level).toBe("crit");
+  });
+});

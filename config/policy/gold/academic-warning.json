@@ -1,0 +1,746 @@
+{
+ "rule_id": "academic-warning",
+ "authored_from": "regulation wording (units.jsonl)",
+ "cases": [
+  {
+   "description": "Không đạt 5/10 tín chỉ trong học kỳ",
+   "inputs": {
+    "semester.failed_credits": 5,
+    "semester.registered_credits": 10,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  },
+  {
+   "description": "Không đạt 6/10 tín chỉ trong học kỳ",
+   "inputs": {
+    "semester.failed_credits": 6,
+    "semester.registered_credits": 10,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  },
+  {
+   "description": "Không đạt 7/15 tín chỉ trong học kỳ",
+   "inputs": {
+    "semester.failed_credits": 7,
+    "semester.registered_credits": 15,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  },
+  {
+   "description": "Không đạt 8/15 tín chỉ trong học kỳ",
+   "inputs": {
+    "semester.failed_credits": 8,
+    "semester.registered_credits": 15,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  },
+  {
+   "description": "Không đạt 10/20 tín chỉ trong học kỳ",
+   "inputs": {
+    "semester.failed_credits": 10,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  },
+  {
+   "description": "Không đạt 11/20 tín chỉ trong học kỳ",
+   "inputs": {
+    "semester.failed_credits": 11,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  },
+  {
+   "description": "Không đạt 12/24 tín chỉ trong học kỳ",
+   "inputs": {
+    "semester.failed_credits": 12,
+    "semester.registered_credits": 24,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  },
+  {
+   "description": "Không đạt 13/24 tín chỉ trong học kỳ",
+   "inputs": {
+    "semester.failed_credits": 13,
+    "semester.registered_credits": 24,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  },
+  {
+   "description": "Nợ đọng 0 tín chỉ",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "tổng số tín chỉ nợ đọng từ đầu khóa học vượt quá 24"
+   }
+  },
+  {
+   "description": "Nợ đọng 10 tín chỉ",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 10,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "tổng số tín chỉ nợ đọng từ đầu khóa học vượt quá 24"
+   }
+  },
+  {
+   "description": "Nợ đọng 23 tín chỉ",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 23,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "tổng số tín chỉ nợ đọng từ đầu khóa học vượt quá 24"
+   }
+  },
+  {
+   "description": "Nợ đọng 24 tín chỉ",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 24,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "tổng số tín chỉ nợ đọng từ đầu khóa học vượt quá 24"
+   }
+  },
+  {
+   "description": "Nợ đọng 25 tín chỉ",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 25,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "tổng số tín chỉ nợ đọng từ đầu khóa học vượt quá 24"
+   }
+  },
+  {
+   "description": "Nợ đọng 26 tín chỉ",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 26,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "tổng số tín chỉ nợ đọng từ đầu khóa học vượt quá 24"
+   }
+  },
+  {
+   "description": "Nợ đọng 40 tín chỉ",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 40,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "tổng số tín chỉ nợ đọng từ đầu khóa học vượt quá 24"
+   }
+  },
+  {
+   "description": "Học kỳ đầu, điểm trung bình học kỳ 0.0",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": true,
+    "gpa.semester": 0.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+   }
+  },
+  {
+   "description": "Học kỳ đầu, điểm trung bình học kỳ 0.5",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": true,
+    "gpa.semester": 0.5,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+   }
+  },
+  {
+   "description": "Học kỳ đầu, điểm trung bình học kỳ 0.79",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": true,
+    "gpa.semester": 0.79,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+   }
+  },
+  {
+   "description": "Học kỳ đầu, điểm trung bình học kỳ 0.8",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": true,
+    "gpa.semester": 0.8,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+   }
+  },
+  {
+   "description": "Học kỳ đầu, điểm trung bình học kỳ 0.81",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": true,
+    "gpa.semester": 0.81,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+   }
+  },
+  {
+   "description": "Học kỳ đầu, điểm trung bình học kỳ 0.9",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": true,
+    "gpa.semester": 0.9,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+   }
+  },
+  {
+   "description": "Học kỳ đầu, điểm trung bình học kỳ 1.0",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": true,
+    "gpa.semester": 1.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+   }
+  },
+  {
+   "description": "Học kỳ sau, điểm trung bình học kỳ 0.5",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 0.5,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 1,0 đối với các học kỳ tiếp theo"
+   }
+  },
+  {
+   "description": "Học kỳ sau, điểm trung bình học kỳ 0.99",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 0.99,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 1,0 đối với các học kỳ tiếp theo"
+   }
+  },
+  {
+   "description": "Học kỳ sau, điểm trung bình học kỳ 1.0",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 1.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 1,0 đối với các học kỳ tiếp theo"
+   }
+  },
+  {
+   "description": "Học kỳ sau, điểm trung bình học kỳ 1.01",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 1.01,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 1,0 đối với các học kỳ tiếp theo"
+   }
+  },
+  {
+   "description": "Học kỳ sau, điểm trung bình học kỳ 1.5",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 1.5,
+    "student.year_level": 2,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7b32589e2489f185",
+    "quote": "dưới 1,0 đối với các học kỳ tiếp theo"
+   }
+  },
+  {
+   "description": "Năm 1, điểm trung bình tích lũy 1.19",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 1,
+    "gpa.cumulative": 1.19
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,2 đối với sinh viên trình độ năm thứ\nnhất"
+   }
+  },
+  {
+   "description": "Năm 1, điểm trung bình tích lũy 1.2",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 1,
+    "gpa.cumulative": 1.2
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,2 đối với sinh viên trình độ năm thứ\nnhất"
+   }
+  },
+  {
+   "description": "Năm 1, điểm trung bình tích lũy 1.4",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 1,
+    "gpa.cumulative": 1.4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,2 đối với sinh viên trình độ năm thứ\nnhất"
+   }
+  },
+  {
+   "description": "Năm 2, điểm trung bình tích lũy 1.39",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 1.39
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,4 đối với sinh viên trình độ năm thứ hai"
+   }
+  },
+  {
+   "description": "Năm 2, điểm trung bình tích lũy 1.4",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 1.4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,4 đối với sinh viên trình độ năm thứ hai"
+   }
+  },
+  {
+   "description": "Năm 2, điểm trung bình tích lũy 1.6",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 1.6
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,4 đối với sinh viên trình độ năm thứ hai"
+   }
+  },
+  {
+   "description": "Năm 3, điểm trung bình tích lũy 1.59",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 3,
+    "gpa.cumulative": 1.59
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,6 đối với sinh viên\ntrình độ năm thứ ba"
+   }
+  },
+  {
+   "description": "Năm 3, điểm trung bình tích lũy 1.6",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 3,
+    "gpa.cumulative": 1.6
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,6 đối với sinh viên\ntrình độ năm thứ ba"
+   }
+  },
+  {
+   "description": "Năm 3, điểm trung bình tích lũy 1.8",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 3,
+    "gpa.cumulative": 1.8
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,6 đối với sinh viên\ntrình độ năm thứ ba"
+   }
+  },
+  {
+   "description": "Năm 4, điểm trung bình tích lũy 1.79",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 4,
+    "gpa.cumulative": 1.79
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,8 đối với sinh viên các năm tiếp theo"
+   }
+  },
+  {
+   "description": "Năm 4, điểm trung bình tích lũy 1.8",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 4,
+    "gpa.cumulative": 1.8
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,8 đối với sinh viên các năm tiếp theo"
+   }
+  },
+  {
+   "description": "Năm 4, điểm trung bình tích lũy 2.0",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 4,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,8 đối với sinh viên các năm tiếp theo"
+   }
+  },
+  {
+   "description": "Năm 5, điểm trung bình tích lũy 1.79",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 5,
+    "gpa.cumulative": 1.79
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,8 đối với sinh viên các năm tiếp theo"
+   }
+  },
+  {
+   "description": "Năm 5, điểm trung bình tích lũy 1.8",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 5,
+    "gpa.cumulative": 1.8
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,8 đối với sinh viên các năm tiếp theo"
+   }
+  },
+  {
+   "description": "Năm 5, điểm trung bình tích lũy 2.0",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 5,
+    "gpa.cumulative": 2.0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,8 đối với sinh viên các năm tiếp theo"
+   }
+  },
+  {
+   "description": "Năm 2 với điểm tích lũy 1,3 (đạt năm 1 nhưng chưa đạt năm 2)",
+   "inputs": {
+    "semester.failed_credits": 0,
+    "semester.registered_credits": 20,
+    "study.debt_credits": 0,
+    "semester.is_first": false,
+    "gpa.semester": 2.0,
+    "student.year_level": 2,
+    "gpa.cumulative": 1.3
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "3d08c940e5d91b6f",
+    "quote": "dưới 1,4 đối với sinh viên trình độ năm thứ hai"
+   }
+  },
+  {
+   "description": "Chưa nhập gì",
+   "inputs": {},
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "95f6fc90ba169718",
+    "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+   }
+  }
+ ]
+}

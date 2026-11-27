@@ -1,4 +1,6 @@
 "use client";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 
 import { useT, type MessageKey } from "@/lib/i18n";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -179,6 +181,6 @@ export function PageExplanations({ actorId, sessionId, materials, canManage, rea
     </form>}
     {error && <p role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
-    <button type="button" disabled={busy} onClick={() => { setError(""); setRefresh(value => value + 1); }}>{t("pex.26")}</button>
+    <IconButton label={t("pex.26")} disabled={busy} onClick={() => { setError(""); setRefresh(value => value + 1); }} icon={<RefreshCw size={17} />} />
   </section>;
 }

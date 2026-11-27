@@ -25,6 +25,7 @@ from campus247.rag_v2.understanding.normalize import fold
 from campus247.rag_v2.generation.rewrite import ResolvedQuestion, clean_question, rewrite_question
 from campus247.rag_v2.understanding.messy import looks_messy
 from campus247.rag_v2.understanding.analyze import analyze
+from campus247.rag_v2.service import vague_reference
 
 
 # Whole-turn ceiling. Measured on 215 natural questions: median 5.7 s, p90 9.3 s, and 11% of turns that needed two
@@ -328,7 +329,9 @@ class RagV2Node:
                     cleaned = state.tool_flow.clean_question if state.tool_flow else None
                     if not cleaned and looks_messy(resolved.original, understanding.topics, understanding.question_type):
                         cleaned = await clean_question(guarded_gateway, resolved.original, deadline_ms=2200)
-                    if cleaned:
+                    # A question that leans on "cái này" names nothing; a restatement ("Quy định áp dụng cho sinh viên khóa
+                    # nào?") would invent a subject and get answered instead of asked what "cái này" is.
+                    if cleaned and not vague_reference(resolved.original):
                         resolved = ResolvedQuestion(resolved.original, cleaned)
                         understanding = analyze(cleaned, ())
                 if understanding.clarify_prompt or understanding.out_of_scope:
@@ -451,5 +454,6 @@ class RagV2Node:
             draft=DraftResponse(text, claim_count=len(claims), is_grounded=bool(claims),
                 gate_decision="grounded" if claims else "abstain", grounded_claims=claims,
                 partial_note=outcome.partial_note, preface=outcome.preface,
-                guidance=tuple(outcome.suggestions), claim_groups=tuple(outcome.groups)),
+                guidance=tuple(outcome.suggestions), claim_groups=tuple(outcome.groups),
+                claim_checks=tuple(outcome.checks), rejected_counts=dict(outcome.rejected_counts)),
             step_count=state.step_count + 1)

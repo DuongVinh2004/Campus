@@ -67,6 +67,15 @@ UNDERSPECIFIED_RESPONSE = (
     "Nếu có chương trình, khóa hoặc năm học cụ thể, bạn cho biết thêm để tôi tra đúng nguồn.")
 
 
+# A question with this many words of its own subject is self-contained even when it opens like a follow-up ("Nếu em bị ốm xuống
+# Trạm Y tế trường khám thì có phải xuất trình thẻ BHYT không?"): asking which topic it continues would be wrong.
+SELF_CONTAINED_WORDS = 6
+
+
+def subject_words(question: str) -> list[str]:
+    return [word for word in normalized_question(question).split() if word not in _NO_SUBJECT]
+
+
 def underspecified_question(question: str) -> bool:
     """No subject left after removing question words and generic nouns (digits and codes count)."""
     subject = [word for word in normalized_question(question).split() if word not in _NO_SUBJECT]
@@ -105,6 +114,7 @@ def conversational_response(question: str, history=None) -> str | None:
     self_contained_exam = "thi" in text.split() and any(marker in text for marker in ("hoan", "ngay thi", "buoi thi"))
     self_contained_quantity = text.startswith("bao nhieu") and any(marker in text for marker in ("tin chi", "hoc phan", "qua mon"))
     if (is_followup_question(question) and not question_topics(question) and not self_contained_exam and not self_contained_quantity
+            and len(subject_words(question)) < SELF_CONTAINED_WORDS
             and prepare_followup_question(question, history=history) is None
             and not has_user_context(history)):
         return "Bạn đang hỏi tiếp về học bổng, học phí hay quy định nào? Hãy nêu chủ đề để tôi tra đúng nguồn."

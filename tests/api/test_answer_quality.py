@@ -185,3 +185,54 @@ def test_the_counts_are_still_served_when_the_knowledge_database_is_down(store):
     with build_client(store, FakeFreshness(fail=True)) as test_client:
         body = test_client.get("/v1/knowledge/answer-quality", headers=auth("kadmin")).json()
     assert body["sources"][0]["version_id"] == "v1" and body["sources"][0]["title"] is None and body["sources"][0]["in_current_release"] is False
+
+
+class TestVerificationCounts:
+    """F4.4: kept and dropped statements per day, as counts only."""
+
+    @staticmethod
+    def checks(verbatim, semantic):
+        from campus247.rag_v2.types import StatementCheck
+        return tuple(StatementCheck("PASSED", v, s) for v, s in zip(verbatim, semantic))
+
+    def test_counts_accumulate_per_day_and_reason_and_report_shares(self, store):
+        store.record_verification(checks=self.checks([True, False], ["NOT_RUN", "PASSED"]), rejected_counts={"NUMBER_NOT_IN_SOURCE": 1}, at=NOW - D)
+        store.record_verification(checks=self.checks([False], ["PASSED"]), rejected_counts={"NUMBER_NOT_IN_SOURCE": 1, "SEMANTIC_UNSUPPORTED": 2}, at=NOW)
+        report = store.verification_report(now=NOW)
+        assert (report["statements"], report["verbatim"], report["semantic"]) == (3, 1, 2)
+        assert report["rejected"] == {"NUMBER_NOT_IN_SOURCE": 2, "SEMANTIC_UNSUPPORTED": 2} and report["rejected_total"] == 4
+        assert report["rejected_share"] == round(4 / 7, 3) and report["verbatim_share"] == round(1 / 3, 3)
+        assert [d["day"] for d in report["daily_rejected"]] == ["2026-11-16", "2026-11-17"]
+
+    def test_unknown_reason_text_is_never_stored_and_old_days_fall_out_of_the_window(self, store):
+        store.record_verification(checks=(), rejected_counts={"free text with a name": 3, "OK_CODE": 1}, at=NOW - 40 * D)
+        assert store.verification_report(now=NOW, days=30)["rejected"] == {}
+        assert store.verification_report(now=NOW, days=60)["rejected"] == {"OK_CODE": 1}
+        assert "free text" not in sqlite3.connect(store.path).execute("SELECT group_concat(kind) FROM verification_counts").fetchone()[0]
+
+    def test_observer_records_answers_and_a_failing_store_never_fails_the_answer(self, store):
+        from campus247.agent.nodes import rag_v2
+        from campus247.application.knowledge.answer_quality import attach_verification_recording
+        before = len(rag_v2.OUTCOME_OBSERVERS)
+        errors = []
+        attach_verification_recording(store, on_error=errors.append)
+        attach_verification_recording(store)  # idempotent
+        assert len(rag_v2.OUTCOME_OBSERVERS) == before + 1
+        observer = rag_v2.OUTCOME_OBSERVERS[-1]
+        try:
+            observer(SimpleNamespace(kind="answer", checks=self.checks([True], ["NOT_RUN"]), rejected_counts={}), {})
+            observer(SimpleNamespace(kind="clarify", checks=(), rejected_counts={"X": 1}), {})
+            assert store.verification_report(now=datetime.now(UTC))["statements"] == 1
+            store.record_verification = lambda **kw: (_ for _ in ()).throw(sqlite3.OperationalError("disk"))  # type: ignore[method-assign]
+            observer(SimpleNamespace(kind="answer", checks=(), rejected_counts={}), {})
+            assert len(errors) == 1
+        finally:
+            rag_v2.OUTCOME_OBSERVERS.remove(observer)
+
+    def test_only_managers_read_the_route(self, store):
+        store.record_verification(checks=self.checks([True], ["NOT_RUN"]), rejected_counts={"NUMBER_NOT_IN_SOURCE": 1}, at=NOW)
+        with build_client(store, FakeFreshness()) as c:
+            ok = c.get("/v1/knowledge/answer-quality/verification", headers=auth("kadmin"))
+            assert ok.status_code == 200 and ok.json()["rejected"] == {"NUMBER_NOT_IN_SOURCE": 1}
+            assert c.get("/v1/knowledge/answer-quality/verification", headers=auth("student")).status_code == 403
+            assert c.get("/v1/knowledge/answer-quality/verification").status_code == 401

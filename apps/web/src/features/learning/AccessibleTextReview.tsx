@@ -1,4 +1,6 @@
 "use client";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
@@ -441,8 +443,6 @@ export function AccessibleTextReview({ actorId, versionId, pageCount, sourcePage
       {release.state === "PUBLISHED" && release.current_release_id === release.id && <button type="button" disabled={busy}
         onClick={() => changeRelease(release, "WITHDRAW")}>Xem trước thu hồi bản chữ</button>}
     </>}
-    <button type="button" disabled={busy} onClick={() => { setError(""); setRefresh(value => value + 1); setRefreshPage(value => value + 1); }}>
-      Tải lại quản lý bản chữ
-    </button>
+    <IconButton label="Tải lại quản lý bản chữ" disabled={busy} onClick={() => { setError(""); setRefresh(value => value + 1); setRefreshPage(value => value + 1); }} icon={<RefreshCw size={17} />} />
   </section>;
 }

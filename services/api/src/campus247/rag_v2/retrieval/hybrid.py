@@ -8,6 +8,7 @@ import re
 import time
 from collections.abc import Mapping
 from dataclasses import dataclass, replace
+from weakref import WeakKeyDictionary
 
 from campus247.rag_v2.observability.vector_stats import VECTOR_STATS
 from campus247.rag_v2.ports import Reranker, UnitIndex
@@ -21,6 +22,57 @@ RRF_K = 60
 # Without a reranker, lexical hits at this rank or better stay inside the packed rows (0 disables).
 LEXICAL_PIN = 4
 PACK_WINDOW = 6
+
+
+def label_only_page(unit: Unit) -> bool:
+    """A page whose text only repeats its own heading: the label of a small table ("71CS / Học phần tiên quyết:" under
+    "71CS — Học phần tiên quyết — 608825 → 608807"), whose rows are indexed on their own."""
+    from campus247.rag_v2.ingest.units import source_text
+    if unit.kind != "page":
+        return False
+    words = re.findall(r"\w+", source_text(unit).casefold())
+    heading = set(re.findall(r"\w+", (unit.path or "").casefold()))
+    return 0 < len(words) <= 12 and all(word in heading for word in words)
+
+
+_ROW_DOCUMENTS: WeakKeyDictionary = WeakKeyDictionary()
+
+
+def _row_documents(index: UnitIndex) -> frozenset[str]:
+    """Documents that have reviewed curriculum rows indexed on their own, computed once per loaded index."""
+    try:
+        return _ROW_DOCUMENTS[index]
+    except (KeyError, TypeError):
+        pass
+    documents = frozenset(unit.document_id for uid in index.all_ids()
+                          if (unit := index.get(uid)) is not None and unit.kind == "curriculum_row")
+    try:
+        _ROW_DOCUMENTS[index] = documents
+    except TypeError:
+        pass
+    return documents
+
+
+def _label_pages_last(ranked: list[Candidate], index: UnitIndex) -> tuple[list[Candidate], frozenset[str]]:
+    """Move behind the rest the label pages of a document after its first one.
+
+    A curriculum prints one small table per semester and per prerequisite pair; each is a page whose text is only a label
+    ("71CS / Học phần tiên quyết:", "71CS / Học kỳ 6") while its rows, indexed on their own with the same headings, carry the
+    course names. The labels tie on every score: 12 of them took all the slots from the row "Học máy" (rank 13). Only a short
+    page of a document with rows of its own moves; nothing is dropped, and the first label of a document keeps its place.
+    Returns the order and the ids that were moved (they are not pinned back by their lexical rank either).
+    """
+    rows = _row_documents(index)
+    kept, later, labelled = [], [], set()
+    for candidate in ranked:
+        unit = index.get(candidate.unit_id)
+        if unit is not None and unit.document_id in rows and label_only_page(unit):
+            if unit.document_id in labelled:
+                later.append(candidate)
+                continue
+            labelled.add(unit.document_id)
+        kept.append(candidate)
+    return kept + later, frozenset(c.unit_id for c in later)
 
 
 @dataclass(frozen=True)
@@ -180,6 +232,7 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
     ranked = [Candidate(uid, pair[0], pair[1], sum(1 / (k + rank) for rank in pair if rank is not None))
               for uid, pair in ranks.items()]
     ranked.sort(key=lambda c: (-c.fused_score, c.unit_id))
+    ranked, labels = _label_pages_last(ranked, index)
     # Diversity is a shortlist for the reranker, not a relevance filter. When
     # reranking is disabled, keep the fused top-k directly: otherwise sibling
     # clauses lose their slots to lower-ranked documents before context packing.
@@ -213,7 +266,8 @@ async def retrieve(u: Understanding, index: UnitIndex, reranker: Reranker, *,
     if LEXICAL_PIN and chosen and rerank_deadline_s == 0:
         # Context packing reads only the first PACK_WINDOW rows, so the strongest lexical hits
         # (exact codes and names that vectors miss) must sit inside that window.
-        pinned = sorted((c for c in ranked if c.lexical_rank is not None and c.lexical_rank <= LEXICAL_PIN),
+        pinned = sorted((c for c in ranked if c.lexical_rank is not None and c.lexical_rank <= LEXICAL_PIN
+                         and c.unit_id not in labels),
                         key=lambda c: c.lexical_rank)
         head = chosen[:PACK_WINDOW]
         missing = [c for c in pinned if all(c.unit_id != h.unit_id for h in head)]

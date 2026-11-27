@@ -5,6 +5,834 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/v1/learning/mastery/offerings/{offering_id}/concept-suggestions": {
+      "post": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Concept Suggestions",
+        "operationId": "learning_post_mastery_offerings_offering_id_concept_suggestions",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/learning/mastery/offerings/{offering_id}/concepts": {
+      "get": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Concepts",
+        "operationId": "learning_get_mastery_offerings_offering_id_concepts",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Concept-Create",
+        "operationId": "learning_post_mastery_offerings_offering_id_concepts",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningConceptInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/learning/mastery/concepts/{concept_id}": {
+      "patch": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Concept-Update",
+        "operationId": "learning_patch_mastery_concepts_concept_id",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningConceptUpdate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/learning/mastery/offerings/{offering_id}/me": {
+      "get": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning My Mastery",
+        "operationId": "learning_get_mastery_offerings_offering_id_me",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/learning/mastery/offerings/{offering_id}/map": {
+      "get": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Mastery Map",
+        "operationId": "learning_get_mastery_offerings_offering_id_map",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/learning/mastery/offerings/{offering_id}/map.csv": {
+      "get": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Mastery Map Csv",
+        "operationId": "learning_get_mastery_offerings_offering_id_map_csv",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/learning/tutor/offerings/{offering_id}/settings": {
+      "get": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Tutor Settings",
+        "operationId": "learning_get_tutor_offerings_offering_id_settings",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Tutor-Settings-Save",
+        "operationId": "learning_put_tutor_offerings_offering_id_settings",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningTutorSettings"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/learning/tutor/practice-items/{item_id}/hints": {
+      "post": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learning Tutor Hint",
+        "operationId": "learning_post_tutor_practice_items_item_id_hints",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Learning request rejected or dependency unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "code"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieSession": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningHintInput"
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/learning/capabilities": {
       "get": {
         "tags": [
@@ -10654,6 +11482,277 @@
   },
   "components": {
     "schemas": {
+      "LearningConceptLink": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "PRACTICE_ITEM",
+              "PAGE"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "target": {
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "^[0-9a-fA-F-]{36}(?::[0-9]{1,3})?$",
+            "title": "Target",
+            "type": "string"
+          },
+          "weight": {
+            "default": 1.0,
+            "exclusiveMinimum": 0,
+            "maximum": 1,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "target"
+        ],
+        "title": "LearningConceptLink",
+        "type": "object"
+      },
+      "LearningConceptInput": {
+        "additionalProperties": false,
+        "properties": {
+          "preview_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Preview Id"
+          },
+          "confirmation_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Confirmation Token"
+          },
+          "label": {
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Label",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 600,
+            "title": "Description",
+            "type": "string"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/LearningConceptLink"
+            },
+            "maxItems": 200,
+            "title": "Links",
+            "type": "array"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "LearningConceptInput",
+        "type": "object"
+      },
+      "LearningConceptUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "preview_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Preview Id"
+          },
+          "confirmation_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Confirmation Token"
+          },
+          "revision": {
+            "minimum": 1,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Label"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 600,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "links": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/LearningConceptLink"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Links"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "APPROVED",
+                  "RETIRED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          }
+        },
+        "required": [
+          "revision"
+        ],
+        "title": "LearningConceptUpdate",
+        "type": "object"
+      },
+      "LearningTutorSettings": {
+        "additionalProperties": false,
+        "properties": {
+          "preview_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Preview Id"
+          },
+          "confirmation_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Confirmation Token"
+          },
+          "revision": {
+            "minimum": 0,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "tutor_enabled": {
+            "title": "Tutor Enabled",
+            "type": "boolean"
+          },
+          "reveal_after_attempts": {
+            "maximum": 5,
+            "minimum": 1,
+            "title": "Reveal After Attempts",
+            "type": "integer"
+          },
+          "model_hints_enabled": {
+            "title": "Model Hints Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "revision",
+          "tutor_enabled",
+          "reveal_after_attempts",
+          "model_hints_enabled"
+        ],
+        "title": "LearningTutorSettings",
+        "type": "object"
+      },
+      "LearningHintInput": {
+        "additionalProperties": false,
+        "properties": {
+          "more": {
+            "default": false,
+            "title": "More",
+            "type": "boolean"
+          },
+          "solution": {
+            "default": false,
+            "title": "Solution",
+            "type": "boolean"
+          },
+          "reply": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reply"
+          }
+        },
+        "title": "LearningHintInput",
+        "type": "object"
+      },
       "LearningOcrJobInput": {
         "additionalProperties": false,
         "properties": {

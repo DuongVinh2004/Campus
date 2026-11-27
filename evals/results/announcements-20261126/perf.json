@@ -1,0 +1,8 @@
+{
+  "recipients": 30000,
+  "seconds": 2.35,
+  "batch": 1000,
+  "deliveries": 30000,
+  "notifications": 30000,
+  "method": "synthetic accounts, local SQLite WAL, one process"
+}

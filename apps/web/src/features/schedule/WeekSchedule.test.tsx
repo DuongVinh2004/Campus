@@ -161,6 +161,7 @@ describe("WeekSchedule", () => {
     expect(dialog).toHaveAttribute("aria-modal", "true");
 
     const titleInput = screen.getByLabelText(/Tên sự kiện/);
+    expect(titleInput).toHaveFocus();
     const startInput = screen.getByLabelText(/Giờ bắt đầu/);
     const endInput = screen.getByLabelText(/Giờ kết thúc/);
 

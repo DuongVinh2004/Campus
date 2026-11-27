@@ -1,0 +1,517 @@
+{
+ "rule_id": "attendance-requirement",
+ "authored_from": "regulation wording (units.jsonl)",
+ "cases": [
+  {
+   "description": "Nghỉ không phép 0/10 tiết",
+   "inputs": {
+    "attendance.absent_periods": 0,
+    "course.total_periods": 10
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 1/10 tiết",
+   "inputs": {
+    "attendance.absent_periods": 1,
+    "course.total_periods": 10
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 2/10 tiết",
+   "inputs": {
+    "attendance.absent_periods": 2,
+    "course.total_periods": 10
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 3/10 tiết",
+   "inputs": {
+    "attendance.absent_periods": 3,
+    "course.total_periods": 10
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 10/10 tiết",
+   "inputs": {
+    "attendance.absent_periods": 10,
+    "course.total_periods": 10
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 0/15 tiết",
+   "inputs": {
+    "attendance.absent_periods": 0,
+    "course.total_periods": 15
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 2/15 tiết",
+   "inputs": {
+    "attendance.absent_periods": 2,
+    "course.total_periods": 15
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 3/15 tiết",
+   "inputs": {
+    "attendance.absent_periods": 3,
+    "course.total_periods": 15
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 4/15 tiết",
+   "inputs": {
+    "attendance.absent_periods": 4,
+    "course.total_periods": 15
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 15/15 tiết",
+   "inputs": {
+    "attendance.absent_periods": 15,
+    "course.total_periods": 15
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 0/20 tiết",
+   "inputs": {
+    "attendance.absent_periods": 0,
+    "course.total_periods": 20
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 3/20 tiết",
+   "inputs": {
+    "attendance.absent_periods": 3,
+    "course.total_periods": 20
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 4/20 tiết",
+   "inputs": {
+    "attendance.absent_periods": 4,
+    "course.total_periods": 20
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 5/20 tiết",
+   "inputs": {
+    "attendance.absent_periods": 5,
+    "course.total_periods": 20
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 20/20 tiết",
+   "inputs": {
+    "attendance.absent_periods": 20,
+    "course.total_periods": 20
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 0/30 tiết",
+   "inputs": {
+    "attendance.absent_periods": 0,
+    "course.total_periods": 30
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 5/30 tiết",
+   "inputs": {
+    "attendance.absent_periods": 5,
+    "course.total_periods": 30
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 6/30 tiết",
+   "inputs": {
+    "attendance.absent_periods": 6,
+    "course.total_periods": 30
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 7/30 tiết",
+   "inputs": {
+    "attendance.absent_periods": 7,
+    "course.total_periods": 30
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 30/30 tiết",
+   "inputs": {
+    "attendance.absent_periods": 30,
+    "course.total_periods": 30
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 0/36 tiết",
+   "inputs": {
+    "attendance.absent_periods": 0,
+    "course.total_periods": 36
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 6/36 tiết",
+   "inputs": {
+    "attendance.absent_periods": 6,
+    "course.total_periods": 36
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 7/36 tiết",
+   "inputs": {
+    "attendance.absent_periods": 7,
+    "course.total_periods": 36
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 8/36 tiết",
+   "inputs": {
+    "attendance.absent_periods": 8,
+    "course.total_periods": 36
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 36/36 tiết",
+   "inputs": {
+    "attendance.absent_periods": 36,
+    "course.total_periods": 36
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 0/45 tiết",
+   "inputs": {
+    "attendance.absent_periods": 0,
+    "course.total_periods": 45
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 8/45 tiết",
+   "inputs": {
+    "attendance.absent_periods": 8,
+    "course.total_periods": 45
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 9/45 tiết",
+   "inputs": {
+    "attendance.absent_periods": 9,
+    "course.total_periods": 45
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 10/45 tiết",
+   "inputs": {
+    "attendance.absent_periods": 10,
+    "course.total_periods": 45
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 45/45 tiết",
+   "inputs": {
+    "attendance.absent_periods": 45,
+    "course.total_periods": 45
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 0/60 tiết",
+   "inputs": {
+    "attendance.absent_periods": 0,
+    "course.total_periods": 60
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 11/60 tiết",
+   "inputs": {
+    "attendance.absent_periods": 11,
+    "course.total_periods": 60
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 12/60 tiết",
+   "inputs": {
+    "attendance.absent_periods": 12,
+    "course.total_periods": 60
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 13/60 tiết",
+   "inputs": {
+    "attendance.absent_periods": 13,
+    "course.total_periods": 60
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 60/60 tiết",
+   "inputs": {
+    "attendance.absent_periods": 60,
+    "course.total_periods": 60
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 0/90 tiết",
+   "inputs": {
+    "attendance.absent_periods": 0,
+    "course.total_periods": 90
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 17/90 tiết",
+   "inputs": {
+    "attendance.absent_periods": 17,
+    "course.total_periods": 90
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 18/90 tiết",
+   "inputs": {
+    "attendance.absent_periods": 18,
+    "course.total_periods": 90
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 19/90 tiết",
+   "inputs": {
+    "attendance.absent_periods": 19,
+    "course.total_periods": 90
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Nghỉ không phép 90/90 tiết",
+   "inputs": {
+    "attendance.absent_periods": 90,
+    "course.total_periods": 90
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Chỉ biết số tiết nghỉ, chưa biết tổng số tiết",
+   "inputs": {
+    "attendance.absent_periods": 5
+   },
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Chỉ biết tổng số tiết",
+   "inputs": {
+    "course.total_periods": 30
+   },
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  },
+  {
+   "description": "Chưa nhập gì",
+   "inputs": {},
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "9cfbe01c0aca8f15",
+    "quote": "nghỉ học không có lý do chính đáng vượt quá 20% thời lượng\nthiết kế"
+   }
+  }
+ ]
+}

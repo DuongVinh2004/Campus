@@ -31,11 +31,13 @@ from starlette.responses import JSONResponse, Response, StreamingResponse
 from campus247.application.learning.accessible_text import OCR_WRITES
 from campus247.application.learning.exit_tickets import EXIT_TICKET_WRITES
 from campus247.application.learning.practice_sets import PRACTICE_WRITES
+from campus247.application.learning.tutor import TUTOR_WRITES
 from campus247.application.learning.idea_cards import IDEA_WRITES
 from campus247.domain.learning import LearningError, require, select_bytes
 from campus247.application.learning.telemetry import record
 from campus247.presentation.identity import get_current_identity
 from campus247.presentation.learning_practice import practice_input_models, register_practice_routes
+from campus247.presentation.learning_tutor import register_tutor_routes, tutor_input_models
 from campus247.presentation.learning_ideas import (
     idea_input_models,
     register_idea_routes,
@@ -212,6 +214,7 @@ SCHEMAS.update({
 })
 SCHEMAS.update(idea_input_models(model))
 SCHEMAS.update(practice_input_models(model))
+SCHEMAS.update(tutor_input_models(model))
 SCHEMAS.update(ocr_input_models(model))
 ALIASES = {"create_term": "term-create", "create_course": "course-create", "create_offering": "offering-create", "add_member": "member-create", "update_member": "member-update", "archive_offering": "archive", "hide_material": "material-update", "update_session": "session-update", "order_sessions": "session-order", "material_links": "material-links"}
 
@@ -396,7 +399,7 @@ def create_learning_router(service):
             current = actor(request, write=True)
             payload = parse(action, body)
             key = request.headers.get("Idempotency-Key")
-            private_write = action in EXIT_TICKET_WRITES | IDEA_WRITES | OCR_WRITES | PRACTICE_WRITES or action in {
+            private_write = action in EXIT_TICKET_WRITES | IDEA_WRITES | OCR_WRITES | PRACTICE_WRITES | TUTOR_WRITES or action in {
                 "feedback-window-open", "page-feedback-withdraw", "page-explanation-create",
                 "page-explanation-update", "version-change-save",
             }
@@ -422,6 +425,7 @@ def create_learning_router(service):
 
     register_idea_routes(router, read_endpoint, write_endpoint)
     register_practice_routes(router, read_endpoint, write_endpoint)
+    register_tutor_routes(router, read_endpoint, write_endpoint, actor, service)
     register_ocr_routes(router, read_endpoint, write_endpoint, actor, service)
     writes = [("POST", "/terms", "term-create", None), ("POST", "/courses", "course-create", None), ("POST", "/offerings", "offering-create", None), ("POST", "/offerings/{offering_id}/members", "member-create", "offering_id"), ("PATCH", "/offerings/{offering_id}/members/{member_id}", "member-update", "member_id"), ("POST", "/offerings/{offering_id}/archive", "archive", "offering_id"), ("POST", "/offerings/{offering_id}/sessions", "session-create", "offering_id"), ("PATCH", "/sessions/{session_id}", "session-update", "session_id"), ("PUT", "/offerings/{offering_id}/session-order", "session-order", "offering_id"), ("POST", "/offerings/{offering_id}/materials", "material-create", "offering_id"), ("PATCH", "/materials/{material_id}", "material-update", "material_id"), ("PUT", "/sessions/{session_id}/material-links", "material-links", "session_id"), ("POST", "/materials/{material_id}/upload-intents", "upload-create", "material_id"), ("POST", "/versions/{version_id}/publish", "publish", "version_id"), ("POST", "/versions/{version_id}/retract", "retract", "version_id"), ("POST", "/versions/{version_id}/cancel-publication", "cancel-publication", "version_id"), ("PUT", "/me/reader-state/{version_id}", "reader-state", "version_id"), ("POST", "/me/bookmarks", "bookmark-create", None), ("PATCH", "/me/bookmarks/{bookmark_id}", "bookmark-update", "bookmark_id"), ("PATCH", "/me/notifications/{notification_id}", "notification-update", "notification_id")]
     writes += [("POST", "/me/annotations", "annotation-create", None), ("PATCH", "/me/annotations/{annotation_id}", "annotation-update", "annotation_id"), ("POST", "/versions/{version_id}/questions", "question-create", "version_id"), ("PATCH", "/questions/{question_id}", "question-update", "question_id"), ("POST", "/questions/{question_id}/replies", "reply-create", "question_id"), ("POST", "/replies/{reply_id}/endorse", "reply-endorse", "reply_id"), ("POST", "/sessions/{session_id}/reading-instructions", "instruction-create", "session_id"), ("PATCH", "/reading-instructions/{instruction_id}", "instruction-update", "instruction_id"), ("POST", "/offerings/{offering_id}/presentations", "presentation-create", "offering_id"), ("POST", "/presentations/{presentation_id}/position", "presentation-position", "presentation_id"), ("POST", "/presentations/{presentation_id}/end", "presentation-end", "presentation_id")]

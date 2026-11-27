@@ -36,3 +36,11 @@ def test_invalid_alembic_config_failure_path(tmp_path: Path):
     config = Config(str(bad_ini))
     with pytest.raises((CommandError, FileNotFoundError)):
         ScriptDirectory.from_config(config)
+
+
+def test_env_creates_pgvector_only_for_a_database_without_a_revision():
+    """Migration 0009 adds a VECTOR column: a brand-new database needs the extension first (found by the 2026-11-25 audit)."""
+    source = (MIGRATIONS_DIR / "env.py").read_text(encoding="utf-8")
+    guarded = source[source.index("def do_run_migrations"):source.index("async def run_async_migrations")]
+    assert "get_current_revision() is None" in guarded
+    assert guarded.index("get_current_revision() is None") < guarded.index("CREATE EXTENSION IF NOT EXISTS vector") < guarded.index("run_migrations()")

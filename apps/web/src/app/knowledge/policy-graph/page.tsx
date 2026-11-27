@@ -2,6 +2,8 @@
 import { CAMPUS_API_BASE_URL } from "@/lib/api/base-url";
 
 import React, { useCallback, useEffect, useState } from "react";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import { AppShell } from "../../../components/AppShell";
 import { ApiClient } from "../../../lib/api/client";
 import { PolicyGraphReview, type GraphView } from "../../../features/knowledge/PolicyGraphReview";
@@ -58,13 +60,7 @@ export default function PolicyGraphPage() {
               </label>
             )}
           </div>
-          <button
-            type="button"
-            className="fluent-btn-secondary text-sm"
-            onClick={() => void load(view?.proposal.id)}
-          >
-            Tải lại
-          </button>
+          <IconButton label="Tải lại" variant="outline" onClick={() => void load(view?.proposal.id)} icon={<RefreshCw size={18} />} />
         </div>
         {error && (
           <div

@@ -1,0 +1,22 @@
+{
+  "cases": 100,
+  "hint_requests": 200,
+  "skipped": 0,
+  "provider_calls": 209,
+  "refused_by_egress_policy": 2,
+  "sent_to_provider": 198,
+  "first_attempt_pass_rate": 0.944,
+  "shown_from_model": 198,
+  "replaced_by_template": 2,
+  "shown_with_leak": 0,
+  "shown_quote_not_verbatim": 0,
+  "shown_failing_recheck": 0,
+  "rejection_reasons": {
+    "HINT_MARKDOWN": 6,
+    "LEAKS_ANSWER": 5,
+    "EGRESS_DENIED": 2
+  },
+  "p90_seconds": 1.67,
+  "evidence": "machine-made fill-in-the-number cases from the RAG v2 index, gold checked by code; real provider via the sidecar"
+}
+exit=0

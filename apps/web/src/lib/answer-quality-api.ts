@@ -19,6 +19,11 @@ export interface AnswerQualityReport {
   gaps: { days: number; minimum_count: number; clusters: GapCluster[] };
 }
 
+export interface VerificationReport {
+  days: number; statements: number; verbatim: number; semantic: number; rejected: Record<string, number>; rejected_total: number;
+  rejected_share: number | null; verbatim_share: number | null; daily_rejected: { day: string; by_reason: Record<string, number> }[];
+}
+
 export interface StudentGapReports {
   total: number; samples: { id: number; at: string; expires_at: string; question: string }[];
   groups?: { question: string; count: number; ids: number[]; last_at: string }[];
@@ -28,6 +33,7 @@ const client = () => new ApiClient({ baseUrl: CAMPUS_API_BASE_URL });
 
 export const answerQualityApi = {
   report: (days = 30) => client().get<AnswerQualityReport>(`/v1/knowledge/answer-quality?days=${days}`),
+  verification: (days = 30) => client().get<VerificationReport>(`/v1/knowledge/answer-quality/verification?days=${days}`),
   studentReports: () => client().get<StudentGapReports>("/v1/knowledge/gap-reports"),
   decide: (clusterKey: string, body: { action: GapAction; note: string; release_ref?: string }) =>
     client().post<{ cluster_key: string; action: GapAction }>(`/v1/knowledge/answer-quality/gaps/${encodeURIComponent(clusterKey)}/decision`, body),

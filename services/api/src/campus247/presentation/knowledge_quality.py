@@ -69,6 +69,12 @@ def create_quality_router(store: AnswerQualityStore, freshness_service, *, clock
         await _title_gaps(body["gaps"], freshness_service)
         return JSONResponse(body, headers=NO_STORE)
 
+    @router.get("/v1/knowledge/answer-quality/verification")
+    async def verification(request: Request, days: int = Query(30, ge=1, le=180)):
+        if manager(request) is None:
+            return _problem(403, "FORBIDDEN", "Chỉ quản trị tri thức mới xem được thống kê này.")
+        return JSONResponse(store.verification_report(now=clock() if clock else datetime.now(UTC), days=days), headers=NO_STORE)
+
     @router.post("/v1/knowledge/answer-quality/gaps/{cluster_key}/decision")
     async def decide(cluster_key: str, body: DecisionBody, request: Request):
         identity = manager(request)

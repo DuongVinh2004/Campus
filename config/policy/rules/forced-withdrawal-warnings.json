@@ -1,0 +1,91 @@
+{
+  "rule_id": "forced-withdrawal-warnings",
+  "topic": "FORCED_WITHDRAWAL_WARNINGS",
+  "version": 1,
+  "description": "Buộc thôi học khi vượt quá 2 lần cảnh báo liên tiếp, hoặc quá 4 lần không liên tiếp (cử nhân).",
+  "conclusion": {
+    "code": "FORCED_WITHDRAWAL",
+    "label": "Thuộc diện buộc thôi học do số lần cảnh báo học tập",
+    "source": {
+      "unit_id": "d377f9b41792e1c1",
+      "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+      "path": "Điều 11 > Khoản 2",
+      "quote": "Sinh viên bị buộc thôi học trong các trường hợp sau"
+    }
+  },
+  "applies": {
+    "audiences": [
+      "STUDENT"
+    ],
+    "cohorts": {
+      "from": null,
+      "to": null
+    },
+    "programs": [
+      "*"
+    ],
+    "effective": {
+      "from": null,
+      "to": null
+    }
+  },
+  "when": {
+    "id": "g",
+    "any": [
+      {
+        "id": "c1",
+        "pred": {
+          "var": "warnings.consecutive",
+          "op": ">",
+          "value": 2
+        },
+        "source": {
+          "unit_id": "7c96e982cc7d34f6",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 11 > Khoản 2 > Điểm a",
+          "quote": "vượt quá 2 lần liên\ntiếp"
+        }
+      },
+      {
+        "id": "g2",
+        "all": [
+          {
+            "id": "c2a",
+            "pred": {
+              "var": "program.kind",
+              "op": "=",
+              "value": "BACHELOR"
+            },
+            "source": {
+              "unit_id": "7c96e982cc7d34f6",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 2 > Điểm a",
+              "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+            }
+          },
+          {
+            "id": "c2b",
+            "pred": {
+              "var": "warnings.total",
+              "op": ">",
+              "value": 4
+            },
+            "source": {
+              "unit_id": "7c96e982cc7d34f6",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 2 > Điểm a",
+              "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "exceptions": [],
+  "supersedes": [],
+  "on_undetermined": {
+    "refer_to": "ACADEMIC_SERVICES",
+    "service_kind": "GENERAL_SUPPORT"
+  },
+  "graph_refs": []
+}

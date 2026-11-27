@@ -33,6 +33,7 @@ class OpsConfig:
     gateway_url: str | None = None
     gateway_token: str | None = None
     background: Callable[[], dict[str, Any]] | None = None  # {"leader": bool, "learning_worker": str}
+    features: Callable[[], dict[str, Any]] | None = None  # {"off": n, "overrides": n, "restart_required": n, "store_error": bool}
     quality_dir: Path | None = None  # where evals/runners/nightly_retrieval.py writes LATEST.json
 
 
@@ -172,6 +173,7 @@ async def build_status(config: OpsConfig, *, client: httpx.AsyncClient, cache: P
         "models": models,
         "gateway": gateway,
         "background": config.background() if config.background else {},
+        "features": config.features() if config.features else {},
         "storage": {"data_free_pct": _free_pct(config.data_dir), "backup_free_pct": _free_pct(config.backup_dir)},
         "backup": backup_state(config.backup_dir, now=now),
         "quality": quality_state(config.quality_dir, now=now),

@@ -1,0 +1,6 @@
+{
+  "people": 30000,
+  "seconds": 2.4,
+  "sent": 30000,
+  "method": "synthetic, one process, SQLite WAL"
+}

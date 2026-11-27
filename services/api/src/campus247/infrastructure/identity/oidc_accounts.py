@@ -21,6 +21,7 @@ from typing import Any
 from campus247.domain.shared.values import generate_uuid7
 from campus247.infrastructure.identity.oidc import OidcConfig, OidcError
 from campus247.ports.identity import IdentityRole
+from campus247.ports.oidc import safe_next  # noqa: F401 -- re-exported: the definition lives in the port
 
 ATTEMPT_TTL = timedelta(minutes=10)
 FROM_PROVIDER = {IdentityRole.STUDENT, IdentityRole.LECTURER}
@@ -47,13 +48,6 @@ def validate_config(config: OidcConfig) -> None:
         re.compile(config.student_code_pattern)
     except re.error:
         raise OidcError("CONFIG_PATTERN_INVALID") from None
-
-
-def safe_next(value: str | None) -> str:
-    """Only a path inside this site: it must start with one slash, never `//`, a backslash, a scheme or a control character."""
-    if not value or not value.startswith("/") or value.startswith("//") or "\\" in value or any(ord(c) < 32 for c in value) or len(value) > 300:
-        return "/"
-    return value
 
 
 def _now_text(now: datetime) -> str:
@@ -96,6 +90,10 @@ class OidcAccountStore:
         return {"nonce": row[1], "verifier": row[2], "next_path": row[3]}
 
     # ------------------------------------------------------------------ accounts
+    def resolve(self, config: OidcConfig, claims: dict[str, Any], *, now: datetime) -> dict[str, Any]:
+        """The account the verified claims stand for (see `resolve_account`); lets the HTTP layer call it without importing this module."""
+        return resolve_account(config, self, claims, now=now)
+
     def lookup(self, issuer: str, sub: str) -> dict[str, Any] | None:
         with closing(self._connect()) as db:
             row = db.execute("SELECT subject_id, disabled FROM oidc_subjects WHERE issuer = ? AND sub = ?", (issuer, sub)).fetchone()

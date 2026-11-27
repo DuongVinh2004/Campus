@@ -1,0 +1,521 @@
+{
+ "rule_id": "forced-withdrawal-warnings",
+ "authored_from": "regulation wording (units.jsonl)",
+ "cases": [
+  {
+   "description": "Cử nhân: 0 lần liên tiếp, tổng 0 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 0,
+    "warnings.total": 0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 0 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 0,
+    "warnings.total": 4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 0 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 0,
+    "warnings.total": 5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 0 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 0,
+    "warnings.total": 6
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 1 lần liên tiếp, tổng 1 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 1,
+    "warnings.total": 1
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 1 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 1,
+    "warnings.total": 4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 1 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 1,
+    "warnings.total": 5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 1 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 1,
+    "warnings.total": 6
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 2 lần liên tiếp, tổng 2 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 2,
+    "warnings.total": 2
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 2 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 2,
+    "warnings.total": 4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 2 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 2,
+    "warnings.total": 5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 2 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 2,
+    "warnings.total": 6
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Cử nhân: 3 lần liên tiếp, tổng 3 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 3,
+    "warnings.total": 3
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Cử nhân: 3 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 3,
+    "warnings.total": 4
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Cử nhân: 3 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 3,
+    "warnings.total": 5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Cử nhân: 3 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 3,
+    "warnings.total": 6
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Cử nhân: 4 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 4,
+    "warnings.total": 4
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Cử nhân: 4 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 4,
+    "warnings.total": 5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Cử nhân: 4 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "BACHELOR",
+    "warnings.consecutive": 4,
+    "warnings.total": 6
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 0 lần liên tiếp, tổng 0 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 0,
+    "warnings.total": 0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 0 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 0,
+    "warnings.total": 4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 0 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 0,
+    "warnings.total": 5
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 0 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 0,
+    "warnings.total": 6
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 1 lần liên tiếp, tổng 1 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 1,
+    "warnings.total": 1
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 1 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 1,
+    "warnings.total": 4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 1 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 1,
+    "warnings.total": 5
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 1 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 1,
+    "warnings.total": 6
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 2 lần liên tiếp, tổng 2 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 2,
+    "warnings.total": 2
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 2 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 2,
+    "warnings.total": 4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 2 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 2,
+    "warnings.total": 5
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 2 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 2,
+    "warnings.total": 6
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 3 lần liên tiếp, tổng 3 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 3,
+    "warnings.total": 3
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 3 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 3,
+    "warnings.total": 4
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 3 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 3,
+    "warnings.total": 5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 3 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 3,
+    "warnings.total": 6
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 4 lần liên tiếp, tổng 4 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 4,
+    "warnings.total": 4
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 4 lần liên tiếp, tổng 5 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 4,
+    "warnings.total": 5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Kỹ sư: 4 lần liên tiếp, tổng 6 lần cảnh báo",
+   "inputs": {
+    "program.kind": "ENGINEER_SPECIAL",
+    "warnings.consecutive": 4,
+    "warnings.total": 6
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  },
+  {
+   "description": "Không biết loại chương trình, 1 lần liên tiếp, tổng 5",
+   "inputs": {
+    "warnings.consecutive": 1,
+    "warnings.total": 5
+   },
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "quá 4 lần không liên tiếp đối với chương trình đào tạo trình độ cử nhân"
+   }
+  },
+  {
+   "description": "Chưa nhập gì",
+   "inputs": {},
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "7c96e982cc7d34f6",
+    "quote": "vượt quá 2 lần liên\ntiếp"
+   }
+  }
+ ]
+}

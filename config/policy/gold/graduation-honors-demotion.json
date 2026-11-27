@@ -1,0 +1,1135 @@
+{
+ "rule_id": "graduation-honors-demotion",
+ "authored_from": "regulation wording (units.jsonl)",
+ "cases": [
+  {
+   "description": "Điểm tích lũy 3.19, học lại 7/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 7/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 7/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 7/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 8/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 8/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 8/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 8/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 6/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 6/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 6/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 6/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 7/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 7/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 7/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.19, học lại 7/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.19,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 7/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 7/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 7/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 7/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 8/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 8/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 8/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 8/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 6/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 6/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 6/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 6/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 7/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 7/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 7/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.2, học lại 7/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.2,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 7/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 7/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 7/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 7/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 8/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 8/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 8/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 8/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 6/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 6/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 6/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 6/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 7/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 7/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 7/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.5, học lại 7/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.5,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 7/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 7/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 7/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 7/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 8/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 8/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 8/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 8/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 6/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 6/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 6/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 6/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 7/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 7/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 7/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 3.6, học lại 7/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 3.6,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 7/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 7/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 7/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 7/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 7,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 8/150 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 8/150 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 8/150 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 8/150 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 8,
+    "program.total_credits": 150,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 6/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 6/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 6/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 6/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 6,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 7/120 tín chỉ, kỷ luật NONE",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "NONE"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 7/120 tín chỉ, kỷ luật REPRIMAND",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "REPRIMAND"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 7/120 tín chỉ, kỷ luật WARNING",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "WARNING"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Điểm tích lũy 4.0, học lại 7/120 tín chỉ, kỷ luật SUSPENSION",
+   "inputs": {
+    "gpa.cumulative": 4.0,
+    "retake.credits": 7,
+    "program.total_credits": 120,
+    "discipline.level": "SUSPENSION"
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  },
+  {
+   "description": "Chưa nhập gì",
+   "inputs": {},
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "fd009919541bf9cf",
+    "quote": "vượt quá 5% so với tổng số tín\nchỉ quy định cho toàn chương trình"
+   }
+  }
+ ]
+}

@@ -41,6 +41,8 @@ class AnswerQualityStore:
             db.execute("""CREATE TABLE IF NOT EXISTS answer_gaps(id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, reason TEXT NOT NULL,
                           cluster_key TEXT NOT NULL, version_ids TEXT NOT NULL)""")
             db.execute("CREATE INDEX IF NOT EXISTS answer_gaps_cluster ON answer_gaps(cluster_key, at)")
+            # Verification counters (F4.4): per day and kind only. No text, no person, no conversation.
+            db.execute("""CREATE TABLE IF NOT EXISTS verification_counts(day TEXT NOT NULL, kind TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY(day, kind))""")
             db.execute("""CREATE TABLE IF NOT EXISTS answer_gap_decisions(cluster_key TEXT PRIMARY KEY, at TEXT NOT NULL, action TEXT NOT NULL,
                           note TEXT NOT NULL, release_ref TEXT NOT NULL, actor TEXT NOT NULL)""")
 
@@ -57,6 +59,40 @@ class AnswerQualityStore:
             db.executemany("INSERT INTO answer_ratings(at, version_id, helpful) VALUES (?,?,?)", [(_stamp(moment), v, int(helpful)) for v in unique])
             db.execute("DELETE FROM answer_ratings WHERE at < ?", (_stamp(moment - RETENTION),))  # this table's own old rows only
         return len(unique)
+
+    def record_verification(self, *, checks, rejected_counts: dict[str, int], at: datetime | None = None) -> None:
+        """Count accepted statements (total, verbatim, semantically checked) and dropped ones per reason, for one day."""
+        moment = at or datetime.now(UTC)
+        day = moment.astimezone(UTC).date().isoformat()
+        counts: dict[str, int] = {"statements": len(checks), "verbatim": sum(1 for c in checks if c.verbatim),
+                                  "semantic": sum(1 for c in checks if c.semantic == "PASSED")}
+        for reason, n in rejected_counts.items():
+            if isinstance(reason, str) and reason.isupper() and len(reason) <= 40:
+                counts["rejected:" + reason] = int(n)
+        with closing(self._connect()) as db, db:
+            db.executemany("INSERT INTO verification_counts(day, kind, n) VALUES (?,?,?) ON CONFLICT(day, kind) DO UPDATE SET n = n + excluded.n",
+                           [(day, kind, n) for kind, n in counts.items() if n])
+            db.execute("DELETE FROM verification_counts WHERE day < ?", ((moment - RETENTION).astimezone(UTC).date().isoformat(),))
+
+    def verification_report(self, *, now: datetime, days: int = 30) -> dict[str, Any]:
+        since = (now - timedelta(days=days)).astimezone(UTC).date().isoformat()
+        with closing(self._connect()) as db:
+            rows = db.execute("SELECT day, kind, n FROM verification_counts WHERE day >= ? ORDER BY day, kind", (since,)).fetchall()
+        total = {"statements": 0, "verbatim": 0, "semantic": 0}
+        rejected: dict[str, int] = {}
+        daily: dict[str, dict[str, int]] = {}
+        for day, kind, n in rows:
+            if kind in total:
+                total[kind] += n
+            elif kind.startswith("rejected:"):
+                rejected[kind[9:]] = rejected.get(kind[9:], 0) + n
+                daily.setdefault(day, {})[kind[9:]] = n
+        dropped = sum(rejected.values())
+        seen = total["statements"] + dropped
+        return {"since": since, "days": days, **total, "rejected": dict(sorted(rejected.items(), key=lambda kv: -kv[1])),
+                "rejected_total": dropped, "rejected_share": round(dropped / seen, 3) if seen else None,
+                "verbatim_share": round(total["verbatim"] / total["statements"], 3) if total["statements"] else None,
+                "daily_rejected": [{"day": d, "by_reason": v} for d, v in sorted(daily.items())]}
 
     @staticmethod
     def _cluster_key(reason: str, version_ids: list[str]) -> str:
@@ -153,6 +189,26 @@ async def titled_report(store: AnswerQualityStore, freshness_service, *, now: da
         known = titles.get(source["version_id"])
         source["title"], source["owner_unit"], source["in_current_release"] = (known["title"], known["owner_unit"], True) if known else (None, None, False)
     return report
+
+
+def attach_verification_recording(store: AnswerQualityStore, *, on_error: Callable[[Exception], None] = lambda error: None) -> None:
+    """Count what the verifier kept and dropped for each answer (F4.4). Safe to call twice; a failure here never affects the answer."""
+    from campus247.agent.nodes import rag_v2
+
+    for existing in rag_v2.OUTCOME_OBSERVERS:
+        if getattr(existing, "verification_store", None) is store:
+            return
+
+    def observe(outcome, rows) -> None:
+        if outcome.kind not in {"answer", "partial", "refuse"}:
+            return
+        try:
+            store.record_verification(checks=outcome.checks, rejected_counts=dict(outcome.rejected_counts))
+        except Exception as error:  # noqa: BLE001 -- the statistics are secondary to the answer
+            on_error(error)
+
+    observe.verification_store = store  # type: ignore[attr-defined]
+    rag_v2.OUTCOME_OBSERVERS.append(observe)
 
 
 def attach_gap_recording(store: AnswerQualityStore, *, on_error: Callable[[Exception], None] = lambda error: None) -> None:

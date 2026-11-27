@@ -1,0 +1,477 @@
+{
+ "rule_id": "course-pass",
+ "authored_from": "regulation wording (units.jsonl)",
+ "cases": [
+  {
+   "description": "Điểm học phần 0",
+   "inputs": {
+    "grade.course_score": 0
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 0.5",
+   "inputs": {
+    "grade.course_score": 0.5
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 1",
+   "inputs": {
+    "grade.course_score": 1
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 1.5",
+   "inputs": {
+    "grade.course_score": 1.5
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 2",
+   "inputs": {
+    "grade.course_score": 2
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 2.5",
+   "inputs": {
+    "grade.course_score": 2.5
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 3",
+   "inputs": {
+    "grade.course_score": 3
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 3.5",
+   "inputs": {
+    "grade.course_score": 3.5
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 3.7",
+   "inputs": {
+    "grade.course_score": 3.7
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 3.8",
+   "inputs": {
+    "grade.course_score": 3.8
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 3.9",
+   "inputs": {
+    "grade.course_score": 3.9
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.0",
+   "inputs": {
+    "grade.course_score": 4.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.1",
+   "inputs": {
+    "grade.course_score": 4.1
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.2",
+   "inputs": {
+    "grade.course_score": 4.2
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.5",
+   "inputs": {
+    "grade.course_score": 4.5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.9",
+   "inputs": {
+    "grade.course_score": 4.9
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 5.0",
+   "inputs": {
+    "grade.course_score": 5.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 5.4",
+   "inputs": {
+    "grade.course_score": 5.4
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 5.5",
+   "inputs": {
+    "grade.course_score": 5.5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 6.0",
+   "inputs": {
+    "grade.course_score": 6.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 6.4",
+   "inputs": {
+    "grade.course_score": 6.4
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 6.5",
+   "inputs": {
+    "grade.course_score": 6.5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 6.9",
+   "inputs": {
+    "grade.course_score": 6.9
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 7.0",
+   "inputs": {
+    "grade.course_score": 7.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 7.5",
+   "inputs": {
+    "grade.course_score": 7.5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 7.9",
+   "inputs": {
+    "grade.course_score": 7.9
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 8.0",
+   "inputs": {
+    "grade.course_score": 8.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 8.4",
+   "inputs": {
+    "grade.course_score": 8.4
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 8.5",
+   "inputs": {
+    "grade.course_score": 8.5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 9.0",
+   "inputs": {
+    "grade.course_score": 9.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 9.5",
+   "inputs": {
+    "grade.course_score": 9.5
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 10.0",
+   "inputs": {
+    "grade.course_score": 10.0
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 1.9",
+   "inputs": {
+    "grade.course_score": 1.9
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 2.9",
+   "inputs": {
+    "grade.course_score": 2.9
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 3.4",
+   "inputs": {
+    "grade.course_score": 3.4
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 3.6",
+   "inputs": {
+    "grade.course_score": 3.6
+   },
+   "expected": "NOT_SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.3",
+   "inputs": {
+    "grade.course_score": 4.3
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.6",
+   "inputs": {
+    "grade.course_score": 4.6
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.7",
+   "inputs": {
+    "grade.course_score": 4.7
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 4.8",
+   "inputs": {
+    "grade.course_score": 4.8
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 5.1",
+   "inputs": {
+    "grade.course_score": 5.1
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Điểm học phần 5.2",
+   "inputs": {
+    "grade.course_score": 5.2
+   },
+   "expected": "SATISFIED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  },
+  {
+   "description": "Chưa có điểm học phần",
+   "inputs": {},
+   "expected": "UNDETERMINED",
+   "source_span": {
+    "unit_id": "686c639234150b83",
+    "quote": "D: từ 4,0 đến 4,9"
+   }
+  }
+ ]
+}

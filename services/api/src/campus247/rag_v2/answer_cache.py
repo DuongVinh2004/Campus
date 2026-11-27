@@ -23,7 +23,8 @@ PROMPT_VERSION = sha256((GENERATION_PROMPT + "\0" + SEMANTIC_PROMPT).encode()).h
 
 
 def enabled() -> bool:
-    return os.environ.get("CAMPUS247_RAG_ANSWER_CACHE", "off").strip().lower() in {"1", "on", "true", "yes"}
+    from campus247.features.runtime import value  # F0: the env variable is the flag's legacy source; an admin override wins
+    return bool(value("chat.answer_cache", os.environ.get("CAMPUS247_RAG_ANSWER_CACHE", "off").strip().lower() in {"1", "on", "true", "yes"}))
 
 
 class AnswerCache:

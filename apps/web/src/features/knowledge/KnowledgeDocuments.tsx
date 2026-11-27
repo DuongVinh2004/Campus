@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AlertTriangle, CheckCircle2, Clock3, FileUp, Loader2, RefreshCw, ShieldCheck, XCircle } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 
 const base = "/v1/knowledge/platform/documents";
 const ATTEST = "Tôi xác nhận đây là văn bản chính thức, đúng nguồn và đúng phạm vi áp dụng.";
@@ -121,7 +122,7 @@ export function KnowledgeDocuments() {
     {notice && <p role="status" className="rounded-xl border p-3 text-sm">{notice}</p>}
     <section className="campus-panel space-y-3" aria-label="Tiến độ tài liệu">
       <div className="flex items-center justify-between"><h2 className="font-semibold">Tiến độ tài liệu</h2>
-        <button type="button" className="fluent-btn-secondary" onClick={() => void load()}><RefreshCw size={14} aria-hidden="true" /> Làm mới</button></div>
+        <IconButton label="Làm mới" variant="outline" onClick={() => void load()} icon={<RefreshCw size={18} />} /></div>
       {!listing ? <p className="text-sm">Đang tải…</p> : !listing.items.length ? <p className="text-sm">Chưa có tài liệu nào được thêm qua trang này. Tài liệu bạn thêm sẽ hiện ở đây.</p>
         : <ul className="space-y-3">{listing.items.map(item => <li key={item.version_id} className="rounded-xl border p-4 space-y-2" data-state={item.state}>
           <div className="flex flex-wrap items-start justify-between gap-2">

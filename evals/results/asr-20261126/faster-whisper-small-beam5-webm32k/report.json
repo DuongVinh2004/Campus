@@ -1,0 +1,18 @@
+{
+  "model": "faster-whisper-small",
+  "clips": 100,
+  "wer": 0.1932,
+  "words": 2986,
+  "rtf_p50": 0.374,
+  "rtf_p95": 0.566,
+  "load_seconds": 1.3,
+  "threads": 4,
+  "beam": 5,
+  "compute_type": "int8",
+  "webm_opus_bitrate": 32000,
+  "targets": {
+    "wer_max": 0.2,
+    "rtf_p95_max": 1.5
+  },
+  "evidence": "FLEURS vi_vn dev (human-read, human transcription), 100 different sentences by fixed seed; this machine's CPU"
+}

@@ -1,0 +1,185 @@
+# Closed variable vocabulary for policy rules (reviewed like code). Units come from a closed set.
+[variables."attendance.absent_periods"]
+type = "integer"
+unit = "period"
+min = 0
+max = 300
+label = "Số tiết nghỉ không có lý do chính đáng"
+input = "USER"
+
+[variables."course.total_periods"]
+type = "integer"
+unit = "period"
+min = 1
+max = 300
+label = "Tổng số tiết của học phần"
+input = "USER"
+
+[variables."attendance.absent_ratio"]
+type = "number"
+unit = "percent"
+min = 0
+max = 100
+step = 0.5
+label = "Tỉ lệ thời lượng nghỉ không có lý do chính đáng"
+input = "USER"
+derive = "attendance.absent_periods / course.total_periods * 100"
+
+[variables."grade.process_score"]
+type = "number"
+unit = "point10"
+min = 0
+max = 10
+step = 0.1
+label = "Điểm quá trình"
+input = "USER"
+
+[variables."grade.final_exam_score"]
+type = "number"
+unit = "point10"
+min = 0
+max = 10
+step = 0.1
+label = "Điểm thi kết thúc học phần"
+input = "USER"
+
+[variables."grade.course_score"]
+type = "number"
+unit = "point10"
+min = 0
+max = 10
+step = 0.1
+label = "Điểm học phần"
+input = "USER"
+
+[variables."student.cohort"]
+type = "string"
+pattern = "^[0-9]{2}$"
+label = "Khóa (ví dụ 66)"
+input = "PROFILE"
+
+[variables."discipline.level"]
+type = "enum"
+values = ["NONE", "REPRIMAND", "WARNING", "SUSPENSION"]
+label = "Mức kỷ luật hiện tại"
+input = "USER"
+
+[variables."semester.registered_credits"]
+type = "integer"
+unit = "credit"
+min = 1
+max = 60
+label = "Số tín chỉ đã đăng ký trong học kỳ"
+input = "USER"
+
+[variables."semester.failed_credits"]
+type = "integer"
+unit = "credit"
+min = 0
+max = 60
+label = "Số tín chỉ không đạt trong học kỳ"
+input = "USER"
+
+[variables."semester.failed_credit_ratio"]
+type = "number"
+unit = "percent"
+min = 0
+max = 100
+step = 0.5
+label = "Tỉ lệ tín chỉ không đạt trên khối lượng đăng ký"
+input = "USER"
+derive = "semester.failed_credits / semester.registered_credits * 100"
+
+[variables."study.debt_credits"]
+type = "integer"
+unit = "credit"
+min = 0
+max = 300
+label = "Tổng số tín chỉ nợ đọng từ đầu khóa"
+input = "USER"
+
+[variables."semester.is_first"]
+type = "boolean"
+label = "Đây là học kỳ đầu của khóa học"
+input = "USER"
+
+[variables."gpa.semester"]
+type = "number"
+unit = "point4"
+min = 0
+max = 4
+step = 0.01
+label = "Điểm trung bình học kỳ (thang 4)"
+input = "USER"
+
+[variables."gpa.cumulative"]
+type = "number"
+unit = "point4"
+min = 0
+max = 4
+step = 0.01
+label = "Điểm trung bình tích lũy (thang 4)"
+input = "USER"
+
+[variables."student.year_level"]
+type = "integer"
+min = 1
+max = 5
+label = "Trình độ năm học (1 đến 5)"
+input = "USER"
+
+[variables."warnings.consecutive"]
+type = "integer"
+min = 0
+max = 20
+label = "Số lần cảnh báo học tập liên tiếp"
+input = "USER"
+
+[variables."warnings.total"]
+type = "integer"
+min = 0
+max = 30
+label = "Tổng số lần cảnh báo học tập"
+input = "USER"
+
+[variables."program.kind"]
+type = "enum"
+values = ["BACHELOR", "ENGINEER_SPECIAL"]
+label = "Loại chương trình (cử nhân, hoặc kỹ sư/kiến trúc sư 1,5 năm)"
+input = "USER"
+
+[variables."graduation.requirements_complete"]
+type = "boolean"
+label = "Đã tích lũy đủ học phần, tín chỉ và đạt chuẩn đầu ra của chương trình"
+input = "USER"
+
+[variables."criminal.liability"]
+type = "boolean"
+label = "Đang bị truy cứu trách nhiệm hình sự"
+input = "USER"
+
+[variables."retake.credits"]
+type = "integer"
+unit = "credit"
+min = 0
+max = 300
+label = "Số tín chỉ của các học phần phải học lại"
+input = "USER"
+
+[variables."program.total_credits"]
+type = "integer"
+unit = "credit"
+min = 1
+max = 300
+label = "Tổng số tín chỉ của toàn chương trình"
+input = "USER"
+
+[variables."retake.credit_ratio"]
+type = "number"
+unit = "percent"
+min = 0
+max = 100
+step = 0.5
+label = "Tỉ lệ khối lượng học phần phải học lại trên toàn chương trình"
+input = "USER"
+derive = "retake.credits / program.total_credits * 100"

@@ -23,19 +23,13 @@ import httpx
 import jwt
 from jwt.algorithms import ECAlgorithm, RSAAlgorithm
 
+from campus247.ports.oidc import OidcError, new_pkce  # noqa: F401 -- re-exported: the definitions live in the port
+
 ALLOWED_ALGORITHMS = ("RS256", "ES256")
 LEEWAY_S = 60
 DISCOVERY_TTL_S = 3600
 JWKS_REFRESH_MIN_S = 60
 HTTP_TIMEOUT_S = 5.0
-
-
-class OidcError(Exception):
-    """`code` is one of a fixed set, safe to show in a URL or a log line."""
-
-    def __init__(self, code: str) -> None:
-        super().__init__(code)
-        self.code = code
 
 
 @dataclass(frozen=True)
@@ -69,13 +63,6 @@ class OidcConfig:
                    claims=dict(data["claims"]) if data.get("claims") else {"student_code": "student_id", "display_name": "name", "roles": "groups"},
                    role_map=dict(data.get("role_map", {})), student_code_pattern=str(data.get("student_code_pattern", r"^[0-9]{6,10}$")),
                    jit_provisioning=bool(data.get("jit_provisioning", False)), privileged_subjects=tuple(data.get("privileged_subjects", ())))
-
-
-def new_pkce() -> tuple[str, str]:
-    """(verifier, S256 challenge)."""
-    verifier = base64.urlsafe_b64encode(secrets.token_bytes(48)).rstrip(b"=").decode()
-    challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b"=").decode()
-    return verifier, challenge
 
 
 def _https_or_local(url: str, *, allow_local: bool) -> bool:

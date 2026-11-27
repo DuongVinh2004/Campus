@@ -57,6 +57,7 @@ export interface OpsStatus {
   models: Record<string, "up" | "down">;
   gateway: { reachable: boolean | null; reason?: string; counters?: Record<string, number>; today?: OpsGatewayToday | null };
   background: { leader?: boolean; learning_worker?: string };
+  features?: { off: number; overrides: number; restart_required: number; store_error: boolean | string | null; expiring_soon?: { key: string; expires_at: string }[] };
   storage: { data_free_pct: number | null; backup_free_pct: number | null };
   backup: { configured: boolean; last?: OpsBackupRecord | null; offsite?: OpsBackupRecord | null; rehearsal?: OpsBackupRecord | null };
   quality?: OpsQuality;

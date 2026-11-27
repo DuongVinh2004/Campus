@@ -1,0 +1,22 @@
+{
+ "topic": "GRADUATION_ELIGIBILITY",
+ "rule": {
+  "rule_id": "graduation-eligibility",
+  "version": 1,
+  "content_sha256": "f7acbc39aed850ce352c0e73cbba1ceb0d2c2632c33d67cf0dfa428da78f4fc6"
+ },
+ "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+ "vectors_by_origin": {
+  "BOUNDARY": 35,
+  "COMBINATORIAL": 45,
+  "GOLD_MODEL": 65
+ },
+ "gold": {
+  "total": 65,
+  "match": 65,
+  "mismatch_pending": 0,
+  "decided": 0,
+  "rate": 1.0
+ },
+ "evidence": "scenarios authored from the regulation wording by the same model that wrote the rules; source spans and quotes checked by code; engine checked against an independent two-valued oracle; not measured with real users"
+}

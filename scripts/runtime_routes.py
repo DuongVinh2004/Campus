@@ -20,7 +20,9 @@ STATIC_FILES = frozenset({"sw.js", "manifest.webmanifest", "favicon.ico"})
 ALLOWED_API_PREFIXES = (
     "/v1/knowledge/", "/v1/conversations", "/v1/privacy/", "/v1/assistant/", "/v1/student-preparations", "/v1/learning/",
     "/v1/rooms", "/v1/tickets", "/v1/students/me/schedule", "/v1/staff/tickets", "/v1/notifications",
-    "/v1/admin/overview", "/v1/admin/operations/", "/v1/answer-gap-reports",
+    "/v1/admin/overview", "/v1/admin/operations/", "/v1/answer-gap-reports", "/v1/features", "/v1/admin/features",
+    "/v1/announcements", "/v1/answer-receipts",
+    "/v1/nudges", "/v1/policy-simulator", "/v1/policy-rules", "/v1/policy-impact", "/v1/policy-conflicts", "/v1/procedures", "/v1/input/image", "/v1/input/voice",
 )
 ALLOWED_API_PATHS = frozenset({"/v1/users/me", "/v1/auth/logout"})
 
@@ -58,11 +60,29 @@ def api_path_allowed(path: str) -> bool:
     return path in ALLOWED_API_PATHS or path.startswith(ALLOWED_API_PREFIXES)
 
 
+# Baseline headers on every response from the single browser origin (8015). Routes that already set a stricter header (for example
+# "Content-Security-Policy: sandbox" on document downloads) keep it. The web never frames its own pages (certificate previews use
+# a sandboxed srcdoc iframe, which these headers do not affect), so framing by any site is refused.
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Content-Security-Policy": "frame-ancestors 'none'",
+}
+
+
+def apply_security_headers(headers) -> None:
+    """Add each baseline header the response does not already carry."""
+    for name, value in SECURITY_HEADERS.items():
+        if name not in headers:
+            headers[name] = value
+
+
 NOT_FOUND_HTML = (
     '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     "<title>Không tìm thấy trang — Campus 24/7</title>"
     "<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f3f1ea;color:#13343b;font:16px/1.6 system-ui,sans-serif}"
-    "main{max-width:28rem;padding:2rem;text-align:center}h1{font:600 2rem Georgia,serif;margin:0 0 .5rem}"
+    "main{max-width:28rem;padding:2rem;text-align:center}h1{font:600 2rem system-ui,'Segoe UI',sans-serif;margin:0 0 .5rem}"
     "a{display:inline-block;margin-top:1rem;padding:.7rem 1.4rem;border-radius:.6rem;background:#14615f;color:#fff;text-decoration:none}</style></head>"
     "<body><main><h1>Không tìm thấy trang</h1><p>Địa chỉ này không tồn tại hoặc chưa được mở trong phiên bản hiện tại.</p>"
     '<a href="/chat">Về trợ lý học vụ</a></main></body></html>'

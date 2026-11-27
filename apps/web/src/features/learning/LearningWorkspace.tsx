@@ -776,7 +776,7 @@ export function LearningWorkspace() {
           sessionId={sessionId} materials={materials} instructions={instructions} zoneId={offering?.timezone || CAMPUS_TIMEZONE}
           canManage={manageable} source={exitReaderSource} refresh={exitRevision} onRows={acceptExitRows} onSelect={selectExitTicket} />}
         {activeSession && actorId && offering?.capabilities.practice && <SessionPracticeSets key={`practice:${actorId}:${sessionId}`} actorId={actorId}
-          sessionId={sessionId} materials={materials} canManage={manageable} />}
+          sessionId={sessionId} materials={materials} canManage={manageable} offeringId={offering?.id} />}
         {activeSession && offering?.capabilities.page_feedback && <SessionPageFeedback
           key={`feedback:${actorId}:${activeSession.id}`} actorId={actorId} sessionId={activeSession.id}
           startsAt={activeSession.starts_at} timeZone={timeZone} canOpen={manageable}

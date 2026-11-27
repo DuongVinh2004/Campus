@@ -38,9 +38,11 @@ async function step(name, fn) {
 const PAGES = {
   student: ["/chat", "/services", "/tickets", "/schedule", "/rooms", "/notifications", "/learning", "/privacy", "/memory"],
   staff: ["/staff", "/tickets", "/chat", "/rooms", "/notifications"],
-  owner: ["/admin", "/knowledge/sources", "/knowledge/documents", "/knowledge/freshness", "/knowledge/quality", "/knowledge/policy-graph", "/knowledge/crawl"],
+  owner: ["/admin", "/knowledge/sources", "/knowledge/documents", "/knowledge/freshness", "/knowledge/quality", "/knowledge/crawl"],
 };
 const PUBLIC_PAGES = ["/login", "/offline"];
+// Pages behind a feature flag that is off by default: they must stay hidden (404) until the flag is turned on.
+const FLAGGED_OFF = { owner: ["/knowledge/policy-graph", "/knowledge/policy-rules", "/knowledge/policy-impact"], student: ["/policy/simulator", "/services/procedures"] };
 // Requests that are expected to be refused for a role (the page shows its own message for them).
 // owner: the policy graph back end is not part of the operational runtime, and its page says so.
 const EXPECTED_REFUSALS = { staff: [/\/v1\/assistant\/conversations/], anon: [/\/v1\/users\/me/], owner: [/\/v1\/policy-graph\//] };
@@ -125,6 +127,12 @@ async function pageSweep() {
       for (const route of routes) await step(`${role} ${route} ${name}`, () => auditPage(page, log, { path: route, text: `${role} ${route} (${name})` }));
       if (name === "desktop") {
         for (const route of routes.slice(0, 3)) await step(`${role} ${route} dark`, () => auditPage(page, log, { path: route, text: `${role} ${route} (dark)` }, { dark: true }));
+      }
+      for (const route of FLAGGED_OFF[role] ?? []) {
+        await step(`${role} ${route} hidden while its flag is off ${name}`, async () => {
+          const response = await page.goto(BASE + route, { waitUntil: "domcontentloaded", timeout: 30000 });
+          check(response && response.status() === 404, `${role} ${route} (${name}): expected 404 while the flag is off, got HTTP ${response && response.status()}`);
+        });
       }
       await context.close();
     }

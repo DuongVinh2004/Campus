@@ -27,6 +27,24 @@ def source_text(unit: Unit) -> str:
     return unit.text
 
 
+# Locator noise in a unit path: page, character range, PDF and row numbers say where the text sits, not what it says.
+_PATH_NOISE = re.compile(r"\s*·\s*trang\s+\d+\s*·\s*chars\s+\d+:\d+|\s*>\s*tr\.\s*\d+|\s*>\s*Dòng\s+\d+|\s*—\s*PDF\s+\d+")
+
+
+def heading_text(unit: Unit) -> str:
+    """The section headings of a unit (its path without locators), e.g. "71CS — Học kỳ 6 — các ô đã đối chiếu > Học phần 608807 - 3".
+
+    For a reviewed curriculum table the semester and the prerequisite pair live only here, so the generator and both checks see
+    it as part of the source. Empty when the path adds nothing beyond the document title.
+    """
+    path = _PATH_NOISE.sub("", unit.path or "")
+    path = path.replace("_verify_individual_row", "").replace("_and_earlier", " trở về trước").replace("_", " ")
+    path = " ".join(path.split())
+    if not path or path == " ".join((unit.doc_title or "").split()):
+        return ""
+    return path
+
+
 def context_text(unit: Unit) -> str:
     if unit.text.startswith(CONTEXT_START) and SOURCE_SEPARATOR in unit.text:
         return unit.text[len(CONTEXT_START):].split(SOURCE_SEPARATOR, 1)[0]

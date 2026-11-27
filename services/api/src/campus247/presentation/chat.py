@@ -372,6 +372,15 @@ def create_chat_router(
                     saved_assistant = await conv_service.append_message(
                         conversation_id=conversation_id, sender_type=SenderType.ASSISTANT,
                         content=result.content, message_id=assistant_msg_id, final_result=result, turn_client_id=payload.client_id)
+                receipts = getattr(getattr(request.scope.get("app"), "state", None), "answer_receipts", None)
+                if receipts is not None and getattr(result, "evidence", None) and receipts.enabled():
+                    from campus247.application.answer_evidence.record import record_receipt
+                    held = await conv_service.get_conversation(conversation_id)
+                    first = saved_assistant.citations[0] if saved_assistant.citations else None
+                    release = (json.loads(first.citation_json).get("release_id") if first else None)
+                    if held is not None:
+                        record_receipt(receipts, owner=identity.subject_id, conversation_id=conversation_id, message=saved_assistant, result=result,
+                                       expires_at=held.retention_expires_at.isoformat(timespec="seconds"), release_id=release)
                 citations_payload = [citation.to_dict() for citation in saved_assistant.citations]
                 await check_result_scope()
                 for citation in citations_payload:

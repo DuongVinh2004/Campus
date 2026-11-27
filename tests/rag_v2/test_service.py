@@ -383,7 +383,8 @@ async def test_model_decision_not_to_answer_becomes_a_typed_outcome_without_veri
     gateway = Deciding(decision, "Bạn hỏi đợt nào?")
     result = await answer(gateway=gateway)
     assert result.kind == kind and result.reason == reason and not result.statements and not result.citations
-    assert [r.request_id for r in gateway.requests] == ["rag_v2_generation"]
+    # A topic-less ask-back on a question that names its subject gets one more generation request (service.vague_reference).
+    assert [r.request_id for r in gateway.requests] == ["rag_v2_generation"] * (2 if decision == "clarify" else 1)
     if kind == "clarify":
         # Model free text is never displayed; the server builds the question.
         assert "Bạn hỏi đợt nào?" not in result.text and "Câu hỏi chưa đủ rõ" in result.text
@@ -472,4 +473,25 @@ async def test_oversized_source_sets_are_trimmed_to_fit_the_provider_input_bound
     assert 1 <= len(sources) < 12                 # lowest-ranked sources were left out
     assert size < 28_000 - 512                    # and the request is within the gateway's input bound
     assert sources[0]["label"] == "[U1]"          # the best-ranked source is kept
+
+
+@pytest.mark.asyncio
+async def test_a_source_that_names_the_major_asked_survives_the_size_trim_over_general_pages_ranked_above_it():
+    from campus247.rag_v2.generation.generate import generate_draft
+    from campus247.rag_v2.understanding.analyze import analyze
+
+    general = [unit("Trang chung số " + str(i) + " " + "Quy định chung về học vụ. " * 150, uid=f"{i:016x}") for i in range(1, 5)]
+    named = unit("Kế hoạch ngành công trình thủy áp dụng K71 ghi 185 tín chỉ. " + "Học phần. " * 150, uid=f"{9:016x}")
+    captured = []
+
+    class Capture(FakeGateway):
+        async def generate(self, request):
+            captured.append(request)
+            return await super().generate(request)
+
+    await generate_draft(Capture(), QUESTION, analyze(QUESTION, ()), general + [named], deadline_ms=5000, max_output_tokens=900,
+                         scope_names=("cong trinh thuy",))
+    sources = json.loads("".join(i["content"] for i in captured[0].input_items))["sources"]
+    assert len(sources) < 5 and any("185 tín chỉ" in s["text"] for s in sources)
+    assert sources[0]["label"] == "[U1]"
 

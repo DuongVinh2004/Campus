@@ -14,6 +14,7 @@ from campus247.rag_v2.generation.contacts import contact_map, redact, restore
 from campus247.rag_v2.generation.json_output import response_object
 from campus247.rag_v2.generation.prompt import GENERATION_PROMPT, STATEMENTS_SCHEMA
 from campus247.rag_v2.types import Statement, Understanding, Unit
+from campus247.rag_v2.ingest.units import heading_text
 from campus247.rag_v2.understanding.normalize import fold
 
 
@@ -88,10 +89,23 @@ PROVIDER_INPUT_BUDGET_BYTES = 27_000   # the gateway's bound is 28,000 including
 _FIXED_REQUEST_BYTES = len(GENERATION_PROMPT.encode()) + len(json.dumps(STATEMENTS_SCHEMA).encode()) + 1_200
 
 
+def _drop_index(selected: Sequence[Unit], scope_names: Sequence[str]) -> int:
+    """Which source to leave out when the request is too large: the lowest-ranked one, but not before the lowest-ranked one that does
+    not carry a name the question uses (a major, a programme). A source that names it is the one the answer is about, even when
+    general documents rank above it (a K71 curriculum table behind two general handbook pages)."""
+    names = [fold(name) for name in scope_names if name]
+    if names:
+        for index in range(len(selected) - 1, 0, -1):
+            text = fold(selected[index].text + " " + selected[index].doc_title)
+            if not any(name in text for name in names):
+                return index
+    return len(selected) - 1
+
+
 async def generate_draft(
     gateway: LlmGateway, question: str, understanding: Understanding, units: Sequence[Unit],
     *, deadline_ms: int, max_output_tokens: int, focus: Sequence[str] = (), relaxed: bool = False,
-    repair: bool = False, scope_names: Sequence[str] = (),
+    repair: bool = False, scope_names: Sequence[str] = (), subject_named: bool = False,
 ) -> Draft:
     selected = list(units[:12])
     if not selected:
@@ -100,6 +114,7 @@ async def generate_draft(
         markers = contact_map(selected)
         labels = {f"U{i}": unit for i, unit in enumerate(selected, 1)}
         evidence = [{"label": f"[{label}]", "text": redact(unit.text, markers),
+                     **({"heading": redact(heading, markers)} if (heading := heading_text(unit)) else {}),
                      "scope": {"cohorts": unit.scope.cohorts, "programs": unit.scope.programs,
                                "academic_years": unit.scope.academic_years}}
                     for label, unit in labels.items()]
@@ -112,6 +127,9 @@ async def generate_draft(
             # Names the question uses as a qualifier (a major, a programme). Data, not instructions: the prompt says what to do when
             # a source is not written along that name.
             body["scope_names"] = list(scope_names)
+        if subject_named:
+            # The previous reply asked back without naming a missing part, but the question names its subject.
+            body["subject_named"] = True
         if repair:
             # The previous reply was cut off or had no statement list; the same call would repeat it.
             body["format_reminder"] = True
@@ -126,7 +144,7 @@ async def generate_draft(
         # whose twelve sources are large tables. Leave out the lowest-ranked sources until the request fits.
         if len(content.encode()) + _FIXED_REQUEST_BYTES <= PROVIDER_INPUT_BUDGET_BYTES or len(selected) <= 1:
             break
-        selected = selected[:-1]
+        del selected[_drop_index(selected, scope_names)]
     if len(content) > 90_000:
         raise ValueError("rag_v2 prompt exceeds bound")
     request = LlmRequest(

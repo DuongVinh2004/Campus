@@ -608,9 +608,9 @@ export function RoomFinder() {
                     </div>
 
                     <div className="space-y-1 pt-2">
-                      <div className="flex items-center justify-between text-[11px] text-[var(--text-secondary)]">
+                      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[11px] text-[var(--text-secondary)]">
                         <span>{t("rooms.14")}</span>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                           <span className="flex items-center gap-1">
                             <span className="inline-block h-2 w-2 rounded-full bg-[var(--color-primary)]" />
                             {t("rooms2.14")}

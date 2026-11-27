@@ -1,0 +1,21 @@
+{
+ "topic": "COURSE_PASS",
+ "rule": {
+  "rule_id": "course-pass",
+  "version": 1,
+  "content_sha256": "784f054c682933ef44fd3be131b9bcea4f7a240e38c616bf9d7f97dc019b8638"
+ },
+ "release_id": "01a172fe-1822-7679-a515-335e063dd1fa",
+ "vectors_by_origin": {
+  "BOUNDARY": 6,
+  "GOLD_MODEL": 43
+ },
+ "gold": {
+  "total": 43,
+  "match": 43,
+  "mismatch_pending": 0,
+  "decided": 0,
+  "rate": 1.0
+ },
+ "evidence": "scenarios authored from the regulation wording by the same model that wrote the rules; source spans and quotes checked by code; engine checked against an independent two-valued oracle; not measured with real users"
+}

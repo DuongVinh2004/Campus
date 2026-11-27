@@ -66,6 +66,25 @@ def test_not_found_is_html_for_people_and_json_for_api_clients():
     assert rr.not_found_response(request("/khong-co", "*/*")).media_type == "application/json"
 
 
+def test_security_headers_are_added_without_replacing_a_stricter_route_header():
+    from starlette.datastructures import MutableHeaders
+
+    page = MutableHeaders()
+    rr.apply_security_headers(page)
+    assert page["x-frame-options"] == "DENY" and page["content-security-policy"] == "frame-ancestors 'none'"
+    assert page["x-content-type-options"] == "nosniff" and page["referrer-policy"] == "strict-origin-when-cross-origin"
+
+    download = MutableHeaders({"Content-Security-Policy": "sandbox"})
+    rr.apply_security_headers(download)
+    assert download["content-security-policy"] == "sandbox"
+
+
+def test_runtime_middleware_applies_the_security_headers():
+    source = (ROOT / "scripts/knowledge_platform.py").read_text(encoding="utf-8")
+    boundary = source[source.index("async def operational_boundary"):]
+    assert "apply_security_headers(response.headers)" in boundary[:boundary.index("return response")]
+
+
 def test_modules_import_without_tzdata(monkeypatch):
     """The runtime Python on Windows has no tzdata: importing the reminder and alert modules must not crash."""
     import zoneinfo

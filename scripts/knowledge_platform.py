@@ -25,7 +25,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "scripts"), str(ROOT / "services/api/src")
     str(ROOT / ".tooling/knowledge-platform-20261023/site-packages")]
 from campus247.infrastructure.knowledge.storage import FileKnowledgeStorage, ReadThroughKnowledgeStorage, checked_path
 from knowledge_parser_runtime import resolve_parser_python
-from runtime_routes import api_path_allowed, is_served_path, not_found_response
+from runtime_routes import api_path_allowed, apply_security_headers, is_served_path, not_found_response
 
 STATE = checked_path(ROOT / "infra/local/knowledge-platform-20261023", ROOT)
 PGROOT = checked_path(ROOT / ".tooling/knowledge-postgres-20261023/pgsql", ROOT)
@@ -279,7 +279,7 @@ async def components(*, rehearsal=None, learning_rehearsal=None):
         init=learning_rehearsal.verify_connection if learning_rehearsal else None)
     async with pool.acquire() as conn:
         revision = await conn.fetchval("SELECT version_num FROM alembic_version")
-        accepted_revisions = {"0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032"} if learning_rehearsal else ({"0020", "0021", "0022", "0023", "0024"} if rehearsal else {"0017", "0018", "0022", "0023", "0024"})
+        accepted_revisions = {"0025", "0026", "0027", "0028", "0029", "0030", "0031", "0032", "0033"} if learning_rehearsal else ({"0020", "0021", "0022", "0023", "0024"} if rehearsal else {"0017", "0018", "0022", "0023", "0024"})
         if revision not in accepted_revisions:
             raise ValueError("Apply additive platform migrations before running services")
         if rehearsal and revision != json.loads(Path(rehearsal).read_text(encoding="utf-8"))["revision"]:
@@ -481,12 +481,29 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         from campus247.bootstrap.learning import configure_learning_ai
         configure_learning_ai(learning_service, gateway, enabled=True)
     factory = RetrievalContextFactory(scope_resolver=LocalScope(), configured_tenant_id=TENANT, configured_campus_id="HUCE")
+    # Feature flags (F0): values from the profile file, the legacy environment variables and admin overrides saved in the state folder.
+    from campus247.application.features.service import FeatureService
+    from campus247.features.registry import feature_for_page
+    from campus247.infrastructure.feature_profile import load_feature_profile
+    from campus247.infrastructure.repositories.sqlite_feature_flags import FeatureStore
+    feature_profile = os.environ.get("CAMPUS247_PROFILE", "local")
+    wired_features = {"learning.core"} if learning_service is not None else set()
+    if learning_ai_flag == "true":
+        wired_features.add("learning.ai_explanations")
+    if os.environ.get("CAMPUS247_OIDC_CONFIG"):
+        wired_features.add("identity.oidc")
+    feature_service = FeatureService(
+        store=FeatureStore(checked_path(identity_root / "feature-flags.sqlite3", ROOT)),
+        profile_values=load_feature_profile(feature_profile, ROOT / "infra/profiles"), env=dict(os.environ),
+        wired=frozenset(wired_features), signing_key=settings.CONFIRMATION_SIGNING_KEY, profile=feature_profile)
+    from campus247.features import runtime as feature_runtime
+    feature_runtime.install(feature_service)
     os.environ["CAMPUS247_IDEMPOTENCY_DB"] = str(bundle["action-idempotency.sqlite3"] if bundle else checked_path(STATE / "action-idempotency.sqlite3", ROOT))
     conversations = SQLiteConversationRepository(bundle["conversations.sqlite3"] if bundle else checked_path(STATE / "conversations.sqlite3", ROOT))
     app = create_app(runtime_settings=settings, synthetic_tenant_id=TENANT, retrieval_context_factory=factory,
         knowledge_runtime=runtime, llm_gateway=gateway, claim_verifier=verifier,
         conversation_repository=conversations,
-        identity_adapter_override=campus_adapter)
+        identity_adapter_override=campus_adapter, feature_service=feature_service)
     app.router.routes[:] = [route for route in app.router.routes
         if getattr(route, "path", None) not in {"/docs", "/docs/oauth2-redirect", "/redoc", "/openapi.json"}]
     app.docs_url = app.redoc_url = app.openapi_url = None
@@ -509,6 +526,125 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.router.routes[0:0] = ops_branches
     register_ops_errors(app)
     app.state.campus_ops = ops_service
+
+    # Official announcements (F1): audience from the local directory accounts; all routes and jobs sit behind the announcements.* flags.
+    from campus247.application.announcements.service import AnnouncementService
+    from campus247.infrastructure.identity.directory_recipients import LocalRecipientDirectory
+    from campus247.presentation.announcements import create_announcements_router, register_announcement_errors
+
+    def announcement_accounts():
+        accounts = list(directory_adapter.directory()["accounts"])
+        local = campus_adapter.student.directory()
+        accounts.append({"role": "STUDENT", "subject_id": local["subject_id"], "faculty_code": None, "class_code": None})
+        accounts.append({"role": "KNOWLEDGE_ADMIN", "subject_id": owner_adapter.directory()["owner_id"]})
+        return accounts
+
+    announcement_service = AnnouncementService(ops_service.store, LocalRecipientDirectory(announcement_accounts), enabled=feature_service.enabled,
+                                               signing_key=settings.CONFIRMATION_SIGNING_KEY)
+    app.include_router(create_announcements_router(announcement_service))
+    register_announcement_errors(app)
+    app.state.announcements = announcement_service
+
+    # Answer receipts (F4.2): the owner re-checks an answer against the current release. Writing them from the chat path waits for F4.1.
+    from campus247.application.answer_evidence.receipts import AnswerReceiptService
+    from campus247.infrastructure.repositories.sqlite_answer_receipts import AnswerReceiptStore
+    from campus247.presentation.answer_receipts import create_answer_receipts_router
+    from campus247.infrastructure.knowledge.rag_v2_units import RagV2Units
+
+    def served_index_dir() -> Path:
+        # The index the chat is answering from now: the runtime swaps in newer releases while it serves, so follow it.
+        loaded = getattr(getattr(app.state, "rag_v2_node", None), "loaded_path", None)
+        index = Path(loaded) if loaded else Path(os.environ.get("CAMPUS247_RAG_V2_INDEX", "data/rag_v2_index"))
+        return index if index.is_absolute() else ROOT / index
+
+    rag_units = RagV2Units(served_index_dir)
+
+    def current_unit_sha(unit_id):  # only used for receipts that carry no document version
+        body = rag_units.text(unit_id)
+        return None if body is None else hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+    receipt_service = AnswerReceiptService(
+        AnswerReceiptStore(checked_path(identity_root / "answer-receipts.sqlite3", ROOT)), current_unit_sha=current_unit_sha,
+        current_release=lambda: rag_units.release()["release_id"], enabled=lambda: feature_service.enabled("chat.evidence_receipts"),
+        version_state=rag_units.version_state)
+    app.include_router(create_answer_receipts_router(receipt_service))
+    app.state.answer_receipts = receipt_service
+
+    # Executable policy rules (F2): rules cite rag_v2 units verbatim; evaluated by pure code, no model.
+    from campus247.application.policy_rules.service import PolicyRulesService
+    from campus247.domain.policy_rules.variables import load_vocabulary
+    from campus247.infrastructure.knowledge.rag_v2_units import RagV2Units
+    from campus247.infrastructure.repositories.sqlite_policy_rules import PolicyRulesStore
+    from campus247.presentation.policy_rules import create_policy_rules_router, register_policy_rule_errors
+    policy_rules = PolicyRulesService(
+        PolicyRulesStore(checked_path(identity_root / "policy-rules.sqlite3", ROOT)), load_vocabulary(ROOT / "config/policy/variables.toml"),
+        rag_units.text, rag_units.release, signing_key=settings.CONFIRMATION_SIGNING_KEY, enabled=feature_service.enabled)
+    policy_rules.seed_from_directory(ROOT / "config/policy/rules", ROOT / "config/policy/gold")
+    app.include_router(create_policy_rules_router(policy_rules))
+    register_policy_rule_errors(app)
+    app.state.policy_rules = policy_rules
+
+    # Procedure agent (F5): deterministic playbooks over the ticket service; the student confirms every write.
+    from campus247.application.campus_ops.service import SERVICE_KINDS
+    from campus247.application.procedures.service import ProcedureService
+    from campus247.domain.procedures import load_procedures
+    from campus247.presentation.procedures import create_procedures_router, register_procedure_errors
+    procedure_service = ProcedureService(
+        ops_service.store, ops_service,
+        load_procedures(ROOT / "config/procedures", service_kinds=set(SERVICE_KINDS), unit_text=rag_units.text),
+        signing_key=settings.CONFIRMATION_SIGNING_KEY, enabled=feature_service.enabled)
+    app.include_router(create_procedures_router(procedure_service))
+    register_procedure_errors(app)
+    app.state.procedures = procedure_service
+
+    # Image input (F8.1): one PNG -> text through a local Tesseract executable (CAMPUS247_INPUT_OCR_TESSERACT); 503 while it is not installed.
+    # CAMPUS247_INPUT_OCR_WSL_RUNTIME (workspace-relative bundle) runs the pinned Linux Tesseract of the learning OCR in WSL + bubblewrap.
+    from campus247.application.input_media.image_ocr import ImageOcrService, configured_engine
+    from campus247.presentation.input_media import create_input_media_router
+    # Voice input (F8.5): the local recognizer of scripts/serve_asr.py on loopback 18083 (503 while it is not running).
+    from campus247.application.input_media.voice import VoiceService
+    app.include_router(create_input_media_router(
+        ImageOcrService(configured_engine(ROOT), temp_root=checked_path(STATE / "input-image-tmp", ROOT)),
+        VoiceService(os.environ.get("CAMPUS247_ASR_URL", "http://127.0.0.1:18083"), STATE / "asr-sidecar.token")))
+
+    # Policy change impact (F3): per-release unit snapshots, diff, dependants, fact conflicts. Admin-only, counts and unit paths only.
+    from campus247.application.policy_impact.service import ImpactService, SnapshotStore
+    from campus247.presentation.policy_impact import create_policy_impact_router
+
+    def index_facts():
+        facts_file = rag_units.index_dir / "facts.jsonl"
+        return [json.loads(line) for line in facts_file.read_text(encoding="utf-8").splitlines()] if facts_file.is_file() else []
+
+    impact_service = ImpactService(
+        SnapshotStore(checked_path(STATE / "release-units", ROOT)), rag_units.rows, lambda: rag_units.release()["release_id"],
+        report_dir=checked_path(STATE / "release-impact", ROOT), rules_citing=policy_rules.rules_citing,
+        eval_dir=ROOT / "evals" / "datasets", facts=index_facts)
+    app.include_router(create_policy_impact_router(impact_service))
+    app.state.policy_impact = impact_service
+
+    # Proactive assistant (F6): signals of one person -> "things to do today" and inbox nudges. No model calls.
+    from campus247.application.proactive.engine import ProactiveEngine
+    from campus247.application.proactive.providers import (AnnouncementProvider, ExamProvider, ExitTicketProvider, PracticeDueProvider,
+        ProcedureDraftProvider, TicketProvider, sqlite_learning_snapshot)
+    from campus247.presentation.nudges import create_nudges_router
+
+    def nudge_subjects():
+        return [a["subject_id"] for a in announcement_accounts() if a["role"] == "STUDENT"]
+
+    def nudge_student_subject(student_code):
+        student = campus_adapter.student.directory()
+        return student["subject_id"] if student["student_code"] == student_code else None
+
+    nudge_providers = [ExamProvider(ops_service.store, nudge_student_subject), AnnouncementProvider(ops_service.store), TicketProvider(ops_service.store),
+                       ProcedureDraftProvider(ops_service.store, lambda pid: getattr(procedure_service.procedures.get(pid), "title", None))]
+    learning_repository = getattr(learning_service, "repository", None)
+    if learning_repository is not None and hasattr(learning_repository, "path"):
+        # The local learning store is SQLite: exit tickets and practice reviews are read from it, read-only.
+        snapshot = sqlite_learning_snapshot(learning_repository.path, learning_repository.tenant_id)
+        nudge_providers += [ExitTicketProvider(snapshot), PracticeDueProvider(snapshot)]
+    proactive_engine = ProactiveEngine(ops_service.store, nudge_providers, enabled=feature_service.enabled, subjects=nudge_subjects)
+    app.include_router(create_nudges_router(proactive_engine))
+    app.state.proactive = proactive_engine
     from campus247.presentation.learning import create_learning_router
     app.include_router(create_learning_router(learning_service))
     app.state.learning_service = learning_service
@@ -526,6 +662,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         model_urls={"embedding": "http://127.0.0.1:18081/info", "reranker": "http://127.0.0.1:18082/info"},
         gateway_url=gateway_url,
         gateway_token=read_token(gateway_token_file) if gateway_url and gateway_token_file else None,
+        features=lambda: feature_service.summary(),
         background=lambda: {"leader": bool(getattr(getattr(app.state, "background_leader", None), "is_leader", False)),
                             "learning_worker": getattr(app.state, "learning_worker_status", "disabled")})
     app.include_router(create_admin_ops_router(ops_config))
@@ -537,12 +674,13 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
     app.include_router(create_freshness_router(freshness_service))
 
     # Which sources are behind answers people mark "not helpful": counts per source only, no question and no person.
-    from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_gap_recording, attach_quality_recording
+    from campus247.application.knowledge.answer_quality import AnswerQualityStore, attach_gap_recording, attach_quality_recording, attach_verification_recording
     from campus247.presentation.knowledge_quality import create_quality_router
     quality_store = AnswerQualityStore(STATE / "answer-quality.sqlite3")
     feedback = getattr(app.state, "feedback_service", None)  # absent in the rehearsal/learning-only apps: nothing to record then
     if feedback is not None:
         attach_quality_recording(feedback, quality_store)
+    attach_verification_recording(quality_store)  # counts of kept and dropped statements per day (F4.4); no text, no person
     attach_gap_recording(quality_store)  # refusals counted under the sources they pointed at; no question, answer or person
     app.include_router(create_quality_router(quality_store, freshness_service))
     # P2 (owner approved the consent text 2026-11-21): a student's own report of missing information, redacted, kept 90 days.
@@ -616,14 +754,38 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     student = campus_adapter.student.directory()
                     return {student["student_code"]: student["subject_id"]}.get
 
+                from campus247.application.features.jobs import run_gated
+
+                def gated(job, make):
+                    # The job runs only while its feature is on; switching it off stops it, switching it on starts it again.
+                    return asyncio.create_task(run_gated(lambda: feature_service.job_enabled(job), make, name=job))
+
                 async def start_jobs():
-                    jobs = [asyncio.create_task(platform.schedules.serve())]
-                    jobs.append(asyncio.create_task(run_reminders(ops_service.store, student_subjects)))
+                    jobs = [gated("knowledge_schedules", platform.schedules.serve)]
+                    jobs.append(gated("exam_reminders", lambda: run_reminders(ops_service.store, student_subjects)))
+                    from campus247.application.announcements.jobs import announcement_jobs
+                    for job_name, job_factory in announcement_jobs(announcement_service):
+                        jobs.append(gated(job_name, job_factory))
+                    from campus247.application.policy_rules.jobs import run_rule_staleness
+                    jobs.append(gated("policy_rule_staleness", lambda: run_rule_staleness(policy_rules)))
+                    from campus247.application.policy_impact.jobs import run_impact_snapshot
+                    jobs.append(gated("impact_snapshot", lambda: run_impact_snapshot(impact_service)))
+                    from campus247.application.policy_impact.jobs import run_answer_source_notices
+
+                    def answer_notice(owner, title, body, link):
+                        with ops_service.store.tx() as c:
+                            ops_service.store.notify(c, owner, "ANSWER_SOURCE_CHANGED", title, body, link)
+                    jobs.append(gated("answer_source_notices", lambda: run_answer_source_notices(receipt_service, answer_notice)))
+                    from campus247.application.procedures.jobs import run_procedure_expiry
+                    jobs.append(gated("procedure_expiry", lambda: run_procedure_expiry(procedure_service)))
+                    from campus247.application.announcements.jobs import proactive_jobs
+                    for job_name, job_factory in proactive_jobs(proactive_engine):
+                        jobs.append(gated(job_name, job_factory))
                     if learning_service is not None:
                         from campus247.application.campus_ops.reminder_job import run_exit_ticket_reminders
-                        jobs.append(asyncio.create_task(run_exit_ticket_reminders(learning_service, ops_service.store)))
+                        jobs.append(gated("exit_ticket_reminders", lambda: run_exit_ticket_reminders(learning_service, ops_service.store)))
                     from campus247.application.knowledge.freshness_reminders import run_freshness_reminders
-                    jobs.append(asyncio.create_task(run_freshness_reminders(
+                    jobs.append(gated("freshness_reminders", lambda: run_freshness_reminders(
                         freshness_service, ops_service.store, lambda: [owner_adapter.directory()["owner_id"]])))
                     from campus247.application.knowledge.release_check import ReleaseWatch, run_release_watch
                     from campus247.observability.ops_metrics import OPS as release_check_ops
@@ -634,7 +796,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                             cwd=str(ROOT), stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
                         asyncio.create_task(check.wait())
 
-                    jobs.append(asyncio.create_task(run_release_watch(ReleaseWatch(
+                    jobs.append(gated("release_check", lambda: run_release_watch(ReleaseWatch(
                         lambda: (runtime.current or {}).get("release_id"), start_release_check,
                         lambda: release_check_ops.gauges.get("in_flight", 0) > 3))))
 
@@ -645,12 +807,12 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                     import httpx
                     alert_client, alert_cache = httpx.AsyncClient(trust_env=False), ProbeCache()
                     alert_manager = AlertManager(STATE / "ops-alerts", build_notifier(os.environ))
-                    jobs.append(asyncio.create_task(run_alerts(
+                    jobs.append(gated("alerts", lambda: run_alerts(
                         alert_manager, lambda: build_status(ops_config, client=alert_client, cache=alert_cache))))
                     if learning_service is not None:
-                        jobs.append(asyncio.create_task(learning_worker()))
+                        jobs.append(gated("learning_worker", learning_worker))
                         if learning_service.accessible_text_pipeline is not None:
-                            jobs.append(asyncio.create_task(learning_service.serve_accessible_text()))
+                            jobs.append(gated("accessible_text", learning_service.serve_accessible_text))
                     return jobs
 
                 def standby():
@@ -701,7 +863,8 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         actor = campus_adapter.resolve_token(token)
         response = JSONResponse({"user_id": actor.subject_id, "roles": [r.value for r in actor.roles],
             "is_synthetic_identity": actor.is_synthetic, "identity_provider":"local", "university_identity_verified":False}, headers={"Cache-Control":"no-store"})
-        response.set_cookie("auth_token", token, httponly=True, samesite="strict", max_age=3600)
+        # Secure whenever the request arrived over HTTPS (directly, or through the reverse proxy that sets X-Forwarded-Proto).
+        response.set_cookie("auth_token", token, httponly=True, samesite="strict", max_age=3600, secure=request.url.scheme == "https")
         return response
 
     from campus247.application.assistance.state_storage import ConversationMetadata, StateScope
@@ -781,6 +944,7 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
         response = await call_next(request)
         if path.startswith("/v1/student-preparations"):
             response.headers["Cache-Control"] = "no-store"
+        apply_security_headers(response.headers)
         return response
 
     if frontend_port is not None:
@@ -792,6 +956,9 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
                 return RedirectResponse("/chat" if not page_path else "/knowledge/sources")
             if not is_served_path(page_path):
                 return not_found_response(request)
+            page_owner = feature_for_page(page_path)
+            if page_owner is not None and not feature_service.enabled(page_owner):
+                return not_found_response(request)  # the feature behind this page is switched off
             return await proxy_frontend(page_path, request, frontend_port)
     return app
 

@@ -33,7 +33,8 @@ def _fold(text: str) -> str:
 
 def mode() -> str:
     """off | shadow | on (CAMPUS247_RAG_SKIP_VERBATIM_SEMANTIC). Shadow still asks the model and records agreement."""
-    value = os.environ.get("CAMPUS247_RAG_SKIP_VERBATIM_SEMANTIC", "off").strip().lower()
+    from campus247.features.runtime import value as feature_value  # F0: env is the legacy source; an admin override wins
+    value = str(feature_value("chat.verbatim_skip", os.environ.get("CAMPUS247_RAG_SKIP_VERBATIM_SEMANTIC", "off"))).strip().lower()
     return value if value in {"off", "shadow", "on"} else "off"
 
 

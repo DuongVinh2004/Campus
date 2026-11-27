@@ -1,0 +1,278 @@
+{
+  "rule_id": "academic-warning",
+  "topic": "ACADEMIC_WARNING",
+  "version": 1,
+  "description": "Cảnh báo học tập khi một trong các điều kiện về tín chỉ không đạt, nợ đọng, điểm trung bình học kỳ hoặc tích lũy xảy ra.",
+  "conclusion": {
+    "code": "WARNED",
+    "label": "Bị cảnh báo học tập cuối học kỳ chính",
+    "source": {
+      "unit_id": "0d49d56bb8f0ee45",
+      "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+      "path": "Điều 11 > Khoản 1",
+      "quote": "Cuối mỗi học kỳ chính, sinh viên được cảnh báo học tập"
+    }
+  },
+  "applies": {
+    "audiences": [
+      "STUDENT"
+    ],
+    "cohorts": {
+      "from": null,
+      "to": null
+    },
+    "programs": [
+      "*"
+    ],
+    "effective": {
+      "from": null,
+      "to": null
+    }
+  },
+  "when": {
+    "id": "g",
+    "any": [
+      {
+        "id": "c1",
+        "pred": {
+          "var": "semester.failed_credit_ratio",
+          "op": ">",
+          "value": 50,
+          "unit": "percent"
+        },
+        "source": {
+          "unit_id": "95f6fc90ba169718",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 11 > Khoản 1 > Điểm a",
+          "quote": "vượt quá 50% khối lượng đã đăng\nkí học trong học kỳ"
+        }
+      },
+      {
+        "id": "c2",
+        "pred": {
+          "var": "study.debt_credits",
+          "op": ">",
+          "value": 24,
+          "unit": "credit"
+        },
+        "source": {
+          "unit_id": "95f6fc90ba169718",
+          "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+          "path": "Điều 11 > Khoản 1 > Điểm a",
+          "quote": "tổng số tín chỉ nợ đọng từ đầu khóa học vượt quá 24"
+        }
+      },
+      {
+        "id": "g3",
+        "all": [
+          {
+            "id": "c3a",
+            "pred": {
+              "var": "semester.is_first",
+              "op": "=",
+              "value": true
+            },
+            "source": {
+              "unit_id": "7b32589e2489f185",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm b",
+              "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+            }
+          },
+          {
+            "id": "c3b",
+            "pred": {
+              "var": "gpa.semester",
+              "op": "<",
+              "value": 0.8,
+              "unit": "point4"
+            },
+            "source": {
+              "unit_id": "7b32589e2489f185",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm b",
+              "quote": "dưới 0,8 đối với học kỳ đầu của khóa học"
+            }
+          }
+        ]
+      },
+      {
+        "id": "g4",
+        "all": [
+          {
+            "id": "c4a",
+            "pred": {
+              "var": "semester.is_first",
+              "op": "=",
+              "value": false
+            },
+            "source": {
+              "unit_id": "7b32589e2489f185",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm b",
+              "quote": "dưới 1,0 đối với các học kỳ tiếp theo"
+            }
+          },
+          {
+            "id": "c4b",
+            "pred": {
+              "var": "gpa.semester",
+              "op": "<",
+              "value": 1.0,
+              "unit": "point4"
+            },
+            "source": {
+              "unit_id": "7b32589e2489f185",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm b",
+              "quote": "dưới 1,0 đối với các học kỳ tiếp theo"
+            }
+          }
+        ]
+      },
+      {
+        "id": "g5",
+        "all": [
+          {
+            "id": "c5a",
+            "pred": {
+              "var": "student.year_level",
+              "op": "=",
+              "value": 1
+            },
+            "source": {
+              "unit_id": "3d08c940e5d91b6f",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm c",
+              "quote": "dưới 1,2 đối với sinh viên trình độ năm thứ\nnhất"
+            }
+          },
+          {
+            "id": "c5b",
+            "pred": {
+              "var": "gpa.cumulative",
+              "op": "<",
+              "value": 1.2,
+              "unit": "point4"
+            },
+            "source": {
+              "unit_id": "3d08c940e5d91b6f",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm c",
+              "quote": "dưới 1,2 đối với sinh viên trình độ năm thứ\nnhất"
+            }
+          }
+        ]
+      },
+      {
+        "id": "g6",
+        "all": [
+          {
+            "id": "c6a",
+            "pred": {
+              "var": "student.year_level",
+              "op": "=",
+              "value": 2
+            },
+            "source": {
+              "unit_id": "3d08c940e5d91b6f",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm c",
+              "quote": "dưới 1,4 đối với sinh viên trình độ năm thứ hai"
+            }
+          },
+          {
+            "id": "c6b",
+            "pred": {
+              "var": "gpa.cumulative",
+              "op": "<",
+              "value": 1.4,
+              "unit": "point4"
+            },
+            "source": {
+              "unit_id": "3d08c940e5d91b6f",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm c",
+              "quote": "dưới 1,4 đối với sinh viên trình độ năm thứ hai"
+            }
+          }
+        ]
+      },
+      {
+        "id": "g7",
+        "all": [
+          {
+            "id": "c7a",
+            "pred": {
+              "var": "student.year_level",
+              "op": "=",
+              "value": 3
+            },
+            "source": {
+              "unit_id": "3d08c940e5d91b6f",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm c",
+              "quote": "dưới 1,6 đối với sinh viên\ntrình độ năm thứ ba"
+            }
+          },
+          {
+            "id": "c7b",
+            "pred": {
+              "var": "gpa.cumulative",
+              "op": "<",
+              "value": 1.6,
+              "unit": "point4"
+            },
+            "source": {
+              "unit_id": "3d08c940e5d91b6f",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm c",
+              "quote": "dưới 1,6 đối với sinh viên\ntrình độ năm thứ ba"
+            }
+          }
+        ]
+      },
+      {
+        "id": "g8",
+        "all": [
+          {
+            "id": "c8a",
+            "pred": {
+              "var": "student.year_level",
+              "op": ">",
+              "value": 3
+            },
+            "source": {
+              "unit_id": "3d08c940e5d91b6f",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm c",
+              "quote": "trình độ năm thứ ba, dưới 1,8 đối với sinh viên các năm tiếp theo"
+            }
+          },
+          {
+            "id": "c8b",
+            "pred": {
+              "var": "gpa.cumulative",
+              "op": "<",
+              "value": 1.8,
+              "unit": "point4"
+            },
+            "source": {
+              "unit_id": "3d08c940e5d91b6f",
+              "version_id": "01a17057-0cbd-7504-a63c-b4c0ca345694",
+              "path": "Điều 11 > Khoản 1 > Điểm c",
+              "quote": "dưới 1,8 đối với sinh viên các năm tiếp theo"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "exceptions": [],
+  "supersedes": [],
+  "on_undetermined": {
+    "refer_to": "ACADEMIC_SERVICES",
+    "service_kind": "GENERAL_SUPPORT"
+  },
+  "graph_refs": []
+}

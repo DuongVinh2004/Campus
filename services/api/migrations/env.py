@@ -44,6 +44,9 @@ def run_migrations_offline() -> None:
 def do_run_migrations(connection: Connection) -> None:
     context.configure(connection=connection, target_metadata=target_metadata)
     with context.begin_transaction():
+        if context.get_context().get_current_revision() is None:
+            # A new database: migration 0009 adds a VECTOR column, so the pgvector extension must exist first.
+            context.execute("CREATE EXTENSION IF NOT EXISTS vector")
         context.run_migrations()
 
 

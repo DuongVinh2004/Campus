@@ -92,6 +92,15 @@ def test_login_uses_only_httponly_cookie(operational):
         assert response.headers["cache-control"] == "no-store"
 
 
+def test_login_cookie_is_secure_over_https_and_plain_over_http(operational):
+    body = {"username": "first", "password": "test-password"}
+    path = "/v1/knowledge/platform/session"
+    with TestClient(operational[0], base_url="https://testserver") as client:
+        assert "secure" in client.post(path, json=body).headers["set-cookie"].lower().split("; ")
+    with TestClient(operational[0]) as client:
+        assert "secure" not in client.post(path, json=body).headers["set-cookie"].lower().split("; ")
+
+
 def test_login_keeps_origin_and_password_guards(operational):
     with TestClient(operational[0]) as client:
         path = "/v1/knowledge/platform/session"

@@ -1,0 +1,40 @@
+{"groups": [{}]}
+{"groups": [{"roles": ["LECTURER"]}]}
+{"groups": [{"class_codes": ["NO-SUCH"]}]}
+{"groups": [{"cohorts": ["67"], "faculty_codes": ["CNTT"], "roles": ["STUDENT"]}]}
+{"groups": [{"class_codes": ["66XD1"], "cohorts": ["66"], "faculty_codes": ["KX"], "roles": ["SUPPORT_OFFICER"]}, {"class_codes": ["66KX2"], "roles": ["STUDENT", "SUPPORT_OFFICER"]}]}
+{"groups": [{"class_codes": ["66KT2"], "faculty_codes": ["KT"], "roles": ["SUPPORT_OFFICER", "STUDENT"]}, {"faculty_codes": ["XD", "CNTT"], "roles": ["LECTURER", "SUPPORT_OFFICER"], "subjects": ["01900000-0000-7000-8000-000000000027", "01900000-0000-7000-8000-0000000003e9"]}]}
+{"groups": [{"cohorts": ["66"], "roles": ["LECTURER"]}, {"class_codes": ["66KT1", "66XD2"], "cohorts": ["66"], "roles": ["LECTURER", "SUPPORT_OFFICER"]}, {"class_codes": ["66XD2"], "cohorts": ["66"], "roles": ["STUDENT"], "subjects": ["01900000-0000-7000-8000-00000000001c", "01900000-0000-7000-8000-000000000024", "01900000-0000-7000-8000-0000000003e8"]}]}
+{"groups": [{"cohorts": ["66"]}, {"class_codes": ["66IT1", "66XD2"], "cohorts": ["66"], "roles": ["LECTURER", "STUDENT"]}]}
+{"groups": [{"faculty_codes": ["KT", "KX"], "roles": ["LECTURER"]}, {"faculty_codes": ["KX"], "roles": ["SUPPORT_OFFICER", "LECTURER"]}, {"faculty_codes": ["KX", "XD"]}]}
+{"groups": [{"faculty_codes": ["XD"], "roles": ["SUPPORT_OFFICER", "STUDENT"]}]}
+{"groups": [{"roles": ["SUPPORT_OFFICER"]}]}
+{"groups": [{"class_codes": ["66KT2", "66KX1"], "cohorts": ["66"]}, {"cohorts": ["66"], "faculty_codes": ["KT", "KX"], "roles": ["LECTURER", "SUPPORT_OFFICER"], "subjects": ["01900000-0000-7000-8000-000000000013", "01900000-0000-7000-8000-00000000001d", "01900000-0000-7000-8000-00000000001c", "01900000-0000-7000-8000-00000000000a", "01900000-0000-7000-8000-000000000015"]}, {"cohorts": ["66"], "faculty_codes": ["KT", "CNTT"], "subjects": ["01900000-0000-7000-8000-000000000004", "01900000-0000-7000-8000-000000000006"]}]}
+{"groups": [{"cohorts": ["66"], "roles": ["LECTURER"], "subjects": ["01900000-0000-7000-8000-000000000025", "01900000-0000-7000-8000-000000000008", "01900000-0000-7000-8000-00000000001e", "01900000-0000-7000-8000-000000000005", "01900000-0000-7000-8000-000000000014", "01900000-0000-7000-8000-0000000003e9"]}, {"roles": ["LECTURER"]}, {"faculty_codes": ["CNTT", "KT"], "roles": ["LECTURER", "STUDENT"]}]}
+{"groups": [{}, {}, {"cohorts": ["66"], "roles": ["STUDENT"]}]}
+{"groups": [{"class_codes": ["66KX1", "66KT2", "66KT1"], "faculty_codes": ["CNTT", "KT"]}]}
+{"groups": [{"class_codes": ["66XD2", "66KT2", "66KT1"], "cohorts": ["66"], "faculty_codes": ["KX"], "roles": ["STUDENT", "SUPPORT_OFFICER"]}, {"faculty_codes": ["KT"]}, {"roles": ["STUDENT"], "subjects": ["01900000-0000-7000-8000-000000000023", "01900000-0000-7000-8000-000000000021", "01900000-0000-7000-8000-000000000004", "01900000-0000-7000-8000-000000000025", "01900000-0000-7000-8000-000000000018"]}]}
+{"groups": [{"faculty_codes": ["XD", "CNTT"]}, {"faculty_codes": ["CNTT"], "roles": ["LECTURER", "STUDENT"], "subjects": ["01900000-0000-7000-8000-000000000026", "01900000-0000-7000-8000-000000000024", "01900000-0000-7000-8000-000000000020", "01900000-0000-7000-8000-000000000002", "01900000-0000-7000-8000-000000000009"]}]}
+{"groups": [{"class_codes": ["66KX1", "66IT1"], "cohorts": ["66"], "subjects": ["01900000-0000-7000-8000-000000000007", "01900000-0000-7000-8000-000000000021", "01900000-0000-7000-8000-000000000020", "01900000-0000-7000-8000-000000000022", "01900000-0000-7000-8000-000000000017"]}, {"class_codes": ["66XD1", "66IT1"], "cohorts": ["66"], "faculty_codes": ["KT"]}]}
+{"groups": [{"class_codes": ["66XD2"], "faculty_codes": ["XD"], "roles": ["LECTURER", "STUDENT"]}]}
+{"groups": [{"class_codes": ["66KX2", "66KT1", "66KT2"]}, {"class_codes": ["66XD2", "66IT1", "66KT1"], "faculty_codes": ["CNTT"]}, {"faculty_codes": ["CNTT", "XD"], "roles": ["SUPPORT_OFFICER", "STUDENT"]}]}
+{"groups": [{"class_codes": ["66KX1", "66KT1", "66IT1"], "cohorts": ["66"]}, {"faculty_codes": ["KT"], "roles": ["SUPPORT_OFFICER", "STUDENT"], "subjects": ["01900000-0000-7000-8000-000000000027"]}]}
+{"groups": [{"class_codes": ["66IT2", "66XD2", "66KX1"], "cohorts": ["66"], "faculty_codes": ["KX"]}]}
+{"groups": [{"cohorts": ["66"], "faculty_codes": ["CNTT"], "roles": ["STUDENT", "LECTURER"]}, {"class_codes": ["66KT1"], "roles": ["LECTURER"]}]}
+{"groups": [{"cohorts": ["66"], "roles": ["SUPPORT_OFFICER", "STUDENT"]}, {"roles": ["SUPPORT_OFFICER", "LECTURER"]}]}
+{"groups": [{"faculty_codes": ["KX", "KT"]}, {"cohorts": ["66"], "roles": ["LECTURER", "STUDENT"]}, {"class_codes": ["66KT2"], "cohorts": ["66"], "roles": ["LECTURER"]}]}
+{"groups": [{}]}
+{"groups": [{"class_codes": ["66KX1", "66IT2"], "faculty_codes": ["KX", "XD"], "roles": ["LECTURER", "STUDENT"]}, {"cohorts": ["66"], "faculty_codes": ["KX", "XD"]}]}
+{"groups": [{"faculty_codes": ["XD", "CNTT"]}, {"class_codes": ["66IT2", "66XD1", "66KX1"], "faculty_codes": ["XD"], "roles": ["STUDENT", "SUPPORT_OFFICER"]}, {"faculty_codes": ["XD"], "roles": ["LECTURER", "SUPPORT_OFFICER"]}]}
+{"groups": [{"class_codes": ["66IT1", "66KX2"], "cohorts": ["66"], "faculty_codes": ["CNTT"], "roles": ["LECTURER", "STUDENT"], "subjects": ["01900000-0000-7000-8000-000000000017"]}, {"cohorts": ["66"], "faculty_codes": ["KX", "KT"]}, {"cohorts": ["66"]}]}
+{"groups": [{"faculty_codes": ["CNTT"], "roles": ["STUDENT"], "subjects": ["01900000-0000-7000-8000-000000000024", "01900000-0000-7000-8000-000000000027", "01900000-0000-7000-8000-0000000003e9", "01900000-0000-7000-8000-000000000020", "01900000-0000-7000-8000-000000000019", "01900000-0000-7000-8000-000000000001"]}, {"roles": ["STUDENT"], "subjects": ["01900000-0000-7000-8000-0000000003ea", "01900000-0000-7000-8000-00000000000d"]}]}
+{"groups": [{}]}
+{"groups": [{"faculty_codes": ["KT"], "roles": ["STUDENT"]}, {"cohorts": ["66"], "faculty_codes": ["CNTT"]}]}
+{"groups": [{"roles": ["SUPPORT_OFFICER"]}, {"roles": ["LECTURER", "STUDENT"], "subjects": ["01900000-0000-7000-8000-000000000012", "01900000-0000-7000-8000-0000000003eb", "01900000-0000-7000-8000-000000000025", "01900000-0000-7000-8000-000000000021", "01900000-0000-7000-8000-000000000019"]}]}
+{"groups": [{"roles": ["LECTURER", "STUDENT"]}, {"class_codes": ["66XD2", "66XD1", "66IT1"], "subjects": ["01900000-0000-7000-8000-000000000015", "01900000-0000-7000-8000-000000000020"]}, {"class_codes": ["66KT1"], "faculty_codes": ["CNTT"], "roles": ["LECTURER"]}]}
+{"groups": [{"roles": ["STUDENT", "LECTURER"]}, {"class_codes": ["66KT2", "66IT1", "66IT2"], "cohorts": ["66"], "faculty_codes": ["KX", "XD"], "roles": ["STUDENT"]}, {"faculty_codes": ["XD"]}]}
+{"groups": [{"faculty_codes": ["KT", "XD"], "roles": ["STUDENT", "LECTURER"]}, {"class_codes": ["66KT2"], "faculty_codes": ["XD", "KT"], "subjects": ["01900000-0000-7000-8000-000000000025", "01900000-0000-7000-8000-00000000001f", "01900000-0000-7000-8000-0000000003e8", "01900000-0000-7000-8000-0000000003e9", "01900000-0000-7000-8000-00000000000f"]}, {"class_codes": ["66KT2"], "roles": ["STUDENT", "SUPPORT_OFFICER"], "subjects": ["01900000-0000-7000-8000-00000000001e"]}]}
+{"groups": [{"cohorts": ["66"], "faculty_codes": ["KT", "KX"], "roles": ["STUDENT", "LECTURER"]}]}
+{"groups": [{"cohorts": ["66"], "faculty_codes": ["KT", "CNTT"]}, {"class_codes": ["66XD1"], "roles": ["STUDENT", "LECTURER"], "subjects": ["01900000-0000-7000-8000-000000000003", "01900000-0000-7000-8000-00000000001d", "01900000-0000-7000-8000-0000000003e9", "01900000-0000-7000-8000-000000000012"]}, {"cohorts": ["66"], "roles": ["STUDENT", "LECTURER"], "subjects": ["01900000-0000-7000-8000-000000000025"]}]}
+{"groups": [{"faculty_codes": ["KT"]}]}
+{"groups": [{"cohorts": ["66"], "faculty_codes": ["KT", "KX"], "roles": ["STUDENT", "LECTURER"]}, {"cohorts": ["66"], "subjects": ["01900000-0000-7000-8000-000000000003", "01900000-0000-7000-8000-000000000012", "01900000-0000-7000-8000-000000000022", "01900000-0000-7000-8000-000000000018"]}]}

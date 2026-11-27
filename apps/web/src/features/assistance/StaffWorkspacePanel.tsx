@@ -1,4 +1,6 @@
 "use client";
+import { RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import { CAMPUS_API_BASE_URL } from "@/lib/api/base-url";
 
 import { useEffect, useRef, useState } from "react";
@@ -88,7 +90,7 @@ export function StaffWorkspacePanel({ resource, actorId, studentId }: { resource
   return <section aria-label="Bộ hồ sơ làm việc" className="my-4 space-y-4 rounded-xl border p-4">
     <h3 className="font-semibold">Bộ hồ sơ làm việc · dữ liệu mô phỏng</h3>
     <p className="text-sm">Thông tin khai báo và đối chiếu theo bản hồ sơ. OCR, SLA và quy định chính thức chưa được xác minh.</p>
-    {error && <p role="alert">{error}</p>}<button type="button" disabled={busy} onClick={() => void run(load)}>Đọc lại bộ hồ sơ</button>
+    {error && <p role="alert">{error}</p>}<IconButton label="Đọc lại bộ hồ sơ" disabled={busy} onClick={() => void run(load)} icon={<RefreshCw size={16} />} />
     {dossier && <>
       <p role="status">{readyLabels[dossier.readiness]} · {dossier.workflow_version} · {dossier.criteria_version}</p>
       <p>{dossier.purpose || "Chưa có mục đích được khai báo"}</p><p className="text-sm">{dossier.next_action}</p>

@@ -4,6 +4,7 @@ import { useT, type MessageKey } from "@/lib/i18n";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { LearningGateway, type LearningMaterial } from "../../lib/data/api/learning-gateway";
 import styles from "./learning.module.css";
+import { ClassMastery, MyMastery, TutorBox, type TutorState } from "./TutorPanels";
 
 const gateway = new LearningGateway();
 
@@ -12,7 +13,8 @@ interface Citation { page_no: number; quote: string }
 interface StudentItem { id: string; kind: "single_choice" | "multi_choice" | "short_answer"; prompt: string; options: Option[] }
 interface StaffItem extends StudentItem { answer: string[]; accepted: string[]; explanation: string; citations: Citation[]; revision: number }
 interface SetRow { id: string; title: string; status: "DRAFT" | "PUBLISHED" | "RETIRED"; revision: number; item_count?: number; items?: (StudentItem | StaffItem)[] }
-interface Result { correct: boolean; answer: string[]; accepted: string[]; explanation: string; citations: Citation[]; next_review_at: string }
+// While the class uses the tutor, a wrong answer before the lecturer's threshold comes back without the answer and with `tutor`.
+interface Result { correct: boolean; answer?: string[]; accepted?: string[]; explanation?: string; citations?: Citation[]; next_review_at: string; tutor?: TutorState }
 
 const STATUS: Record<SetRow["status"], MessageKey> = { DRAFT: "psx.1", PUBLISHED: "psx.2", RETIRED: "psx.3" };
 
@@ -70,6 +72,12 @@ function StudentSession({ set, onDone }: { set: SetRow; onDone: () => void }) {
     setIndex((value) => value + 1);
   }
 
+  function retry() {
+    setResult(null);
+    setPicked([]);
+    setText("");
+  }
+
   const toggle = (id: string) => setPicked((current) => item.kind === "single_choice" ? [id] : current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
   const ready = item.kind === "short_answer" ? text.trim().length > 0 : picked.length > 0;
   return (
@@ -90,13 +98,15 @@ function StudentSession({ set, onDone }: { set: SetRow; onDone: () => void }) {
         </fieldset>
       )}
       {error && <p role="alert">{error}</p>}
-      {!result ? <button type="submit" disabled={!ready || busy}>{t("psx.17")}</button> : (
+      {!result ? <button type="submit" disabled={!ready || busy}>{t("psx.17")}</button> : result.tutor ? (
+        <TutorBox itemId={item.id} tutor={result.tutor} onRetry={retry} />
+      ) : (
         <div data-testid="practice-result">
           <p>{result.correct ? t("psx.18") : t("psx.19")}</p>
-          {item.kind === "short_answer" ? <p>{t("psx.7", { a: result.accepted.join("; ") })}</p>
-            : <p>{t("psx.8", { a: item.options.filter((o) => result.answer.includes(o.id)).map((o) => o.text).join("; ") })}</p>}
+          {item.kind === "short_answer" ? <p>{t("psx.7", { a: (result.accepted ?? []).join("; ") })}</p>
+            : <p>{t("psx.8", { a: item.options.filter((o) => (result.answer ?? []).includes(o.id)).map((o) => o.text).join("; ") })}</p>}
           {result.explanation && <p>{result.explanation}</p>}
-          {result.citations.map((citation) => <blockquote key={`${citation.page_no}:${citation.quote}`}>Trang {citation.page_no}: {citation.quote}</blockquote>)}
+          {(result.citations ?? []).map((citation) => <blockquote key={`${citation.page_no}:${citation.quote}`}>Trang {citation.page_no}: {citation.quote}</blockquote>)}
           <button type="button" onClick={next}>{index + 1 < items.length ? t("psx.20") : t("psx.21")}</button>
         </div>
       )}
@@ -201,7 +211,7 @@ function StaffSet({ summary, onChanged }: { summary: SetRow; onChanged: () => vo
   );
 }
 
-export function SessionPracticeSets({ sessionId, materials, canManage, actorId }: { sessionId: string; materials: LearningMaterial[]; canManage: boolean; actorId: string }) {
+export function SessionPracticeSets({ sessionId, materials, canManage, actorId, offeringId }: { sessionId: string; materials: LearningMaterial[]; canManage: boolean; actorId: string; offeringId?: string }) {
   const t = useT();
   const [sets, setSets] = useState<SetRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -235,6 +245,7 @@ export function SessionPracticeSets({ sessionId, materials, canManage, actorId }
       ) : (
         <ul>{sets.map((row) => <li key={row.id}>{row.title} · {t("psx.9", { n: row.item_count ?? 0 })} <button type="button" onClick={() => setActive(row)}>{t("psx.36")}</button></li>)}</ul>
       )}
+      {offeringId && (canManage ? <ClassMastery offeringId={offeringId} /> : <MyMastery offeringId={offeringId} />)}
       {canManage && (
         <form onSubmit={(event) => void create(event)} aria-label={t("psx.40")}>
           <label>{t("psx.41")}<input value={title} maxLength={160} onChange={(event) => setTitle(event.target.value)} required /></label>

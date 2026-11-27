@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, Play, RefreshCw } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 
 const base = "/v1/knowledge/platform/crawl-sources";
 const DECISION_LABELS: Record<string, string> = {
@@ -78,7 +79,7 @@ export function KnowledgeCrawl() {
     {error && <p role="alert" className="rounded-xl border p-3 text-sm text-[var(--color-danger)]">{error}</p>}
     {notice && <p role="status" className="rounded-xl border p-3 text-sm">{notice}</p>}
     <section className="campus-panel space-y-3" aria-label="Danh sách nguồn tự động">
-      <div className="flex items-center justify-between"><h2 className="font-semibold">Nguồn tự động</h2><button type="button" className="fluent-btn-secondary" onClick={() => void load()}><RefreshCw size={14} aria-hidden="true" /> Làm mới</button></div>
+      <div className="flex items-center justify-between"><h2 className="font-semibold">Nguồn tự động</h2><IconButton label="Làm mới" variant="outline" onClick={() => void load()} icon={<RefreshCw size={18} />} /></div>
       {!sources ? <p className="text-sm">Đang tải…</p> : !sources.length ? <p className="text-sm">Chưa có nguồn nào.</p> : <ul className="space-y-3">{sources.map(source => <li key={source.id} className="rounded-xl border p-4 space-y-2">
         <div className="flex flex-wrap items-start justify-between gap-2"><div><p className="font-semibold">{source.name}</p><p className="text-xs break-all">{source.seed_urls.join(", ")}</p></div>
           <span className="text-sm font-semibold">{!source.active ? "Đã tạm dừng" : source.ingest_enabled ? "Đang nạp tài liệu" : "Chỉ chạy thử"}</span></div>

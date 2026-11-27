@@ -34,6 +34,7 @@ api_worker_mb = 30
 worker_mb = 40
 gateway_mb = 7
 scanner_mb = 11
+asr_mb = 13
 """
 
 

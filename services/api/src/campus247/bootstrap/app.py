@@ -151,7 +151,7 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
                public_knowledge_store: PublicKnowledgeStore | None = None,
                claim_verifier=None, certificate_service=None,
                multi_agent_store=None, multi_agent_policy=None, multi_agent_admission=None, policy_graph=None,
-               knowledge_runtime=None, identity_adapter_override=None, rag_v2_node=None) -> FastAPI:
+               knowledge_runtime=None, identity_adapter_override=None, rag_v2_node=None, feature_service=None) -> FastAPI:
     """Application factory for Campus 24/7 FastAPI backend service."""
     if runtime_settings is not None and not isinstance(runtime_settings, Settings):
         raise ValueError("validated runtime settings required")
@@ -295,6 +295,11 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
     )
     session_service = SessionService(revocation_store) if revocation_store is not None else get_session_service()
     app.state.current_session_service = session_service
+    if feature_service is not None:
+        # Added before the identity middleware so it runs inside it and can see the caller (audience rules).
+        from campus247.presentation.features import FeatureGateMiddleware
+        app.add_middleware(FeatureGateMiddleware, service=feature_service)
+        app.state.feature_service = feature_service
     app.add_middleware(IdentityMiddleware, adapter=identity_adapter,session_service=session_service)
 
     # 3. CORS Middleware for Local Frontend Development
@@ -427,6 +432,11 @@ def create_app(*, retrieval_context_factory: RetrievalContextFactory | None = No
     # Mount all 15 presentation routers
     # Health: /health/live, /health/ready
     app.include_router(health.router)
+    if feature_service is not None:
+        from campus247.presentation.features import create_features_router
+        app.include_router(create_features_router(feature_service))
+        from campus247.presentation.campus_ops import register_ops_errors
+        register_ops_errors(app)
 
     # Identity: /v1/users/me
     app.include_router(identity.create_identity_router(adapter=identity_adapter, environment=settings.ENVIRONMENT))

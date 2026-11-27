@@ -1,0 +1,33 @@
+id = "student-certificate"
+version = 1
+title = "Giấy xác nhận sinh viên đang học"
+service_kind = "STUDENT_CERTIFICATE"
+description = "Xin giấy xác nhận đang học để nộp cho cơ quan, ngân hàng hoặc làm thủ tục khác."
+roles = ["STUDENT"]
+checks = []
+
+[[fields]]
+key = "purpose"
+label = "Mục đích sử dụng"
+type = "enum"
+values = ["Xin visa", "Vay vốn", "Hoãn nghĩa vụ quân sự", "Hồ sơ cơ quan", "Khác"]
+required = true
+
+[[fields]]
+key = "copies"
+label = "Số bản"
+type = "integer"
+min = 1
+max = 5
+default = 1
+
+[[fields]]
+key = "note"
+label = "Ghi chú thêm"
+type = "text"
+min = 0
+max = 300
+
+[ticket]
+title_template = "Giấy xác nhận sinh viên — {purpose}"
+summary_fields = ["purpose", "copies", "note"]

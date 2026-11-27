@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { RefreshCw, Search } from "lucide-react";
+import { IconButton } from "@/components/shared/IconButton";
 import { useStore } from "@/lib/store";
 import { filterTickets, ticketTypeLabels } from "@/lib/staff-policy";
 import { formatDate } from "@/lib/format-date";
@@ -54,7 +55,7 @@ export function StaffQueue() {
   }, [hydrated, currentUser]);
   async function refresh() { if (busy) return; setBusy(true); setError(""); try { await reloadData(); setUpdated(new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date())); } catch (e) { setError(e instanceof Error ? e.message : "Chưa làm mới được. Kết quả trước đó được giữ lại."); } finally { setBusy(false); } }
   return <StaffShell>
-    <header className="mb-3 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold tracking-tight">Hàng chờ hồ sơ</h1><p className="sr-only">Tiếp nhận, kiểm tra và phản hồi sinh viên.</p></div><div className="flex items-center gap-3"><span role="status" className="text-xs text-slate-500">{updated && `Đã làm mới ${updated}`}</span><button onClick={() => void refresh()} disabled={busy} className={staffButton}><RefreshCw className={`h-4 w-4 ${busy ? "animate-spin" : ""}`} />{busy ? "Đang làm mới…" : "Làm mới"}</button></div></header>
+    <header className="mb-3 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold tracking-tight">Hàng chờ hồ sơ</h1><p className="sr-only">Tiếp nhận, kiểm tra và phản hồi sinh viên.</p></div><div className="flex items-center gap-3"><span role="status" className="text-xs text-slate-500">{updated && `Đã làm mới ${updated}`}</span><IconButton label={busy ? "Đang làm mới…" : "Làm mới"} variant="outline" onClick={() => void refresh()} disabled={busy} icon={<RefreshCw size={18} className={busy ? "animate-spin" : ""} />} /></div></header>
     <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Phạm vi hàng chờ">
       {[{ label: "Chưa hoàn tất", count: tickets.filter(t => t.status !== "resolved").length, status: "active", priority: "all" }, { label: "Ưu tiên cao", count: tickets.filter(t => t.status !== "resolved" && t.priority === "high").length, status: "active", priority: "high" }, { label: "Đã hoàn tất", count: tickets.filter(t => t.status === "resolved").length, status: "resolved", priority: "all" }].map(item => <button key={item.label} aria-pressed={filters.status === item.status && filters.priority === item.priority} onClick={() => change({ status: item.status, priority: item.priority })} className={`${staffButton} ${filters.status === item.status && filters.priority === item.priority ? "border-blue-500 text-blue-700 dark:text-blue-300" : ""}`}>{item.label}<span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs dark:bg-slate-800">{item.count}</span></button>)}
     </div>

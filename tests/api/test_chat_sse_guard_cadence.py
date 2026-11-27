@@ -82,3 +82,54 @@ async def test_revocation_during_deltas_fails_before_persistence_and_citations()
     assert source in "".join(deltas)
     assert checks == [1, 1] and len(await messages.list_messages(conversation.id)) == 1
     assert "SYNTHETIC_REVOKED_SOURCE" not in str(events)
+
+
+async def _stream_with_receipts(service):
+    stack = setup(source=TEXT, gateway=FakeGateway(drafts=[[TEXT]]))
+    messages = ConversationMessageService()
+    conversation = await messages.create_conversation(owner_user_id=ACTOR)
+    now = datetime.now(UTC)
+    from types import SimpleNamespace
+    app = SimpleNamespace(state=SimpleNamespace(answer_receipts=service))
+    request = Request({"type": "http", "method": "POST", "path": "/synthetic", "headers": [], "query_string": b"", "app": app})
+    request.state.identity = IdentityContext(ACTOR, "tenant", "urn:synthetic", (IdentityRole.STUDENT,), "Synthetic", now, now + timedelta(hours=1), student_code="SYN-STREAM")
+    async def connected():
+        return False
+    request.is_disconnected = connected
+    async def runner(turn, identity, **kwargs):
+        return await stack.workflow.arun(turn, retrieval_context=context())
+    router = create_chat_router(messages, trusted_agent_runner=runner)
+    endpoint = next(route.endpoint for route in router.routes if "messages:stream" in route.path)
+    response = await endpoint(conversation.id, CreateMessagePayload(content=QUESTION), request)
+    events = []
+    async for frame in response.body_iterator:
+        events.extend(parse_events(frame))
+    return events, conversation, stack
+
+
+@pytest.mark.asyncio
+async def test_answer_receipt_is_written_after_the_message_is_saved(tmp_path):
+    from campus247.application.answer_evidence.receipts import AnswerReceiptService
+    from campus247.infrastructure.repositories.sqlite_answer_receipts import AnswerReceiptStore
+    store = AnswerReceiptStore(tmp_path / "r.sqlite3")
+    service = AnswerReceiptService(store, current_unit_sha=lambda unit_id: "sha-" + unit_id, current_release=lambda: "rel")
+    events, conversation, stack = await _stream_with_receipts(service)
+    assert events[-1]["event"] == "message.completed"
+    message_id = events[-1]["data"]["message_id"] if "message_id" in events[-1]["data"] else events[-1]["data"].get("id")
+    row = store.for_message(conversation.id, message_id)
+    assert row and row["owner_subject_id"] == ACTOR and row["outcome_kind"] == "answer"
+    assert TEXT not in str(row)  # the receipt keeps hashes, not the statement text
+    assert row["checks"][0]["verbatim"] is True and len(row["sources"][0]["text_sha256"]) == 64 and row["sources"][0]["version_id"]
+
+
+@pytest.mark.asyncio
+async def test_failing_receipt_store_never_breaks_the_answer():
+    class Broken:
+        def enabled(self):
+            return True
+        def current_unit_sha(self, unit_id):
+            raise RuntimeError("store down")
+        def on_error(self, error):
+            pass
+    events, _, _ = await _stream_with_receipts(Broken())
+    assert events[-1]["event"] == "message.completed" and events[-1]["data"]["response_class"] == "grounded_answer"
