@@ -99,13 +99,13 @@ Chủ dự án duyệt làm theo đề xuất tốt nhất, không hỏi lại. 
   - `f_series_check.mjs`: 13/13 đạt. Gửi hồ sơ được bỏ qua vì tài khoản đã chạm giới hạn 10 thủ tục/ngày. Lần chạy trước có giọng nói trả 503 vì chốt RAM của ASR (trống 1188 MB, cần 1200 MB); chạy lại khi máy trống 1,7 GB thì đạt.
   - vitest: 187 file, 1056/1056 (chạy lại sau mọi sửa giao diện). `web_acceptance` chạy lại trên runtime cuối (mã `b046fbd`, snapshot 09): 478/478.
   - Hồi quy Windows đầy đủ (`run_full_regression.py`, `final-regression-20261127050308`): 5944 + 264 đạt, 6 hỏng:
-    - guard migration head 0033 cố ý chờ người duyệt;
+    - guard migration head 0033 cố ý chờ người duyệt (chủ dự án duyệt ngày 27/11, `92e09bf`: guard nay đạt, migration 0023–0033 chạy được trên DB tạm);
     - `test_image_ocr::test_http` hỏng vì `.venv` thiếu `python-multipart` (venv của runtime có, luồng ảnh đạt trên 8015);
     - `test_l22_event_loop` nhạy thời gian khi máy tải nặng, chạy riêng thì đạt;
     - 3 test RAG hỏng do rò dịch vụ cờ giữa các test, đã sửa ở `028d852`.
   - Chạy lại (`final-regression-20261127072512`): 5948 + 264 đạt, 4 hỏng. Ba test rò dịch vụ cờ đã hết.
     - `test_clamd_scanner_retry` hỏng 3/6 lần chạy riêng. Đây là lỗi thật: daemon cắt kết nối khi đang nạp lại; trên Windows lúc ra reset (được thử lại), lúc ra đọc rỗng, bị xếp SCANNER_ERROR (không thử lại). Đã sửa ở `5086ac4`: đọc rỗng là "unavailable", vẫn chặn file. Chạy lại `tests/unit/scanning` 5/5 lần đều đạt. `scan_check.py` trên 8015 với ClamAV thật: file sạch được nhận 202, EICAR bị từ chối 422.
-    - Còn lại là lỗi môi trường hoặc chốt duyệt đã nêu ở trên: guard migration, `python-multipart` trong `.venv`, `test_l22_event_loop` khi máy tải nặng.
+    - Còn lại là lỗi môi trường đã nêu ở trên: `python-multipart` trong `.venv`, `test_l22_event_loop` khi máy tải nặng (guard migration đã được duyệt).
 - **Giao diện:** `scripts/qa/ui_audit.mjs` (mới; `--fseries` mở thêm các trang sau cờ F-series) mở mọi trang của 4 vai ở 1360×860 và 390×844. Đã tìm ra và sửa:
   - 2 ô tìm kiếm của cán bộ không có nhãn;
   - tiêu đề trang 404 vỡ dấu ("thâ´y", do Georgia trên Windows thiếu chữ "ấ");
