@@ -72,6 +72,55 @@ Bằng chứng là các ca do máy sinh có đáp án kiểm bằng code; khả 
 
 - Trang động `[id]` không chạy được trên 8015 vì `runtime_routes.page_routes()` liệt kê trang tĩnh; chi tiết thông báo dùng `/announcements?id=`.
 
+## Lượt 5 (27/11): kiểm định lại chất lượng RAG, tính năng cốt lõi và giao diện
+
+Chủ dự án duyệt làm theo đề xuất tốt nhất, không hỏi lại. Mỗi lỗi RAG dưới đây được tìm bằng cách hỏi lại các câu cổng chấm chưa tốt rồi truy vết trong tiến trình bằng mô hình thật của runtime (`evals/runners/rag_trace_one.py`); sửa theo nguyên nhân chung, không sửa theo từng câu.
+
+- **Nguyên nhân gốc đã sửa:**
+  - `0329099`: phần còn thiếu được tìm bằng chính chữ của nó trong tài liệu đang dùng; tiêu đề mục là căn cứ; tên ngành ghép và viết tắt ("QLĐT"); khóa không có trong nguồn (K74); hỏi lại một lần khi câu đã nêu chủ đề.
+  - `3920496`: bỏ dấu biến "Chứa đựng" thành "chua", bị đọc là phủ định "chưa", làm câu "thẻ sinh viên được cấp sau khi nhập học" bị loại. Tương tự với "cầm", "lưu trữ", "nội trú". Ngoài ra, "Không: A, B, C" nay phủ định cả danh sách (câu hỏi laptop/điện thoại trong phòng máy).
+  - `c94b03b`: bước kiểm ngữ nghĩa loại dòng "K70 trở về trước" khi người hỏi K69. Đo 4 lần mỗi kiểu: 0/4 → 4/4, còn câu sai khóa vẫn 0/4.
+  - `bb87069`: 72 trang nhãn "71CS / Học phần tiên quyết:" giống hệt nhau chiếm hết 12 chỗ, đẩy dòng "Học máy" xuống thứ 13. Nay trang nhãn xếp sau, không bị ghim lại, và dòng được gói riêng.
+  - `1f4b8a3`: "quy định này" do router viết lại được coi là chưa nêu chủ đề (một câu holdout tụt ở gate 013947).
+  - `fced6b5`: câu có/không về hình thức nguồn không nhắc ("thích ứng") trả `no_source`.
+  - `033a5c5`: khóa nằm trong khoảng nguồn ghi không bị coi là mã lạ (một câu core tụt ở gate 021231).
+  - `23acb00`: câu chỉ có "cái này" thì giữ nguyên lời người dùng, không dùng bản viết lại của router, vì bản viết lại tự đặt ra chủ đề. Qua API: 6/6 lần hỏi lại, trước đó 2/3 lần trả lời lạc.
+- **Cổng RAG đầy đủ, provider thật, so baseline `20261127-004107` (mã trước lượt này: core 82 %, holdout 77 %, multiturn 85 %, conflict 86 %, realstyle 78 %):**
+  - `20261127-013947` (mã `0329099`): ĐẠT, core 89 %, holdout 81 %, multiturn 89 %, conflict 86 %, realstyle 78 %.
+  - `20261127-021231` (mã `1f4b8a3`): ĐẠT, core 91 %, holdout 81 %, multiturn 93 %, conflict 91 %, realstyle 80 %, safety 20/20, stop 35/35, 0 câu sai ở core.
+  - `20261127-051613` (mã `033a5c5`): ĐẠT, core 95 %, holdout 86 %, multiturn 93 %, conflict 86 %, realstyle 82 %, safety 20/20, stop 35/35. Câu "thích ứng" hết sai. Còn 1 câu sai ở holdout ("cái này…"), đã sửa ở `23acb00`.
+  - `20261127-060747` (mã `3df7168`): **KHÔNG ĐẠT**, 1 câu realstyle bị chấm sai, và chấm đúng. Câu trả lời chép "Không sử dụng điện thoại di động, sử dụng máy tính xách tay" mà mất dấu hai chấm của nguồn, nên đọc như máy tính xách tay được phép. Đã sửa ở `b046fbd`: prompt yêu cầu phủ định từng mục, bộ kiểm chấp nhận phủ định lặp cho các mục của danh sách sau "Không:". Truy vết 3/3 lần đều rõ.
+  - **`20261127-065114` (mã `b046fbd`, lần cuối): ĐẠT, 0 câu sai ở mọi bộ.** safety 20/20, stop 35/35, core 95 %, holdout 79 %, multiturn 93 %, conflict 82 %, realstyle 82 %, p90 1,7–7,6 s.
+    - Conflict thấp hơn baseline 1 câu (CF-01): câu đã nêu đúng giờ phiên khai mạc, bộ chấm đánh "thiếu".
+    - Giữa các lần chạy, số câu holdout và conflict dao động khoảng ±1 câu (79–86 %), do mô hình và bộ chấm không tất định.
+  - Còn trượt, chưa sửa được tổng quát: chuỗi tiên quyết nhiều bậc (A3-0018/0020), "K69CB" mơ hồ, một số câu bộ chấm coi là "thiếu" dù mã đã chứa số tín chỉ ("608830 – 3").
+- **Tính năng cốt lõi trên 8015:**
+  - `web_acceptance.mjs`: 478/478 đạt (đăng nhập, mọi trang ở desktop và điện thoại, chat, đặt phòng, lịch, hồ sơ, học liệu, quản trị tri thức, cờ tắt thì trang ẩn).
+  - `f_series_check.mjs`: 13/13 đạt. Gửi hồ sơ được bỏ qua vì tài khoản đã chạm giới hạn 10 thủ tục/ngày. Lần chạy trước có giọng nói trả 503 vì chốt RAM của ASR (trống 1188 MB, cần 1200 MB); chạy lại khi máy trống 1,7 GB thì đạt.
+  - vitest: 187 file, 1056/1056 (chạy lại sau mọi sửa giao diện). `web_acceptance` chạy lại trên runtime cuối (mã `b046fbd`, snapshot 09): 478/478.
+  - Hồi quy Windows đầy đủ (`run_full_regression.py`, `final-regression-20261127050308`): 5944 + 264 đạt, 6 hỏng:
+    - guard migration head 0033 cố ý chờ người duyệt;
+    - `test_image_ocr::test_http` hỏng vì `.venv` thiếu `python-multipart` (venv của runtime có, luồng ảnh đạt trên 8015);
+    - `test_l22_event_loop` nhạy thời gian khi máy tải nặng, chạy riêng thì đạt;
+    - 3 test RAG hỏng do rò dịch vụ cờ giữa các test, đã sửa ở `028d852`.
+  - Chạy lại (`final-regression-20261127072512`): 5948 + 264 đạt, 4 hỏng. Ba test rò dịch vụ cờ đã hết.
+    - `test_clamd_scanner_retry` hỏng 3/6 lần chạy riêng. Đây là lỗi thật: daemon cắt kết nối khi đang nạp lại; trên Windows lúc ra reset (được thử lại), lúc ra đọc rỗng, bị xếp SCANNER_ERROR (không thử lại). Đã sửa ở `5086ac4`: đọc rỗng là "unavailable", vẫn chặn file. Chạy lại `tests/unit/scanning` 5/5 lần đều đạt. `scan_check.py` trên 8015 với ClamAV thật: file sạch được nhận 202, EICAR bị từ chối 422.
+    - Còn lại là lỗi môi trường hoặc chốt duyệt đã nêu ở trên: guard migration, `python-multipart` trong `.venv`, `test_l22_event_loop` khi máy tải nặng.
+- **Giao diện:** `scripts/qa/ui_audit.mjs` (mới; `--fseries` mở thêm các trang sau cờ F-series) mở mọi trang của 4 vai ở 1360×860 và 390×844. Đã tìm ra và sửa:
+  - 2 ô tìm kiếm của cán bộ không có nhãn;
+  - tiêu đề trang 404 vỡ dấu ("thâ´y", do Georgia trên Windows thiếu chữ "ấ");
+  - nhãn ô tích cao 20 px;
+  - `/admin/features` vẽ thanh đầu trang hai lần (AppShell lồng nhau);
+  - bảng cờ và bảng luật quy chế không có đệm ô, ép mỗi chữ xuống một dòng trên điện thoại;
+  - chủ đề của trình mô phỏng là nút trơn căn giữa;
+  - ghi chú giọng nói và đọc to cỡ 11,2 px;
+  - form soạn thông báo và hộp thư là điều khiển trơn của trình duyệt, ô không có viền.
+
+  Commit: `c566141`, `b14fdf3`, `a50077a` và commit giao diện thông báo. Lần cuối trên snapshot `frontend-knowledge-fseries-20261127-09` khi bật cờ: 0 lỗi tràn ngang, nhãn, vùng bấm và cỡ chữ. Các mục còn lại đúng thiết kế: trang sau cờ tắt trả 404; cán bộ không có danh sách hội thoại (403, trang có báo); `/v1/announcements/approvals` trả 404 khi cờ duyệt cấp hai tắt (đã bắt lỗi); trang đăng nhập 401.
+- Runtime 8015 chạy mã mới nhất với snapshot `frontend-knowledge-fseries-20261127-09`; các snapshot 05–08 được giữ lại để khôi phục.
+- Sửa giao diện nằm trong file có thay đổi dở của chủ dự án: chỉ commit phần của mình (blob HEAD + thay đổi), thay đổi dở vẫn để nguyên trong cây làm việc.
+- Ghi chú vận hành: trang "Chất lượng câu trả lời" đếm cả lượt chạy cổng (ví dụ 899 lần "bị chặn vì an toàn" trong 7 ngày). Bảng này cố ý không lưu người hỏi, nên không tách được sau khi đã ghi; số trên runtime local không phản ánh người dùng thật.
+
 ## Lượt 4 (26–27/11): F7, F8, các gói dở; kiểm lại phần cũ
 
 - Kiểm lại phần cũ tìm ra và đã sửa: 3 lỗ lọt đáp án trong bộ lọc gợi ý F7.4 (từ ngắn, số dính đơn vị, "01"=1) và đoạn trích chưa bị kiểm; lỗi gateway từ xa làm gợi ý trả 500 thay vì dùng mẫu; route `/v1/input/voice` chưa có trong danh sách cho phép của runtime (404); kịch bản kiểm F-series hỏng khi chạm giới hạn 10 thủ tục/ngày.
