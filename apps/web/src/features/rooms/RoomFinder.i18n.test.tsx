@@ -24,7 +24,7 @@ describe("RoomFinder in English", () => {
     render(<LanguageProvider><RoomFinder /></LanguageProvider>);
     expect(await screen.findByRole("heading", { name: "Rooms" })).toBeInTheDocument();
     expect(screen.getByText("All buildings")).toBeInTheDocument();
-    expect(screen.getByText("Building H1 · Floor 1")).toBeInTheDocument();
+    expect(await screen.findByText("Building H1 · Floor 1")).toBeInTheDocument();
     expect(screen.getByText("40 seats")).toBeInTheDocument();
     expect(screen.getByText("Projector")).toBeInTheDocument();
     expect(screen.getByText("Lecture hall", { selector: "span,div,p" })).toBeInTheDocument();

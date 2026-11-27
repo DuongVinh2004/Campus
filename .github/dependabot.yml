@@ -1,5 +1,7 @@
 # Dependabot keeps dependencies and CI actions current. Updates arrive as pull requests that must pass the same
 # required CI checks as any other change. Weekly cadence and grouped minor/patch updates keep the volume small.
+# Major version updates are not opened automatically (owner decision 2026-11-27): they need a migration of their own.
+# The ignore rules below do not hold back security updates.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -16,7 +18,11 @@ updates:
         patterns: ["*"]
 
   - package-ecosystem: npm # pnpm workspace (pnpm-lock.yaml)
-    directories: [/, /apps/web, /infra/cdk]
+    # apps/web is a workspace member: the root entry updates it together with pnpm-lock.yaml.
+    directories: [/, /infra/cdk]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     schedule:
       interval: weekly
       day: monday
@@ -30,6 +36,9 @@ updates:
 
   - package-ecosystem: uv # pyproject.toml + uv.lock (runtime dependencies are exact-pinned)
     directory: /
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     schedule:
       interval: weekly
       day: monday
@@ -43,6 +52,9 @@ updates:
 
   - package-ecosystem: docker
     directory: /infra/cloud/docker
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     schedule:
       interval: weekly
       day: monday
@@ -53,6 +65,9 @@ updates:
 
   - package-ecosystem: docker-compose
     directory: /
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     schedule:
       interval: weekly
       day: monday
