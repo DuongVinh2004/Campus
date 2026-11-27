@@ -53,6 +53,8 @@ updates:
   - package-ecosystem: docker
     directory: /infra/cloud/docker
     ignore:
+      # The cloud image stays on one Ubuntu LTS; moving to another release is a task of its own (interim releases expire).
+      - dependency-name: "ubuntu"
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
     schedule:
