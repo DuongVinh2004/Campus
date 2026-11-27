@@ -14,6 +14,8 @@ export function MemoryCenter() {
   const t = useT();
   const runtime = useOptionalUnifiedAssistant();
   const { dataConfig } = useStore();
+  // Without the assistant runtime there is nothing to sign in to: say the feature is off instead of blaming the session.
+  if (!runtime) return <p role="status">{t("mcx.off")}</p>;
   const actorKey = runtime?.actor && runtime.capabilities ? `${CAMPUS_API_BASE_URL}:${dataConfig?.mode}:${runtime.capabilities.tenant_id}:${runtime.actor.user_id}:${[...runtime.actor.roles].sort().join(",")}` : "";
   return actorKey && runtime ? <ActorMemory key={actorKey} actorKey={actorKey} guard={runtime.guard} /> : <p role="status">{t("mcx.1")}</p>;
 }

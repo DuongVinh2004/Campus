@@ -106,3 +106,20 @@ def test_contact_restored_from_exact_cited_unit():
 def test_forged_passed_verdict_cannot_bypass_deterministic_gate():
     forged = replace(verdict("Học phí 680.500 đồng."), passed=True, reasons=())
     assert build_outcome(UNDERSTANDING, [forged], UNITS, semantic_results=[True]).kind == "refuse"
+
+
+def test_groups_follow_the_answered_parts_of_the_question():
+    second = Unit("b", ("chunk-b",), "doc", "v1", "Lịch", "fee", "clause", "Điều 2", 3, "Hạn nộp 20/10/2026.")
+    units = {"a": SOURCE, "b": second}
+    verdicts = [check_statement(Statement(SOURCE.text, ("a",)), units),
+                check_statement(Statement(second.text, ("b",)), units),
+                check_statement(Statement("Học phí 999.999 đồng.", ("a",)), units)]
+    facets = (("f1", "học phí"), ("f2", "hạn nộp"), ("f3", "lịch thi"))
+    result = build_outcome(UNDERSTANDING, verdicts, units, semantic_results=[True, True, True],
+                           facets=facets, facet_of=["f2", "f1", "f1"])
+    # The rejected third statement is not shown, so f3 (never answered) and its index drop out.
+    assert [s.text for s in result.statements] == [SOURCE.text, second.text]
+    assert result.groups == (("học phí", (1,)), ("hạn nộp", (0,)))
+    one_part = build_outcome(UNDERSTANDING, verdicts[:2], units, semantic_results=[True, True],
+                             facets=facets, facet_of=["f1", "f1"])
+    assert one_part.groups == ()

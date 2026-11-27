@@ -134,27 +134,27 @@ const PROMPT_CARDS: PromptCardItem[] = [
     title: "Thủ tục xin cấp bảng điểm",
     desc: "Đăng ký qua Một cửa và nhận bảng điểm",
     prompt: "Thủ tục xin cấp bảng điểm",
-    iconBg: "bg-[#155E63]/15 dark:bg-[#155E63]/25",
-    iconColor: "text-[#155E63]",
-    iconRing: "ring-[#155E63]/30",
+    iconBg: "bg-[#2250D3]/12 dark:bg-[#8FB0FF]/20",
+    iconColor: "text-[#2250D3] dark:text-[#8FB0FF]",
+    iconRing: "ring-[#2250D3]/25",
   },
   {
     icon: Calendar,
     title: "Quy chế hoãn thi học kỳ",
     desc: "Vắng thi có lý do chính đáng và cách gửi đơn",
     prompt: "Quy chế hoãn thi học kỳ",
-    iconBg: "bg-[#008080]/15 dark:bg-[#008080]/25",
-    iconColor: "text-[#008080]",
-    iconRing: "ring-[#008080]/30",
+    iconBg: "bg-[#E8590C]/12 dark:bg-[#FF9A5C]/20",
+    iconColor: "text-[#C94A06] dark:text-[#FF9A5C]",
+    iconRing: "ring-[#E8590C]/25",
   },
   {
     icon: Building2,
     title: "Quy chế chuyển ngành",
     desc: "Đối tượng được chuyển ngành và thẩm quyền xét duyệt",
     prompt: "Quy chế chuyển ngành",
-    iconBg: "bg-[#155E63]/15 dark:bg-[#155E63]/25",
-    iconColor: "text-[#155E63]",
-    iconRing: "ring-[#155E63]/30",
+    iconBg: "bg-[#2250D3]/12 dark:bg-[#8FB0FF]/20",
+    iconColor: "text-[#2250D3] dark:text-[#8FB0FF]",
+    iconRing: "ring-[#2250D3]/25",
   },
 ];
 
@@ -788,7 +788,7 @@ export function ChatPanel({
                           <span>{t("chat.11")}</span>
                           {message.timestamp && <span className="text-[11px] font-normal">• {message.timestamp}</span>}
                         </div>
-                        <div className="campus-chat-user-bubble max-w-[85%] sm:max-w-[70%] px-5 py-3 rounded-2xl rounded-tr-xs bg-[#155E63] text-white text-[15px] leading-relaxed break-words shadow-sm">
+                        <div className="campus-chat-user-bubble max-w-[85%] sm:max-w-[70%] px-5 py-3 rounded-2xl rounded-tr-xs bg-[#2250D3] text-white text-[15px] leading-relaxed break-words shadow-sm">
                           <p className="m-0 whitespace-pre-wrap">{message.content}</p>
                         </div>
                       </article>
@@ -810,7 +810,7 @@ export function ChatPanel({
                         </div>
                       )}
                       <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
-                        <div className="w-7 h-7 rounded-md bg-[#155E63] text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <div className="w-7 h-7 rounded-md bg-[#2250D3] text-white flex items-center justify-center shrink-0 shadow-xs">
                           <Bot className="w-4 h-4" />
                         </div>
                         <span className="text-slate-900 dark:text-slate-200 font-semibold">{t("chat.12")}</span>

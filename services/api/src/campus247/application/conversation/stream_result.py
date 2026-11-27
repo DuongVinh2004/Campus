@@ -191,15 +191,23 @@ def _prepare_chat_result(state: AgentState) -> FinalChatResult:
             except (ValueError, KeyError, TypeError):
                 return FinalChatResult("abstained", "safe_refusal", SAFE_ABSTENTION)
             from campus247.application.retrieval.contact_minimization import present_without_contact_markers
-            content = label_grounded_answer(present_without_contact_markers(state.draft.text), cited_statuses=tuple(
+            from campus247.application.conversation.answer_layout import layout_grounded_draft, quote
+            from campus247.application.retrieval.simulation import SIMULATION_NOTICE
+            # Layout is presentation only: the same checked claims, set out as paragraphs, lists and sections.
+            laid_out = layout_grounded_draft(state.draft)
+            note_block = quote if laid_out is not None else (lambda text: text)
+            content = label_grounded_answer(present_without_contact_markers(
+                laid_out if laid_out is not None else state.draft.text), cited_statuses=tuple(
                 json.loads(citation.citation_json)["source_status"] for citation in citations
             ))
+            if laid_out is not None and content.startswith(SIMULATION_NOTICE + "\n"):
+                content = SIMULATION_NOTICE + "\n\n" + content[len(SIMULATION_NOTICE) + 1:]
             if state.draft.preface:
-                content = state.draft.preface + "\n\n" + content
+                content = note_block(state.draft.preface) + "\n\n" + content
             guidance = render_guidance(state.draft.guidance)
             if "AI_PARTIAL_COVERAGE" in state.errors:
                 return FinalChatResult(status, "partial_answer", content +
-                    "\n\n" + (state.draft.partial_note or
+                    "\n\n" + note_block(state.draft.partial_note or
                     "Thông tin hiện có chỉ đủ cho một phần câu hỏi. Tôi chưa có đủ nguồn để xác minh phần còn thiếu.") + guidance, citations)
             return FinalChatResult(status, "grounded_answer", content + guidance, citations)
         if state.route == Route.PERSONAL_SCHEDULE:

@@ -58,3 +58,13 @@ it("also conceals a private portal dialog while retaining its unsent input", asy
   fireEvent.click(screen.getByRole("button", { name: "Kiểm tra lại tài khoản" }));
   expect((await screen.findByRole("textbox", { name: "Private modal draft" }) as HTMLInputElement).value).toBe("Unsent modal text");
 });
+
+it("signs out through the server so the session cookie is revoked, then returns to the login page", async () => {
+  const assign = vi.fn();
+  vi.stubGlobal("location", { ...window.location, assign });
+  render(<AppShell activeNav="tickets"><p>Nội dung</p></AppShell>);
+  fireEvent.click(await screen.findByRole("button", { name: "Đăng xuất" }));
+  await vi.waitFor(() => expect(assign).toHaveBeenCalledWith("/login"));
+  const logout = vi.mocked(fetch).mock.calls.find(([url]) => String(url).endsWith("/v1/auth/logout"));
+  expect(logout?.[1]).toMatchObject({ method: "POST", credentials: "include" });
+});
