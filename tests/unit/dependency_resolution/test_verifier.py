@@ -164,17 +164,17 @@ class DependencyGateTests(unittest.TestCase):
                 errors = []
                 parsed = gate._requirements([f"{name}=={version}"], errors, {(name, version)})
                 self.assertEqual(errors, [])
-                self.assertEqual(parsed[name]["specifier"], "==0.66b0")
+                self.assertEqual(parsed[name]["specifier"], "==0.66b2")
 
     def test_otel_prerelease_without_version_approval_is_denied(self):
         errors = []
-        gate._requirements(["opentelemetry-instrumentation==0.66b0"], errors)
+        gate._requirements(["opentelemetry-instrumentation==0.66b2"], errors)
         self.assertTrue(errors)
 
     def test_other_prereleases_remain_denied_even_with_version_approval(self):
-        for name, version in (("foreign", "0.66b0"),
+        for name, version in (("foreign", "0.66b2"),
                               ("opentelemetry-instrumentation", "0.67b0"),
-                              ("opentelemetry-instrumentation", "0.66b1"),
+                              ("opentelemetry-instrumentation", "0.66b0"),
                               ("opentelemetry-instrumentation", "0.66rc0")):
             with self.subTest(name=name, version=version):
                 errors = []
@@ -182,7 +182,7 @@ class DependencyGateTests(unittest.TestCase):
                 self.assertTrue(errors)
 
     def test_transitive_otel_prerelease_requires_exact_version_approval(self):
-        name, version = "opentelemetry-semantic-conventions", "0.66b0"
+        name, version = "opentelemetry-semantic-conventions", "0.66b2"
         self.lock["package"][1]["dependencies"] = [{"name": name}]
         self.lock["package"][2] = package(name, version)
         self.approved.add(name)
