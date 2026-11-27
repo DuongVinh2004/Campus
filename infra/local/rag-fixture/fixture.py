@@ -85,7 +85,8 @@ REVIEWED_ADDITIONS = {
     # 0033 (learning concepts, mastery, tutor) approved by the owner in chat on 2026-11-26 ("tôi duyệt các phần đang vướng theo
     # đề xuất của bạn"): linear 0032 -> 0033, creates four new learning.* tables (concepts, concept_mastery, tutor_settings,
     # tutor_turns), indexes, one function and triggers only; no DROP/DELETE/TRUNCATE/ALTER/UPDATE of existing data; downgrade()
-    # raises. Executed on a throwaway database by tests/learning_entry/test_tutor_postgres.py.
+    # raises. Executed on a throwaway database by tests/learning_entry/test_tutor_postgres.py. Approved again explicitly on
+    # 2026-11-27 ("duyệt migration 0033") after the source was re-read at this exact hash.
     "0033_learning_concepts_tutor.py": "94b852b5ab9063a25f8d989432751d8eec8b7140f569897ec5bf1c1461ad94fc",
 }
 SOURCE_ID = "019a0000-0000-7000-8000-000000000001"
