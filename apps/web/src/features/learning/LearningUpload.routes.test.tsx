@@ -19,9 +19,7 @@ beforeEach(()=>{
 });
 afterEach(()=>{cleanup();vi.resetAllMocks();vi.unstubAllGlobals();});
 function Root({show=true}:{show?:boolean}){return <ChatDraftSessionProvider>{show&&<LearningWorkspace/>}</ChatDraftSessionProvider>;}
-// The heading can be on screen before React has run the effects that subscribe the forms to the tab draft store. A change
-// fired in that gap leaves the controlled input empty at the next click, and the required field then blocks the submit.
-async function ready(){await screen.findByRole('heading',{name:'Synthetic material'});await act(async()=>{});}
+async function ready(){await screen.findByRole('heading',{name:'Synthetic material'});}
 it('uses the same selected File after actual route unmount without another file picker',async()=>{
   const view=render(<Root/>);await ready();screen.getByText('Tải phiên bản mới').closest('details')!.open=true;
   const file=new File(['synthetic'],'retained.pdf',{type:'application/pdf'});fireEvent.change(screen.getAllByLabelText('File PDF')[0],{target:{files:[file]}});
