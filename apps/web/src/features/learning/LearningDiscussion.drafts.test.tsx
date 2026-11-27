@@ -19,7 +19,8 @@ function View({ open = true, version = V, actor = "student-a", roles = originalR
       <LearningExplanation actorId={actor} versionId={version} selection={select(version)} available onSource={() => {}} /></>}
   </ChatDraftActor></ChatDraftSessionProvider>;
 }
-const edit = (name: string, value: string) => fireEvent.change(screen.getByLabelText(name), { target: { value } });
+// An icon button can share its accessible name with a field ("Sửa ghi chú"), so prefer the text field when both exist.
+const edit = (name: string, value: string) => fireEvent.change(screen.queryByRole("textbox", { name }) ?? screen.getByLabelText(name), { target: { value } });
 const note = () => screen.getByLabelText("Nội dung ghi chú");
 beforeEach(() => {
   api.list.mockImplementation(async (path: string) => path.includes("/questions") ? [{ id: "q1", body: "Stored question", page_no: 2,
@@ -75,7 +76,7 @@ it("keeps the expected revision and separate new-note draft when an existing not
   const view = render(<View />); await screen.findByText("Stored note"); edit("Nội dung ghi chú", "Separate new-note draft");
   fireEvent.click(screen.getByRole("button", { name: "Sửa ghi chú" })); edit("Sửa ghi chú", "Unsent edit of saved note");
   view.rerender(<View open={false} />); view.rerender(<View />); await screen.findByText("Stored note");
-  expect(screen.getByLabelText("Sửa ghi chú")).toHaveValue("Unsent edit of saved note");
+  expect(screen.getByRole("textbox", { name: "Sửa ghi chú" })).toHaveValue("Unsent edit of saved note");
   fireEvent.click(screen.getByRole("button", { name: "Lưu ghi chú riêng" }));
   await waitFor(() => expect(api.write).toHaveBeenCalledWith("/me/annotations/saved-note", { body: "Unsent edit of saved note", revision: 7 }, "PATCH", expect.any(String)));
   expect(await screen.findByLabelText("Nội dung ghi chú")).toHaveValue("Separate new-note draft");

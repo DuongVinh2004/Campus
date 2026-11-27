@@ -1110,6 +1110,7 @@ export const en: Record<MessageKey, string> = {
   "ncx.56": "Next: {v}",
   "ncx.57": "The preview expires {d}",
   "mcx.1": "Your session and role must be verified to open memory.",
+  "mcx.off": "Assistant memory is not enabled in this build.",
   "mcx.2": "The result could not be verified; your draft is kept.",
   "mcx.3": "The receipt does not match; your draft is kept.",
   "mcx.4": "Personal memory",

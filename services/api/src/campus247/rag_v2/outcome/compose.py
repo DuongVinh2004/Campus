@@ -38,6 +38,7 @@ def build_outcome(
     coverage: float = 1.0, infra_error: bool = False,
     refuse_reason: RefuseReason | None = None, suggestions: Sequence[str] = (),
     missing_parts: Sequence[str] = (), scope_note: str | None = None,
+    facets: Sequence[tuple[str, str]] = (), facet_of: Sequence[str] = (),
 ) -> Outcome:
     """Semantic results align with *all* verdicts; unavailable means fail closed.
 
@@ -60,7 +61,7 @@ def build_outcome(
     candidates = len(units_by_id) if candidate_count is None else candidate_count
     semantic_valid = (semantic_results is not None and len(semantic_results) == len(verdicts)
                       and all(type(item) is bool for item in semantic_results))
-    accepted, citations = [], {}
+    accepted, citations, accepted_facets = [], {}, []
     for index, verdict in enumerate(verdicts):
         if not verdict.passed or not check_statement(verdict.statement, units_by_id).passed:
             continue
@@ -75,6 +76,7 @@ def build_outcome(
         if text is None:
             continue
         accepted.append(Statement(text, stmt.unit_ids))
+        accepted_facets.append(facet_of[index] if index < len(facet_of) else "")
         for unit in units:
             # The whole indivisible unit is an exact quote containing every
             # referenced value, including values restored from contact labels.
@@ -106,4 +108,16 @@ def build_outcome(
     if note:
         text += "\n\n" + note
     return Outcome("partial" if partial else "answer", text, tuple(accepted), tuple(citations.values()),
-                   partial_note=note, suggestions=tuple(suggestions), preface=scope_note)
+                   partial_note=note, suggestions=tuple(suggestions), preface=scope_note,
+                   groups=_groups(facets, accepted_facets))
+
+
+def _groups(facets: Sequence[tuple[str, str]], accepted_facets: Sequence[str]) -> tuple[tuple[str, tuple[int, ...]], ...]:
+    """Accepted statements per answered part of the question, in the question's order; unassigned ones last ("")."""
+    groups = [(ask, tuple(i for i, f in enumerate(accepted_facets) if f == facet_id)) for facet_id, ask in facets]
+    groups = [(ask, idx) for ask, idx in groups if idx]
+    if len(groups) < 2:
+        return ()
+    known = {facet_id for facet_id, _ in facets}
+    rest = tuple(i for i, f in enumerate(accepted_facets) if f not in known)
+    return tuple(groups) + ((("", rest),) if rest else ())

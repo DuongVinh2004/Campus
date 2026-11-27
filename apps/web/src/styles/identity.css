@@ -1,143 +1,127 @@
-/* Campus 24/7 — HUCE identity layer.
-   Idea: an architecture school's drawing sheet. Warm paper canvas with a faint survey grid, serif titles with
-   an ochre title-block rule, a deep teal rail, square-ish technical corners, hairline ink borders. */
+/* Campus 24/7 — "Calm" identity layer.
+   Modern and serious but warm: a flat light canvas, white hairline-bordered cards with 14px corners, one blue,
+   Be Vietnam Pro throughout, orange reserved for "today" and things that need attention. No grid, no serif. */
 
 html:root {
-  --paper: #f3f1ea;
-  --paper-line: rgba(21, 94, 99, 0.055);
-  --ink: #17303a;
-  --ink-line: #d9d4c4;
-  --ochre-ink: #8a5f12;
-  --rail: #0e3b3f;
-  --rail-hover: rgba(255, 255, 255, 0.08);
-  --rail-active: rgba(255, 255, 255, 0.13);
-  --rail-text: #c9dedd;
-  --font-display: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Georgia, Cambria, "Times New Roman", serif;
-  --bg-page: var(--paper);
-  --color-bg-main: var(--paper);
-  --surface-canvas: var(--paper);
-  --border-color: var(--ink-line);
-  --color-border: var(--ink-line);
+  --ink: var(--text-primary);
+  --ink-line: var(--border-color);
+  --brand-ink: #1a3fa8;
+  --brand-deep: #0e1b45;
+  --font-display: var(--font-sans);
+  --ring: 0 0 0 3px rgba(34, 80, 211, .18);
 }
 html.dark {
-  /* html:root above sets the light paper and ink, and it outranks tokens.css, so the dark values must be restated here. */
-  --paper: #101b22;
-  --ink: #eaf0f3;
-  --rail-text: #c2d8d6;
-  --paper-line: rgba(158, 216, 207, 0.05);
-  --ink-line: #2b414b;
-  --ochre-ink: #e3b765;
-  --rail: #0b2428;
+  --brand-ink: #b2c9ff;
+  --brand-deep: #0b1220;
+  --ring: 0 0 0 3px rgba(143, 176, 255, .28);
 }
 
-/* Canvas: faint survey grid behind the content area. */
-html [data-campus-ui] .campus-content {
-  background-image:
-    linear-gradient(var(--paper-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
-  background-size: 28px 28px;
-  background-position: -1px -1px;
-}
+html, body { background: var(--bg-page); }
+body { font-feature-settings: "calt", "kern"; }
 
-/* Rail (sidebar) */
-html [data-campus-ui] .campus-sidebar {
-  background: var(--rail);
-  border-right: 0;
-  color: var(--rail-text);
-}
+/* Canvas */
+html [data-campus-ui] .campus-content { background: var(--bg-page); }
+
+/* Sidebar: white, hairline edge, soft blue pill for the current page. */
+html [data-campus-ui] .campus-sidebar { background: var(--surface-card); border-right: 1px solid var(--border-color); color: var(--text-secondary); }
 html [data-campus-ui] .campus-sidebar .campus-brand-title,
-html [data-campus-ui] .campus-sidebar .campus-brand-number { color: #fff; font-family: var(--font-display); font-size: 19px; font-weight: 600; letter-spacing: 0; }
-html [data-campus-ui] .campus-sidebar .campus-brand-sub { color: #8fb4b3; font-size: 11px; letter-spacing: .02em; }
-html [data-campus-ui] .campus-sidebar .campus-brand-mark { background: var(--accent-ochre); color: var(--rail); border-radius: 6px; }
-html [data-campus-ui] .campus-sidebar .campus-nav-item { color: var(--rail-text) !important; border-left: 3px solid transparent; border-radius: 4px; }
-html [data-campus-ui] .campus-sidebar .campus-nav-item:hover { background: var(--rail-hover); color: #fff !important; }
-html [data-campus-ui] .campus-sidebar .campus-nav-item.is-active { background: var(--rail-active); color: #fff !important; border-left-color: var(--accent-ochre); font-weight: 600; }
-html [data-campus-ui] .campus-sidebar .campus-nav-item svg { opacity: .85; }
-html [data-campus-ui] .campus-sidebar .campus-nav-divider { border-color: rgba(255, 255, 255, .12); }
-html [data-campus-ui] .campus-sidebar .campus-account { background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .1); color: #fff; }
-html [data-campus-ui] .campus-sidebar .campus-account * { color: inherit; }
-html [data-campus-ui] .campus-sidebar .campus-account-info span:last-child { color: #8fb4b3; }
-html [data-campus-ui] .campus-sidebar .campus-nav-collapse { color: #8fb4b3; }
-html [data-campus-ui] .campus-sidebar .campus-nav-label { color: #6f9a99; }
+html [data-campus-ui] .campus-sidebar .campus-brand-number { color: var(--text-primary); font-family: var(--font-sans); font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+html [data-campus-ui] .campus-sidebar .campus-brand-sub { color: var(--text-muted); font-size: 11px; letter-spacing: 0; }
+html [data-campus-ui] .campus-sidebar .campus-brand-mark { background: var(--color-primary); color: var(--color-on-primary); border-radius: 10px; font-weight: 700; }
+html [data-campus-ui] .campus-sidebar .campus-nav-item { color: var(--text-secondary) !important; border-left: 0; border-radius: 10px; font-weight: 500; transition: background var(--duration-fast), color var(--duration-fast); }
+html [data-campus-ui] .campus-sidebar .campus-nav-item:hover { background: var(--surface-subtle); color: var(--text-primary) !important; }
+html [data-campus-ui] .campus-sidebar .campus-nav-item.is-active { background: var(--color-primary-light); color: var(--brand-ink) !important; font-weight: 600; box-shadow: none; }
+html [data-campus-ui] .campus-sidebar .campus-nav-item svg { opacity: .9; }
+html [data-campus-ui] .campus-sidebar .campus-nav-divider { border-color: var(--border-color); }
+html [data-campus-ui] .campus-sidebar .campus-account { background: var(--surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 12px; }
+html [data-campus-ui] .campus-sidebar .campus-account-info span:last-child { color: var(--text-muted); }
+html [data-campus-ui] .campus-sidebar .campus-nav-collapse { color: var(--text-muted); }
+html [data-campus-ui] .campus-sidebar .campus-nav-label { color: var(--text-muted); }
 
 /* Toolbar */
-html [data-campus-ui] .campus-toolbar { background: color-mix(in srgb, var(--paper) 94%, transparent); border-bottom: 1px solid var(--ink-line); backdrop-filter: blur(8px); }
-html [data-campus-ui] .campus-breadcrumb-title { font-family: var(--font-display); font-size: 15px; }
+html [data-campus-ui] .campus-toolbar { background: color-mix(in srgb, var(--bg-page) 88%, transparent); border-bottom: 1px solid var(--border-color); backdrop-filter: blur(10px); }
+html [data-campus-ui] .campus-breadcrumb-title { font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--text-primary); }
+html [data-campus-ui] .campus-breadcrumb-brand { color: var(--text-muted); font-weight: 500; }
+html [data-campus-ui] .campus-icon-button { border-radius: 10px; }
+html [data-campus-ui] .campus-icon-button:hover { background: var(--surface-subtle); }
+html [data-campus-ui] .campus-institution strong { color: var(--text-primary); }
 
-/* Page title block */
-html [data-campus-ui] .campus-page-heading {
-  position: relative; padding: 4px 0 22px; margin-bottom: 28px; border-bottom: 1px solid var(--ink-line); align-items: flex-end;
-}
-html [data-campus-ui] .campus-page-heading::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 88px; height: 3px; background: var(--accent-ochre); }
+/* Page heading: a calm title, a muted line, a small blue eyebrow. No rules, no ornaments. */
+html [data-campus-ui] .campus-page-heading { position: relative; padding: 0 0 20px; margin-bottom: 24px; border-bottom: 0; align-items: flex-end; }
+html [data-campus-ui] .campus-page-heading::after { display: none; }
 html [data-campus-ui] .campus-page-heading > div::before {
-  content: attr(data-eyebrow); display: block; margin-bottom: 8px; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ochre-ink);
+  content: attr(data-eyebrow); display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--color-primary);
 }
 html [data-campus-ui] .campus-page-heading > div:not([data-eyebrow])::before { display: none; }
-html [data-campus-ui] h1 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.012em; color: var(--ink); }
-html.dark [data-campus-ui] h1 { color: var(--text-primary); }
-html [data-campus-ui] .campus-page-heading h1 { font-size: clamp(30px, 3.2vw, 42px); line-height: 1.12; }
-html [data-campus-ui] .campus-page-heading p { margin-top: 10px; max-width: 62ch; font-size: 14.5px; color: var(--text-secondary); }
+html [data-campus-ui] h1 { font-family: var(--font-sans); font-weight: 700; letter-spacing: -.02em; color: var(--text-primary); }
+html [data-campus-ui] .campus-page-heading h1 { font-size: clamp(26px, 2.6vw, 32px); line-height: 1.2; }
+html [data-campus-ui] .campus-page-heading p { margin-top: 8px; max-width: 64ch; font-size: 14.5px; color: var(--text-secondary); }
+html [data-campus-ui] h2 { font-family: var(--font-sans); font-weight: 600; letter-spacing: -.01em; }
+html [data-campus-ui] h3 { font-family: var(--font-sans); font-weight: 600; }
 
-/* Surfaces: sheets on paper — hairline ink border, small radius, no float. */
-html [data-campus-ui] :is(.campus-panel, .fluent-card, .campus-card) { border-radius: 6px; border-color: var(--ink-line); box-shadow: none; }
-html [data-campus-ui] :is(.fluent-btn-primary, .campus-btn-primary, .btn-primary) { border-radius: 6px; }
-html [data-campus-ui] :is(.fluent-btn-secondary, .campus-btn-secondary, .btn-secondary) { border-radius: 6px; }
-html [data-campus-ui] :is(.fluent-input, .campus-input, input:not([type=checkbox]):not([type=radio]), select, textarea) { border-radius: 6px; }
-html [data-campus-ui] h2 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.005em; }
+/* Surfaces: white cards, hairline border, 14px corners, a whisper of shadow. */
+html [data-campus-ui] :is(.campus-panel, .fluent-card, .campus-card, .campus-settings-surface, .campus-empty-state) { border-radius: 14px; border-color: var(--border-color); box-shadow: var(--shadow-xs); }
+html [data-campus-ui] :is(.fluent-btn-primary, .campus-btn-primary, .btn-primary) { border-radius: 10px; }
+html [data-campus-ui] :is(.fluent-btn-primary, .campus-btn-primary, .btn-primary):hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+html [data-campus-ui] :is(.fluent-btn-secondary, .campus-btn-secondary, .btn-secondary) { border-radius: 10px; border-color: var(--color-border-strong); font-weight: 500; }
+html [data-campus-ui] :is(.fluent-btn-secondary, .campus-btn-secondary, .btn-secondary):hover { background: var(--surface-subtle); }
+html [data-campus-ui] :is(.fluent-input, .campus-input, input:not([type=checkbox]):not([type=radio]), select, textarea) { border-radius: 10px; border-color: var(--color-border-strong); }
+html [data-campus-ui] :is(input:not([type=checkbox]):not([type=radio]), select, textarea):focus { border-color: var(--color-primary); outline: 0; box-shadow: var(--ring); }
+html [data-campus-ui] a:not([class]) { color: var(--color-primary); text-underline-offset: 3px; }
 
-/* Small utility used by feature screens: a labelled figure (title-block cell). */
-.campus-figure { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border: 1px solid var(--ink-line); border-radius: 6px; background: var(--surface-card); min-width: 120px; }
-.campus-figure > span:first-child { font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-secondary); }
-.campus-figure > strong { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.1; color: var(--ink); }
-html.dark .campus-figure > strong { color: var(--text-primary); }
+/* A labelled figure (key number). */
+.campus-figure { display: flex; flex-direction: column; gap: 2px; padding: 14px 18px; border: 1px solid var(--border-color); border-radius: 14px; background: var(--surface-card); min-width: 132px; box-shadow: var(--shadow-xs); }
+.campus-figure > span:first-child { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+.campus-figure > strong { font-size: 26px; font-weight: 700; line-height: 1.15; letter-spacing: -.02em; color: var(--text-primary); }
 .campus-figure > small { font-size: 12px; color: var(--text-secondary); }
-.campus-figures { display: flex; flex-wrap: wrap; gap: 10px; }
+.campus-figures { display: flex; flex-wrap: wrap; gap: 12px; }
 
-/* Timetable: one row per day — date block on the left, sessions on the right. */
-.campus-timetable { display: flex; flex-direction: column; border: 1px solid var(--ink-line); border-radius: 6px; background: var(--surface-card); }
-.campus-timetable-day { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 20px; padding: 16px 20px; border-top: 1px solid var(--ink-line); }
+/* Timetable: one row per day — date on the left, sessions as soft tinted cards on the right. */
+.campus-timetable { display: flex; flex-direction: column; border: 1px solid var(--border-color); border-radius: 14px; background: var(--surface-card); overflow: hidden; box-shadow: var(--shadow-xs); }
+.campus-timetable-day { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 20px; padding: 16px 20px; border-top: 1px solid var(--border-color); }
 .campus-timetable-day:first-child { border-top: 0; }
-.campus-timetable-day[data-today="true"] { background: linear-gradient(90deg, var(--color-primary-light), transparent 70%); box-shadow: inset 3px 0 0 var(--accent-ochre); }
+.campus-timetable-day[data-today="true"] { background: var(--color-primary-subtle); }
 .campus-timetable-date { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
-.campus-timetable-dow { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-secondary); }
-.campus-timetable-dom { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.1; color: var(--ink); }
-html.dark .campus-timetable-dom { color: var(--text-primary); }
-.campus-timetable-today { margin-top: 4px; padding: 1px 8px; border-radius: 3px; background: var(--accent-ochre); color: #3b2a07; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; }
-.campus-timetable-empty { align-self: center; margin: 0; font-size: 13px; color: var(--text-secondary); }
+.campus-timetable-dow { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.campus-timetable-dom { font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -.02em; color: var(--text-primary); }
+.campus-timetable-today { margin-top: 4px; padding: 2px 9px; border-radius: 999px; background: var(--accent-ochre); color: #fff; font-size: 11px; font-weight: 600; }
+.campus-timetable-empty { align-self: center; margin: 0; font-size: 13px; color: var(--text-muted); }
 .campus-timetable-events { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-.campus-timetable-event { padding: 10px 12px 10px 14px; border: 1px solid var(--ink-line); border-left: 4px solid var(--color-primary); border-radius: 4px; background: var(--surface-card); }
-.campus-timetable-event[data-kind="EXAM"] { border-left-color: #b4452b; background: color-mix(in srgb, #b4452b 5%, var(--surface-card)); }
-.campus-timetable-event[data-kind="PERSONAL"] { border-left-color: var(--accent-ochre); }
+.campus-timetable-event { padding: 12px 14px; border: 1px solid #d9e2fa; border-radius: 12px; background: #eef2fd; }
+.campus-timetable-event[data-kind="EXAM"] { border-color: #fbd9c3; background: #fff2ea; }
+.campus-timetable-event[data-kind="PERSONAL"] { border-color: #dfdaf3; background: #f2f0fa; }
+html.dark .campus-timetable-event { border-color: #2b3f6e; background: #16233f; }
+html.dark .campus-timetable-event[data-kind="EXAM"] { border-color: #5a3320; background: #2a1e17; }
+html.dark .campus-timetable-event[data-kind="PERSONAL"] { border-color: #3a3560; background: #1e1b36; }
 @media (max-width: 640px) { .campus-timetable-day { grid-template-columns: 1fr; gap: 10px; padding: 14px; } .campus-timetable-date { flex-direction: row; align-items: baseline; gap: 10px; } }
 
-/* Rooms: state is read from a top rule, like a drawing's status stamp. */
-.campus-room-card { border-top: 3px solid var(--ink-line); padding: 18px 20px; }
-.campus-room-card[data-state="free"] { border-top-color: #2f8f5b; }
-.campus-room-card[data-state="busy"] { border-top-color: #b4452b; }
+/* Rooms: availability is read from a coloured top edge. */
+.campus-room-card { border-top: 3px solid var(--border-color); padding: 18px 20px; }
+.campus-room-card[data-state="free"] { border-top-color: #2f9e6b; }
+.campus-room-card[data-state="busy"] { border-top-color: #d14a2b; }
 .campus-room-card[data-state="maintenance"] { border-top-color: var(--accent-ochre); }
-.campus-room-card h3 { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.25; }
+.campus-room-card h3 { font-size: 17px; font-weight: 600; line-height: 1.3; }
 
 /* Chat welcome: a guided start, not an empty box. */
 html [data-campus-ui] .campus-chat-welcome { max-width: 820px; }
-html [data-campus-ui] .campus-chat-welcome h1 { font-size: clamp(30px, 3.4vw, 40px); }
-html [data-campus-ui] .campus-chat-welcome h1::before { content: "Trợ lý học vụ HUCE"; display: block; margin-bottom: 10px; font-family: var(--font-sans, inherit); font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ochre-ink); }
+html [data-campus-ui] .campus-chat-welcome h1 { font-size: clamp(28px, 3.2vw, 38px); }
+html [data-campus-ui] .campus-chat-welcome h1::before { content: "Trợ lý học vụ HUCE"; display: block; margin-bottom: 10px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--color-primary); }
 .campus-starters { display: grid; gap: 18px; width: 100%; margin-top: 4px; }
-.campus-starter-group h2 { margin: 0 0 8px; font-family: inherit !important; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-secondary); }
-html [data-campus-ui] .campus-chat-welcome button.campus-prompt-chip { border-radius: 4px; border-color: var(--ink-line); background: var(--surface-card); color: var(--ink); min-height: 40px; padding: 8px 14px; font-size: 13.5px; }
-html [data-campus-ui] .campus-chat-welcome button.campus-prompt-chip:hover { border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary); }
+.campus-starter-group h2 { margin: 0 0 8px; font-family: inherit !important; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+html [data-campus-ui] .campus-chat-welcome button.campus-prompt-chip { border-radius: 12px; border-color: var(--color-border-strong); background: var(--surface-card); color: var(--text-primary); min-height: 42px; padding: 8px 14px; font-size: 13.5px; font-weight: 500; transition: border-color var(--duration-fast), background var(--duration-fast); }
+html [data-campus-ui] .campus-chat-welcome button.campus-prompt-chip:hover { border-color: var(--color-primary); background: var(--color-primary-light); color: var(--brand-ink); }
 
-/* Sign-in: the same paper, rule and serif as the rest of the product. */
-.campus-login { min-height: calc(100dvh - 60px); display: grid; place-items: center; padding: 32px 16px;
-  background-color: var(--paper); color: var(--text-primary);
-  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px), linear-gradient(90deg, var(--paper-line) 1px, transparent 1px); background-size: 28px 28px; }
-.campus-login-card { width: 100%; max-width: 440px; border-radius: 6px; }
-.campus-login-brand { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 19px; font-weight: 600; color: var(--text-primary); }
-.campus-login-brand small { display: block; font: 400 11px/1.3 system-ui, sans-serif; color: var(--text-secondary); letter-spacing: .02em; }
-.campus-login-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 6px; background: var(--accent-ochre); color: var(--rail); font-weight: 700; }
-.campus-login h1 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.01em; }
+/* Sign-in: a soft blue wash with the brand mark. */
+.campus-login { min-height: calc(100dvh - 60px); display: grid; place-items: center; padding: 32px 16px; color: var(--text-primary);
+  background: radial-gradient(900px 420px at 50% -10%, var(--color-primary-light), transparent 70%), var(--bg-page); }
+.campus-login-card { width: 100%; max-width: 440px; border-radius: 18px; box-shadow: var(--shadow-lg); }
+.campus-login-brand { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.campus-login-brand small { display: block; font: 400 11.5px/1.3 var(--font-sans); color: var(--text-secondary); }
+.campus-login-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--color-primary); color: var(--color-on-primary); font-weight: 700; }
+.campus-login h1 { font-weight: 700; letter-spacing: -.02em; }
 .campus-login-password { position: relative; display: block; }
 .campus-login-password input { padding-right: 64px; }
-.campus-login-reveal { position: absolute; right: 6px; top: 50%; transform: translateY(-35%); min-height: 36px; padding: 0 12px; border: 0; border-radius: 4px; background: transparent; color: var(--color-primary); font-size: 12px; font-weight: 600; cursor: pointer; }
+.campus-login-reveal { position: absolute; right: 6px; top: 50%; transform: translateY(-35%); min-height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: var(--color-primary); font-size: 12px; font-weight: 600; cursor: pointer; }
 .campus-login-reveal:hover { background: var(--color-primary-light); }
 
 /* Phone chat: the menu button sits inside the chat header instead of taking a row of its own. */
@@ -148,4 +132,24 @@ html [data-campus-ui] .campus-chat-welcome button.campus-prompt-chip:hover { bor
 }
 
 /* The "Đăng nhập" link in the availability banner is a button-sized target, not a hairline link. */
-.knowledge-availability-link { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 6px; }
+.knowledge-availability-link { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 10px; }
+
+/* Icon buttons: quiet squares for secondary actions (edit, delete, refresh, close, copy, share, reorder). */
+html [data-campus-ui] button.campus-icon-btn, html button.campus-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
+  width: 36px; min-width: 36px; height: 36px; min-height: 36px; padding: 0; border: 1px solid transparent; border-radius: 10px;
+  background: transparent; color: var(--text-secondary); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+}
+html [data-campus-ui] button.campus-icon-btn[data-labelled], html button.campus-icon-btn[data-labelled] { width: auto; padding: 0 12px; }
+html [data-campus-ui] button.campus-icon-btn[data-variant=outline], html button.campus-icon-btn[data-variant=outline] { border-color: var(--color-border-strong); background: var(--surface-card); color: var(--text-primary); }
+html [data-campus-ui] button.campus-icon-btn[data-variant=primary], html button.campus-icon-btn[data-variant=primary] { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); font-weight: 600; }
+html [data-campus-ui] button.campus-icon-btn:hover:not(:disabled), html button.campus-icon-btn:hover:not(:disabled) { background: var(--color-primary-light); color: var(--brand-ink); }
+html [data-campus-ui] button.campus-icon-btn[data-variant=primary]:hover:not(:disabled), html button.campus-icon-btn[data-variant=primary]:hover:not(:disabled) { background: var(--color-primary-hover); color: var(--color-on-primary); }
+html [data-campus-ui] button.campus-icon-btn[data-variant=danger]:hover:not(:disabled), html button.campus-icon-btn[data-variant=danger]:hover:not(:disabled) { background: #fef2f2; color: #b91c1c; }
+html.dark button.campus-icon-btn[data-variant=danger]:hover:not(:disabled) { background: #2a1517; color: #fca5a5; }
+html [data-campus-ui] button.campus-icon-btn:disabled, html button.campus-icon-btn:disabled { opacity: .45; cursor: not-allowed; }
+html [data-campus-ui] button.campus-icon-btn:focus-visible, html button.campus-icon-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.campus-icon-btn-glyph { display: inline-grid; place-items: center; line-height: 0; }
+.campus-icon-btn-label { line-height: 1; }
+.campus-icon-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }

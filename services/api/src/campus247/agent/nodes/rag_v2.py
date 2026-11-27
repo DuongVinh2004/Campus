@@ -451,4 +451,5 @@ class RagV2Node:
             draft=DraftResponse(text, claim_count=len(claims), is_grounded=bool(claims),
                 gate_decision="grounded" if claims else "abstain", grounded_claims=claims,
                 partial_note=outcome.partial_note, preface=outcome.preface,
-                guidance=tuple(outcome.suggestions)), step_count=state.step_count + 1)
+                guidance=tuple(outcome.suggestions), claim_groups=tuple(outcome.groups)),
+            step_count=state.step_count + 1)
