@@ -5,6 +5,7 @@ import importlib.util
 import json
 import os
 import re
+import subprocess
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -16,6 +17,27 @@ from campus247.ports.learning_rendition import PDF_MEDIA_TYPE, PPTX_MEDIA_TYPE
 
 
 from campus247.application.learning.scanner import UnavailableScanner  # noqa: E402,F401 -- the default scanner lives in the application layer
+
+
+async def run_bounded(arguments, *, timeout, env=None, capture=False):
+    """Run a child process with a hard time limit; returns (exit code, stdout bytes or None).
+
+    asyncio subprocesses need the Proactor loop on Windows, but uvicorn's multi-worker mode runs the selector loop
+    there (create_subprocess_exec raises NotImplementedError), so the child is waited for in a worker thread instead.
+    The time limit kills the child (TimeoutError); a cancelled caller kills it too.
+    """
+    process = subprocess.Popen(arguments, env=env, stdin=subprocess.DEVNULL,
+                               stdout=subprocess.PIPE if capture else subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        stdout, _ = await asyncio.to_thread(process.communicate, None, timeout)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        await asyncio.to_thread(process.communicate)
+        raise TimeoutError from None
+    except asyncio.CancelledError:
+        process.kill()
+        raise
+    return process.returncode, stdout
 
 
 class FixtureHashScanner:
@@ -75,18 +97,10 @@ class ClamAVScanner:
         if self.cvd_certs_dir:
             arguments.append("--cvdcertsdir=" + str(self.cvd_certs_dir))
         arguments.extend(["--", str(path)])
-        process = await asyncio.create_subprocess_exec(*arguments, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
         try:
-            code = await asyncio.wait_for(process.wait(), 90)
+            code, _ = await run_bounded(arguments, timeout=90)
         except TimeoutError:
-            process.kill()
-            await process.wait()
             raise LearningError(503, "SCANNER_UNAVAILABLE", "Bộ quét tệp quá thời gian.") from None
-        except asyncio.CancelledError:
-            if process.returncode is None:
-                process.kill()
-                await process.wait()
-            raise
         require(code == 0, 422 if code == 1 else 503, "FILE_REJECTED" if code == 1 else "SCANNER_UNAVAILABLE", "Tệp chưa vượt qua kiểm tra an toàn.")
 
 
@@ -202,22 +216,12 @@ class LearningBlobStore:
         destination = self.path(view_key)
         helper = Path(__file__).with_name('pdf_layout.py')
         environment = self._pdf_environment()
-        process = await asyncio.create_subprocess_exec(sys.executable, '-B', str(helper),
-            str(source), str(destination), str(self.workspace), env=environment,
-            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
         try:
-            stdout, _ = await asyncio.wait_for(process.communicate(), 45)
+            returncode, stdout = await run_bounded([sys.executable, '-B', str(helper), str(source), str(destination),
+                                                    str(self.workspace)], timeout=45, env=environment, capture=True)
         except TimeoutError:
-            if process.returncode is None:
-                process.kill()
-                await process.wait()
             raise LearningError(503, 'PDF_VIEW_TIMEOUT', 'Quá thời gian chuẩn bị bản PDF xem.') from None
-        except asyncio.CancelledError:
-            if process.returncode is None:
-                process.kill()
-                await process.wait()
-            raise
-        require(process.returncode == 0 and len(stdout) <= 4096, 422, 'PDF_VIEW_INVALID', 'Chưa xác minh được bản PDF tối ưu để đọc.')
+        require(returncode == 0 and len(stdout) <= 4096, 422, 'PDF_VIEW_INVALID', 'Chưa xác minh được bản PDF tối ưu để đọc.')
         result = json.loads(stdout)
         if result.get('optimized'):
             require(destination.is_file() and destination.stat().st_size <= self.max_bytes, 413, 'PDF_VIEW_TOO_LARGE', 'Bản PDF xem vượt hạn mức.')
@@ -235,19 +239,12 @@ if not 0<n<=500: raise ValueError('page_count')
 has_text=any(bool((r.pages[i].extract_text() or '').strip()) for i in range(min(n,10)))
 print(json.dumps({'page_count':n,'has_text_layer':has_text}))
 """
-        process = await asyncio.create_subprocess_exec(sys.executable, "-B", "-c", script, str(path), env=self._pdf_environment(), stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
         try:
-            stdout, _ = await asyncio.wait_for(process.communicate(), 45)
+            returncode, stdout = await run_bounded([sys.executable, "-B", "-c", script, str(path)], timeout=45,
+                                                   env=self._pdf_environment(), capture=True)
         except TimeoutError:
-            process.kill()
-            await process.wait()
             raise LearningError(422, "PDF_TIMEOUT", "Không xử lý được PDF trong thời gian cho phép.") from None
-        except asyncio.CancelledError:
-            if process.returncode is None:
-                process.kill()
-                await process.wait()
-            raise
-        require(process.returncode == 0 and len(stdout) < 2048, 422, "INVALID_PDF", "PDF hỏng, có mật khẩu hoặc vượt giới hạn 500 trang.")
+        require(returncode == 0 and len(stdout) < 2048, 422, "INVALID_PDF", "PDF hỏng, có mật khẩu hoặc vượt giới hạn 500 trang.")
         return json.loads(stdout)
 
     async def verify(self, key, sha256, size):
@@ -273,19 +270,12 @@ p=int(sys.argv[2])-1
 if r.is_encrypted or not 0<=p<len(r.pages): raise ValueError('page')
 print(json.dumps((r.pages[p].extract_text() or '')[:10000]))
 """
-        process = await asyncio.create_subprocess_exec(sys.executable, "-B", "-c", script, str(self.path(key)), str(page_no), env=self._pdf_environment(), stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
         try:
-            stdout, _ = await asyncio.wait_for(process.communicate(), 15)
+            returncode, stdout = await run_bounded([sys.executable, "-B", "-c", script, str(self.path(key)), str(page_no)],
+                                                   timeout=15, env=self._pdf_environment(), capture=True)
         except TimeoutError:
-            process.kill()
-            await process.wait()
             raise LearningError(503, "SOURCE_UNAVAILABLE", "Chưa đọc được chữ của trang.") from None
-        except asyncio.CancelledError:
-            if process.returncode is None:
-                process.kill()
-                await process.wait()
-            raise
-        require(process.returncode == 0 and len(stdout) <= 80000, 503, "SOURCE_UNAVAILABLE", "Chưa đọc được nguồn trang.")
+        require(returncode == 0 and len(stdout) <= 80000, 503, "SOURCE_UNAVAILABLE", "Chưa đọc được nguồn trang.")
         return json.loads(stdout)
 
     async def chunks(self, key, start, length):

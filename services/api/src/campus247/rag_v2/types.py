@@ -114,4 +114,7 @@ class Outcome:
     retry_hint: str | None = None
     suggestions: tuple[str, ...] = ()
     preface: str | None = None                 # server text shown before the answer (e.g. a scope caveat)
+    # Accepted statements grouped by the part of the question they answer: (the user's own words, statement indexes).
+    # Set only when two or more parts were answered; presentation uses it for layout, never for content.
+    groups: tuple[tuple[str, tuple[int, ...]], ...] = ()
     trace: Mapping[str, object] = field(default_factory=dict)  # finite counters/codes only, never question text

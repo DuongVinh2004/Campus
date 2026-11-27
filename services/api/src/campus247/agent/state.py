@@ -91,6 +91,8 @@ class DraftResponse:
     partial_note: str | None = None  # Fixed server text; never model-authored.
     preface: str | None = None       # Fixed server text shown before the answer (scope caveat).
     guidance: tuple[str, ...] = ()   # Server-derived next-step suggestions shown after the answer.
+    # Layout only: grounded claims grouped by the part of the question they answer (user's words, claim indexes).
+    claim_groups: tuple[tuple[str, tuple[int, ...]], ...] = ()
 
 
 @dataclass(frozen=True)

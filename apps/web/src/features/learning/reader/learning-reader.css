@@ -1,31 +1,80 @@
-.learning-pdf-reader{border:1px solid var(--border,#d5d9df);border-radius:12px;overflow:hidden;background:var(--background,#fff);color:var(--foreground,#17202e);min-width:0;max-width:100%}
-.learning-reader-title{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;overflow-wrap:anywhere}
-.learning-reader-title span{flex-shrink:0;color:var(--muted-foreground,#526071)}
-.learning-reader-toolbar,.learning-reader-search{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--border,#d5d9df)}
-.learning-reader-toolbar button,.learning-reader-search button,.learning-reader-toolbar select,.learning-reader-toolbar input,.learning-reader-search input,.learning-reader-toolbar a{font:inherit;min-height:36px;border:1px solid var(--border,#cbd2da);border-radius:6px;padding:5px 9px;background:var(--background,#fff);color:inherit;max-width:100%}
-.learning-reader-toolbar button:disabled,.learning-reader-search button:disabled{opacity:.5}
-.learning-reader-toolbar .learning-reader-tools-toggle{display:none}
-.learning-reader-toolbar button[aria-pressed=true]{background:var(--primary,#263a65);color:var(--primary-foreground,#fff)}
-.learning-reader-toolbar label,.learning-reader-search label{display:flex;gap:6px;align-items:center;min-width:0}
-.learning-reader-toolbar input{width:64px}.learning-reader-search input{width:180px;min-width:0}
-.learning-reader-notice{padding:10px 16px;margin:0;overflow-wrap:anywhere}
-.learning-reader-body{position:relative;display:flex;height:clamp(420px,70vh,920px);min-width:0;background:#74777b}
+/* PDF reader: a small document app. Slim icon toolbar, page rail on the left, soft grey desk with white pages. */
+.learning-pdf-reader{--lpr-desk:#e9edf5;--lpr-bar:var(--surface-card,#fff);--lpr-line:var(--border-color,#e3e8f1);display:flex;flex-direction:column;border:1px solid var(--lpr-line);border-radius:14px;overflow:hidden;background:var(--lpr-bar);color:var(--text-primary,#0f172a);min-width:0;max-width:100%;box-shadow:var(--shadow-sm,0 1px 2px rgba(15,23,42,.05))}
+html.dark .learning-pdf-reader{--lpr-desk:#0b1220}
+
+/* Two quiet rows: document actions on top, view controls underneath. */
+.lpr-bar,.lpr-viewbar{display:flex;align-items:center;gap:6px;padding:6px 10px;min-width:0}
+.lpr-bar{border-bottom:1px solid var(--lpr-line)}
+.lpr-viewbar{justify-content:center;gap:10px;background:var(--surface-subtle,#f2f5fa);border-bottom:1px solid var(--lpr-line);overflow-x:auto;scrollbar-width:none}
+.lpr-viewbar::-webkit-scrollbar{display:none}
+.lpr-group{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.lpr-title{display:flex;align-items:baseline;gap:8px;flex:1 1 auto;min-width:0;padding:0 6px}
+.lpr-title strong{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lpr-title span{flex-shrink:0;font-size:12px;color:var(--text-secondary,#4b5670)}
+.lpr-divider{width:1px;height:20px;background:var(--lpr-line);flex-shrink:0;margin:0 4px}
+.lpr-spacer{flex:1}
+
+/* Icon buttons: 34px squares, no borders until hovered or pressed. */
+.lpr-btn{display:inline-grid;place-items:center;width:34px;height:34px;min-height:34px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--text-secondary,#4b5670);cursor:pointer;flex-shrink:0;transition:background var(--duration-fast,.16s),color var(--duration-fast,.16s);text-decoration:none}
+.lpr-btn:hover:not(:disabled){background:var(--color-primary-light,#ebf0fd);color:var(--color-primary,#2250d3)}
+.lpr-btn[aria-pressed=true]{background:var(--color-primary-light,#ebf0fd);color:var(--color-primary,#2250d3)}
+.lpr-btn:disabled{opacity:.4;cursor:not-allowed}
+.lpr-btn:focus-visible{outline:2px solid var(--color-primary,#2250d3);outline-offset:1px}
+.lpr-page-input{width:46px;height:30px;min-height:30px;padding:0 4px;text-align:center;border:1px solid var(--color-border-strong,#cbd3e1);border-radius:8px;background:var(--surface-card,#fff);color:inherit;font:inherit;font-size:13px;-moz-appearance:textfield}
+.lpr-page-input::-webkit-outer-spin-button,.lpr-page-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.lpr-count{margin:0 4px 0 6px;font-size:13px;color:var(--text-secondary,#4b5670);white-space:nowrap}
+.lpr-zoom{display:inline-block;min-width:46px;text-align:center;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+
+/* Search: a slim field that opens under the toolbar. */
+.lpr-search{display:flex;align-items:center;gap:6px;padding:6px 12px;border-bottom:1px solid var(--lpr-line);background:var(--surface-card,#fff);color:var(--text-secondary,#4b5670)}
+.lpr-search input{flex:1;min-width:0;height:32px;min-height:32px;border:0;outline:0;background:transparent;color:var(--text-primary,#0f172a);font:inherit;font-size:14px}
+.lpr-matches{font-size:12px;white-space:nowrap}
+
+.learning-reader-notice{padding:8px 14px;margin:0;font-size:13px;overflow-wrap:anywhere;background:var(--color-primary-subtle,#f4f7fe);border-bottom:1px solid var(--lpr-line)}
+.learning-reader-selection{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 14px;border-bottom:1px solid var(--lpr-line);background:var(--color-primary-light,#ebf0fd);font-size:13px}
+.learning-reader-selection span{flex:1 1 200px;overflow-wrap:anywhere}
+.learning-reader-selection button,.learning-reader-notice button{font:inherit;font-size:13px;min-height:32px;padding:4px 12px;border:1px solid var(--color-border-strong,#cbd3e1);border-radius:8px;background:var(--surface-card,#fff);color:inherit;cursor:pointer}
+.learning-reader-selection button:hover,.learning-reader-notice button:hover{background:var(--surface-subtle,#f2f5fa)}
+
+/* Body: page rail + desk. */
+.learning-reader-body{position:relative;display:flex;height:clamp(460px,78vh,960px);min-width:0;background:var(--lpr-desk)}
 .learning-reader-viewport{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain}
-.learning-reader-sidebar{position:relative;z-index:2;flex:0 0 160px;max-width:46%;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:8px;background:var(--background,#fff);color:inherit;box-sizing:border-box}
-.learning-reader-sidebar:has(+.learning-reader-viewport){margin-right:0}.learning-reader-sidebar+.learning-reader-viewport{left:160px}
-.learning-reader-sidebar button{font:inherit;min-height:36px;border:1px solid var(--border,#cbd2da);border-radius:5px;background:var(--background,#fff);color:inherit;text-align:left;padding:8px;overflow-wrap:anywhere}
-.learning-reader-bookmark-form{display:grid;gap:8px}
-.learning-reader-bookmark-form label{display:grid;gap:4px;min-width:0}
-.learning-reader-bookmark-form input{box-sizing:border-box;width:100%;min-width:0;min-height:36px;font:inherit}
-.learning-reader-thumbnail{display:flex;align-items:center;flex-direction:column;gap:6px}.learning-reader-thumbnail canvas{max-width:100%;height:auto}.learning-reader-thumbnail[aria-current=page]{outline:2px solid var(--ring,#4874bb);outline-offset:-2px}
-.learning-reader-focused{position:fixed;inset:0;z-index:1000;border-radius:0;display:flex;flex-direction:column;background:var(--background,#fff)}
+.learning-reader-sidebar{position:relative;z-index:2;flex:0 0 184px;max-width:46%;display:flex;flex-direction:column;background:var(--surface-card,#fff);border-right:1px solid var(--lpr-line);box-sizing:border-box}
+.learning-reader-sidebar+.learning-reader-viewport{left:184px}
+.lpr-side-tabs{display:flex;align-items:center;gap:2px;padding:6px 8px;border-bottom:1px solid var(--lpr-line)}
+.lpr-side-list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:12px 10px}
+.lpr-side-item{display:flex;align-items:center;gap:6px;width:100%;min-height:32px;padding:6px 10px;border:0;border-radius:8px;background:transparent;color:var(--text-primary,#0f172a);font:inherit;font-size:13px;text-align:left;overflow-wrap:anywhere;cursor:pointer}
+.lpr-side-item:hover{background:var(--color-primary-light,#ebf0fd)}
+.lpr-side-empty{margin:4px;font-size:13px;color:var(--text-secondary,#4b5670)}
+.learning-reader-bookmark-form{display:grid;gap:8px;margin-top:6px;padding-top:12px;border-top:1px solid var(--lpr-line);font-size:13px}
+.learning-reader-bookmark-form label{display:grid;gap:4px;min-width:0;color:var(--text-secondary,#4b5670)}
+.learning-reader-bookmark-form input{box-sizing:border-box;width:100%;min-width:0;min-height:34px;padding:4px 8px;border:1px solid var(--color-border-strong,#cbd3e1);border-radius:8px;background:var(--surface-card,#fff);color:inherit;font:inherit}
+.learning-reader-bookmark-form button{min-height:34px;border:0;border-radius:8px;background:var(--color-primary,#2250d3);color:var(--color-on-primary,#fff);font:inherit;font-weight:600;cursor:pointer}
+.learning-reader-bookmark-form button:disabled{opacity:.5}
+
+/* Thumbnails: the page itself, a number underneath. */
+.learning-reader-thumbnail{display:flex;align-items:center;flex-direction:column;gap:6px;width:100%;padding:8px 6px 6px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--text-secondary,#4b5670);font:inherit;font-size:12px;cursor:pointer}
+.learning-reader-thumbnail canvas{max-width:100%;height:auto;background:#fff;border-radius:3px;box-shadow:0 1px 3px rgba(15,23,42,.18)}
+.learning-reader-thumbnail:hover{background:var(--surface-subtle,#f2f5fa)}
+.learning-reader-thumbnail[aria-current=page]{background:var(--color-primary-light,#ebf0fd);border-color:var(--color-primary-border,#c9d6f7);color:var(--color-primary,#2250d3);font-weight:600}
+
+/* Pages float on the desk. */
+.learning-reader-viewport .pdfViewer{--page-margin:14px auto;--page-border:0 solid transparent;padding:6px 0}
+.learning-reader-viewport .pdfViewer .page{box-shadow:0 1px 3px rgba(15,23,42,.14),0 8px 24px -12px rgba(15,23,42,.28);border:0;background-color:#fff}
+
+.learning-reader-focused{position:fixed;inset:0;z-index:1000;border-radius:0;display:flex;flex-direction:column}
 .learning-reader-focused .learning-reader-body{flex:1;height:auto;min-height:0}
 .learning-pdf-reader:fullscreen{display:flex;flex-direction:column}.learning-pdf-reader:fullscreen .learning-reader-body{flex:1;height:auto;min-height:0}
-.learning-reader-selection{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 16px;border-top:1px solid var(--border,#d5d9df)}
-.learning-reader-selection span{overflow-wrap:anywhere}.learning-reader-selection button{font:inherit;padding:8px;border:1px solid var(--border,#cbd2da);border-radius:6px;background:var(--background,#fff);color:inherit}
 .learning-reader-region-mode .page{touch-action:none;user-select:none;cursor:crosshair}
 .learning-reader-annotation{position:absolute;z-index:4;min-height:3px;min-width:3px;padding:0;border:1px solid #987a10;background:rgba(255,210,40,.28);cursor:pointer}
 .learning-reader-annotation[data-focused="true"]{outline:2px solid #604d00;outline-offset:2px;background:rgba(255,210,40,.48)}
 .learning-reader-citation{position:absolute;z-index:4;pointer-events:none;border:2px solid #0c567a;background:rgba(34,154,208,.18)}
-@media(max-width:600px){.learning-reader-title{padding:10px}.learning-reader-toolbar,.learning-reader-search{gap:6px;padding:8px}.learning-reader-toolbar button,.learning-reader-search button,.learning-reader-toolbar select,.learning-reader-toolbar input,.learning-reader-search input,.learning-reader-toolbar a{min-height:44px;font-size:16px}.learning-reader-sidebar{flex-basis:128px}.learning-reader-sidebar+.learning-reader-viewport{left:128px}.learning-reader-search label{flex:1}.learning-reader-search input{width:100%;max-width:180px}.learning-reader-body{height:65vh;min-height:400px}}
-@media(max-width:600px){.learning-reader-toolbar .learning-reader-tools-toggle{display:inline-flex;align-items:center}.learning-pdf-reader:not(.learning-reader-tools-expanded) .learning-reader-toolbar>button:not(.learning-reader-primary-control),.learning-pdf-reader:not(.learning-reader-tools-expanded) .learning-reader-toolbar>a,.learning-pdf-reader:not(.learning-reader-tools-expanded) .learning-reader-search{display:none}}
+
+@media(max-width:700px){
+  .lpr-bar{padding:4px 6px}.lpr-viewbar{justify-content:flex-start;padding:4px 6px;gap:6px}
+  .lpr-btn{width:40px;height:40px;min-height:40px}.lpr-page-input{height:36px;min-height:36px;font-size:16px}
+  .lpr-bar{overflow-x:auto;scrollbar-width:none}.lpr-bar::-webkit-scrollbar{display:none}
+  .lpr-title{display:none}.lpr-bar>.lpr-group:last-child{margin-left:auto}
+  .learning-reader-sidebar{flex-basis:132px}.learning-reader-sidebar+.learning-reader-viewport{left:132px}
+  .learning-reader-body{height:68vh;min-height:420px}
+}

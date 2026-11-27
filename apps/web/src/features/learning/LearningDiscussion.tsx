@@ -6,6 +6,8 @@ import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { LearningGateway, type LearningPreview } from "../../lib/data/api/learning-gateway";
 import type { ReaderAnchor, ReaderAnnotation, ReaderSelection } from "./reader/LearningPdfReader";
 import styles from "./learning.module.css";
+import { IconButton } from "../../components/shared/IconButton";
+import { Pencil, Archive, Share2, RefreshCw, ArrowUpRight, Lock, BadgeCheck, Send } from "lucide-react";
 import { useActorRouteState, useTabDraftOwner } from "../chat/route-drafts";
 
 type Note = ReaderAnnotation & { body: string; revision: number; status: string };
@@ -113,13 +115,13 @@ export function LearningDiscussion({ versionId, renditionId, selection, canManag
   }
   if (owner.enabled && !owner.scope) return <p role="status">{t("ldx.8")}</p>;
   return <section className={`${styles.panel} ${styles.stack}`} aria-label={t("ldx.9")}>
-    <div className={styles.row}><h2>{t("ldx.10")}</h2><button disabled={busy} onClick={()=>void run(async()=>{})}>{t("ldx.11")}</button></div>
+    <div className={styles.row}><h2>{t("ldx.10")}</h2><IconButton label={t("ldx.11")} icon={<RefreshCw size={17} />} disabled={busy} onClick={()=>void run(async()=>{})} /></div>
     {error&&<p role="alert" className={`${styles.alert} ${styles.error}`}>{error}</p>}{notice&&<p role="status">{notice}</p>}
     <p>{selection?t("ldx.48", { p: selection.page_no }) : t("ldx.12")}</p>
     <details open><summary>{t("ldx.13")}</summary><p className={styles.muted}>{t("ldx.14")}</p>
       <form className={styles.form} key={editing?.id||"new-note"} onSubmit={saveNote}><label>{editing?t("ldx.15"):t("ldx.16")}<textarea name="body" value={editor.drafts[noteKey]?.text??editing?.body??""} onChange={event=>{const text=event.target.value;setEditor(current=>({...current,drafts:{...current.drafts,[noteKey]:{text}}}));}} required maxLength={8000}/></label><button disabled={busy||(!selection&&!editing)}>{t("ldx.17")}</button>{editing&&<button type="button" onClick={()=>setEditing(null)}>{t("ldx.18")}</button>}</form>
       {!notes.length&&<p>{t("ldx.19")}</p>}
-      <ul className={styles.list}>{notes.filter(note=>note.status!=="ARCHIVED").map(note=><li key={note.id} className={styles.material}><strong>Trang {note.page_no}</strong><p style={{whiteSpace:"pre-wrap"}}>{note.body}</p><div className={styles.row}><button disabled={busy} onClick={()=>setEditing(note)}>{t("ldx.15")}</button><button disabled={busy} onClick={()=>void run(async()=>{await api.write(`/me/annotations/${note.id}`,{status:"ARCHIVED",revision:note.revision},"PATCH");})}>{t("ldx.20")}</button>{canShareNotes && <button disabled={busy} onClick={()=>void run(()=>previewNoteSharing(note))}>{t("ldx.21")}</button>}</div></li>)}</ul>
+      <ul className={styles.list}>{notes.filter(note=>note.status!=="ARCHIVED").map(note=><li key={note.id} className={styles.material}><strong>Trang {note.page_no}</strong><p style={{whiteSpace:"pre-wrap"}}>{note.body}</p><div className="campus-icon-actions"><IconButton label={t("ldx.15")} icon={<Pencil size={16} />} disabled={busy} onClick={()=>setEditing(note)} /><IconButton label={t("ldx.20")} icon={<Archive size={16} />} disabled={busy} onClick={()=>void run(async()=>{await api.write(`/me/annotations/${note.id}`,{status:"ARCHIVED",revision:note.revision},"PATCH");})} />{canShareNotes && <IconButton label={t("ldx.21")} icon={<Share2 size={16} />} disabled={busy} onClick={()=>void run(()=>previewNoteSharing(note))} />}</div></li>)}</ul>
     </details>
     <details><summary>{t("ldx.22")}</summary><form className={styles.form} onSubmit={ask}><label>{t("ldx.23")}<textarea name="body" value={questionDraft.text} onChange={event=>{const text=event.target.value;setQuestionDraft(current=>({...current,text}));}} required maxLength={8000}/></label><label>{t("ldx.24")}<select aria-label={t("ldx.24")} name="visibility" value={questionDraft.visibility} onChange={event=>{const visibility=event.target.value as Scope;setQuestionDraft(current=>({...current,visibility}));}}><option value="PRIVATE_TO_INSTRUCTORS">{t("ldx.25")}</option><option value="CLASS">{t("ldx.26")}</option></select></label><button disabled={busy||!selection}>{t("ldx.27")}</button></form></details>
     {!questions.length&&<p>{t("ldx.28")}</p>}
@@ -128,15 +130,15 @@ export function LearningDiscussion({ versionId, renditionId, selection, canManag
       <p className={styles.muted}>{question.visibility==="CLASS"?t("ldx.30"):t("ldx.31")}</p>
       <p style={{whiteSpace:"pre-wrap"}}>{question.body}</p>
       <div className={styles.row}>
-        {onSource&&<button disabled={busy} onClick={()=>onSource(question.page_no)}>{t("ldx.54", { p: question.page_no })}</button>}
-        {actorId&&actorId===question.author_id&&<button disabled={busy} onClick={()=>void run(()=>previewSharing(question))}>{question.visibility==="CLASS"?t("ldx.32"):t("ldx.33")}</button>}
+        {onSource&&<IconButton label={t("ldx.54", { p: question.page_no })} icon={<ArrowUpRight size={16} />} disabled={busy} onClick={()=>onSource(question.page_no)} />}
+        {actorId&&actorId===question.author_id&&<IconButton label={question.visibility==="CLASS"?t("ldx.32"):t("ldx.33")} icon={question.visibility==="CLASS"?<Lock size={16} />:<Share2 size={16} />} disabled={busy} onClick={()=>void run(()=>previewSharing(question))} />}
       </div>
       <ul>{question.replies?.map(reply=><li key={reply.id}>
         <strong>{reply.author_name||t("ldx.29")}</strong>
         {reply.visibility==="PRIVATE_TO_INSTRUCTORS"&&question.visibility==="CLASS"&&<span> {t("ldx.34")}</span>}
         {reply.endorsed&&<span> {t("ldx.35")}</span>}
         <p style={{whiteSpace:"pre-wrap"}}>{reply.body}</p>
-        {canManage&&!reply.endorsed&&<button disabled={busy} onClick={()=>void run(async()=>{await api.write(`/replies/${reply.id}/endorse`,{});})}>{t("ldx.36")}</button>}
+        {canManage&&!reply.endorsed&&<IconButton label={t("ldx.36")} icon={<BadgeCheck size={16} />} showLabel variant="outline" disabled={busy} onClick={()=>void run(async()=>{await api.write(`/replies/${reply.id}/endorse`,{});})} />}
       </li>)}</ul>
       <form className={styles.form} onSubmit={event=>{
         event.preventDefault();const form=event.currentTarget;const body=String(new FormData(form).get("body")||"").trim();
@@ -145,7 +147,7 @@ export function LearningDiscussion({ versionId, renditionId, selection, canManag
       }}>
         <label>{t("ldx.37")}<textarea name="body" value={replyDrafts[question.id]?.text??""} onChange={event=>{const text=event.target.value;setReplyDrafts(current=>({...current,[question.id]:{text}}));}} required maxLength={5000}/></label>
         <p className={styles.muted}>{question.visibility==="CLASS"?t("ldx.38"):t("ldx.39")}</p>
-        <button disabled={busy}>{t("ldx.40")}</button>
+        <IconButton label={t("ldx.40")} icon={<Send size={16} />} showLabel variant="primary" type="submit" disabled={busy} />
       </form>
     </li>)}</ul>
     <AccessibleDialog open={!!sharing} onClose={()=>setSharing(null)} preventClose={busy} labelledBy="learning-question-sharing-title" className={styles.dialog}>

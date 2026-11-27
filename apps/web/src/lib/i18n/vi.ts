@@ -1109,6 +1109,7 @@ export const vi = {
   "ncx.56": "Tiếp theo: {v}",
   "ncx.57": "Preview hết hạn {d}",
   "mcx.1": "Cần xác nhận phiên và vai trò để mở memory.",
+  "mcx.off": "Bộ nhớ trợ lý chưa được bật trong bản chạy này.",
   "mcx.2": "Chưa xác minh kết quả; giữ nội dung soạn.",
   "mcx.3": "Receipt chưa khớp; giữ bản soạn.",
   "mcx.4": "Memory cá nhân",
