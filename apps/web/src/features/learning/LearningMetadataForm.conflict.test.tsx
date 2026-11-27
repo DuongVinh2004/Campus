@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/vitest';
 import {act,cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react';
-import {afterEach,expect,it,vi} from 'vitest';
+import {afterEach,expect,it,vi,type Mock} from 'vitest';
 import {LearningMetadataForm} from './LearningMetadataForm';
 import type {MetadataSnapshot} from './LearningMetadataComparison';
 import {ChatDraftActor,ChatDraftSessionProvider} from '../chat/route-drafts';
@@ -9,8 +9,9 @@ import {ChatDraftActor,ChatDraftSessionProvider} from '../chat/route-drafts';
 afterEach(cleanup);
 const initial={values:{title:'Original title',description:'Original description'},basis:{revision:3}};
 const latest={values:{title:'Server title',description:'Server description'},basis:{revision:4}};
-type Props={actor?:string;record?:string;show?:boolean;read:(signal:AbortSignal)=>Promise<MetadataSnapshot>;save?:ReturnType<typeof vi.fn>};
-function Root({actor='teacher',record='record-a',show=true,read,save=vi.fn()}:Props){
+type Save=(payload:Record<string,unknown>,key:string)=>Promise<unknown>;
+type Props={actor?:string;record?:string;show?:boolean;read:(signal:AbortSignal)=>Promise<MetadataSnapshot>;save?:Mock<Save>};
+function Root({actor='teacher',record='record-a',show=true,read,save=vi.fn<Save>()}:Props){
   return <ChatDraftSessionProvider><ChatDraftActor value={actor}>{show&&<LearningMetadataForm actorId={actor} draftId={record} initialValues={initial.values} basis={initial.basis}
     fieldLabels={{title:'Title',description:'Description'}} onRead={read} onSave={save} toPayload={({values,basis})=>({...values,revision:basis.revision})}>
     {(values,change)=><><label>Title<input value={values.title} onChange={event=>change('title',event.target.value)}/></label><label>Description<textarea value={values.description} onChange={event=>change('description',event.target.value)}/></label><button>Preview</button></>}
@@ -20,7 +21,7 @@ const compare=()=>fireEvent.click(screen.getByRole('button',{name:'Đối chiế
 const apply=()=>fireEvent.click(screen.getByRole('button',{name:'Dùng kết quả đối chiếu để soạn tiếp'}));
 
 it('retains unresolved comparison choices through route navigation without updating the write revision',async()=>{
-  const read=vi.fn().mockResolvedValue(latest),save=vi.fn().mockRejectedValue(new Error('Synthetic preview failure'));
+  const read=vi.fn().mockResolvedValue(latest),save=vi.fn<Save>().mockRejectedValue(new Error('Synthetic preview failure'));
   const view=render(<Root read={read} save={save}/>);fireEvent.change(screen.getByLabelText('Title'),{target:{value:'My title'}});compare();
   await screen.findByLabelText('Chọn nội dung: Title');expect(screen.getByRole('button',{name:'Dùng kết quả đối chiếu để soạn tiếp'})).toBeDisabled();
   fireEvent.change(screen.getByLabelText('Chọn nội dung: Title'),{target:{value:'server'}});
@@ -53,7 +54,7 @@ it.each(['owner','record','route'] as const)('aborts comparison across %s change
 
 it('hides an older comparison when a fresh read is denied and preserves the original draft and revision',async()=>{
   const read=vi.fn().mockResolvedValueOnce(latest).mockRejectedValueOnce(new Error('Synthetic access denied'));
-  const save=vi.fn().mockRejectedValue(new Error('Keep synthetic draft'));
+  const save=vi.fn<Save>().mockRejectedValue(new Error('Keep synthetic draft'));
   render(<Root read={read} save={save}/>);fireEvent.change(screen.getByLabelText('Title'),{target:{value:'Private edit'}});compare();await screen.findByLabelText('Chọn nội dung: Title');
   // The button reads "Đang đọc…" until the loading state clears one update later; wait for it instead of querying synchronously.
   await screen.findByRole('button',{name:'Đối chiếu bản trên máy chủ'});compare();
@@ -64,7 +65,7 @@ it('hides an older comparison when a fresh read is denied and preserves the orig
 it('starts a new three-way baseline after adoption and retains every previous draft',async()=>{
   const read=vi.fn().mockResolvedValueOnce({...latest,values:{title:'Original title',description:'Server description'}})
     .mockResolvedValueOnce({values:{title:'My title',description:'Third server description'},basis:{revision:5}});
-  const save=vi.fn().mockRejectedValue(new Error('Synthetic keep draft'));
+  const save=vi.fn<Save>().mockRejectedValue(new Error('Synthetic keep draft'));
   render(<Root read={read} save={save}/>);fireEvent.change(screen.getByLabelText('Title'),{target:{value:'My title'}});compare();await screen.findByText('Server description');apply();
   fireEvent.change(screen.getByLabelText('Description'),{target:{value:'My second description'}});compare();await screen.findByLabelText('Chọn nội dung: Description');
   fireEvent.change(screen.getByLabelText('Chọn nội dung: Description'),{target:{value:'server'}});apply();
@@ -82,7 +83,7 @@ it.each([undefined,0,2,4.5])('rejects an incomplete or regressed server revision
 });
 
 it('sends the latest retained fields when editing and submitting in the same event batch',async()=>{
-  const save=vi.fn().mockRejectedValue(new Error('Synthetic retained result'));
+  const save=vi.fn<Save>().mockRejectedValue(new Error('Synthetic retained result'));
   render(<Root read={async()=>latest} save={save}/>);
   act(()=>{
     fireEvent.change(screen.getByLabelText('Title'),{target:{value:'Latest title in batch'}});
@@ -96,7 +97,7 @@ it('sends the latest retained fields when editing and submitting in the same eve
 
 it('starts only one request for two submissions in the same event batch',async()=>{
   let finish!:(value:unknown)=>void;
-  const save=vi.fn(()=>new Promise(resolve=>{finish=resolve;}));
+  const save=vi.fn<Save>(()=>new Promise(resolve=>{finish=resolve;}));
   render(<Root read={async()=>latest} save={save}/>);
   const form=screen.getByRole('button',{name:'Preview'}).closest('form')!;
   act(()=>{fireEvent.submit(form);fireEvent.submit(form);});
@@ -108,7 +109,7 @@ it('starts only one request for two submissions in the same event batch',async()
 
 it('keeps one pending request through remount and preserves a newer draft on acknowledgement',async()=>{
   let finish!:(value:unknown)=>void;
-  const save=vi.fn(()=>new Promise(resolve=>{finish=resolve;})),read=async()=>latest;
+  const save=vi.fn<Save>(()=>new Promise(resolve=>{finish=resolve;})),read=async()=>latest;
   const view=render(<Root read={read} save={save}/>);
   fireEvent.change(screen.getByLabelText('Title'),{target:{value:'Submitted title'}});
   fireEvent.submit(screen.getByRole('button',{name:'Preview'}).closest('form')!);
@@ -124,7 +125,7 @@ it('keeps one pending request through remount and preserves a newer draft on ack
 
 it('blocks duplicate requests even when used without a retained-draft provider',async()=>{
   let finish!:(value:unknown)=>void;
-  const save=vi.fn(()=>new Promise(resolve=>{finish=resolve;}));
+  const save=vi.fn<Save>(()=>new Promise(resolve=>{finish=resolve;}));
   render(<LearningMetadataForm actorId='teacher' draftId='standalone' initialValues={{title:'Standalone'}} toPayload={({values})=>values} onSave={save}>{()=> <button>Standalone save</button>}</LearningMetadataForm>);
   const form=screen.getByRole('button',{name:'Standalone save'}).closest('form')!;
   act(()=>{fireEvent.submit(form);fireEvent.submit(form);});
@@ -133,7 +134,7 @@ it('blocks duplicate requests even when used without a retained-draft provider',
 });
 
 it('reuses the exact request and key after an uncertain save and route remount',async()=>{
-  const read=async()=>latest,save=vi.fn().mockRejectedValue(new Error('Synthetic uncertain result'));
+  const read=async()=>latest,save=vi.fn<Save>().mockRejectedValue(new Error('Synthetic uncertain result'));
   const view=render(<Root read={read} save={save}/>);fireEvent.change(screen.getByLabelText('Title'),{target:{value:'Retry retained title'}});
   fireEvent.click(screen.getByRole('button',{name:'Preview'}));await screen.findByText('Synthetic uncertain result');
   view.rerender(<Root read={read} save={save} show={false}/>);view.rerender(<Root read={read} save={save}/>);
@@ -143,7 +144,7 @@ it('reuses the exact request and key after an uncertain save and route remount',
 
 it('keeps a late acknowledgement and error within their original actor scope',async()=>{
   let reject!:(value:Error)=>void;
-  const read=async()=>latest,save=vi.fn(()=>new Promise((_resolve,fail)=>{reject=fail;}));
+  const read=async()=>latest,save=vi.fn<Save>(()=>new Promise((_resolve,fail)=>{reject=fail;}));
   const view=render(<Root read={read} save={save}/>);fireEvent.change(screen.getByLabelText('Title'),{target:{value:'Owner A submitted'}});
   fireEvent.click(screen.getByRole('button',{name:'Preview'}));await waitFor(()=>expect(save).toHaveBeenCalledTimes(1));
   view.rerender(<Root actor='teacher-b' read={read} save={save}/>);
