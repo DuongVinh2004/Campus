@@ -1,24 +1,34 @@
-/* Presentation from stitch_campus_24_7_huce_portal (3).zip. */
-@font-face { font-family: Inter; font-style: normal; font-weight: 100 900; font-display: swap; src: url('/fonts/inter-latin.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: Inter; font-style: normal; font-weight: 100 900; font-display: swap; src: url('/fonts/inter-vietnamese.woff2') format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
-@font-face { font-family: Inter; font-style: normal; font-weight: 100 900; font-display: swap; src: url('/fonts/inter-latin-ext.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-:root { --font-inter: Inter; }
+/* Presentation layer shared by every page. Visual identity lives in tokens.css and identity.css. */
+/* Be Vietnam Pro, self-hosted (SIL OFL): the Vietnamese subset keeps diacritics crisp. */
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/BeVietnamPro-400-vietnamese.woff2) format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/BeVietnamPro-400-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/BeVietnamPro-400-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts/BeVietnamPro-500-vietnamese.woff2) format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts/BeVietnamPro-500-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts/BeVietnamPro-500-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/BeVietnamPro-600-vietnamese.woff2) format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/BeVietnamPro-600-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/BeVietnamPro-600-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/BeVietnamPro-700-vietnamese.woff2) format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/BeVietnamPro-700-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Be Vietnam Pro'; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/BeVietnamPro-700-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+:root { --font-inter: "Be Vietnam Pro"; }
 @theme {
-  --color-blue-50: #edf6f6;
-  --color-blue-100: #dceeee;
-  --color-blue-200: #badbde;
-  --color-blue-300: #91c9cb;
-  --color-blue-400: #6cb3b5;
-  --color-blue-500: #287c81;
-  --color-blue-600: #155e63;
-  --color-blue-700: #104c50;
-  --color-blue-800: #0e4347;
-  --color-blue-900: #12393d;
-  --color-blue-950: #102b30;
+  --color-blue-50: #ebf0fd;
+  --color-blue-100: #dce5fb;
+  --color-blue-200: #bfcff7;
+  --color-blue-300: #93aef1;
+  --color-blue-400: #5f85e6;
+  --color-blue-500: #3b67dd;
+  --color-blue-600: #2250d3;
+  --color-blue-700: #1a3fa8;
+  --color-blue-800: #163383;
+  --color-blue-900: #122a69;
+  --color-blue-950: #0e1b45;
 }
 
-html:root { --color-border: #dce4e8; --border-color: #dce4e8; --text-secondary: #526371; --color-text-muted: #526371; }
-html.dark { --color-border: #2b414b; --border-color: #2b414b; --text-secondary: #a4b7c2; --color-text-muted: #a4b7c2; }
+html:root { --color-border: #e3e8f1; --border-color: #e3e8f1; --text-secondary: #4b5670; --color-text-muted: #5b6682; }
+html.dark { --color-border: #243050; --border-color: #243050; --text-secondary: #a3b0c9; --color-text-muted: #a3b0c9; }
 [data-campus-ui] { font-size: 14px; line-height: 1.6; }
 [data-campus-ui] .campus-toolbar { flex-shrink: 0; box-shadow: none; }
 [data-campus-ui] .campus-theme-toggle { border: 0; background: transparent; box-shadow: none; }
@@ -65,7 +75,7 @@ html.dark { --color-border: #2b414b; --border-color: #2b414b; --text-secondary: 
 
 /* Shared surfaces, fields and actions also cover screens without a separate export. */
 [data-campus-ui] :is(.fluent-card, .campus-card), .campus-dialog {
-  background: var(--surface-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 1px 2px #182c3a04;
+  background: var(--surface-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 1px 2px rgba(15,23,42,.04);
 }
 [data-campus-ui] :is(.fluent-btn-primary, .campus-btn-primary, .btn-primary), .campus-auth .fluent-btn-primary, .campus-dialog .fluent-btn-primary {
   background: var(--color-primary); color: var(--color-text-inverse); border: 1px solid var(--color-primary); border-radius: 8px; box-shadow: none; font-size: 13px; font-weight: 600; min-height: 44px; padding: 10px 16px; display: inline-flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer;
@@ -121,7 +131,8 @@ html.dark { --color-border: #2b414b; --border-color: #2b414b; --text-secondary: 
 .campus-empty-state p { color: var(--text-secondary); font-size: 13px; }
 .campus-notification-card { display: flex; align-items: flex-start; gap: 16px; border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; background: var(--surface-card); }
 .campus-notification-icon { flex-shrink: 0; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; color: var(--color-primary); background: var(--color-primary-light); }
-.campus-notification-card > div { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.campus-notification-card > div:not(.campus-notification-icon) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.campus-notification-card > .campus-notification-icon { flex: 0 0 42px; }
 .campus-notification-card p:first-child { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
 .campus-notification-card p:not(:first-child) { color: var(--text-secondary); font-size: 12px; margin-block: 5px; }
 .campus-notification-card button { margin-top: 12px; margin-right: 8px; }
@@ -200,7 +211,7 @@ html.dark { --color-border: #2b414b; --border-color: #2b414b; --text-secondary: 
 /* Student overview — ZIP screen 06 / 03. */
 .campus-home { display: flex; flex-direction: column; gap: 28px; }
 .campus-home-intro p { margin-top: 8px; color: var(--text-secondary); font-size: 15px; }
-.campus-home-assistant { border: 1px solid var(--color-primary-border); border-radius: 16px; background: var(--color-primary-light); padding: 24px; box-shadow: 0 1px 2px #182c3a08; }
+.campus-home-assistant { border: 1px solid var(--color-primary-border); border-radius: 16px; background: var(--color-primary-light); padding: 24px; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
 .campus-home-assistant h2 { display: flex; gap: 12px; align-items: center; font-size: 18px; font-weight: 600; color: var(--color-primary); margin-bottom: 16px; }
 .campus-home-assistant h2 svg { width: 34px; height: 34px; padding: 7px; border-radius: 8px; background: var(--color-primary); color: var(--color-text-inverse); }
 .campus-home-assistant label { display: block; margin-bottom: 8px; font-weight: 500; }
@@ -212,7 +223,8 @@ html.dark { --color-border: #2b414b; --border-color: #2b414b; --text-secondary: 
 .campus-home-services h2 { font-size: 17px; font-weight: 600; margin-bottom: 18px; }
 .campus-service-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .campus-service-card { display: flex; flex-direction: column; gap: 12px; min-width: 0; border: 1px solid var(--border-color); background: var(--surface-card); border-radius: 12px; padding: 20px; }
-.campus-service-card:hover { border-color: var(--color-primary-border); box-shadow: var(--shadow-sm); }
+.campus-service-card { border-radius: 14px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast); }
+.campus-service-card:hover { border-color: var(--color-primary-border); box-shadow: var(--shadow-md); transform: translateY(-1px); }
 .campus-service-card > div { display: flex; align-items: center; justify-content: space-between; color: var(--text-secondary); }
 .campus-service-card > div > svg:first-child { width: 40px; height: 40px; padding: 10px; background: var(--color-primary-light); color: var(--color-primary); border-radius: 9px; }
 .campus-service-card h3 { font-size: 15px; font-weight: 600; }
@@ -253,8 +265,8 @@ html.dark { --color-border: #2b414b; --border-color: #2b414b; --text-secondary: 
 [data-campus-ui] .campus-composer button { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; min-height: 44px; min-width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--text-primary); }
 [data-campus-ui] .campus-composer button:hover { background: var(--surface-subtle); }
 [data-campus-ui] .campus-composer .campus-composer-settings { gap: 6px; border-radius: 12px; padding: 0 8px; color: var(--text-secondary); font-size: 14px; }
-[data-campus-ui] .campus-composer .campus-composer-send { width: 44px; background: #347ff6; color: white; }
-[data-campus-ui] .campus-composer .campus-composer-send:hover { background: #2468d6; }
+[data-campus-ui] .campus-composer .campus-composer-send { width: 44px; background: var(--color-primary); color: var(--color-on-primary); }
+[data-campus-ui] .campus-composer .campus-composer-send:hover { background: var(--color-primary-hover); }
 [data-campus-ui] .campus-composer .campus-composer-send:disabled { background: var(--surface-subtle); color: var(--text-secondary); opacity: .65; }
 [data-campus-ui] .campus-composer > div > p { margin: 0 0 6px; font-size: 10px; line-height: 14px; color: var(--text-secondary); }
 @media (max-width: 480px) { [data-campus-ui] .campus-composer-settings span { display: none; } [data-campus-ui] .campus-composer form { gap: 4px; min-height: 60px; padding: 6px 8px; } }
