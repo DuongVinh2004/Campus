@@ -505,7 +505,7 @@ class RagV2Service:
                         aligned = [*aligned, *(True for _ in extra)]
                 return await done(build_outcome(u, verdicts, units, semantic_results=aligned,
                     coverage=0.9 if missing else 1.0, missing_parts=missing, suggestions=chips,
-                    scope_note=note), units)
+                    scope_note=note, facets=facets, facet_of=facet_of), units)
         except Exception as exc:  # noqa: BLE001 -- port failures must become content-free typed outcomes
             logging.getLogger("campus247.rag_v2").warning("rag_v2_failure kind=%s where=%s detail=%s", type(exc).__name__,
                 exc.__traceback__.tb_next.tb_frame.f_code.co_name if exc.__traceback__ and exc.__traceback__.tb_next else "?",
