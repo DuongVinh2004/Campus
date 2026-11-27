@@ -2,8 +2,9 @@
 
 import { useT } from "../../lib/i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { IconButton } from "../../components/shared/IconButton";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Link2, X, ArrowUp, ArrowDown, RefreshCw } from "lucide-react";
 import { AppShell, type Role } from "../../components/AppShell";
 import { AccessibleDialog } from "../../components/shared/AccessibleDialog";
 import { LearningGateway, LearningApiError, type LearningCapabilities, type LearningExitTicket, type LearningMaterial, type LearningOcrAnchor, type LearningOffering, type LearningPreview, type LearningReaderMetadata, type LearningSession, type LearningVersionChangeSet } from "../../lib/data/api/learning-gateway";
@@ -145,6 +146,8 @@ export function LearningWorkspace() {
     };
   },[]);
   const readerId = reader?.version_id || reader?.id;
+  // Opening a document brings the reader into view, like opening a file in an app.
+  useEffect(() => { if (readerId) document.getElementById("learning-reader")?.scrollIntoView?.({ block: "start", behavior: "smooth" }); }, [readerId]);
   const syncIssue = readerId ? syncIssues[readerId] : undefined;
   const offering = offerings.find(item => item.id === offeringId);
   const activeMembers=catalogScope===JSON.stringify([actorId,offeringId])?catalogs.members:[];
@@ -590,12 +593,12 @@ export function LearningWorkspace() {
   return <><LearningSessionNotice state={session.state} onCheck={() => void session.check()} />
     <PreservedActivity mode={session.state === "ready" ? "visible" : "hidden"}>
     <AppShell activeNav="learning" userRole={role}><div className={styles.workspace}>
-    <header className={styles.heading}><div><h1>{t("lwx.18")}</h1><p className={styles.muted}>{t("lwx.19")}</p></div><button disabled={busy || loading} onClick={() => {
+    <header className={styles.heading}><div><h1>{t("lwx.18")}</h1><p className={styles.muted}>{t("lwx.19")}</p></div><IconButton label={t("lwx.21")} variant="outline" icon={<RefreshCw size={17} />} disabled={busy || loading} onClick={() => {
       if (!capabilities || capabilities.enabled === false || capabilities.available === false) {
         setError(""); setLoading(true); setInitializationAttempt(value => value + 1); return;
       }
       void run(async () => { setOfferings(await gateway.offerings(admin)); if (sessionId) await reloadMaterials(); setNotice(t("lwx.20")); });
-    }}>{t("lwx.21")}</button></header>
+    }} /></header>
     {error && <div role="alert" className={`${styles.alert} ${styles.error}`}>{error} {role==="guest"&&<Link href={`/login?redirect=${encodeURIComponent(loginTarget)}`}>{t("lwx.22")}</Link>}</div>}
     {notice && <p role="status" className={styles.alert}>{notice}</p>}
     {busy&&<p role="status">{t("lwx.23")}</p>}
@@ -684,7 +687,7 @@ export function LearningWorkspace() {
               const rows=await gateway.sessions(offeringId);
               if(currentWorkspace.current.actorId===actorId&&currentWorkspace.current.offeringId===offeringId){setSessions(rows);setSessionId(created.id);}
             }
-          }}>{(values,change)=><><label>Tên buổi mới<input name="title" required maxLength={200} value={values.title} onChange={event=>change("title",event.target.value)}/></label><button>Thêm buổi</button></>}</LearningMetadataForm>}
+          }}>{(values,change)=><><label>Tên buổi mới<input name="title" required maxLength={200} value={values.title} onChange={event=>change("title",event.target.value)}/></label><button className={styles.primary}>Thêm buổi</button></>}</LearningMetadataForm>}
       </aside><section className={`${styles.panel} ${styles.stack}`} aria-label={t("lwx.38")}><div className={styles.row}><h2>{activeSession?.title || t("lwx.39")}</h2><span>{materials.length} tài liệu</span></div>
         {manageable && <p id="learning-class-timezone" className={styles.muted}>Múi giờ của lớp {timeZone}</p>}
         {manageable && activeSession && <details><summary>Chỉnh sửa buổi học</summary>
@@ -708,12 +711,12 @@ export function LearningWorkspace() {
               }
             }}>{(values,change)=><>
             <label>Tiêu đề buổi<input name="title" value={values.title} onChange={event=>change("title",event.target.value)} required/></label><label>Mô tả buổi<textarea name="description" value={values.description} onChange={event=>change("description",event.target.value)}/></label><label>Thời gian dự kiến<input type="datetime-local" name="starts_at" aria-describedby="learning-class-timezone" value={values.starts_at} onChange={event=>change("starts_at",event.target.value)}/></label><button>Xem trước cập nhật</button>
-          </>}</LearningMetadataForm><div className={styles.row}><button disabled={busy||sessions[0]?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,-1))}>Đưa buổi lên</button><button disabled={busy||sessions.at(-1)?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,1))}>Đưa buổi xuống</button></div>
+          </>}</LearningMetadataForm><div className={styles.actions}><IconButton label="Đưa buổi lên" variant="outline" icon={<ArrowUp size={16} />} disabled={busy||sessions[0]?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,-1))} /><IconButton label="Đưa buổi xuống" variant="outline" icon={<ArrowDown size={16} />} disabled={busy||sessions.at(-1)?.id===sessionId} onClick={()=>void run(()=>reorderSession(sessionId,1))} /></div>
         </details>}
         {manageable&&sessionId&&<details onToggle={event=>{if(event.currentTarget.open)void run(async()=>{const lists=await Promise.all(sessions.map(item=>gateway.materials(item.id)));const unique=new Map(lists.flat().map(item=>[item.id,item]));setLinkCandidates([...unique.values()].filter(item=>!materials.some(current=>current.id===item.id)));});}}><summary>Dùng lại bài giảng của buổi khác</summary><form className={styles.form} onSubmit={event=>{event.preventDefault();const id=formValue(event.currentTarget,"material_id");void run(async()=>{await reviewedWrite(`/sessions/${sessionId}/material-links`,{material_ids:[...materials.map(item=>item.id),id]},"material_links","Liên kết bài giảng vào buổi này","PUT");await reloadMaterials();});}}><label>Tài liệu trong cùng lớp<select aria-label="Tài liệu trong cùng lớp" name="material_id" required><option value="">Chọn tài liệu</option>{linkCandidates.map(item=><option key={item.id} value={item.id}>{item.title}</option>)}</select></label><button disabled={busy||!linkCandidates.length}>Thêm liên kết</button></form></details>}
         {sessionId && !materials.length && <p>{t("lwx.40")}</p>}
-        <ul className={styles.list}>{materials.map(item=><li key={item.id} className={styles.material}><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}<p className={styles.muted}>{item.visibility === "HIDDEN" ? "Đang ẩn" : item.current_published_version_id ? "Đã công bố" : "Chưa công bố"}</p>
-          {item.current_published_version_id && <button disabled={busy} onClick={()=>void run(()=>openVersion(item.current_published_version_id!,undefined,undefined,sessionId))}>{t("lwx.41")}</button>}
+        <ul className={styles.list}>{materials.map(item=><li key={item.id} className={styles.material}><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}<p className={`${styles.badge} ${item.visibility === "HIDDEN" || !item.current_published_version_id ? styles.badgeMuted : styles.badgeLive}`}>{item.visibility === "HIDDEN" ? "Đang ẩn" : item.current_published_version_id ? "Đã công bố" : "Chưa công bố"}</p>
+          {item.current_published_version_id && <button className={styles.primary} disabled={busy} onClick={()=>void run(()=>openVersion(item.current_published_version_id!,undefined,undefined,sessionId))}>{t("lwx.41")}</button>}
           <details><summary>{t("lwx.42")}</summary>{item.versions?.length ? item.versions.map(version=><div className={styles.version} key={version.id}>
             <span>Phiên bản {version.version_no} · {stateLabel(version.processing_state)} · {stateLabel(version.publication_state)}</span>
             {version.source_media_type==='application/vnd.openxmlformats-officedocument.presentationml.presentation'&&<span>{t("lwx.44")}</span>}
@@ -757,7 +760,7 @@ export function LearningWorkspace() {
                 if(currentWorkspace.current.actorId===actorId&&currentWorkspace.current.sessionId===sessionId)setMaterials(rows);
               }
             }}>{(values,change)=><><label>Tiêu đề<input name="title" value={values.title} onChange={event=>change("title",event.target.value)} required/></label><label>Mô tả<textarea name="description" value={values.description} onChange={event=>change("description",event.target.value)}/></label><label>Hiển thị<select aria-label="Hiển thị" name="visibility" value={values.visibility} onChange={event=>change("visibility",event.target.value)}><option value="VISIBLE">Hiển thị trong lớp</option><option value="HIDDEN">Ẩn với sinh viên</option></select></label><button>Xem trước thay đổi</button></>}</LearningMetadataForm></details>}
-          {manageable&&<div className={styles.row}><button disabled={busy||materials[0]?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,-1))}>Đưa bài lên</button><button disabled={busy||materials.at(-1)?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,1))}>Đưa bài xuống</button></div>}
+          {manageable&&<div className={styles.actions}><IconButton label="Đưa bài lên" variant="outline" icon={<ArrowUp size={16} />} disabled={busy||materials[0]?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,-1))} /><IconButton label="Đưa bài xuống" variant="outline" icon={<ArrowDown size={16} />} disabled={busy||materials.at(-1)?.id===item.id} onClick={()=>void run(()=>reorderMaterial(item.id,1))} /></div>}
           {manageable && <details><summary>{t("lwx.55")}</summary><LearningUploadForm actorId={actorId} draftId={`version-upload:${item.id}`} existing accept={uploadAccept} pptxEnabled={pptxEnabled} disabled={busy}
             maxBytes={capabilities?.max_file_bytes||capabilities?.limits?.max_file_bytes||50*1024*1024} onUpload={(draft,file,signal,onIntent)=>upload(draft,file,signal,onIntent,item.id)} onAccepted={acceptedUpload}
             onCancelIntent={id=>gateway.write(`/upload-intents/${id}/abort`,{})}/></details>}
@@ -792,11 +795,18 @@ export function LearningWorkspace() {
       </section></div>}
       {(reader || exitTicketId) && <div className={reader && exitTicketId ? styles.exitReaderColumns : undefined}>
       {reader && <section id="learning-reader" tabIndex={-1} className={styles.reader} aria-label={t("lwx.46")}>
-        <div className={styles.row}><h2>{reader.title}</h2><span>Phiên bản {reader.version_no}</span><button onClick={()=>void run(async()=>{await flushReaderState();setReader(null);})}>{t("lwx.47")}</button></div>
-        {readerId && reader.capabilities.page_feedback && actorId && <StudentPageFeedback
-          key={`${actorId}:${readerId}:${readerGeneration}`} actorId={actorId} versionId={readerId}
-          versionNumber={reader.version_no} pageNo={readerPage} sourceSessionId={readerSessionId} timeZone={timeZone}
-        />}
+        <header className={styles.readerHeader}>
+          <h2>{reader.title}</h2><span className={styles.badge}>Phiên bản {reader.version_no}</span>
+          <span className={styles.spacer} />
+          <button type="button" className={styles.iconButton} aria-label={t("lwx.49")} title={t("lwx.49")} disabled={busy} onClick={()=>void run(async()=>{
+            const note=annotations.find(item=>item.id===anchorId&&item.version_id===readerId&&item.page_no===readerPage);
+            const url=new URL(linkPath({version_id:readerId!,page_no:readerPage,anchor_id:note?.id,session_id:readerSessionId}),window.location.origin);
+            await navigator.clipboard.writeText(url.href);setNotice(t("lwx.48"));
+          })}><Link2 size={18} aria-hidden="true" /></button>
+          <button type="button" className={styles.iconButton} aria-label={t("lwx.47")} title={t("lwx.47")} onClick={()=>void run(async()=>{await flushReaderState();setReader(null);})}><X size={18} aria-hidden="true" /></button>
+        </header>
+        <div className={styles.readerLayout}>
+        <div className={styles.readerMain}>
         {readerId && reader.capabilities.version_changes && reader.publication_state === "PUBLISHED" && actorId && <VersionChangeBanner
           key={`${actorId}:${readerId}:${readerGeneration}`} actorId={actorId} versionId={readerId}
           onOpen={(versionId, page) => void run(() => openVersion(versionId, page, undefined, readerSessionId))}
@@ -804,18 +814,11 @@ export function LearningWorkspace() {
         {exitEnabled && exitReaderSource && exitTickets.map(ticket => ticket.state !== "SOURCE_UNAVAILABLE"
           && ticket.state !== "DRAFT" && ticket.version_id === readerId && ticket.page_no === readerPage
           && <button type="button" key={ticket.id} onClick={() => selectExitTicket(ticket.id)}>Mở phiếu ra lớp · {ticket.question}</button>)}
-        <button disabled={busy} onClick={()=>void run(async()=>{
-          const note=annotations.find(item=>item.id===anchorId&&item.version_id===readerId&&item.page_no===readerPage);
-          const url=new URL(linkPath({version_id:readerId!,page_no:readerPage,anchor_id:note?.id,session_id:readerSessionId}),window.location.origin);
-          await navigator.clipboard.writeText(url.href);setNotice(t("lwx.48"));
-        })}>{t("lwx.49")}</button>
         {reader.publication_state==="PUBLISHED"&&reader.current_published_version_id&&reader.current_published_version_id!==readerId&&
           <div className={styles.alert}><p role="status">{t("lwx.50")}</p><button disabled={busy} onClick={()=>void run(()=>openVersion(reader.current_published_version_id!,undefined,undefined,readerSessionId))}>Mở bản hiện hành</button></div>}
         {syncIssue === "conflict" && <div role="alert" className={styles.alert}><p>{t("lwx.51")}</p><button disabled={busy} onClick={()=>void run(()=>resolveReaderConflict(false))}>Dùng vị trí đã đồng bộ</button><button disabled={busy} onClick={()=>void run(()=>resolveReaderConflict(true))}>Giữ vị trí trên thiết bị này</button></div>}
         {syncIssue === "retry" && <div role="status" className={styles.alert}>{t("lwx.52")}<button disabled={busy} onClick={() => void flushReaderState()}>{t("lwx.53")}</button></div>}
         <LearningPresentation key={`${reader.offering_id||offeringId}:${reader.version_id||reader.id}`} offeringId={reader.offering_id||offeringId} versionId={reader.version_id||reader.id} actorId={actorId} canManage={reader.capabilities.manage} pageNo={readerPage} onPresentation={setPresentation}/>
-        {readerId && reader.capabilities.idea_cards && <button type="button"
-          onClick={() => beginIdea({ version_id: readerId, page_no: readerPage, anchor: { kind: "PAGE" } })}>{t("lwx.54")}</button>}
         {actorId && readerId && (reader.capabilities.accessible_text || reader.capabilities.manage_accessible_text)
           ? <AccessibleText key={`ocr:${actorId}:${readerId}`} actorId={actorId} versionId={readerId} pageCount={reader.page_count} sourcePage={readerPage}
             canRead={!!reader.capabilities.accessible_text} canManage={!!reader.capabilities.manage_accessible_text}
@@ -823,8 +826,18 @@ export function LearningWorkspace() {
               {pdfReader}
             </AccessibleText>
           : pdfReader}
+        </div>
+        <aside className={styles.readerSide} aria-label="Ghi chú và hỏi đáp">
+        {readerId && reader.capabilities.page_feedback && actorId && <StudentPageFeedback
+          key={`${actorId}:${readerId}:${readerGeneration}`} actorId={actorId} versionId={readerId}
+          versionNumber={reader.version_no} pageNo={readerPage} sourceSessionId={readerSessionId} timeZone={timeZone}
+        />}
+        {readerId && reader.capabilities.idea_cards && <button type="button"
+          onClick={() => beginIdea({ version_id: readerId, page_no: readerPage, anchor: { kind: "PAGE" } })}>{t("lwx.54")}</button>}
         <LearningDiscussion key={reader.version_id||reader.id} versionId={reader.version_id||reader.id} renditionId={reader.rendition_id} selection={selection} canManage={reader.capabilities.manage} canShareNotes={reader.publication_state === "PUBLISHED"} actorId={actorId} onSource={page=>void run(async()=>{await openVersion(reader.version_id||reader.id,page,undefined,readerSessionId);document.getElementById("learning-reader")?.focus();})} onAnnotationsChange={setAnnotations}/>
         <LearningExplanation actorId={actorId} versionId={reader.version_id||reader.id} selection={selection} available={reader.capabilities.explain===true} onSource={(id,page)=>void run(()=>openVersion(id,page))}/>
+        </aside>
+        </div>
       </section>}
       {exitTicketId && <ExitTicketDetail key={`${actorId}:${exitTicketId}`} actorId={actorId} ticketId={exitTicketId}
         staff={exitStaff} canManage={manageable} materials={materials} instructions={instructions}

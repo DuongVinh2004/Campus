@@ -73,16 +73,24 @@ class LocalStudentIdentityAdapter:
 
 class LocalCampusIdentityAdapter:
     """An unverified issuer only selects a verifier; each verifier checks its own signature."""
-    def __init__(self, owner, student, learning=None, staff=None):
+    def __init__(self, owner, student, learning=None, staff=None, directory=None):
         self.owner, self.student = owner, student
         self.learning = learning
         self.staff = staff
+        self.directory = directory if directory is not None and directory.path.is_file() else None
+        if learning is None and self.directory is None:
+            return  # nothing extra to guard; an unreadable student file must not block the owner
+        reserved = {owner.directory()["username"]}
+        if student.path.is_file():
+            reserved.add(student.directory()["username"])
+        if staff is not None and staff.path.is_file():
+            reserved.add(staff.directory()["username"])
         if learning is not None:
-            reserved = {owner.directory()["username"]}
-            if student.path.is_file():
-                reserved.add(student.directory()["username"])
             if reserved.intersection(a["username"] for a in learning.directory()["accounts"]):
                 raise ValueError("Learning accounts must not replace existing accounts")
+            reserved.update(a["username"] for a in learning.directory()["accounts"])
+        if self.directory is not None and reserved.intersection(self.directory.usernames()):
+            raise ValueError("Directory accounts must not replace existing accounts")
 
     def authenticate(self, username, password):
         if self.learning is not None and any(a["username"] == username for a in self.learning.directory()["accounts"]):
@@ -93,6 +101,8 @@ class LocalCampusIdentityAdapter:
             return self.staff.authenticate(username,password)
         if self.student.path.is_file() and username == self.student.directory()["username"]:
             return self.student.authenticate(username,password)
+        if self.directory is not None and username in self.directory.usernames():
+            return self.directory.authenticate(username, password)
         return self.owner.authenticate(username,password)
 
     def learning_directory(self):
@@ -103,6 +113,9 @@ class LocalCampusIdentityAdapter:
             if not any(row["subject_id"] == student["subject_id"] for row in rows):
                 rows.append({"subject_id": student["subject_id"], "display_name": "Sinh viên local",
                     "roles": ["STUDENT"], "is_synthetic": False})
+        if self.directory is not None:
+            known = {row["subject_id"] for row in rows}
+            rows += [row for row in self.directory.public_directory("STUDENT") if row["subject_id"] not in known]
         return rows
 
     def resolve_token(self, token):
@@ -121,6 +134,10 @@ class LocalCampusIdentityAdapter:
                 return self.staff.resolve_token(token)
         if claims.get("iss") == ISSUER and self.student.path.is_file():
             return self.student.resolve_token(token)
+        if self.directory is not None:
+            from campus247.infrastructure.identity.local_directory import ISSUER as DIRECTORY_ISSUER
+            if claims.get("iss") == DIRECTORY_ISSUER:
+                return self.directory.resolve_token(token)
         oidc = getattr(self, "oidc", None)  # set by the runtime when sign-in with the university account is configured
         if oidc is not None:
             from campus247.infrastructure.identity.oidc_session import ISSUER as OIDC_ISSUER

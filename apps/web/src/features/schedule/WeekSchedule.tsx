@@ -1,6 +1,7 @@
 "use client";
 
 import { useT, type MessageKey } from "@/lib/i18n";
+import { IconButton } from "@/components/shared/IconButton";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertCircle,
@@ -383,15 +384,7 @@ export function WeekSchedule() {
           {/* Thanh điều hướng tuần */}
           <div className="campus-panel flex flex-wrap items-center justify-between gap-4 p-4">
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                data-testid="week-prev"
-                onClick={handlePrevWeek}
-                className="inline-flex min-h-[44px] items-center gap-1 rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-              >
-                <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
-                {t("week.12")}
-              </button>
+              <IconButton label={t("week.12")} variant="outline" icon={<ChevronLeft size={18} />} data-testid="week-prev" onClick={handlePrevWeek} />
               <button
                 type="button"
                 data-testid="week-today"
@@ -400,15 +393,7 @@ export function WeekSchedule() {
               >
                 {t("week.4")}
               </button>
-              <button
-                type="button"
-                data-testid="week-next"
-                onClick={handleNextWeek}
-                className="inline-flex min-h-[44px] items-center gap-1 rounded-lg border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-              >
-                {t("week.13")}
-                <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-              </button>
+              <IconButton label={t("week.13")} variant="outline" icon={<ChevronRight size={18} />} data-testid="week-next" onClick={handleNextWeek} />
             </div>
 
             <div className="text-sm font-semibold text-[var(--text-primary)] sm:text-base">
@@ -579,23 +564,9 @@ export function WeekSchedule() {
                                       </div>
                                     </div>
                                   ) : (
-                                    <div className="mt-2 flex items-center justify-end gap-2 border-t border-[var(--border-color)] pt-2">
-                                      <button
-                                        type="button"
-                                        onClick={(e) => openEditDialog(item, e)}
-                                        className="inline-flex min-h-[44px] items-center gap-1 rounded border border-[var(--border-color)] bg-[var(--surface-card)] px-2.5 py-1 text-xs font-medium text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
-                                      >
-                                        <Edit2 className="h-3 w-3 shrink-0" aria-hidden="true" />
-                                        {t("week.21")}
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => setDeletingId(item.id)}
-                                        className="inline-flex min-h-[44px] items-center gap-1 rounded border border-[var(--border-color)] bg-[var(--surface-card)] px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-[var(--surface-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]"
-                                      >
-                                        <Trash2 className="h-3 w-3 shrink-0" aria-hidden="true" />
-                                        {t("week.22")}
-                                      </button>
+                                    <div className="mt-2 flex items-center justify-end gap-1 border-t border-[var(--border-color)] pt-2">
+                                      <IconButton label={t("week.21")} icon={<Edit2 size={16} />} onClick={(e) => openEditDialog(item, e)} />
+                                      <IconButton label={t("week.22")} variant="danger" icon={<Trash2 size={16} />} onClick={() => setDeletingId(item.id)} />
                                     </div>
                                   )}
                                 </>
