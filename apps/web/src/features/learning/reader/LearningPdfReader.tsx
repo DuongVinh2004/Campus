@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import type { PDFDocumentProxy, RenderTask, TouchManager } from "pdfjs-dist";
 import type { PDFViewer, PDFLinkService, PDFFindController, EventBus } from "pdfjs-dist/web/pdf_viewer.mjs";
 import "pdfjs-dist/web/pdf_viewer.css";
+import { PanelLeft, LayoutGrid, ListTree, Bookmark, BookmarkPlus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Minus, Plus, MoveHorizontal, Scan, RotateCw, Maximize, Minimize, Search, Download, BoxSelect, StickyNote, Rows3, Columns2, File as FileIcon, X } from "lucide-react";
 import "./learning-reader.css";
 import { rectFromClient, rotateAnchorRect, type ReaderAnnotation, type ReaderSelection } from "./reader-anchors";
 import { authenticatedPdfRange } from "./authenticated-range";
@@ -82,6 +83,10 @@ export function normalizeReaderState(state: Partial<ReaderState> | null | undefi
   };
 }
 
+function IconButton({ label, children, pressed, ...rest }: { label: string; children: React.ReactNode; pressed?: boolean } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "aria-label" | "title">) {
+  return <button type="button" className="lpr-btn" aria-label={label} title={label} aria-pressed={pressed} {...rest}>{children}</button>;
+}
+
 function PageThumbnail({ doc, pageNo, selected, onSelect }: { doc: PDFDocumentProxy; pageNo: number; selected: boolean; onSelect: () => void }) {
   const t = useT();
   const button = useRef<HTMLButtonElement>(null), canvas = useRef<HTMLCanvasElement>(null);
@@ -129,7 +134,7 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
   const [regionMode, setRegionMode] = useState(false), [selection, setSelection] = useState<ReaderSelection | null>(null);
   const [paint, setPaint] = useState(0);
   const [following,setFollowing]=useState(false);
-  const [toolsExpanded, setToolsExpanded] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const drag = useRef<{page:HTMLElement; x:number; y:number; pointer:number} | null>(null);
 
   useEffect(() => {
@@ -368,27 +373,61 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
     }
   }
 
-  return <section ref={shell} className={`learning-pdf-reader ${focused ? "learning-reader-focused" : ""} ${toolsExpanded ? "learning-reader-tools-expanded" : ""} ${className}`} aria-label={t("pdfx.65", { v: version.title })}>
-    <div className="learning-reader-title"><strong>{version.title}</strong><span>{count > 0 ? `${count} trang` : "PDF"}</span></div>
-    <div className="learning-reader-toolbar" role="toolbar" aria-label={t("pdfx.10")}>
-      <button type="button" onClick={() => setSidebar(sidebar === "pages" ? null : "pages")} aria-pressed={sidebar === "pages"}>{t("pdfx.11")}</button>
-      <button type="button" onClick={() => setSidebar(sidebar === "outline" ? null : "outline")} aria-pressed={sidebar === "outline"}>{t("pdfx.12")}</button>
-      <button type="button" onClick={() => setSidebar(sidebar === "bookmarks" ? null : "bookmarks")} aria-pressed={sidebar === "bookmarks"}>{t("pdfx.13")}</button>
-      <label>{t("pdfx.14")} <select aria-label={t("pdfx.15")} value={mode} disabled={!ready} onChange={e => changeMode(e.target.value as ReaderState["scroll_mode"])}><option value="vertical">{t("pdfx.16")}</option><option value="horizontal">{t("pdfx.17")}</option><option value="page">{t("pdfx.18")}</option></select></label>
-      <button type="button" className="learning-reader-primary-control" aria-label={t("pdfx.19")} disabled={!ready || current <= 1} onClick={() => go(current - 1)}>‹</button>
-      <label>{t("pdfx.68")} <input aria-label={t("pdfx.21")} type="number" min={1} max={count || 1} value={current} disabled={!ready} onChange={e => { if (e.target.value) go(Number(e.target.value)); }} /></label><span>/ {count || "—"}</span>
-      <button type="button" className="learning-reader-primary-control" aria-label={t("pdfx.20")} disabled={!ready || current >= count} onClick={() => go(current + 1)}>›</button>
-      <button type="button" className="learning-reader-primary-control" aria-label={t("pdfx.22")} disabled={!ready} onClick={() => zoom(scale - 0.25)}>−</button><output aria-label={t("pdfx.23")}>{Math.round(scale * 100)}%</output>
-      <button type="button" className="learning-reader-primary-control" aria-label={t("pdfx.24")} disabled={!ready} onClick={() => zoom(scale + 0.25)}>+</button>
-      <button type="button" className="learning-reader-primary-control" disabled={!ready} onClick={() => zoom("page-width")}>{t("pdfx.25")}</button><button type="button" disabled={!ready} onClick={() => zoom("page-fit")}>{t("pdfx.26")}</button>
-      <button type="button" className="learning-reader-tools-toggle learning-reader-primary-control" aria-expanded={toolsExpanded} onClick={() => setToolsExpanded(value => !value)}>{toolsExpanded ? t("pdfx.27") : t("pdfx.28")}</button>
-      <button type="button" disabled={!ready} onClick={() => { if (runtime.current) runtime.current.viewer.pagesRotation = (runtime.current.viewer.pagesRotation + 90) % 360; }}>Xoay</button>
-      <button type="button" onClick={() => void fullscreen()} aria-pressed={focused}>{focused ? t("pdfx.29") : t("pdfx.30")}</button>
-      {onBookmark && <button type="button" disabled={!ready || bookmarkSaving} onClick={() => void bookmark()}>{t("pdfx.31")}</button>}
-      {onSelection && <><button type="button" disabled={!ready} aria-pressed={regionMode} onClick={()=>{setRegionMode(v=>!v);setSelection(null);}}>{t("pdfx.32")}</button><button type="button" disabled={!ready} onClick={()=>onSelection({version_id:version.version_id,page_no:current,anchor:{kind:'PAGE'}})}>{t("pdfx.33")}</button></>}
-      {(version.download_allowed ?? version.capabilities?.download) && <a href={version.download_path ?? version.content_path.replace(/\/content$/, "/download")} download>{t("pdfx.34")}</a>}
+  const downloadHref = (version.download_allowed ?? version.capabilities?.download) ? (version.download_path ?? version.content_path.replace(/\/content$/, "/download")) : null;
+  const openSidebar = (tab: "pages" | "outline" | "bookmarks") => setSidebar(sidebar === tab ? null : tab);
+  const viewModes: { id: ReaderState["scroll_mode"]; label: string; icon: React.ReactNode }[] = [
+    { id: "vertical", label: t("pdfx.16"), icon: <Rows3 size={17} aria-hidden="true" /> },
+    { id: "horizontal", label: t("pdfx.17"), icon: <Columns2 size={17} aria-hidden="true" /> },
+    { id: "page", label: t("pdfx.18"), icon: <FileIcon size={17} aria-hidden="true" /> },
+  ];
+
+  return <section ref={shell} className={`learning-pdf-reader ${focused ? "learning-reader-focused" : ""} ${className}`} aria-label={t("pdfx.65", { v: version.title })}>
+    <div className="lpr-bar" role="toolbar" aria-label={t("pdfx.10")}>
+      <div className="lpr-group">
+        <IconButton label={t("pdfx.51")} pressed={sidebar !== null} onClick={() => setSidebar(sidebar ? null : "pages")}><PanelLeft size={18} aria-hidden="true" /></IconButton>
+      </div>
+      <div className="lpr-title"><strong>{version.title}</strong><span>{count > 0 ? `${count} trang` : "PDF"}</span></div>
+      <div className="lpr-group">
+        <IconButton label={t("pdfx.35")} pressed={searchOpen} onClick={() => setSearchOpen(value => !value)}><Search size={18} aria-hidden="true" /></IconButton>
+        {onBookmark && <IconButton label={t("pdfx.31")} disabled={!ready || bookmarkSaving} onClick={() => void bookmark()}><BookmarkPlus size={18} aria-hidden="true" /></IconButton>}
+        {onSelection && <>
+          <span className="lpr-divider" aria-hidden="true" />
+          <IconButton label={t("pdfx.32")} pressed={regionMode} disabled={!ready} onClick={() => { setRegionMode(v => !v); setSelection(null); }}><BoxSelect size={18} aria-hidden="true" /></IconButton>
+          <IconButton label={t("pdfx.33")} disabled={!ready} onClick={() => onSelection({ version_id: version.version_id, page_no: current, anchor: { kind: "PAGE" } })}><StickyNote size={18} aria-hidden="true" /></IconButton>
+        </>}
+        <span className="lpr-divider" aria-hidden="true" />
+        {downloadHref && <a className="lpr-btn" href={downloadHref} download aria-label={t("pdfx.34")} title={t("pdfx.34")}><Download size={18} aria-hidden="true" /></a>}
+        <IconButton label={focused ? t("pdfx.29") : t("pdfx.30")} pressed={focused} onClick={() => void fullscreen()}>{focused ? <Minimize size={18} aria-hidden="true" /> : <Maximize size={18} aria-hidden="true" />}</IconButton>
+      </div>
     </div>
-    <form className="learning-reader-search" onSubmit={e => { e.preventDefault(); search(); }}><label>{t("pdfx.35")} <input aria-label={t("pdfx.35")} value={query} onChange={e => setQuery(e.target.value)} /></label><button type="submit" disabled={!ready || !query.trim()}>{t("pdfx.36")}</button><button type="button" disabled={!ready || !query.trim()} onClick={() => search(true)}>{t("pdfx.37")}</button><span role="status">{matches}</span></form>
+    <div className="lpr-viewbar">
+      <div className="lpr-group">
+        <IconButton label={t("pdfx.19")} disabled={!ready || current <= 1} onClick={() => go(current - 1)}><ChevronLeft size={18} aria-hidden="true" /></IconButton>
+        <input className="lpr-page-input" aria-label={t("pdfx.21")} type="number" min={1} max={count || 1} value={current} disabled={!ready} onChange={e => { if (e.target.value) go(Number(e.target.value)); }} />
+        <span className="lpr-count">/ {count || "—"}</span>
+        <IconButton label={t("pdfx.20")} disabled={!ready || current >= count} onClick={() => go(current + 1)}><ChevronRight size={18} aria-hidden="true" /></IconButton>
+      </div>
+      <span className="lpr-divider" aria-hidden="true" />
+      <div className="lpr-group">
+        <IconButton label={t("pdfx.22")} disabled={!ready} onClick={() => zoom(scale - 0.25)}><Minus size={17} aria-hidden="true" /></IconButton>
+        <output className="lpr-zoom" aria-label={t("pdfx.23")}>{Math.round(scale * 100)}%</output>
+        <IconButton label={t("pdfx.24")} disabled={!ready} onClick={() => zoom(scale + 0.25)}><Plus size={17} aria-hidden="true" /></IconButton>
+        <IconButton label={t("pdfx.25")} disabled={!ready} onClick={() => zoom("page-width")}><MoveHorizontal size={17} aria-hidden="true" /></IconButton>
+        <IconButton label={t("pdfx.26")} disabled={!ready} onClick={() => zoom("page-fit")}><Scan size={17} aria-hidden="true" /></IconButton>
+      </div>
+      <span className="lpr-divider" aria-hidden="true" />
+      <div className="lpr-group" role="group" aria-label={t("pdfx.15")}>
+        {viewModes.map(item => <IconButton key={item.id} label={item.label} pressed={mode === item.id} disabled={!ready} onClick={() => changeMode(item.id)}>{item.icon}</IconButton>)}
+        <IconButton label="Xoay" disabled={!ready} onClick={() => { if (runtime.current) runtime.current.viewer.pagesRotation = (runtime.current.viewer.pagesRotation + 90) % 360; }}><RotateCw size={17} aria-hidden="true" /></IconButton>
+      </div>
+    </div>
+    {searchOpen && <form className="lpr-search" role="search" onSubmit={e => { e.preventDefault(); search(); }}>
+      <Search size={16} aria-hidden="true" />
+      <input aria-label={t("pdfx.35")} placeholder={t("pdfx.35")} value={query} onChange={e => setQuery(e.target.value)} autoFocus />
+      <span role="status" className="lpr-matches">{matches}</span>
+      <IconButton label={t("pdfx.37")} disabled={!ready || !query.trim()} onClick={() => search(true)}><ChevronUp size={17} aria-hidden="true" /></IconButton>
+      <IconButton label={t("pdfx.36")} type="submit" disabled={!ready || !query.trim()}><ChevronDown size={17} aria-hidden="true" /></IconButton>
+    </form>}
     {version.has_text_layer === false && <p className="learning-reader-notice">{t("pdfx.38")}</p>}
     {status && <p className="learning-reader-notice" role="status">{status}</p>}
     {rangePaused && <div className="learning-reader-notice" role="status">
@@ -396,22 +435,31 @@ export function LearningPdfReader({ version, initialState, bookmarks = [], onSta
       <button type="button" onClick={() => retryRange.current?.()}>{t("pdfx.40")}</button>
     </div>}
     {error && <div role="alert" className="learning-reader-notice"><p>{error}</p><button type="button" onClick={() => setRetry(v => v + 1)}>{t("pdfx.41")}</button></div>}
-    {regionMode&&<p role="status" className="learning-reader-notice">{t("pdfx.42")}</p>}
-    {selection&&<div className="learning-reader-selection" role="status"><span>{t("pdfx.70", { p: selection.page_no })}: {selection.anchor.text_quote?.exact.slice(0,120)??t("pdfx.43")}</span><button type="button" onClick={()=>{onSelection?.(selection);setSelection(null);}}>{t("pdfx.44")}</button>{onIdeaSelection && <button type="button" onClick={() => { onIdeaSelection(selection); setSelection(null); }}>{t("pdfx.45")}</button>}<button type="button" onClick={()=>setSelection(null)}>{t("pdfx.46")}</button></div>}
-    {presentation&&presentation.active!==false&&<div className="learning-reader-selection"><span>{presentation.version_id!==version.version_id?t("pdfx.47"):following?t("pdfx.66", { p: presentation.page_no }):t("pdfx.67", { p: presentation.page_no })}</span><button type="button" disabled={!ready||presentation.version_id!==version.version_id} onClick={following?stopFollowing:startFollowing}>{following?t("pdfx.48"):personalPosition.current?t("pdfx.49"):t("pdfx.50")}</button></div>}
+    {regionMode && <p role="status" className="learning-reader-notice">{t("pdfx.42")}</p>}
+    {selection && <div className="learning-reader-selection" role="status"><span>{t("pdfx.70", { p: selection.page_no })}: {selection.anchor.text_quote?.exact.slice(0, 120) ?? t("pdfx.43")}</span><button type="button" onClick={() => { onSelection?.(selection); setSelection(null); }}>{t("pdfx.44")}</button>{onIdeaSelection && <button type="button" onClick={() => { onIdeaSelection(selection); setSelection(null); }}>{t("pdfx.45")}</button>}<button type="button" onClick={() => setSelection(null)}>{t("pdfx.46")}</button></div>}
+    {presentation && presentation.active !== false && <div className="learning-reader-selection"><span>{presentation.version_id !== version.version_id ? t("pdfx.47") : following ? t("pdfx.66", { p: presentation.page_no }) : t("pdfx.67", { p: presentation.page_no })}</span><button type="button" disabled={!ready || presentation.version_id !== version.version_id} onClick={following ? stopFollowing : startFollowing}>{following ? t("pdfx.48") : personalPosition.current ? t("pdfx.49") : t("pdfx.50")}</button></div>}
     <div className="learning-reader-body">
-      {sidebar && <aside className="learning-reader-sidebar" aria-label={t("pdfx.51")}><button type="button" onClick={() => setSidebar(null)}>{t("pdfx.52")}</button>
-        {sidebar === "pages" && doc && Array.from({ length: count }, (_, i) => <PageThumbnail key={i} doc={doc} pageNo={i + 1} selected={current === i + 1} onSelect={() => go(i + 1)} />)}
-        {sidebar === "outline" && (outline.length ? outline.map((entry, i) => <button type="button" key={i} style={{ paddingInlineStart: `${8 + entry.depth * 12}px` }} onClick={() => { if (entry.dest) void runtime.current?.links.goToDestination(entry.dest); }}>{entry.title}</button>) : <p>{t("pdfx.53")}</p>)}
-        {sidebar === "bookmarks" && <>
-          {bookmarks.length ? bookmarks.map(mark => <button type="button" key={mark.id} onClick={() => go(mark.page_no)}>{mark.label || t("pdfx.69", { p: mark.page_no })}</button>) : <p>{t("pdfx.54")}</p>}
-          {onBookmark && <form className="learning-reader-bookmark-form" onSubmit={event => { event.preventDefault(); void bookmark(bookmarkLabel); }}>
-            <label>{t("pdfx.55")}<input maxLength={500} value={bookmarkLabel} onChange={event => setBookmarkLabel(event.target.value)} /></label>
-            <button type="submit" disabled={!ready || bookmarkSaving}>{t("pdfx.56")}</button>
-          </form>}
-        </>}
+      {sidebar && <aside className="learning-reader-sidebar" aria-label={t("pdfx.51")}>
+        <div className="lpr-side-tabs">
+          <IconButton label={t("pdfx.11")} pressed={sidebar === "pages"} onClick={() => openSidebar("pages")}><LayoutGrid size={17} aria-hidden="true" /></IconButton>
+          <IconButton label={t("pdfx.12")} pressed={sidebar === "outline"} onClick={() => openSidebar("outline")}><ListTree size={17} aria-hidden="true" /></IconButton>
+          <IconButton label={t("pdfx.13")} pressed={sidebar === "bookmarks"} onClick={() => openSidebar("bookmarks")}><Bookmark size={17} aria-hidden="true" /></IconButton>
+          <span className="lpr-spacer" />
+          <IconButton label={t("pdfx.52")} onClick={() => setSidebar(null)}><X size={17} aria-hidden="true" /></IconButton>
+        </div>
+        <div className="lpr-side-list">
+          {sidebar === "pages" && doc && Array.from({ length: count }, (_, i) => <PageThumbnail key={i} doc={doc} pageNo={i + 1} selected={current === i + 1} onSelect={() => go(i + 1)} />)}
+          {sidebar === "outline" && (outline.length ? outline.map((entry, i) => <button type="button" className="lpr-side-item" key={i} style={{ paddingInlineStart: `${10 + entry.depth * 14}px` }} onClick={() => { if (entry.dest) void runtime.current?.links.goToDestination(entry.dest); }}>{entry.title}</button>) : <p className="lpr-side-empty">{t("pdfx.53")}</p>)}
+          {sidebar === "bookmarks" && <>
+            {bookmarks.length ? bookmarks.map(mark => <button type="button" className="lpr-side-item" key={mark.id} onClick={() => go(mark.page_no)}><Bookmark size={14} aria-hidden="true" /> {mark.label || t("pdfx.69", { p: mark.page_no })}</button>) : <p className="lpr-side-empty">{t("pdfx.54")}</p>}
+            {onBookmark && <form className="learning-reader-bookmark-form" onSubmit={event => { event.preventDefault(); void bookmark(bookmarkLabel); }}>
+              <label>{t("pdfx.55")}<input maxLength={500} value={bookmarkLabel} onChange={event => setBookmarkLabel(event.target.value)} /></label>
+              <button type="submit" disabled={!ready || bookmarkSaving}>{t("pdfx.56")}</button>
+            </form>}
+          </>}
+        </div>
       </aside>}
-      <div ref={container} className={`learning-reader-viewport ${regionMode?'learning-reader-region-mode':''}`} data-testid="learning-pdf-viewport" onMouseUp={captureTextSelection} onKeyUp={captureTextSelection} onPointerDown={regionStart} onPointerUp={regionEnd} onPointerCancel={()=>{drag.current=null;}}><div ref={pages} className="pdfViewer" /></div>
+      <div ref={container} className={`learning-reader-viewport ${regionMode ? "learning-reader-region-mode" : ""}`} data-testid="learning-pdf-viewport" onMouseUp={captureTextSelection} onKeyUp={captureTextSelection} onPointerDown={regionStart} onPointerUp={regionEnd} onPointerCancel={() => { drag.current = null; }}><div ref={pages} className="pdfViewer" /></div>
     </div>
     <AccessibleDialog open={externalUrl !== null} onClose={() => setExternalUrl(null)} labelledBy="learning-external-link-title" className={styles.dialog}>
       <h3 id="learning-external-link-title">{t("pdfx.57")}</h3>

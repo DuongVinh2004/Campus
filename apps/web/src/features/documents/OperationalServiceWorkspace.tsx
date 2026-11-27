@@ -20,6 +20,13 @@ type Pending = { preview_id: string; confirmation_token: string; client_id: stri
 const titles: Record<Kind, string> = { STUDENT_CERTIFICATE: "Giấy xác nhận sinh viên đang học", GRADE_APPEAL: "Phúc khảo kết quả học tập", GENERAL_SUPPORT: "Hỗ trợ thủ tục học vụ" };
 const blank = (kind: Kind): Form => ({ kind, purpose: "", recipient: "", course: "", reason: "" });
 const endpoint = "/v1/student-preparations";
+const SENT_KEY = "campus:sent-drafts";
+function readSentDrafts(): Record<string, string> {
+  try { const value = JSON.parse(window.localStorage.getItem(SENT_KEY) || "{}"); return value && typeof value === "object" ? value : {}; } catch { return {}; }
+}
+function writeSentDrafts(value: Record<string, string>) {
+  try { window.localStorage.setItem(SENT_KEY, JSON.stringify(value)); } catch { /* private mode: the badge is session-only */ }
+}
 
 export function OperationalServiceWorkspace({ history = false }: { history?: boolean }) {
   const t = useT();
@@ -59,6 +66,9 @@ function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope:
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [submitResult, setSubmitResult] = useState<{ ok: boolean; message: string; ticketId?: string } | null>(null);
   const [ticketsRefresh, setTicketsRefresh] = useState(0);
+  // A draft stays on file after it is sent (the server has no draft deletion), so remember which version went out.
+  const [sent, setSent] = useState<Record<string, string>>({});
+  useEffect(() => { setSent(readSentDrafts()); }, []);
   const formPanel = useRef<HTMLElement>(null);
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
@@ -152,6 +162,7 @@ function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope:
         .filter(([, value]) => value.trim()).map(([key, value]) => [key, value.trim()]));
       const ticket = await ticketsApi.submit({ service_kind: row.form.kind as ServiceKind, title: titles[row.form.kind], summary, fields }, `draft-${row.id}-v${row.version}`);
       setSubmitResult({ ok: true, message: `Đã gửi hồ sơ ${ticket.code} đến bộ phận Một cửa. Theo dõi tiến trình ở mục “Hồ sơ đã gửi” bên dưới.`, ticketId: ticket.id });
+      setSent(current => { const next = { ...current, [`${row.id}-v${row.version}`]: ticket.code }; writeSentDrafts(next); return next; });
       setTicketsRefresh(value => value + 1);
       window.dispatchEvent(new Event("campus:notifications-changed"));
     } catch (e) {
@@ -238,7 +249,9 @@ function ServiceContent({ history, ownerScope }: { history: boolean; ownerScope:
                 </button>
                 {OPS_ENABLED && (
                   <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
-                    {confirmSubmitId === row.id ? (
+                    {sent[`${row.id}-v${row.version}`] ? (
+                      <span className="text-sm text-[var(--color-success)]" role="status" data-testid={`draft-sent-${row.id}`}>Đã gửi hồ sơ {sent[`${row.id}-v${row.version}`]}</span>
+                    ) : confirmSubmitId === row.id ? (
                       <>
                         <span className="text-sm text-[var(--text-secondary)]" role="status">{t("osw.12")}</span>
                         <button type="button" className="fluent-btn-primary min-h-[44px]" data-testid={`draft-submit-confirm-${row.id}`} disabled={submittingId === row.id} onClick={() => void submitDraft(row)}>

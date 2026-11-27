@@ -409,8 +409,12 @@ async def make_app(*, generation=False, frontend_port=None, rehearsal=None, lear
             postgres_pool=pool, verified_database_name=verified_learning_database, verified_schema_revision=verified_learning_revision)
     from campus247.infrastructure.identity.local_staff import LocalStaffIdentityAdapter
     staff_adapter = LocalStaffIdentityAdapter(checked_path(identity_root / "staff-identity.json", ROOT), TENANT)
+    from campus247.infrastructure.identity.local_directory import LocalDirectoryIdentityAdapter
+    # Simulated demo semester accounts (students, support officers); absent file = no extra accounts.
+    directory_adapter = LocalDirectoryIdentityAdapter(checked_path(identity_root / "campus-directory.json", ROOT), TENANT)
     campus_adapter = LocalCampusIdentityAdapter(owner_adapter,
-        LocalStudentIdentityAdapter(checked_path(student_path, ROOT), TENANT), learning=learning_adapter, staff=staff_adapter)
+        LocalStudentIdentityAdapter(checked_path(student_path, ROOT), TENANT), learning=learning_adapter, staff=staff_adapter,
+        directory=directory_adapter)
     if learning_service is not None:
         learning_service.directory = campus_adapter.learning_directory
     from campus247.infrastructure.repositories.sqlite_actor_state import SQLiteActorStateStore
