@@ -36,6 +36,10 @@ updates:
 
   - package-ecosystem: uv # pyproject.toml + uv.lock (runtime dependencies are exact-pinned)
     directory: /
+    # A change of Python packages needs the owner to approve the new uv.lock, so a release waits two weeks before it is
+    # proposed. Security updates are not delayed.
+    cooldown:
+      default-days: 14
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
